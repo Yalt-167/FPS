@@ -21,7 +21,9 @@ public class PlayerCombat : MonoBehaviour
 
     #endregion
 
-    [SerializeField] private GameObject ShotTrail;
+    [SerializeField] private GameObject landingShotEffect;
+    [SerializeField] private float hitEffectLifetime;
+
 
     #region Katana Setup
 
@@ -92,11 +94,7 @@ public class PlayerCombat : MonoBehaviour
                 shootableComponent.ReactShot(hit.point, cameraTransform.forward);
             }
 
-            Instantiate(ShotTrail, transform.position, Quaternion.identity).GetComponent<BulletTrail>().Set(transform.position, hit.point);
-        }
-        else
-        {
-            Instantiate(ShotTrail, transform.position, Quaternion.identity).GetComponent<BulletTrail>().Set(transform.position, cameraTransform.forward * 10);
+            Destroy(Instantiate(landingShotEffect, hit.point - cameraTransform.forward * .1f, Quaternion.identity), hitEffectLifetime) ;
         }
 
         StartCoroutine(ShootingCooldown());
