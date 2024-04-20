@@ -30,7 +30,7 @@ public class PlayerMovement : MonoBehaviour, IEntity
     public bool IsJumping { get; private set; } = false;
     public bool IsGrappling { get; private set; } = false;
     public bool IsGrounded => isCollidingDown;
-    
+
 
 
     [Space(10)]
@@ -82,12 +82,12 @@ public class PlayerMovement : MonoBehaviour, IEntity
     private Vector3 ceilingCheckOffset = new(0f, .55f, 0f);
     private Vector3 groundCheckOffset = new(0f, -.7f, 0f);
 
-    
+
     public LayerMask limits;
 
 
     private Vector3 bodyCheckSize = new(1.1f, 1f, 1.1f);
-    
+
 
     // already colliding (while the functions are real time checks
     private bool isCollidingDown = false;
@@ -110,7 +110,7 @@ public class PlayerMovement : MonoBehaviour, IEntity
     private float timeLeftGround;
     [SerializeField] private float initialJumpSpeedBoost;
     [SerializeField] private float slideIntoJumpVelocityBoost;
-    
+
     [SerializeField] private float terminalVelocity = -75f;
 
     private readonly float coyoteTimeThreshold = .1f;
@@ -157,6 +157,8 @@ public class PlayerMovement : MonoBehaviour, IEntity
     [SerializeField] private float dashIntoSlideVelocityBoost;
     private bool InSlideJumpBoostWindow => timeFinishedSliding + slideJumpBoostWindow > Time.time;
 
+    [SerializeField] private float slideCameraHeightAdjustmentDuration = .3f;
+
     #endregion
 
     #region Wallrun && WallJump Setup
@@ -200,12 +202,16 @@ public class PlayerMovement : MonoBehaviour, IEntity
     //private Coroutine adjustCameraTiltCoroutine;
     
     private Transform cameraRoot;
-    private Vector3[] cameraPositions = new Vector3[2] { new(0f, .6f, 0f), new(0f, 2f, -5f) };
-    private int currentCameraPositionIndex = 0;
+    private Vector3[] cameraRootPosition = new Vector3[2] { new(0f, .6f, 0f), new(0f, 2f, -5f) };
+    private int currentCameraRootPositionIndex = 0;
+
+    private float cameraTransformBaseHeight = .6f;
+    private float cameraTransformSlidingHeight = .3f;
+
 
     #endregion
 
- // actual code 
+    // actual code 
 
     #region Collision Handling
 
@@ -269,8 +275,7 @@ public class PlayerMovement : MonoBehaviour, IEntity
 
     private void SwitchCameraPosition()
     {
-        currentCameraPositionIndex++;
-        cameraRoot.localPosition = cameraPositions[currentCameraPositionIndex % 2];
+        cameraRoot.localPosition = cameraRootPosition[++currentCameraRootPositionIndex % 2];
     }
 
     #endregion
@@ -294,7 +299,7 @@ public class PlayerMovement : MonoBehaviour, IEntity
         upperLedgeClimbCheck = BoxCasterManager.Instance.RetrieveBoxCasterFromInstance(BoxCasterInstances.LEGDE_CLIMB_UPPER_CHECK);
         lowerLedgeClimbCheck = BoxCasterManager.Instance.RetrieveBoxCasterFromInstance(BoxCasterInstances.LEGDE_CLIMB_LOWER_CHECK);
 
-        cameraRoot.localPosition = cameraPositions[0];
+        cameraRoot.localPosition = cameraRootPosition[0];
         SetMovementMode(MovementMode.RUN);
     }
 
@@ -446,7 +451,7 @@ public class PlayerMovement : MonoBehaviour, IEntity
             
         horizontalVelocityBoost.y = 0f; // just in case (bc of that: Rigidbody.velocity.normalized) (even though it s reset in CommonJumpStart() I had issues with it so better safe than sorry
 
-        Rigidbody.velocity += (awayFromWall ? upwardWallJumpForceAwayFromWall : upwardWallJumpForce);
+        Rigidbody.AddForce(awayFromWall ? upwardWallJumpForceAwayFromWall : upwardWallJumpForce, ForceMode.Impulse);
 
         StartCoroutine(ResetJumping());
     }
@@ -561,10 +566,8 @@ public class PlayerMovement : MonoBehaviour, IEntity
         // dumb shit
         //{
 
-
         //float xVelocityComponent = wantedMoveVec.x == 0f ? sidewayInertiaControlFactor : (Mathf.Sign(wantedMoveVec.x) != Mathf.Sign(transform.InverseTransformDirection(Rigidbody.velocity).x)) ? 0f : 1f;
         //float zVelocityComponent = Mathf.Sign(wantedMoveVec.y) != Mathf.Sign(transform.InverseTransformDirection(Rigidbody.velocity).z) ? 0f : 1f;
-
 
         //Rigidbody.velocity = transform.TransformDirection(transform.InverseTransformDirection(Rigidbody.velocity).Mask(wantedMoveVec.x == 0f ? sidewayInertiaControlFactor : (Mathf.Sign(wantedMoveVec.x) != Mathf.Sign(transform.InverseTransformDirection(Rigidbody.velocity).x)) ? 0f : 1f, 0f, Mathf.Sign(wantedMoveVec.y) != Mathf.Sign(transform.InverseTransformDirection(Rigidbody.velocity).z) ? 0f : 1f));
         //}
@@ -615,7 +618,9 @@ public class PlayerMovement : MonoBehaviour, IEntity
                 :
                 transform.TransformDirection(dir)).normalized;
 
-        cameraRoot.localPosition = new(cameraRoot.localPosition.x, .5f * cameraRoot.localPosition.y, cameraRoot.localPosition.z);
+        //StartCoroutine(LerpCameraHeight(false));
+        cameraRoot.localPosition = cameraRoot.localPosition.Mask(1f, .5f, 1f);
+        //new(cameraRoot.localPosition.x, .5f * cameraRoot.localPosition.y, cameraRoot.localPosition.z);
         var dashed = false;
 
         yield return new WaitUntil(() =>
@@ -637,7 +642,9 @@ public class PlayerMovement : MonoBehaviour, IEntity
                 ;
         });
 
-        cameraRoot.localPosition = new(cameraRoot.localPosition.x, 2f * cameraRoot.localPosition.y, cameraRoot.localPosition.z);
+        //StartCoroutine(LerpCameraHeight(true));
+        cameraRoot.localPosition = cameraRoot.localPosition.Mask(1f, 2f, 1f);
+        //new(cameraRoot.localPosition.x, 2f * cameraRoot.localPosition.y, cameraRoot.localPosition.z);
         if (dashed)
         {
             CommonSlideExit(MovementMode.DASH);
@@ -656,6 +663,21 @@ public class PlayerMovement : MonoBehaviour, IEntity
         CapsuleCollider.height *= 2;
         timeStoppedSlide = Time.time;
         SetMovementMode(newMovementMode);
+    }
+
+    private IEnumerator LerpCameraHeight(bool isReset)
+    {
+        var startingPoint = cameraRoot.localPosition.y;
+        var goal = isReset ? cameraTransformBaseHeight : cameraTransformSlidingHeight;
+        var upperBound = Mathf.Max(startingPoint, goal);
+        var lowerBound = Mathf.Min(startingPoint, goal);
+        var elapsedTime = 0f;
+        while (elapsedTime < slideCameraHeightAdjustmentDuration)
+        {
+            cameraRoot.localPosition = new(cameraRoot.localPosition.x, Mathf.Lerp(lowerBound, upperBound, elapsedTime / slideCameraHeightAdjustmentDuration), cameraRoot.localPosition.z);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
     }
 
     #endregion
