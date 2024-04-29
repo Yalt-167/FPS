@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 [DefaultExecutionOrder(-7)]
@@ -975,6 +976,7 @@ public class PlayerMovement : MonoBehaviour, IEntity
     {
         currentExternalVelocityBoost += force;
     }
+
 
     private void OnDrawGizmosSelected()
     {
