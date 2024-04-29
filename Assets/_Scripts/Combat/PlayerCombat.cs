@@ -41,7 +41,8 @@ public class PlayerCombat : MonoBehaviour
 
     private void Awake()
     {
-        cameraTransform = Camera.main.transform;
+        //cameraTransform = Camera.main.transform;
+        cameraTransform = transform.GetChild(0).GetChild(0);
         InputQuery.Init();
         katanaChecks = new BoxCaster[]
         {
@@ -178,3 +179,5 @@ public class PlayerCombat : MonoBehaviour
 }
 
 // bullet bounce??
+
+

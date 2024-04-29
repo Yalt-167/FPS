@@ -1,10 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Net.WebSockets;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Rendering;
 
 [DefaultExecutionOrder(-7)]
 public class PlayerMovement : MonoBehaviour, IEntity
@@ -1039,6 +1036,8 @@ public enum MovementMode
 // fiox the bug when jumping left/right forever untils it keeps one or the other direction even though I press the
 // other
 
+# region Debug
+
 [Serializable]
 public struct VelocityDebug
 {
@@ -1075,5 +1074,5 @@ public struct CollisionDebug
     }
 }
 
-
+#endregion
 

@@ -21,28 +21,36 @@ public class ViewBobbing : MonoBehaviour
             :
         0f;
 
-    private void Start()
+    private Coroutine bobbingCoroutine;
+
+    private void Awake()
     {
         // Store the original position of the camera
         originalPosition = cameraTransform.localPosition;
-
-        // Start the view bobbing coroutine
-        if (Game.Manager.GameSettings.viewBobbing) StartCoroutine(Bob());
     }
+
+    //private void OnEnable()
+    //{
+    //    // Start the view bobbing coroutine
+    //    if (Game.Manager.GameSettings.viewBobbing) bobbingCoroutine = StartCoroutine(Bob());
+    //}
+
+    //private void OnDisable()
+    //{
+    //    StopCoroutine(bobbingCoroutine);
+    //}
+
 
     private IEnumerator Bob()
     {
-        float timer = 0f;
+        var timer = 0f;
 
-        while (true)
+        for (; ; )
         {
-            // Calculate vertical position using a sine wave
-            float verticalOffset = Mathf.Sin(timer) * bobbingAmount;
+            var verticalOffset = Mathf.Sin(timer) * bobbingAmount;
 
-            // Apply the bobbing motion to the camera's local position
             cameraTransform.localPosition = originalPosition + new Vector3(0f, verticalOffset, 0f);
 
-            // Increment timer based on speed
             timer += BobbingSpeed * Time.deltaTime;
 
             yield return null;
