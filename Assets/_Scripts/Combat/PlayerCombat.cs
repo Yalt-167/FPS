@@ -33,7 +33,7 @@ public class PlayerCombat : MonoBehaviour
     private float lastSlashPressed;
     private bool HasBufferedSlash => lastSlashPressed + slashBuffer > Time.time;
 
-    private BoxCaster[] katanaChecks;
+    [SerializeField] private BoxCaster[] katanaChecks;
     [SerializeField] private float slashSpeed;
 
 
@@ -43,15 +43,7 @@ public class PlayerCombat : MonoBehaviour
     {
         //cameraTransform = Camera.main.transform;
         cameraTransform = transform.GetChild(0).GetChild(0);
-        InputQuery.Init();
-        katanaChecks = new BoxCaster[]
-        {
-            BoxCasterManager.Instance.RetrieveBoxCasterFromInstance(BoxCasterInstances.KATANA_LEFT_MOST),
-            BoxCasterManager.Instance.RetrieveBoxCasterFromInstance(BoxCasterInstances.KATANA_LEFT),
-            BoxCasterManager.Instance.RetrieveBoxCasterFromInstance(BoxCasterInstances.KATANA_MIDDLE),
-            BoxCasterManager.Instance.RetrieveBoxCasterFromInstance(BoxCasterInstances.KATANA_RIGHT),
-            BoxCasterManager.Instance.RetrieveBoxCasterFromInstance(BoxCasterInstances.KATANA_RIGHT_MOST),
-        };
+        InputQuery.Init(); 
     }
 
     private void Update()
@@ -64,7 +56,7 @@ public class PlayerCombat : MonoBehaviour
         {
             TryShoot(true);
         }
-        else if (InputQuery.Slash) 
+        else if (InputQuery.Slash)
         {
             TrySlash(false);
         }

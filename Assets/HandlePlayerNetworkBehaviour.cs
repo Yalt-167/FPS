@@ -12,10 +12,13 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         if (!IsOwner)
+        {
             foreach (var component in componentsToKillOnForeignPlayers)
             {
                 Destroy(component);
             }
+
+        }
     }
 
     #endregion

@@ -9,14 +9,7 @@ using UnityEngine;
 public class BoxCaster : MonoBehaviour
 {
     [SerializeField] private bool debugBox;
-    [field: SerializeField] public BoxCasterInstances Instance { get; private set; }
     [field: SerializeField] public Vector3 Size { get; private set; }
-
-
-    private void Awake()
-    {
-        BoxCasterManager.Instance.RegistedBoxCaster(this);
-    }
 
     public bool DiscardCast(LayerMask layers)
     {

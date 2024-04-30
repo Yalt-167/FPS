@@ -94,10 +94,10 @@ public class PlayerMovement : MonoBehaviour, IEntity
     private bool isCollidingLeft = false;
     private bool isCollidingOnAnySide = false;
 
-    private BoxCaster leftCheck;
-    private BoxCaster rightCheck;
-    private BoxCaster upperLedgeClimbCheck;
-    private BoxCaster lowerLedgeClimbCheck;
+    [SerializeField] private BoxCaster leftCheck;
+    [SerializeField] private BoxCaster rightCheck;
+    [SerializeField] private BoxCaster upperLedgeClimbCheck;
+    [SerializeField] private BoxCaster lowerLedgeClimbCheck;
 
     #endregion
 
@@ -291,11 +291,6 @@ public class PlayerMovement : MonoBehaviour, IEntity
         cameraRoot = transform.GetChild(0).GetComponent<Transform>();
         followRotationCamera = transform.GetChild(0).GetComponent<FollowRotationCamera>();
         cameraTransform = transform.GetChild(0);
-
-        rightCheck = BoxCasterManager.Instance.RetrieveBoxCasterFromInstance(BoxCasterInstances.RIGHT_CHECK);
-        leftCheck = BoxCasterManager.Instance.RetrieveBoxCasterFromInstance(BoxCasterInstances.LEFT_CHECK);
-        upperLedgeClimbCheck = BoxCasterManager.Instance.RetrieveBoxCasterFromInstance(BoxCasterInstances.LEGDE_CLIMB_UPPER_CHECK);
-        lowerLedgeClimbCheck = BoxCasterManager.Instance.RetrieveBoxCasterFromInstance(BoxCasterInstances.LEGDE_CLIMB_LOWER_CHECK);
 
         cameraRoot.localPosition = cameraRootPosition[0];
         SetMovementMode(MovementMode.RUN);
