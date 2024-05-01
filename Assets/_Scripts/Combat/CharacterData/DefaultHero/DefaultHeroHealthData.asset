@@ -13,13 +13,12 @@ MonoBehaviour:
   m_Name: DefaultHeroHealthData
   m_EditorClassIdentifier: 
   MaxHealth: 100
-  MaxBonusHealth: 0
-  PassiveHealthRegenerationAmount: 5
+  PassiveHealthRegenerationAmount: 1
   HealthRegeneratedOnKill: 100
   PassiveHealthRegenerationRate: 1
   MaxShieldSlots: 10
   MaxBonusShieldSlots: 0
   ShieldSlotHealth: 10
-  PassiveShieldRegenerationAmount: 5
+  PassiveShieldRegenerationAmount: 1
   PassiveShieldRegenerationRate: 1
   ShieldRegeneratedOnKill: 20

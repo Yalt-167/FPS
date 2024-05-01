@@ -6,16 +6,15 @@ using UnityEngine;
 public class PlayerHealthData : ScriptableObject
 {
     public int MaxHealth;
-    public int MaxBonusHealth;
     public int PassiveHealthRegenerationAmount;
     public int HealthRegeneratedOnKill;
-    public int PassiveHealthRegenerationRate;
+    public float PassiveHealthRegenerationRate;
 
     public int MaxShieldSlots;
     public int MaxBonusShieldSlots;
     public int ShieldSlotHealth;
     public int PassiveShieldRegenerationAmount;
-    public int PassiveShieldRegenerationRate;
+    public float PassiveShieldRegenerationRate;
     public int ShieldRegeneratedOnKill;
 }
 

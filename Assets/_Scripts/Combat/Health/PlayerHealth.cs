@@ -11,7 +11,7 @@ public class PlayerHealth : MonoBehaviour
     private float currentHealth;
     private int currentShieldSlots;
     private float currentShieldSlotRemainingPower;
-    private float TotalShield => currentShieldSlots * healthData.ShieldSlotHealth + currentShieldSlotRemainingPower;
+    private float TotalShield => (currentShieldSlots - 1) * healthData.ShieldSlotHealth + currentShieldSlotRemainingPower;
 
     private Slider healthSlider;
     private Slider shieldSlider;
@@ -20,7 +20,7 @@ public class PlayerHealth : MonoBehaviour
     private void Awake()
     {
         ResetHealth();
-        //PassiveRegen();
+        PassiveRegen();
         healthSlider = transform.GetChild(4).GetChild(0).GetComponent<Slider>();
         shieldSlider = transform.GetChild(4).GetChild(1).GetComponent<Slider>();
     }
@@ -33,19 +33,23 @@ public class PlayerHealth : MonoBehaviour
 
     private IEnumerator PassiveHealthRegen()
     {
+        float lastHealTime;
         for (; ; )
         {
-            yield return new WaitForSeconds(healthData.PassiveHealthRegenerationRate);
-            Heal(healthData.PassiveHealthRegenerationAmount);
+            lastHealTime = Time.time;
+            yield return new WaitUntil(() => lastHealTime + healthData.PassiveHealthRegenerationRate < Time.time && currentHealth < healthData.MaxHealth);
+            RegenerateHealth(healthData.PassiveHealthRegenerationAmount);
         }
     }
 
     private IEnumerator PassiveShieldRegen()
     {
+        float lastHealTime;
         for (; ; )
         {
-            yield return new WaitForSeconds(healthData.PassiveShieldRegenerationRate);
-            Heal(healthData.PassiveShieldRegenerationAmount);
+            lastHealTime = Time.time;
+            yield return new WaitUntil(() => lastHealTime + healthData.PassiveShieldRegenerationRate < Time.time && currentHealth == healthData.MaxHealth);
+            RegenerateShield(healthData.PassiveShieldRegenerationAmount, false);
         }
     }
 
@@ -90,9 +94,9 @@ public class PlayerHealth : MonoBehaviour
     }
 
 
-    public void Heal(int howMuch)
+    public void RawHeal(int howMuch)
     {
-        RegenerateShield(RegenerateHealth(howMuch));
+        RegenerateShield(RegenerateHealth(howMuch), true);
     }
 
     public int RegenerateHealth(int howMuch)
@@ -106,15 +110,21 @@ public class PlayerHealth : MonoBehaviour
    
     }
 
-    public void RegenerateShield(int howMuch)
+    public void RegenerateShield(int howMuch, bool canGoBeyondGauge)
     {
+        if (canGoBeyondGauge)
+        {
+            var totalShieldAfterHeal = TotalShield + howMuch;
+            currentShieldSlots = (int)(totalShieldAfterHeal / healthData.ShieldSlotHealth);
+            currentShieldSlotRemainingPower = totalShieldAfterHeal - currentShieldSlots * healthData.ShieldSlotHealth;
+            currentShieldSlots++; // the half filled slot
+        }
+        else
+        {
+            currentShieldSlots++;
+            currentShieldSlotRemainingPower = healthData.ShieldSlotHealth;
+        }
         
-        var currentTotalShield = currentShieldSlots * healthData.ShieldSlotHealth + currentShieldSlotRemainingPower;
-        var totalShieldAfterHeal = currentTotalShield + howMuch;
-        currentShieldSlots = (int)(totalShieldAfterHeal / healthData.ShieldSlotHealth);
-        currentShieldSlotRemainingPower = totalShieldAfterHeal - currentShieldSlots * healthData.ShieldSlotHealth;
-        currentShieldSlots++; // the half filled slot
-
         if (currentShieldSlots > healthData.MaxShieldSlots)
         {
             currentShieldSlots = healthData.MaxShieldSlots;
