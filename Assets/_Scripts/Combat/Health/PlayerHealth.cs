@@ -15,6 +15,15 @@ public class PlayerHealth : MonoBehaviour
 
     private Slider healthSlider;
     private Slider shieldSlider;
+    private Slider[] shieldCells;
+    [SerializeField] private GameObject shieldCellPrefab;
+    [SerializeField] private Transform healthCanvasTransform;
+
+    private static readonly int leftMostHealthBarExtent = 460;
+    //private readonly int rightMostHealthBarExtent = 1460;
+    private static readonly int healthBarLength = 1000;
+    [SerializeField] private int shieldCellPadding = 10;
+    private static readonly int healthBarY = -480;
     private bool Alive => currentHealth > 0;
 
     private void Awake()
@@ -25,11 +34,53 @@ public class PlayerHealth : MonoBehaviour
         shieldSlider = transform.GetChild(4).GetChild(1).GetComponent<Slider>();
     }
 
+    private void Start()
+    {
+        SetupHealthBar();
+        shieldCells = new Slider[healthData.MaxShieldSlots];
+    }
+
+    private void SetupHealthBar()
+    {
+        var allocatedPaddingsAmount = healthData.MaxShieldSlots - 1;
+        var spaceDedicatedToPadding = allocatedPaddingsAmount * shieldCellPadding;
+        var spaceDedicatedToShieldCells = healthBarLength - spaceDedicatedToPadding;
+        var spaceAllocatedPerShieldCell = (float)spaceDedicatedToShieldCells / healthData.MaxShieldSlots;
+
+        for (int i = 0; i < healthData.MaxShieldSlots; i++)
+        {
+            var shieldCelleGameObject = Instantiate(shieldCellPrefab, healthCanvasTransform);
+            shieldCells[i] = shieldCelleGameObject.GetComponent<Slider>();
+            var shieldCellRect = shieldCelleGameObject.GetComponent<RectTransform>();
+
+            var sizeDeltaWhateverThatMeans = shieldCellRect.sizeDelta;
+            sizeDeltaWhateverThatMeans.x = spaceAllocatedPerShieldCell;
+            shieldCellRect.sizeDelta = sizeDeltaWhateverThatMeans;
+
+            shieldCellRect.anchoredPosition = new(leftMostHealthBarExtent + spaceAllocatedPerShieldCell / 2 + i * (spaceAllocatedPerShieldCell + shieldCellPadding), healthBarY);
+        }
+
+        //var x = leftMostHealthBarExtent + spaceAllocatedPerShieldCell / 2;
+        //for (int i = 0; i < healthData.MaxShieldSlots; i++)
+        //{
+        //    var shieldCellRect = Instantiate(shieldCellPrefab, healthCanvasTransform).GetComponent<RectTransform>();
+
+        //    var sizeDeltaWhateverThatMeans = shieldCellRect.sizeDelta;
+        //    sizeDeltaWhateverThatMeans.x = spaceAllocatedPerShieldCell;
+        //    shieldCellRect.sizeDelta = sizeDeltaWhateverThatMeans;
+
+        //    shieldCellRect.anchoredPosition = new(x, healthBarY);
+        //    x += spaceAllocatedPerShieldCell + shieldCellPadding;
+        //}
+    }
+
     private void PassiveRegen()
     {
         StartCoroutine(PassiveHealthRegen());
         StartCoroutine(PassiveShieldRegen());
     }
+
+
 
     private IEnumerator PassiveHealthRegen()
     {
