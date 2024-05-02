@@ -24,13 +24,14 @@ public class PlayerHealth : MonoBehaviour
     //private readonly int rightMostHealthBarExtent = 1460;
     private static readonly int healthBarLength = 1000;
     [SerializeField] private int shieldCellPadding = 10;
-    private static readonly int healthBarY = -480;
+    //private static readonly int healthBarY = -480;
+    private static readonly int healthBarY = -420;
     private bool Alive => currentHealth > 0;
 
     private void Awake()
     {
         ResetHealth();
-        //PassiveRegen();
+        PassiveRegen();
         healthSlider = transform.GetChild(4).GetChild(0).GetComponent<Slider>();
         //shieldSlider = transform.GetChild(4).GetChild(1).GetComponent<Slider>();
     }
@@ -182,25 +183,27 @@ public class PlayerHealth : MonoBehaviour
    
     }
 
-    public void RegenerateShield(int howMuch, bool canGoBeyondGauge)
+    public void RegenerateShield(int healProficiency, bool canReviveCell)
     {
-        if (canGoBeyondGauge)
-        {
-            var totalShieldAfterHeal = TotalShield + howMuch;
-            currentShieldSlots = (int)(totalShieldAfterHeal / healthData.ShieldSlotHealth);
-            currentShieldSlotRemainingPower = totalShieldAfterHeal - currentShieldSlots * healthData.ShieldSlotHealth;
-            currentShieldSlots++; // the half filled slot
-        }
-        else
-        {
-            currentShieldSlots++;
-            currentShieldSlotRemainingPower = healthData.ShieldSlotHealth;
-        }
+        shield.Heal(healProficiency, canReviveCell);
+
+        //if (canReviveCell)
+        //{
+        //    var totalShieldAfterHeal = TotalShield + howMuch;
+        //    currentShieldSlots = (int)(totalShieldAfterHeal / healthData.ShieldSlotHealth);
+        //    currentShieldSlotRemainingPower = totalShieldAfterHeal - currentShieldSlots * healthData.ShieldSlotHealth;
+        //    currentShieldSlots++; // the half filled slot
+        //}
+        //else
+        //{
+        //    currentShieldSlots++;
+        //    currentShieldSlotRemainingPower = healthData.ShieldSlotHealth;
+        //}
         
-        if (currentShieldSlots > healthData.MaxShieldSlots)
-        {
-            currentShieldSlots = healthData.MaxShieldSlots;
-            currentShieldSlotRemainingPower = healthData.ShieldSlotHealth;
-        }
+        //if (currentShieldSlots > healthData.MaxShieldSlots)
+        //{
+        //    currentShieldSlots = healthData.MaxShieldSlots;
+        //    currentShieldSlotRemainingPower = healthData.ShieldSlotHealth;
+        //}
     }
 }

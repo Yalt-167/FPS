@@ -19,7 +19,7 @@ public class ShieldCell
     public float TakeDamage(float damage)
     {
         Shield -= damage;
-        if (Shield < 0)
+        if (Shield <= 0)
         {
             damage = -Shield;
             Break();

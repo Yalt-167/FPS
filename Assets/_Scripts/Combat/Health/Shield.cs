@@ -7,6 +7,7 @@ public class Shield
 {
     private ShieldCell[] shieldCells;
     private int shieldCellAmount;
+    private int shieldCellHealth;
     private int lastHealthyShieldCellIndex;
     private int LastHealthyShieldCellIndex
     {
@@ -16,17 +17,16 @@ public class Shield
         }
         set
         {
-            lastHealthyShieldCellIndex = value;
-            if (lastHealthyShieldCellIndex > shieldCellAmount - 1)
-            {
-                lastHealthyShieldCellIndex = shieldCellAmount - 1;
-            }
+            lastHealthyShieldCellIndex = Mathf.Clamp(value, 0, shieldCellAmount - 1);
         }
     }
-    public Shield(int shieldCellAmount_, int shieldCellHealth)
+    private bool FullShield => shieldCells[shieldCellAmount - 1].Shield == shieldCellHealth;
+    public Shield(int shieldCellAmount_, int shieldCellHealth_)
     {
         shieldCellAmount = shieldCellAmount_;
         LastHealthyShieldCellIndex = shieldCellAmount - 1;
+
+        shieldCellHealth = shieldCellHealth_;
 
         shieldCells = new ShieldCell[shieldCellAmount_];
         for (int i = 0; i < shieldCellAmount_; i++)
@@ -39,7 +39,6 @@ public class Shield
     {
         while (damage > 0 && this)
         {
-            Debug.Log(LastHealthyShieldCellIndex);
             damage = shieldCells[LastHealthyShieldCellIndex].TakeDamage(damage);
             if (damage > 0) LastHealthyShieldCellIndex--;
         }
@@ -49,8 +48,9 @@ public class Shield
 
     public void Heal(float healProficiency, bool canReviveCell)
     {
-        while (healProficiency > 0)
+        while (healProficiency > 0 && !FullShield)
         {
+            Debug.Log(LastHealthyShieldCellIndex);
             healProficiency = shieldCells[LastHealthyShieldCellIndex].Heal(healProficiency, canReviveCell);
             if (healProficiency > 0) LastHealthyShieldCellIndex++;
         }
@@ -64,7 +64,7 @@ public class Shield
         }
     }
     
-     public static implicit operator bool(Shield shield)
+    public static implicit operator bool(Shield shield)
     {
         return shield.shieldCells[0].Shield > 0;
     }
