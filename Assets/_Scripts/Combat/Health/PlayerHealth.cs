@@ -13,6 +13,7 @@ public class PlayerHealth : MonoBehaviour
     private float currentShieldSlotRemainingPower;
     private float TotalShield => (currentShieldSlots - 1) * healthData.ShieldSlotHealth + currentShieldSlotRemainingPower;
 
+    private Shield shield;
     private Slider healthSlider;
     private Slider shieldSlider;
     private Slider[] shieldCells;
@@ -29,24 +30,26 @@ public class PlayerHealth : MonoBehaviour
     private void Awake()
     {
         ResetHealth();
-        PassiveRegen();
+        //PassiveRegen();
         healthSlider = transform.GetChild(4).GetChild(0).GetComponent<Slider>();
-        shieldSlider = transform.GetChild(4).GetChild(1).GetComponent<Slider>();
+        //shieldSlider = transform.GetChild(4).GetChild(1).GetComponent<Slider>();
     }
 
     private void Start()
     {
         SetupHealthBar();
-        shieldCells = new Slider[healthData.MaxShieldSlots];
     }
 
     private void SetupHealthBar()
     {
+        shieldCells = new Slider[healthData.MaxShieldSlots];
+
         var allocatedPaddingsAmount = healthData.MaxShieldSlots - 1;
         var spaceDedicatedToPadding = allocatedPaddingsAmount * shieldCellPadding;
         var spaceDedicatedToShieldCells = healthBarLength - spaceDedicatedToPadding;
         var spaceAllocatedPerShieldCell = (float)spaceDedicatedToShieldCells / healthData.MaxShieldSlots;
 
+        var halfCellSize = spaceAllocatedPerShieldCell / 2;
         for (int i = 0; i < healthData.MaxShieldSlots; i++)
         {
             var shieldCelleGameObject = Instantiate(shieldCellPrefab, healthCanvasTransform);
@@ -57,13 +60,15 @@ public class PlayerHealth : MonoBehaviour
             sizeDeltaWhateverThatMeans.x = spaceAllocatedPerShieldCell;
             shieldCellRect.sizeDelta = sizeDeltaWhateverThatMeans;
 
-            shieldCellRect.anchoredPosition = new(leftMostHealthBarExtent + spaceAllocatedPerShieldCell / 2 + i * (spaceAllocatedPerShieldCell + shieldCellPadding), healthBarY);
+            shieldCellRect.anchoredPosition = new(leftMostHealthBarExtent + halfCellSize + i * (spaceAllocatedPerShieldCell + shieldCellPadding), healthBarY);
         }
 
         //var x = leftMostHealthBarExtent + spaceAllocatedPerShieldCell / 2;
         //for (int i = 0; i < healthData.MaxShieldSlots; i++)
         //{
-        //    var shieldCellRect = Instantiate(shieldCellPrefab, healthCanvasTransform).GetComponent<RectTransform>();
+        //    var shieldCelleGameObject = Instantiate(shieldCellPrefab, healthCanvasTransform);
+        //    shieldCells[i] = shieldCelleGameObject.GetComponent<Slider>();
+        //    var shieldCellRect = shieldCelleGameObject.GetComponent<RectTransform>();
 
         //    var sizeDeltaWhateverThatMeans = shieldCellRect.sizeDelta;
         //    sizeDeltaWhateverThatMeans.x = spaceAllocatedPerShieldCell;
@@ -109,9 +114,14 @@ public class PlayerHealth : MonoBehaviour
         if (!Alive) { return; }
 
         healthSlider.value = currentHealth / healthData.MaxHealth;
-        shieldSlider.value = TotalShield / (healthData.MaxShieldSlots * healthData.ShieldSlotHealth);
+        //shieldSlider.value = TotalShield / (healthData.MaxShieldSlots * healthData.ShieldSlotHealth);
+        foreach (var idxValueTuple in shield.AsSliderValues())
+        {
+            shieldCells[idxValueTuple.Index].value = idxValueTuple.Value;
+        }
 
-        if (Input.GetKeyDown(KeyCode.L)) { TakeDamage(10, false); }
+
+        if (Input.GetKeyDown(KeyCode.L)) { TakeDamage(3, false); }
 
     }
 
@@ -120,28 +130,39 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = healthData.MaxHealth;
         currentShieldSlots = healthData.MaxShieldSlots;
         currentShieldSlotRemainingPower = healthData.ShieldSlotHealth;
+
+        shield = new(healthData.MaxShieldSlots, healthData.ShieldSlotHealth);
     }
 
     public void TakeDamage(float damage, bool ignoreShield)
     {
-        if (damage < 0) { return; }
+        if (damage <= 0) { return; }
 
-        while (!ignoreShield && damage > 0 && currentShieldSlots > 0)
+        if (!ignoreShield && shield)
         {
-            currentShieldSlotRemainingPower -= damage;
-            if (currentShieldSlotRemainingPower < 0)
-            {
-                damage = -currentShieldSlotRemainingPower;
-                currentShieldSlotRemainingPower = healthData.ShieldSlotHealth;
-                currentShieldSlots--;
-            }
-            else
-            {
-                damage = 0;
-            }
+            print("here");
+            damage = shield.TakeDamage(damage);
         }
 
+        if (damage <= 0) { return; }
+
         currentHealth -= damage;
+        //while (!ignoreShield && damage > 0 && currentShieldSlots > 0)
+        //{
+        //    currentShieldSlotRemainingPower -= damage;
+        //    if (currentShieldSlotRemainingPower < 0)
+        //    {
+        //        damage = -currentShieldSlotRemainingPower;
+        //        currentShieldSlotRemainingPower = healthData.ShieldSlotHealth;
+        //        currentShieldSlots--;
+        //    }
+        //    else
+        //    {
+        //        damage = 0;
+        //    }
+        //}
+
+        //currentHealth -= damage;
     }
 
 

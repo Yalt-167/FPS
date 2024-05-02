@@ -11,11 +11,12 @@ public class PlayerHealthData : ScriptableObject
     public float PassiveHealthRegenerationRate;
 
     public int MaxShieldSlots;
-    public int MaxBonusShieldSlots;
     public int ShieldSlotHealth;
     public int PassiveShieldRegenerationAmount;
     public float PassiveShieldRegenerationRate;
     public int ShieldRegeneratedOnKill;
+
+    public int MaxBonusShieldSlots;
 }
 
 // the player has several gauges of shield
