@@ -48,7 +48,7 @@ public class ShieldCell
     {
         if (broken && !canReviveCell) { return 0f; }
 
-        Repair(); // doesn t make much sense but if arrived there the either the shield cell is ealready health or the canReviveCell flag is true
+        Repair(); // doesn t make much sense but if arrived there then either the shield cell is ealready health or the canReviveCell flag is true
 
         Shield += healProficiency;
         if (Shield > maxShield)

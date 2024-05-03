@@ -9,7 +9,7 @@ public class BodyPart : MonoBehaviour, IShootable
 
     public void ReactShot(Vector3 _, Vector3 __)
     {
-        throw new System.NotImplementedException();
+        print(relevantDamageMultiplier);
     }
 }
 

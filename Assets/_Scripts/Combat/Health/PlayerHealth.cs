@@ -6,79 +6,75 @@ using UnityEngine.UI;
 
 public class PlayerHealth : MonoBehaviour
 {
-    [SerializeField] private PlayerHealthData healthData;
+    [field: SerializeField] public PlayerHealthData HealthData { get; private set; }
 
-    private float currentHealth;
+    public float CurrentHealth { get; private set; }
     private int currentShieldSlots;
     private float currentShieldSlotRemainingPower;
-    private float TotalShield => (currentShieldSlots - 1) * healthData.ShieldSlotHealth + currentShieldSlotRemainingPower;
+    private float TotalShield => (currentShieldSlots - 1) * HealthData.ShieldSlotHealth + currentShieldSlotRemainingPower;
 
-    private Shield shield;
-    private Slider healthSlider;
-    private Slider shieldSlider;
-    private Slider[] shieldCells;
-    [SerializeField] private GameObject shieldCellPrefab;
-    [SerializeField] private Transform healthCanvasTransform;
+    public Shield Shield { get; private set; }
+    //private Slider healthSlider;
+    //private Slider[] shieldCellsSliders;
+    //[SerializeField] private GameObject shieldCellPrefab;
+    //[SerializeField] private Transform healthCanvasTransform;
 
-    private static readonly int leftMostHealthBarExtent = 460;
-    //private readonly int rightMostHealthBarExtent = 1460;
-    private static readonly int healthBarLength = 1000;
-    [SerializeField] private int shieldCellPadding = 10;
-    //private static readonly int healthBarY = -480;
-    private static readonly int healthBarY = -420;
-    private bool Alive => currentHealth > 0;
+    //private static readonly int leftMostHealthBarExtent = 460;
+    //private static readonly int healthBarLength = 1000;
+    //[SerializeField] private int shieldCellPadding = 10;
+    private static readonly int shieldBarY = -420;
+    private bool Alive => CurrentHealth > 0;
 
     private void Awake()
     {
         ResetHealth();
         PassiveRegen();
-        healthSlider = transform.GetChild(4).GetChild(0).GetComponent<Slider>();
-        //shieldSlider = transform.GetChild(4).GetChild(1).GetComponent<Slider>();
+        //healthSlider = transform.GetChild(4).GetChild(0).GetComponent<Slider>();
     }
 
-    private void Start()
-    {
-        SetupHealthBar();
-    }
+    //private void Start()
+    //{
+    //    SetupHealthBar();
+    //}
 
-    private void SetupHealthBar()
-    {
-        shieldCells = new Slider[healthData.MaxShieldSlots];
+    //private void SetupHealthBar()
+    //{
+    //    shieldCellsSliders = new Slider[HealthData.MaxShieldSlots];
 
-        var allocatedPaddingsAmount = healthData.MaxShieldSlots - 1;
-        var spaceDedicatedToPadding = allocatedPaddingsAmount * shieldCellPadding;
-        var spaceDedicatedToShieldCells = healthBarLength - spaceDedicatedToPadding;
-        var spaceAllocatedPerShieldCell = (float)spaceDedicatedToShieldCells / healthData.MaxShieldSlots;
+    //    var allocatedPaddingsAmount = HealthData.MaxShieldSlots - 1;
+    //    var spaceDedicatedToPadding = allocatedPaddingsAmount * shieldCellPadding;
+    //    var spaceDedicatedToShieldCells = healthBarLength - spaceDedicatedToPadding;
+    //    var spaceAllocatedPerShieldCell = (float)spaceDedicatedToShieldCells / HealthData.MaxShieldSlots;
 
-        var halfCellSize = spaceAllocatedPerShieldCell / 2;
-        for (int i = 0; i < healthData.MaxShieldSlots; i++)
-        {
-            var shieldCelleGameObject = Instantiate(shieldCellPrefab, healthCanvasTransform);
-            shieldCells[i] = shieldCelleGameObject.GetComponent<Slider>();
-            var shieldCellRect = shieldCelleGameObject.GetComponent<RectTransform>();
+    //    var halfCellSize = spaceAllocatedPerShieldCell / 2;
+    //    for (int i = 0; i < HealthData.MaxShieldSlots; i++)
+    //    {
+    //        var shieldCelleGameObject = Instantiate(shieldCellPrefab, healthCanvasTransform);
+    //        shieldCellsSliders[i] = shieldCelleGameObject.GetComponent<Slider>();
+    //        var shieldCellRect = shieldCelleGameObject.GetComponent<RectTransform>();
 
-            var sizeDeltaWhateverThatMeans = shieldCellRect.sizeDelta;
-            sizeDeltaWhateverThatMeans.x = spaceAllocatedPerShieldCell;
-            shieldCellRect.sizeDelta = sizeDeltaWhateverThatMeans;
+    //        var sizeDeltaWhateverThatMeans = shieldCellRect.sizeDelta;
+    //        sizeDeltaWhateverThatMeans.x = spaceAllocatedPerShieldCell;
+    //        shieldCellRect.sizeDelta = sizeDeltaWhateverThatMeans;
 
-            shieldCellRect.anchoredPosition = new(leftMostHealthBarExtent + halfCellSize + i * (spaceAllocatedPerShieldCell + shieldCellPadding), healthBarY);
-        }
+    //        shieldCellRect.anchoredPosition = new(leftMostHealthBarExtent + halfCellSize + i * (spaceAllocatedPerShieldCell + shieldCellPadding), shieldBarY);
+    //    }
 
-        //var x = leftMostHealthBarExtent + spaceAllocatedPerShieldCell / 2;
-        //for (int i = 0; i < healthData.MaxShieldSlots; i++)
-        //{
-        //    var shieldCelleGameObject = Instantiate(shieldCellPrefab, healthCanvasTransform);
-        //    shieldCells[i] = shieldCelleGameObject.GetComponent<Slider>();
-        //    var shieldCellRect = shieldCelleGameObject.GetComponent<RectTransform>();
+    //    //var x = leftMostHealthBarExtent + spaceAllocatedPerShieldCell / 2;
+    //    //for (int i = 0; i < healthData.MaxShieldSlots; i++)
+    //    //{
+    //    //    var shieldCelleGameObject = Instantiate(shieldCellPrefab, healthCanvasTransform);
+    //    //    shieldCells[i] = shieldCelleGameObject.GetComponent<Slider>();
+    //    //    var shieldCellRect = shieldCelleGameObject.GetComponent<RectTransform>();
 
-        //    var sizeDeltaWhateverThatMeans = shieldCellRect.sizeDelta;
-        //    sizeDeltaWhateverThatMeans.x = spaceAllocatedPerShieldCell;
-        //    shieldCellRect.sizeDelta = sizeDeltaWhateverThatMeans;
+    //    //    var sizeDeltaWhateverThatMeans = shieldCellRect.sizeDelta;
+    //    //    sizeDeltaWhateverThatMeans.x = spaceAllocatedPerShieldCell;
+    //    //    shieldCellRect.sizeDelta = sizeDeltaWhateverThatMeans;
 
-        //    shieldCellRect.anchoredPosition = new(x, healthBarY);
-        //    x += spaceAllocatedPerShieldCell + shieldCellPadding;
-        //}
-    }
+    //    //    shieldCellRect.anchoredPosition = new(x, healthBarY);
+    //    //    x += spaceAllocatedPerShieldCell + shieldCellPadding;
+    //    //}
+    //}
 
     private void PassiveRegen()
     {
@@ -86,16 +82,14 @@ public class PlayerHealth : MonoBehaviour
         StartCoroutine(PassiveShieldRegen());
     }
 
-
-
     private IEnumerator PassiveHealthRegen()
     {
         float lastHealTime;
         for (; ; )
         {
             lastHealTime = Time.time;
-            yield return new WaitUntil(() => lastHealTime + healthData.PassiveHealthRegenerationRate < Time.time && currentHealth < healthData.MaxHealth);
-            RegenerateHealth(healthData.PassiveHealthRegenerationAmount);
+            yield return new WaitUntil(() => lastHealTime + HealthData.PassiveHealthRegenerationRate < Time.time && CurrentHealth < HealthData.MaxHealth);
+            RegenerateHealth(HealthData.PassiveHealthRegenerationAmount);
         }
     }
 
@@ -105,8 +99,8 @@ public class PlayerHealth : MonoBehaviour
         for (; ; )
         {
             lastHealTime = Time.time;
-            yield return new WaitUntil(() => lastHealTime + healthData.PassiveShieldRegenerationRate < Time.time && currentHealth == healthData.MaxHealth);
-            RegenerateShield(healthData.PassiveShieldRegenerationAmount, false);
+            yield return new WaitUntil(() => lastHealTime + HealthData.PassiveShieldRegenerationRate < Time.time && CurrentHealth == HealthData.MaxHealth);
+            RegenerateShield(HealthData.PassiveShieldRegenerationAmount, false);
         }
     }
 
@@ -114,12 +108,11 @@ public class PlayerHealth : MonoBehaviour
     {
         if (!Alive) { return; }
 
-        healthSlider.value = currentHealth / healthData.MaxHealth;
-        //shieldSlider.value = TotalShield / (healthData.MaxShieldSlots * healthData.ShieldSlotHealth);
-        foreach (var idxValueTuple in shield.AsSliderValues())
-        {
-            shieldCells[idxValueTuple.Index].value = idxValueTuple.Value;
-        }
+        //healthSlider.value = CurrentHealth / HealthData.MaxHealth;
+        //foreach (var idxValueTuple in Shield.AsSliderValues())
+        //{
+        //    shieldCellsSliders[idxValueTuple.Index].value = idxValueTuple.Value;
+        //}
 
 
         if (Input.GetKeyDown(KeyCode.L)) { TakeDamage(3, false); }
@@ -128,64 +121,47 @@ public class PlayerHealth : MonoBehaviour
 
     private void ResetHealth()
     {
-        currentHealth = healthData.MaxHealth;
-        currentShieldSlots = healthData.MaxShieldSlots;
-        currentShieldSlotRemainingPower = healthData.ShieldSlotHealth;
+        CurrentHealth = HealthData.MaxHealth;
+        currentShieldSlots = HealthData.MaxShieldSlots;
+        currentShieldSlotRemainingPower = HealthData.ShieldSlotHealth;
 
-        shield = new(healthData.MaxShieldSlots, healthData.ShieldSlotHealth);
+        Shield = new(HealthData.MaxShieldSlots, HealthData.ShieldSlotHealth);
     }
 
     public void TakeDamage(float damage, bool ignoreShield)
     {
         if (damage <= 0) { return; }
 
-        if (!ignoreShield && shield)
+        if (!ignoreShield && Shield)
         {
-            print("here");
-            damage = shield.TakeDamage(damage);
+            damage = Shield.TakeDamage(damage);
         }
 
         if (damage <= 0) { return; }
 
-        currentHealth -= damage;
-        //while (!ignoreShield && damage > 0 && currentShieldSlots > 0)
-        //{
-        //    currentShieldSlotRemainingPower -= damage;
-        //    if (currentShieldSlotRemainingPower < 0)
-        //    {
-        //        damage = -currentShieldSlotRemainingPower;
-        //        currentShieldSlotRemainingPower = healthData.ShieldSlotHealth;
-        //        currentShieldSlots--;
-        //    }
-        //    else
-        //    {
-        //        damage = 0;
-        //    }
-        //}
-
-        //currentHealth -= damage;
+        CurrentHealth -= damage;
     }
 
 
-    public void RawHeal(int howMuch)
+    public void RawHeal(float healProficiency)
     {
-        RegenerateShield(RegenerateHealth(howMuch), true);
+        RegenerateShield(RegenerateHealth(healProficiency), true);
     }
 
-    public int RegenerateHealth(int howMuch)
+    public float RegenerateHealth(float healProficiency)
     {
-        currentHealth += howMuch;
-        if (currentHealth < healthData.MaxHealth) { return 0; }
+        CurrentHealth += healProficiency;
+        if (CurrentHealth < HealthData.MaxHealth) { return 0; }
 
-        var excessHeal = currentHealth - healthData.MaxHealth;
-        currentHealth = healthData.MaxHealth;
-        return (int)excessHeal;
+        var excessHeal = CurrentHealth - HealthData.MaxHealth;
+        CurrentHealth = HealthData.MaxHealth;
+        return excessHeal;
    
     }
 
-    public void RegenerateShield(int healProficiency, bool canReviveCell)
+    public void RegenerateShield(float healProficiency, bool canReviveCell)
     {
-        shield.Heal(healProficiency, canReviveCell);
+        Shield.Heal(healProficiency, canReviveCell);
 
         //if (canReviveCell)
         //{
