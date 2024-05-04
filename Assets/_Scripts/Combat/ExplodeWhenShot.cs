@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
-public class ExplodeWhenShot : MonoBehaviour, IShootable
+public class ExplodeWhenShot : MonoBehaviour// , IShootable
 {
     [SerializeField] private float explosionForce;
     [SerializeField] private float explosionRadius;
     [SerializeField] private float verticalBoostCoefficient;
-    public void ReactShot(Vector3 _, Vector3 __)
+    public void ReactShotServerRpc(Vector3 _, Vector3 __)
     {
         print("baboom");
         var vecPlayerBarrelSqrMagnitude = (PlayerMovement.Instance.transform.position - transform.position).sqrMagnitude;

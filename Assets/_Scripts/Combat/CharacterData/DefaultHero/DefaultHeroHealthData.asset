@@ -16,9 +16,11 @@ MonoBehaviour:
   PassiveHealthRegenerationAmount: 1
   HealthRegeneratedOnKill: 100
   PassiveHealthRegenerationRate: 1
-  MaxShieldSlots: 10
-  MaxBonusShieldSlots: 0
-  ShieldSlotHealth: 10
+  TimeBeforeInitiatingHealthRegeneration: 0
+  MaxShieldSlots: 3
+  ShieldSlotHealth: 100
   PassiveShieldRegenerationAmount: 1
   PassiveShieldRegenerationRate: 1
   ShieldRegeneratedOnKill: 20
+  TimeBeforeInitiatingShieldRegeneration: 0
+  MaxBonusShieldSlots: 0

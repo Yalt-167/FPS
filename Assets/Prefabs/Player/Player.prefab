@@ -344,7 +344,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 54767499
+  GlobalObjectIdHash: 3013796309
   InScenePlacedSourceGlobalObjectIdHash: 870966366
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1014,6 +1014,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   relevantDamageMultiplier: 2
+  playerHealth: {fileID: 8430323774073140898}
 --- !u!1 &2860168322371012019
 GameObject:
   m_ObjectHideFlags: 0
@@ -1283,6 +1284,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   relevantDamageMultiplier: 0
+  playerHealth: {fileID: 8430323774073140898}
 --- !u!1 &6412299622495923733
 GameObject:
   m_ObjectHideFlags: 0
@@ -1684,6 +1686,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   relevantDamageMultiplier: 1
+  playerHealth: {fileID: 8430323774073140898}
 --- !u!1 &8420618424029535013
 GameObject:
   m_ObjectHideFlags: 0

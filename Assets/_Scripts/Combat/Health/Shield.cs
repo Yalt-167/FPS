@@ -50,7 +50,6 @@ public class Shield
     {
         while (healProficiency > 0 && !FullShield)
         {
-            Debug.Log(LastHealthyShieldCellIndex);
             healProficiency = shieldCells[LastHealthyShieldCellIndex].Heal(healProficiency, canReviveCell);
             if (healProficiency > 0) LastHealthyShieldCellIndex++;
         }

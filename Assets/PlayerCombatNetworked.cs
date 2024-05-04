@@ -30,7 +30,7 @@ public class PlayerCombatNetworked : NetworkBehaviour
             bulletTrail.Set(transform.position, hit.point);
             if (hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
             {
-                shootableComponent.ReactShot(hit.point, shootingDir);
+                shootableComponent.ReactShot(hit.point, shootingDir); // the problem prolly lies here
             }
 
             Destroy(Instantiate(landingShotEffect, hit.point - shootingDir * .1f, Quaternion.identity), hitEffectLifetime);

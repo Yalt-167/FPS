@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyShootHitscanAfterTime : MonoBehaviour, IShootable
+public class EnemyShootHitscanAfterTime : MonoBehaviour //, IShootable
 {
     [SerializeField] private float timeToShoot;
     [SerializeField] private float viewDistance;
@@ -68,8 +68,8 @@ public class EnemyShootHitscanAfterTime : MonoBehaviour, IShootable
         Gizmos.DrawLine(transform.position, transform.position + transform.forward * viewDistance);
     }
 
-    public void ReactShot(Vector3 shootingAngle, Vector3 hitPoint)
-    {
-        Destroy(gameObject);
-    }
+    //public void ReactShotServerRpc(Vector3 shootingAngle, Vector3 hitPoint)
+    //{
+    //    Destroy(gameObject);
+    //}
 }
