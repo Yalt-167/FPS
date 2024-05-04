@@ -17,7 +17,7 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
 
     #region Networking & Tears
 
-    public override void OnNetworkSpawn()
+    public override void OnNetworkSpawn() // also fix spawn in ground
     {
         var (componentsToKill, gameObjectsToKill) = IsOwner ? (componentsToKillOnLocalPlayers, gameObjectsToKillOnLocalPlayers) : (componentsToKillOnForeignPlayers, gameObjectsToKillOnForeignPlayers);
 

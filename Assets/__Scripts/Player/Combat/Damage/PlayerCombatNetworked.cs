@@ -15,7 +15,7 @@ public class PlayerCombatNetworked : NetworkBehaviour
     [SerializeField] private LayerMask hittableLayers;
     // Rpc -> remote procedure call
 
-    [ServerRpc] // called by a client to execute on the server
+    [ServerRpc] // called by a client to execute on the server; the caller MUST be the local player
     public void RequestAttackServerRpc(Vector3 shootingPos, Vector3 shootingDir)
     {
         ExecuteAttackClientRpc(shootingPos, shootingDir);
@@ -30,7 +30,7 @@ public class PlayerCombatNetworked : NetworkBehaviour
             bulletTrail.Set(transform.position, hit.point);
             if (hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
             {
-                shootableComponent.ReactShot(hit.point, shootingDir); // the problem prolly lies here
+                shootableComponent.ReactShot(hit.point, shootingDir);
             }
 
             Destroy(Instantiate(landingShotEffect, hit.point - shootingDir * .1f, Quaternion.identity), hitEffectLifetime);

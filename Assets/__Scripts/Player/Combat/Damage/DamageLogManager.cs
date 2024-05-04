@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DamageLogManager : MonoBehaviour
 {
-    [Tooltip("Order: Head(Shielded) -> Body(Shielded) -> Head -> Body")][SerializeField] private Color[] hitColors;
+    [Tooltip("Order: Head(Shielded) -> Body(Shielded) -> Head -> Body -> Object(Weakpoint) -> Object")][SerializeField] private Color[] hitColors;
     [SerializeField] private GameObject damageLogPrefab;
     [SerializeField] private List<GameObject> activeDamageLogs;
 
