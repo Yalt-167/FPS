@@ -21,7 +21,6 @@ public class PlayerHealth : NetworkBehaviour
     {
         ResetHealth();
         PassiveRegen();
-      
     }
 
     private void PassiveRegen()
@@ -54,7 +53,12 @@ public class PlayerHealth : NetworkBehaviour
 
     private void Update()
     {
-        if (!Alive) { return; }
+        if (!Alive)
+        {
+            ResetHealth();
+            transform.position = Vector3.up * 100;
+            return;
+        }
 
         //if (Input.GetKeyDown(KeyCode.L)) { TakeDamageClientRpc(3, false); }
     }

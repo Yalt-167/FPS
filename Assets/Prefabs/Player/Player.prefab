@@ -344,7 +344,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3013796309
+  GlobalObjectIdHash: 1718870620
   InScenePlacedSourceGlobalObjectIdHash: 870966366
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -642,6 +642,9 @@ MonoBehaviour:
   - {fileID: 7715329695785719329}
   gameObjectsToKillOnForeignPlayers:
   - {fileID: 7803131807664606466}
+  componentsToKillOnLocalPlayers: []
+  gameObjectsToKillOnLocalPlayers:
+  - {fileID: 0}
 --- !u!114 &8430323774073140898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1526,7 +1529,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
