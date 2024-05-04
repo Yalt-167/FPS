@@ -17,6 +17,5 @@ public class BulletTrail : MonoBehaviour
         lineRenderer.SetPosition(0, origin);
         lineRenderer.SetPosition(1, end);
         Destroy(gameObject, lifeTime);
-
     }
 }

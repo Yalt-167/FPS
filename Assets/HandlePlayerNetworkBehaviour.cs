@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 //using UnityEngine.Networking;
-
+[DefaultExecutionOrder(-1000)]
 public class HandlePlayerNetworkBehaviour : NetworkBehaviour
 {
     [SerializeField] private List<Component> componentsToKillOnForeignPlayers;

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -22,7 +21,7 @@ public class PlayerHealth : MonoBehaviour
     //private static readonly int leftMostHealthBarExtent = 460;
     //private static readonly int healthBarLength = 1000;
     //[SerializeField] private int shieldCellPadding = 10;
-    private static readonly int shieldBarY = -420;
+    //private static readonly int shieldBarY = -420;
     private bool Alive => CurrentHealth > 0;
 
     private void Awake()

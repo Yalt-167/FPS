@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 [DefaultExecutionOrder(-6)]
@@ -19,10 +20,7 @@ public class PlayerCombat : MonoBehaviour
     private float lastShootPressed;
     private bool HasBufferedShoot => lastShootPressed + shootBuffer > Time.time;
 
-    #endregion
-
-    [SerializeField] private GameObject landingShotEffect;
-    [SerializeField] private float hitEffectLifetime;
+    #endregion  
 
 
     #region Katana Setup
@@ -35,15 +33,16 @@ public class PlayerCombat : MonoBehaviour
 
     [SerializeField] private BoxCaster[] katanaChecks;
     [SerializeField] private float slashSpeed;
+    private PlayerCombatNetworked playerCombatNetworked;
 
 
     #endregion
 
     private void Awake()
     {
-        //cameraTransform = Camera.main.transform;
         cameraTransform = transform.GetChild(0).GetChild(0);
-        InputQuery.Init(); 
+        InputQuery.Init();
+        playerCombatNetworked = GetComponent<PlayerCombatNetworked>();
     }
 
     private void Update()
@@ -56,14 +55,15 @@ public class PlayerCombat : MonoBehaviour
         {
             TryShoot(true);
         }
-        else if (InputQuery.Slash)
-        {
-            TrySlash(false);
-        }
-        else if (HasBufferedSlash)
-        {
-            TrySlash(true);
-        }
+
+        //else if (InputQuery.Slash)
+        //{
+        //    TrySlash(false);
+        //}
+        //else if (HasBufferedSlash)
+        //{
+        //    TrySlash(true);
+        //}
     }
 
     #region Shooting
@@ -80,18 +80,9 @@ public class PlayerCombat : MonoBehaviour
             return;
         }
 
-        if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out RaycastHit hit, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore))
-        {
-            if (hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
-            {
-                shootableComponent.ReactShot(hit.point, cameraTransform.forward);
-            }
-
-            Destroy(Instantiate(landingShotEffect, hit.point - cameraTransform.forward * .1f, Quaternion.identity), hitEffectLifetime) ;
-        }
+        playerCombatNetworked.RequestAttackServerRpc(cameraTransform.position, cameraTransform.forward);
 
         StartCoroutine(ShootingCooldown());
-
     }
 
     private IEnumerator ShootingCooldown()
@@ -99,7 +90,7 @@ public class PlayerCombat : MonoBehaviour
         shootingOnCooldown = true;
 
         yield return new WaitForSeconds(shootingCooldown);
-        
+
         shootingOnCooldown = false;
     }
 

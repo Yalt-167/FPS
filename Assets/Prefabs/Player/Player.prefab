@@ -204,6 +204,7 @@ GameObject:
   - component: {fileID: -5576412062431197468}
   - component: {fileID: 8430323774073140898}
   - component: {fileID: 8620312614544550616}
+  - component: {fileID: 603688747316902264}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -343,7 +344,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3013796309
+  GlobalObjectIdHash: 54767499
   InScenePlacedSourceGlobalObjectIdHash: 870966366
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -565,9 +566,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   shootingCooldown: 0.2
-  landingShotEffect: {fileID: 333620519314160190, guid: 67d8f8fec9785114ea7de41d7f4f63f4,
-    type: 3}
-  hitEffectLifetime: 0.8
   slashingCooldown: 1
   katanaChecks:
   - {fileID: 7660277758185836383}
@@ -633,7 +631,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   componentsToKillOnForeignPlayers:
   - {fileID: 7169882754446854393}
-  - {fileID: 7715329695785719329}
   - {fileID: 6865873029081377145}
   - {fileID: 5566541058021640135}
   - {fileID: 1983241356730822388}
@@ -642,6 +639,7 @@ MonoBehaviour:
   - {fileID: 9185951407581257990}
   - {fileID: 2315917569305143264}
   - {fileID: 8620312614544550616}
+  - {fileID: 7715329695785719329}
   gameObjectsToKillOnForeignPlayers:
   - {fileID: 7803131807664606466}
 --- !u!114 &8430323774073140898
@@ -673,6 +671,26 @@ MonoBehaviour:
   shieldCellPrefab: {fileID: 3488288628753210600, guid: 59a4db51f7c10c44db10608f3ac3c15c,
     type: 3}
   healthCanvasTransform: {fileID: 6707109648705851472}
+--- !u!114 &603688747316902264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 615695314538812458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa36f4638aad5fc44b7a0d83f720e74b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  landingShotEffect: {fileID: 333620519314160190, guid: 67d8f8fec9785114ea7de41d7f4f63f4,
+    type: 3}
+  hitEffectLifetime: 0.8
+  bulletTrailPrefab: {fileID: 7113286195165761649, guid: 4925344593a3b01449e2fe6ccf6abb88,
+    type: 3}
+  hittableLayers:
+    serializedVersion: 2
+    m_Bits: 136
 --- !u!1 &888805865160700714
 GameObject:
   m_ObjectHideFlags: 0
@@ -1764,7 +1782,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8028006712738075451}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Hitboxes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
