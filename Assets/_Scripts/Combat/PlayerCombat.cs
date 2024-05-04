@@ -15,6 +15,7 @@ public class PlayerCombat : MonoBehaviour
     #region Shoot Setup
 
     [SerializeField] private float shootingCooldown;
+    [SerializeField] private Transform barrelEnd;
     private bool shootingOnCooldown;
     private readonly float shootBuffer = .1f;
     private float lastShootPressed;
@@ -80,7 +81,7 @@ public class PlayerCombat : MonoBehaviour
             return;
         }
 
-        playerCombatNetworked.RequestAttackServerRpc(cameraTransform.position, cameraTransform.forward);
+        playerCombatNetworked.RequestAttackServerRpc(barrelEnd.position, cameraTransform.forward);
 
         StartCoroutine(ShootingCooldown());
     }
