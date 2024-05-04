@@ -313,7 +313,7 @@ public class PlayerMovement : MonoBehaviour, IEntity
         CollisionDebug = new(isCollidingUp, isCollidingDown, isCollidingRight, isCollidingLeft, isCollidingOnAnySide);
         HorizontalVelocityBoostDebug = new(horizontalVelocityBoost);
 
-        if (Physics.Raycast(transform.position, Vector3.down, 2f * 0.5f + 0.2f, limits) || inputQuery.QuickReset) ResetLevel();
+        if (Physics.Raycast(transform.position, Vector3.down, 2f * 0.5f + 0.2f, limits)) transform.position = Vector3.up * 100;
         // do a layer per level instead with a scriptable object LevelInfo holding all relevant y
     }
 
