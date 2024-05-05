@@ -345,7 +345,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3013796309
+  GlobalObjectIdHash: 609228021
   InScenePlacedSourceGlobalObjectIdHash: 870966366
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -588,11 +588,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 959bf49a2f4c4754387eaaedce54cd85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HitMarkerSettings:
-    DisplayOnRight: 0
-    DisplayOffset: 0
-    DynamicMarker: 0
-    HitMarkerDuration: 0
+  DamageLogSettings:
+    DisplayOnRight: 1
+    DisplayOffset: 25
+    DynamicLog: 0
+    DamageLogColors:
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    DamageLogTextModifiers: 0000000000000000000000000000000000000000000000000000000000000000
+    DamageLogDuration: 2
+    DamageLogSize: 24
 --- !u!114 &8008324741424589376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -702,11 +721,30 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 136
   playerHitMarkerSettings:
-    DisplayOnRight: 0
-    DisplayOffset: 0
-    DynamicMarker: 0
-    HitMarkerDuration: 10
-  damageLogManager: {fileID: 0}
+    DisplayOnRight: 1
+    DisplayOffset: 25
+    DynamicLog: 0
+    DamageLogColors:
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    - Ignore: 1
+      Color: {r: 0, g: 0, b: 0, a: 0}
+    DamageLogTextModifiers: 0000000000000000000000000000000000000000000000000000000000000000
+    DamageLogDuration: 2
+    DamageLogSize: 24
+  damageLogManager: {fileID: 6404117653549858473}
 --- !u!1 &888805865160700714
 GameObject:
   m_ObjectHideFlags: 0
@@ -1707,17 +1745,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d046456b1af91b34382b5f61ea2b3aa2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitColors:
-  - {r: 0.2, g: 0.6, b: 1, a: 0.003921569}
-  - {r: 0.1, g: 0.4, b: 0.8, a: 0.003921569}
-  - {r: 0, g: 0.78431374, b: 0.78431374, a: 0.003921569}
-  - {r: 1, g: 0.92, b: 0.016, a: 0.003921569}
-  - {r: 0.92, g: 0.92, b: 0.92, a: 0.003921569}
-  - {r: 0.39215687, g: 0.5882353, b: 0.5882353, a: 0.003921569}
-  - {r: 0.2509804, g: 0.2509804, b: 0.2509804, a: 0.003921569}
-  - {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 0.003921569}
   damageLogPrefab: {fileID: 9184270945164853946, guid: 0456bd4ff3f9c7d43875a067ed0f5825,
     type: 3}
+  baseHitMarkerColors:
+  - Ignore: 0
+    Color: {r: 0.2, g: 0.6, b: 1, a: 1}
+  - Ignore: 0
+    Color: {r: 0.101960786, g: 0.4, b: 0.8, a: 1}
+  - Ignore: 0
+    Color: {r: 0, g: 0.78431374, b: 0.78431374, a: 1}
+  - Ignore: 0
+    Color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - Ignore: 0
+    Color: {r: 0.92156863, g: 0.92156863, b: 0.92156863, a: 1}
+  - Ignore: 0
+    Color: {r: 0.39215687, g: 0.5882353, b: 0.5882353, a: 1}
+  - Ignore: 0
+    Color: {r: 0.2509804, g: 0.2509804, b: 0.2509804, a: 1}
+  - Ignore: 0
+    Color: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+  baseHitMarkerTextModifiers: 0300000002000000040000000300000002000000040000000500000005000000
 --- !u!1 &8011353813352860872
 GameObject:
   m_ObjectHideFlags: 0

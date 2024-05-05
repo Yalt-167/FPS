@@ -2,7 +2,7 @@ public enum TargetType
 {
     HEAD_SHIELDED,
     BODY_SHIELDED,
-    Legs_SHIELDED,
+    LEGS_SHIELDED,
     HEAD,
     BODY,
     LEGS,

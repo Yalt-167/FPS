@@ -3,29 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using TMPro;
 
 public class DamageLogManager : MonoBehaviour
 {
-    [Tooltip("Order: Head(Shielded) -> Body(Shielded) -> Legs(Shielded) -> Head -> Body -> Legs -> Object(Weakpoint) -> Object")][SerializeField] private Color[] hitColors;
     [SerializeField] private GameObject damageLogPrefab;
     private List<GameObject> activeDamageLogs = new();
 
-    private WaitForSeconds hitMarkerLifeTime;
-    private RectTransform rectTransform;
+    [Space(10)]
+    [Tooltip("Order: Head(Shielded) -> Body(Shielded) -> Legs(Shielded) -> Head -> Body -> Legs -> Object(Weakpoint) -> Object")][SerializeField] private IgnorableNonNullableType<Color>[] baseHitMarkerColors;
+    [Tooltip("Order: Head(Shielded) -> Body(Shielded) -> Legs(Shielded) -> Head -> Body -> Legs -> Object(Weakpoint) -> Object")][SerializeField] private IgnorableNonNullableType<FontStyles>[] baseHitMarkerTextModifiers;
+
+    private DamageLogSettings currentSettings;
+    private WaitForSeconds damageLogLifetime;
 
 
 
     public void SummonDamageLog(Vector3 position, TargetType targetType, int damage)
     {
-        GetComponent<RectTransform>().position = position;
         var damageLog = Instantiate(damageLogPrefab, transform);
-        damageLog.GetComponent<DamageLog>().Init(MapTargetTypeToColor(targetType), MapHitToLogText(targetType, damage));
+        damageLog.GetComponent<DamageLog>().Init(currentSettings, targetType, MapHitToLogText(targetType, damage));
         StartCoroutine(HandleDamageLog(damageLog));
-    }
-
-    private Color MapTargetTypeToColor(TargetType targetType)
-    {
-        return hitColors[(int)targetType];
     }
 
     private string MapHitToLogText(TargetType targetType, int damage)
@@ -33,9 +31,8 @@ public class DamageLogManager : MonoBehaviour
         return targetType switch {
             TargetType.HEAD_SHIELDED or TargetType.HEAD => $"{damage}!",
             TargetType.BODY_SHIELDED or TargetType.BODY => $"{damage}",
-            TargetType.Legs_SHIELDED or TargetType.LEGS => $"{damage}?",
-            TargetType.OBJECT_WEAKPOINT => $"{damage}",
-            TargetType.OBJECT => $"{damage}",
+            TargetType.LEGS_SHIELDED or TargetType.LEGS => $"{damage}?",
+            TargetType.OBJECT_WEAKPOINT or TargetType.OBJECT => $"{damage}",
             _ => ""  
         };
     }
@@ -44,16 +41,59 @@ public class DamageLogManager : MonoBehaviour
     {
         activeDamageLogs.Add(damageLog);
 
-        yield return hitMarkerLifeTime;
+        yield return damageLogLifetime;
 
         activeDamageLogs.Remove(damageLog);
         Destroy(damageLog);
     }
 
-    public void UpdatePlayerSettings(HitMarkerSettings playerHitMarkerSettings)
+    #region Player Settings Modifiers
+
+    public void UpdatePlayerSettings(DamageLogSettings playerDamageLogsSettings)
     {
-        hitMarkerLifeTime = new(playerHitMarkerSettings.HitMarkerDuration);
+        currentSettings.DisplayOnRight = playerDamageLogsSettings.DisplayOnRight;
+
+        currentSettings.DisplayOffset = playerDamageLogsSettings.DisplayOffset;
+
+        UpdateDamageLogsColor(playerDamageLogsSettings.DamageLogColors);
+
+        UpdateDamagelogsTextModifiers(playerDamageLogsSettings.DamageLogTextModifiers);
+
+        currentSettings.DynamicLog = playerDamageLogsSettings.DynamicLog;
+
+        damageLogLifetime = new(playerDamageLogsSettings.DamageLogDuration);
+
+        currentSettings.DamageLogSize = playerDamageLogsSettings.DamageLogSize;
     }
 
+    private void UpdateDamageLogsColor(IgnorableNonNullableType<Color>[] playerCustomColors)
+    {
+        currentSettings.DamageLogColors = new IgnorableNonNullableType<Color>[8];
+        for (int i = 0; i < 8; i++)
+        {
+            currentSettings.DamageLogColors[i] = playerCustomColors[i].Ignore ? baseHitMarkerColors[i] : playerCustomColors[i];
+        }
+    }
+
+    private void UpdateDamagelogsTextModifiers(IgnorableNonNullableType<FontStyles>[] playerDamageLogsTextModifiers)
+    {
+        currentSettings.DamageLogTextModifiers = new IgnorableNonNullableType<FontStyles>[8];
+        for (int i = 0; i < 8; i++)
+        {
+            currentSettings.DamageLogTextModifiers[i] = playerDamageLogsTextModifiers[i].Ignore ? baseHitMarkerTextModifiers[i] : playerDamageLogsTextModifiers[i];
+        }
+    }
+
+    #endregion
 
 }
+
+//public enum TextModifier
+//{
+//    NONE,
+//    VANILLA,
+//    ITALIC,
+//    BOLD,
+//    UNDERLINED,
+//    STRIKED,
+//}

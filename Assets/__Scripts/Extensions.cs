@@ -71,7 +71,4 @@ public static class Extensions
     {
         return new Vector3(currentVector.x, currentVector.y, currentVector.z * z);
     }
-
-
-   
 }

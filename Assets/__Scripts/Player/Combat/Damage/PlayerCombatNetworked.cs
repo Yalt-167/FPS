@@ -14,7 +14,7 @@ public class PlayerCombatNetworked : NetworkBehaviour
 
     [SerializeField] private LayerMask hittableLayers;
 
-    [SerializeField] private HitMarkerSettings playerHitMarkerSettings;
+    [SerializeField] private DamageLogSettings playerHitMarkerSettings;
     [SerializeField] private DamageLogManager damageLogManager;
 
 

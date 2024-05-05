@@ -5,17 +5,46 @@ using TMPro;
 
 public class DamageLog : MonoBehaviour
 {
-    private TextMeshProUGUI scoreRenderer;
+    private TextMeshProUGUI log;
+    public RectTransform rectTransform;
+    private bool dynamic;
 
-    public void Init(Color color, string logText)
+    public float Init(DamageLogSettings damageLogSettings, TargetType targetType, string logText)
     {
-        scoreRenderer = GetComponent<TextMeshProUGUI>();
-        print("not yet");
-        scoreRenderer.color = color;
-        print("made it");
-        scoreRenderer.fontSize = 18;
-        scoreRenderer.text = logText;
+        log = GetComponent<TextMeshProUGUI>();
 
-        GetComponent<RectTransform>().anchoredPosition = new(0, 0);
+        log.text = logText;
+        log.fontSize = damageLogSettings.DamageLogSize;
+        log.fontStyle = MapTargetTypeToFontStyle(damageLogSettings, targetType);
+        log.alignment = damageLogSettings.DisplayOnRight ? TextAlignmentOptions.Left : TextAlignmentOptions.Right;
+
+        log.color = MapTargetTypeToColor(damageLogSettings, targetType);
+
+        rectTransform = GetComponent<RectTransform>();
+        rectTransform.anchoredPosition = new(damageLogSettings.DisplayOnRight ? damageLogSettings.DisplayOffset : -damageLogSettings.DisplayOffset, 0);
+
+        return rectTransform.sizeDelta.y;
+    }
+
+    private Color MapTargetTypeToColor(DamageLogSettings damageLogSettings, TargetType targetType)
+    {
+        return damageLogSettings.DamageLogColors[(int)targetType];
+    }
+
+    private FontStyles MapTargetTypeToFontStyle(DamageLogSettings damageLogSettings, TargetType targetType)
+    {
+        return damageLogSettings.DamageLogTextModifiers[(int)targetType]; //switch
+        //{
+        //    TextModifier.ITALIC => FontStyles.Italic,
+        //    TextModifier.BOLD => FontStyles.Bold,
+        //    TextModifier.UNDERLINED => FontStyles.Underline,
+        //    TextModifier.STRIKED => FontStyles.Strikethrough,
+        //    TextModifier.VANILLA or TextModifier.NONE or _ => FontStyles.Normal,
+        //};
+    }
+
+    public void FixedUpdate()
+    {
+        if (!dynamic) { return; }
     }
 }
