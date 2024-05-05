@@ -6,7 +6,7 @@ public class Goal : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        SaveAndLoad.Save(Game.Manager.GameTime);
+        //SaveAndLoad.Save(Game.Manager.GameTime);
         Game.Manager.NextLevel();
     }
 }

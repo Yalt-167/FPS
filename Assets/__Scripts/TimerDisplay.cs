@@ -15,10 +15,10 @@ public class TimerDisplay : MonoBehaviour
 
     public void UpdateText(float currentTime)
     {
-        textMeshPro.text = FormatTime(currentTime);
+        textMeshPro.text = GetFormattedTime(currentTime);
     }
 
-    private string FormatTime(float timeInSeconds)
+    private string GetFormattedTime(float timeInSeconds)
     {
         var timeInMilliseconds = Mathf.RoundToInt(timeInSeconds * 1000);
 

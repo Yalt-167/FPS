@@ -997,14 +997,7 @@ public class PlayerMovement : MonoBehaviour, IEntity
 
     public void OnHurt()
     {
-        ResetLevel();
-    }
-
-    public void ResetLevel()
-    {
-        Rigidbody.velocity = new();
-        transform.SetPositionAndRotation(Game.Manager.SpawnPoint.position, Game.Manager.SpawnPoint.rotation);
-        Game.Manager.ResetTimer();
+        throw new NotImplementedException();
     }
 }
 

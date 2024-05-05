@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 8425936294815986091}
   - component: {fileID: 3181321198823545346}
   m_Layer: 0
-  m_Name: Capsule
+  m_Name: EnemyHitscan
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

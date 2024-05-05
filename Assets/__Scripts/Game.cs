@@ -9,9 +9,6 @@ public class Game : MonoBehaviour
 {
     public static Game Manager;
 
-    private Stopwatch timer = new();
-    public float GameTime => timer.Elapsed;
-
     #region Debug
 
     [SerializeField] private bool debugBottomPlane;
@@ -19,16 +16,11 @@ public class Game : MonoBehaviour
     #endregion
 
     [field: SerializeField] public Settings GameSettings { get; private set; }
-    private float[] times;
     public int CurrentSceneID { get; private set; } = 1;
-
-    public Transform SpawnPoint { get; set; }
 
     private void Awake()
     {
-        DontDestroyOnLoad(gameObject);
         Manager = this;
-        times = new float[] { float.MaxValue, float.MaxValue, float.MaxValue, float.MaxValue };
     }
 
 
@@ -39,17 +31,10 @@ public class Game : MonoBehaviour
         Application.targetFrameRate = 120;
     }
 
-    private void Update()
-    {
-        timer.Update(Time.deltaTime);
-        TimerDisplay.Instance.UpdateText(GameTime);
-    }
-
+    
     public void NextLevel()
     {
-        times[CurrentSceneID - 1] = GameTime;
         SceneManager.LoadScene(++CurrentSceneID);
-        PlayerMovement.Instance.ResetLevel();
     }
 
     private void OnDrawGizmos()
@@ -72,16 +57,6 @@ public class Game : MonoBehaviour
                 Gizmos.DrawLine(origin - forward + sidewardOffsetVec, origin + forward + sidewardOffsetVec);
             }
         }
-    }
-
-    public void StartTimer()
-    {
-        timer.Start();
-    }
-
-    public void ResetTimer()
-    {
-        timer.Reset();
     }
 }
 

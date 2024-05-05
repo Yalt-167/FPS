@@ -1,18 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerSettings : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public HitMarkerSettings HitMarkerSettings;
+}
+[Serializable]
+public struct HitMarkerSettings
+{
+    public bool DisplayOnRight;
+    [Range(0, 400)] public int DisplayOffset;
+    public bool DynamicMarker;
+    [Tooltip("Order: Head(Shielded) -> Body(Shielded) -> Legs(Shielded) -> Head -> Body -> Legs -> Object(Weakpoint) -> Object")] public Color?[] CustomColors;
+    [Range(0, 10)] public float HitMarkerDuration;
 }

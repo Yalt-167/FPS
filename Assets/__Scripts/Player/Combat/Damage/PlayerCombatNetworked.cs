@@ -13,6 +13,13 @@ public class PlayerCombatNetworked : NetworkBehaviour
     [SerializeField] private GameObject bulletTrailPrefab;
 
     [SerializeField] private LayerMask hittableLayers;
+
+    [SerializeField] private HitMarkerSettings playerHitMarkerSettings;
+    [SerializeField] private DamageLogManager damageLogManager;
+
+
+
+
     // Rpc -> remote procedure call
 
     [ServerRpc] // called by a client to execute on the server; the caller MUST be the local player
@@ -33,7 +40,10 @@ public class PlayerCombatNetworked : NetworkBehaviour
                 shootableComponent.ReactShot(hit.point, shootingDir);
             }
 
-            Destroy(Instantiate(landingShotEffect, hit.point - shootingDir * .1f, Quaternion.identity), hitEffectLifetime);
+            damageLogManager.UpdatePlayerSettings(playerHitMarkerSettings);
+            damageLogManager.SummonDamageLog(hit.point, TargetType.HEAD_SHIELDED, 75);
+            //Destroy(Instantiate(landingShotEffect, hit.point - shootingDir * .1f, Quaternion.identity), hitEffectLifetime);
+
         }
         else
         {
