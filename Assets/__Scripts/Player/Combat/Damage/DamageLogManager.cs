@@ -11,13 +11,11 @@ public class DamageLogManager : MonoBehaviour
     private List<GameObject> activeDamageLogs = new();
 
     [Space(10)]
-    [Tooltip("Order: Head(Shielded) -> Body(Shielded) -> Legs(Shielded) -> Head -> Body -> Legs -> Object(Weakpoint) -> Object")][SerializeField] private IgnorableNonNullableType<Color>[] baseHitMarkerColors;
-    [Tooltip("Order: Head(Shielded) -> Body(Shielded) -> Legs(Shielded) -> Head -> Body -> Legs -> Object(Weakpoint) -> Object")][SerializeField] private IgnorableNonNullableType<FontStyles>[] baseHitMarkerTextModifiers;
+    [Tooltip("Order: Head(Shielded) -> Body(Shielded) -> Legs(Shielded) -> Head -> Body -> Legs -> Object(Weakpoint) -> Object")][SerializeField] private IgnorableNonNullableType<Color>[] baseDamageLogsColors;
+    [Tooltip("Order: Head(Shielded) -> Body(Shielded) -> Legs(Shielded) -> Head -> Body -> Legs -> Object(Weakpoint) -> Object")][SerializeField] private IgnorableNonNullableType<FontStyles>[] baseDamageLogsTextModifiers;
 
     private DamageLogSettings currentSettings;
     private WaitForSeconds damageLogLifetime;
-
-
 
     public void SummonDamageLog(Vector3 position, TargetType targetType, int damage)
     {
@@ -71,7 +69,7 @@ public class DamageLogManager : MonoBehaviour
         currentSettings.DamageLogColors = new IgnorableNonNullableType<Color>[8];
         for (int i = 0; i < 8; i++)
         {
-            currentSettings.DamageLogColors[i] = playerCustomColors[i].Ignore ? baseHitMarkerColors[i] : playerCustomColors[i];
+            currentSettings.DamageLogColors[i] = playerCustomColors[i].Ignore ? baseDamageLogsColors[i] : playerCustomColors[i];
         }
     }
 
@@ -80,20 +78,10 @@ public class DamageLogManager : MonoBehaviour
         currentSettings.DamageLogTextModifiers = new IgnorableNonNullableType<FontStyles>[8];
         for (int i = 0; i < 8; i++)
         {
-            currentSettings.DamageLogTextModifiers[i] = playerDamageLogsTextModifiers[i].Ignore ? baseHitMarkerTextModifiers[i] : playerDamageLogsTextModifiers[i];
+            currentSettings.DamageLogTextModifiers[i] = playerDamageLogsTextModifiers[i].Ignore ? baseDamageLogsTextModifiers[i] : playerDamageLogsTextModifiers[i];
         }
     }
 
     #endregion
 
 }
-
-//public enum TextModifier
-//{
-//    NONE,
-//    VANILLA,
-//    ITALIC,
-//    BOLD,
-//    UNDERLINED,
-//    STRIKED,
-//}
