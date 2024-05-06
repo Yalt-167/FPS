@@ -685,8 +685,7 @@ MonoBehaviour:
   gameObjectsToKillOnForeignPlayers:
   - {fileID: 7803131807664606466}
   componentsToKillOnLocalPlayers: []
-  gameObjectsToKillOnLocalPlayers:
-  - {fileID: 0}
+  gameObjectsToKillOnLocalPlayers: []
 --- !u!114 &8430323774073140898
 MonoBehaviour:
   m_ObjectHideFlags: 0

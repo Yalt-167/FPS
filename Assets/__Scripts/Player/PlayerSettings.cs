@@ -8,6 +8,7 @@ public class PlayerSettings : MonoBehaviour
 {
     public DamageLogSettings DamageLogSettings;
 }
+
 [Serializable]
 public struct DamageLogSettings
 {

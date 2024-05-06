@@ -83,5 +83,4 @@ public class DamageLogManager : MonoBehaviour
     }
 
     #endregion
-
 }

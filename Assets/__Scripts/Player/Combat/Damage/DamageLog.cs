@@ -33,14 +33,7 @@ public class DamageLog : MonoBehaviour
 
     private FontStyles MapTargetTypeToFontStyle(DamageLogSettings damageLogSettings, TargetType targetType)
     {
-        return damageLogSettings.DamageLogTextModifiers[(int)targetType]; //switch
-        //{
-        //    TextModifier.ITALIC => FontStyles.Italic,
-        //    TextModifier.BOLD => FontStyles.Bold,
-        //    TextModifier.UNDERLINED => FontStyles.Underline,
-        //    TextModifier.STRIKED => FontStyles.Strikethrough,
-        //    TextModifier.VANILLA or TextModifier.NONE or _ => FontStyles.Normal,
-        //};
+        return damageLogSettings.DamageLogTextModifiers[(int)targetType];
     }
 
     public void FixedUpdate()

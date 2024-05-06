@@ -14,7 +14,7 @@ public class PlayerMovement : MonoBehaviour, IEntity
 
     #region References
 
-    public static PlayerMovement Instance;
+    public static PlayerMovement Instance; // fix ASAP
     [SerializeField] private MovementInputQuery inputQuery;
     private Rigidbody Rigidbody;
     private CapsuleCollider CapsuleCollider;
