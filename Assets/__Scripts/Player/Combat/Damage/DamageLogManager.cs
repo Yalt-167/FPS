@@ -8,7 +8,7 @@ using TMPro;
 public class DamageLogManager : MonoBehaviour
 {
     [SerializeField] private GameObject damageLogPrefab;
-    private List<GameObject> activeDamageLogs = new();
+    private readonly List<GameObject> activeDamageLogs = new();
 
     [Space(10)]
     [Tooltip("Order: Head(Shielded) -> Body(Shielded) -> Legs(Shielded) -> Head -> Body -> Legs -> Object(Weakpoint) -> Object")][SerializeField] private IgnorableNonNullableType<Color>[] baseDamageLogsColors;
@@ -40,9 +40,13 @@ public class DamageLogManager : MonoBehaviour
     {
         activeDamageLogs.Add(damageLog);
 
+
         yield return damageLogLifetime;
 
+
         currentVerticalOffset -= (int)damageLog.GetComponent<RectTransform>().sizeDelta.y;
+        if (currentVerticalOffset < 0) { currentVerticalOffset = 0; }
+
         activeDamageLogs.Remove(damageLog);
         Destroy(damageLog);
     }

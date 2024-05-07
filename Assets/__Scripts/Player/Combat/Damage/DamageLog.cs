@@ -7,7 +7,10 @@ public class DamageLog : MonoBehaviour
 {
     private TextMeshProUGUI log;
     public RectTransform rectTransform;
-    private bool dynamic;
+    private static WaitForFixedUpdate awaitFixedUpdate = new();
+    private static float gravity = -.7f;
+    private static float xMovement = .05f;
+    // + rotation
 
     public int Init(DamageLogSettings damageLogSettings, TargetType targetType, string logText, int verticalOffset)
     {
@@ -25,6 +28,12 @@ public class DamageLog : MonoBehaviour
         rectTransform.pivot = new(damageLogSettings.DisplayOnRight ? 0f : 1f, .5f);
         rectTransform.anchoredPosition = new(damageLogSettings.DisplayOnRight ? damageLogSettings.DisplayOffset : -damageLogSettings.DisplayOffset, damageLogSettings.GoingUp ? verticalOffset : -verticalOffset);
 
+        if (damageLogSettings.DynamicLog)
+        {
+            StartCoroutine(Behave(damageLogSettings.DisplayOnRight));
+            return 0;
+        }
+
         return (int)rectTransform.sizeDelta.y;
     }
 
@@ -38,8 +47,17 @@ public class DamageLog : MonoBehaviour
         return damageLogSettings.DamageLogTextModifiers[(int)targetType];
     }
 
-    public void FixedUpdate()
+    private IEnumerator Behave(bool onRight)
     {
-        if (!dynamic) { return; }
+        var lifeTimeSoFar = 0f;
+        var velocity = new Vector2(0f, 10f);
+        var addedVelocityX = onRight ? xMovement : -xMovement;
+        for(; ; )
+        {
+            yield return awaitFixedUpdate;
+            lifeTimeSoFar += Time.fixedDeltaTime;
+            velocity += new Vector2(addedVelocityX, gravity);
+            rectTransform.anchoredPosition += velocity;
+        }
     }
 }

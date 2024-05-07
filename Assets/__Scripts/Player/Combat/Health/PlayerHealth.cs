@@ -20,11 +20,8 @@ public class PlayerHealth : NetworkBehaviour
     
     private bool Alive => CurrentHealth > 0;
 
-    private PlayerCombatNetworked myPlayerCombatNetworked;
-
     private void Awake()
     {
-        myPlayerCombatNetworked = GetComponent<PlayerCombatNetworked>();
         ResetHealth();
         PassiveRegen();
     }
@@ -141,7 +138,6 @@ public class PlayerHealth : NetworkBehaviour
             BodyParts.HEAD => hadShield ? TargetType.HEAD_SHIELDED : TargetType.HEAD,
             BodyParts.BODY => hadShield ? TargetType.BODY_SHIELDED : TargetType.BODY,
             BodyParts.LEGS => hadShield ? TargetType.LEGS_SHIELDED : TargetType.LEGS,
-            _ => throw new NotImplementedException(),
         };
     }
 }
