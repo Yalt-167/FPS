@@ -15,7 +15,50 @@ public class Game : MonoBehaviour
 
     #endregion
 
+    #region Player Combat List
+
+    private List<PlayerCombatNetworked> playerCombatNetworked = new();
+
+    public void AddPlayerCombatNetworked(PlayerCombatNetworked playerNetworked)
+    {
+        playerCombatNetworked.Add(playerNetworked);
+    }
+
+    public void RemovePlayerCombatNetworked(PlayerCombatNetworked playerNetworked)
+    {
+        if (!playerCombatNetworked.Contains(playerNetworked)) { return; }
+
+        playerCombatNetworked.Add(playerNetworked);
+    }
+    public PlayerCombatNetworked GetPlayerCombatNetworkedFromNetworkObjectID(ulong playerObjectID)
+    {
+        var size = playerCombatNetworked.Count;
+        for (int i = 0; i < size; i++)
+        {
+            if (playerCombatNetworked[i].NetworkObjectId == playerObjectID)
+            {
+                return playerCombatNetworked[i];
+            }
+        }
+
+        return null;
+    }
+
+    public IEnumerable<PlayerCombatNetworked>PlayersCombatNetworked()
+    {
+        var size = playerCombatNetworked.Count;
+        for (int i = 0; i < size; i++)
+        {
+            yield return playerCombatNetworked[i];
+        }
+    }
+
+
+    #endregion
+
+
     [field: SerializeField] public Settings GameSettings { get; private set; }
+
     public int CurrentSceneID { get; private set; } = 1;
 
     private void Awake()

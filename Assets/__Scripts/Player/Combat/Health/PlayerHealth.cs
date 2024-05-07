@@ -3,7 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEditor;
+using Unity.VisualScripting;
 
+[DefaultExecutionOrder(-4)]
 public class PlayerHealth : NetworkBehaviour
 {
     [field: SerializeField] public PlayerHealthData HealthData { get; private set; }
@@ -17,8 +20,11 @@ public class PlayerHealth : NetworkBehaviour
     
     private bool Alive => CurrentHealth > 0;
 
+    private PlayerCombatNetworked myPlayerCombatNetworked;
+
     private void Awake()
     {
+        myPlayerCombatNetworked = GetComponent<PlayerCombatNetworked>();
         ResetHealth();
         PassiveRegen();
     }
@@ -59,8 +65,6 @@ public class PlayerHealth : NetworkBehaviour
             transform.position = Vector3.up * 100;
             return;
         }
-
-        //if (Input.GetKeyDown(KeyCode.L)) { TakeDamageClientRpc(3, false); }
     }
 
     private void ResetHealth()
@@ -72,16 +76,20 @@ public class PlayerHealth : NetworkBehaviour
         Shield = new(HealthData.MaxShieldSlots, HealthData.ShieldSlotHealth);
     }
 
-    [ClientRpc]
-    public void TakeDamageClientRpc(float damage, bool ignoreShield) // add shield only modifier ?
+    [Rpc(SendTo.ClientsAndHost)]
+    public void TakeDamageClientRpc(ushort damage, BodyParts bodyPartShot, bool ignoreShield, ulong attackerNetworkID) // add shield only modifier ?
     {
-        if (!IsOwner) { return; }
+        //if (!IsOwner) { return; }
+
+        // send the info about wether shielded here (bool)Shield
+        SendDamageLogInfosServerRpc(MapBodyPartToTargetType(bodyPartShot, Shield), damage, attackerNetworkID);
 
         if (damage <= 0) { return; }
 
+
         if (!ignoreShield && Shield)
         {
-            damage = Shield.TakeDamage(damage);
+            damage = (ushort)Shield.TakeDamage(damage);
         }
 
         if (damage <= 0) { return; }
@@ -109,24 +117,31 @@ public class PlayerHealth : NetworkBehaviour
     public void RegenerateShield(float healProficiency, bool canReviveCell)
     {
         Shield.Heal(healProficiency, canReviveCell);
+    }
 
-        //if (canReviveCell)
-        //{
-        //    var totalShieldAfterHeal = TotalShield + howMuch;
-        //    currentShieldSlots = (int)(totalShieldAfterHeal / healthData.ShieldSlotHealth);
-        //    currentShieldSlotRemainingPower = totalShieldAfterHeal - currentShieldSlots * healthData.ShieldSlotHealth;
-        //    currentShieldSlots++; // the half filled slot
-        //}
-        //else
-        //{
-        //    currentShieldSlots++;
-        //    currentShieldSlotRemainingPower = healthData.ShieldSlotHealth;
-        //}
-        
-        //if (currentShieldSlots > healthData.MaxShieldSlots)
-        //{
-        //    currentShieldSlots = healthData.MaxShieldSlots;
-        //    currentShieldSlotRemainingPower = healthData.ShieldSlotHealth;
-        //}
+    [Rpc(SendTo.Server)]
+    public void SendDamageLogInfosServerRpc(TargetType targetType, ushort damage, ulong attackerNetworkID)
+    {
+        DisplayDamageLogsClientRPC(targetType, damage, attackerNetworkID);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)] // called on all client on this INSTANCE of this script
+    public void DisplayDamageLogsClientRPC(TargetType targetType, ushort damageDealt, ulong attackerNetworkID)
+    {
+        //if (!IsOwner) { return; }
+
+        Game.Manager.GetPlayerCombatNetworkedFromNetworkObjectID(attackerNetworkID).SpawnDamageLog(targetType, damageDealt);
+    }
+
+
+    private TargetType MapBodyPartToTargetType(BodyParts bodyPart, bool hadShield)
+    {
+        return bodyPart switch
+        {
+            BodyParts.HEAD => hadShield ? TargetType.HEAD_SHIELDED : TargetType.HEAD,
+            BodyParts.BODY => hadShield ? TargetType.BODY_SHIELDED : TargetType.BODY,
+            BodyParts.LEGS => hadShield ? TargetType.LEGS_SHIELDED : TargetType.LEGS,
+            _ => throw new NotImplementedException(),
+        };
     }
 }

@@ -12,6 +12,7 @@ public class DamageLog : MonoBehaviour
     public float Init(DamageLogSettings damageLogSettings, TargetType targetType, string logText)
     {
         log = GetComponent<TextMeshProUGUI>();
+        rectTransform = GetComponent<RectTransform>();
 
         log.text = logText;
         log.fontSize = damageLogSettings.DamageLogSize;
@@ -20,7 +21,6 @@ public class DamageLog : MonoBehaviour
 
         log.color = MapTargetTypeToColor(damageLogSettings, targetType);
 
-        rectTransform = GetComponent<RectTransform>();
         rectTransform.anchoredPosition = new(damageLogSettings.DisplayOnRight ? damageLogSettings.DisplayOffset : -damageLogSettings.DisplayOffset, 0);
 
         return rectTransform.sizeDelta.y;

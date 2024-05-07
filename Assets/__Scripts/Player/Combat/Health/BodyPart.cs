@@ -2,29 +2,48 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.UI;
+using System.Diagnostics;
+using System;
 
 public class BodyPart : NetworkBehaviour, IShootable
 {
-    [SerializeField] private DamageMultipliers relevantDamageMultiplier;
-    [SerializeField] private PlayerHealth playerHealth;
+    [SerializeField] private BodyParts bodyPart;
+    private PlayerHealth playerHealth;
 
-    
-    public void ReactShot(Vector3 _, Vector3 __)
+    private void Awake()
     {
-        print(relevantDamageMultiplier);
-        if (!IsOwner) { return; }
-
-        DamageTargetServerRpc();
+        playerHealth = transform.parent.parent.GetComponent<PlayerHealth>();
     }
 
-    [ServerRpc]
-    private void DamageTargetServerRpc()
+    public void ReactShot(ushort damage, Vector3 _, Vector3 __, ulong attackerNetworkID)
     {
-        playerHealth.TakeDamageClientRpc(75, false);
+        if (!IsOwner) { return; }
+
+        var damageAfterMultiplier = GetDamageAfterMultipliers(damage);
+
+        DamageTargetServerRpc(damageAfterMultiplier, bodyPart, attackerNetworkID);
+    }
+
+    [Rpc(SendTo.Server)]
+    private void DamageTargetServerRpc(ushort damage, BodyParts bodyPart, ulong attackerNetworkID)
+    {
+        playerHealth.TakeDamageClientRpc(damage, bodyPart, false, attackerNetworkID);
+    }
+
+    private ushort GetDamageAfterMultipliers(ushort rawDamage)
+    {
+        return bodyPart switch
+        {
+            BodyParts.HEAD => (ushort)(rawDamage * 2),
+            BodyParts.BODY => rawDamage,
+            BodyParts.LEGS => (ushort)(.5f * rawDamage),
+            _ => rawDamage,
+        };
     }
 }
 
-public enum DamageMultipliers
+public enum BodyParts : byte
 {
     HEAD,
     BODY,

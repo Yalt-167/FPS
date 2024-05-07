@@ -1,4 +1,4 @@
-public enum TargetType
+public enum TargetType : byte
 {
     HEAD_SHIELDED,
     BODY_SHIELDED,
