@@ -21,6 +21,7 @@ public class DamageLog : MonoBehaviour
 
         log.color = MapTargetTypeToColor(damageLogSettings, targetType);
 
+        rectTransform.pivot = new(damageLogSettings.DisplayOnRight ? 0f : 1f, .5f);
         rectTransform.anchoredPosition = new(damageLogSettings.DisplayOnRight ? damageLogSettings.DisplayOffset : -damageLogSettings.DisplayOffset, 0);
 
         return rectTransform.sizeDelta.y;

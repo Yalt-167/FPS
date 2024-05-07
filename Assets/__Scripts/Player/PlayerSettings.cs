@@ -18,7 +18,7 @@ public struct DamageLogSettings
     [Tooltip("Order: Head(Shielded) -> Body(Shielded) -> Legs(Shielded) -> Head -> Body -> Legs -> Object(Weakpoint) -> Object")] public IgnorableNonNullableType<Color>[] DamageLogColors;
     [Tooltip("Order: Head(Shielded) -> Body(Shielded) -> Legs(Shielded) -> Head -> Body -> Legs -> Object(Weakpoint) -> Object")] public IgnorableNonNullableType<FontStyles>[] DamageLogTextModifiers;
     [Range(0, 10)] public float DamageLogDuration;
-    [Range(8, 36)] public int DamageLogSize;
+    [Range(16, 36)] public int DamageLogSize;
 }
 
 [Serializable]
