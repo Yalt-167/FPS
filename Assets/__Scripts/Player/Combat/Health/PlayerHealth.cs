@@ -79,7 +79,7 @@ public class PlayerHealth : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     public void TakeDamageClientRpc(ushort damage, BodyParts bodyPartShot, bool ignoreShield, ulong attackerNetworkID) // add shield only modifier ?
     {
-        //if (!IsOwner) { return; }
+        if (!IsOwner) { return; }
 
         // send the info about wether shielded here (bool)Shield
         SendDamageLogInfosServerRpc(MapBodyPartToTargetType(bodyPartShot, Shield), damage, attackerNetworkID);
@@ -128,7 +128,9 @@ public class PlayerHealth : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)] // called on all client on this INSTANCE of this script
     public void DisplayDamageLogsClientRPC(TargetType targetType, ushort damageDealt, ulong attackerNetworkID)
     {
-        //if (!IsOwner) { return; }
+        if (IsOwner) { return; }
+
+        print("been here once");
 
         Game.Manager.GetPlayerCombatNetworkedFromNetworkObjectID(attackerNetworkID).SpawnDamageLog(targetType, damageDealt);
     }
