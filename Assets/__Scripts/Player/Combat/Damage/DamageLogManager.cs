@@ -16,11 +16,12 @@ public class DamageLogManager : MonoBehaviour
 
     private DamageLogSettings currentSettings;
     private WaitForSeconds damageLogLifetime;
+    private int currentVerticalOffset = 0;
 
     public void SummonDamageLog(Vector3 position, TargetType targetType, int damage)
     {
         var damageLog = Instantiate(damageLogPrefab, transform);
-        damageLog.GetComponent<DamageLog>().Init(currentSettings, targetType, MapHitToLogText(targetType, damage));
+        currentVerticalOffset += damageLog.GetComponent<DamageLog>().Init(currentSettings, targetType, MapHitToLogText(targetType, damage), currentVerticalOffset);
         StartCoroutine(HandleDamageLog(damageLog));
     }
 
@@ -41,6 +42,7 @@ public class DamageLogManager : MonoBehaviour
 
         yield return damageLogLifetime;
 
+        currentVerticalOffset -= (int)damageLog.GetComponent<RectTransform>().sizeDelta.y;
         activeDamageLogs.Remove(damageLog);
         Destroy(damageLog);
     }

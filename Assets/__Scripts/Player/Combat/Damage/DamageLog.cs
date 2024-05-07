@@ -9,7 +9,7 @@ public class DamageLog : MonoBehaviour
     public RectTransform rectTransform;
     private bool dynamic;
 
-    public float Init(DamageLogSettings damageLogSettings, TargetType targetType, string logText)
+    public int Init(DamageLogSettings damageLogSettings, TargetType targetType, string logText, int verticalOffset)
     {
         log = GetComponent<TextMeshProUGUI>();
         rectTransform = GetComponent<RectTransform>();
@@ -21,10 +21,11 @@ public class DamageLog : MonoBehaviour
 
         log.color = MapTargetTypeToColor(damageLogSettings, targetType);
 
+        rectTransform.sizeDelta = new(log.preferredWidth, log.preferredHeight);
         rectTransform.pivot = new(damageLogSettings.DisplayOnRight ? 0f : 1f, .5f);
-        rectTransform.anchoredPosition = new(damageLogSettings.DisplayOnRight ? damageLogSettings.DisplayOffset : -damageLogSettings.DisplayOffset, 0);
+        rectTransform.anchoredPosition = new(damageLogSettings.DisplayOnRight ? damageLogSettings.DisplayOffset : -damageLogSettings.DisplayOffset, damageLogSettings.GoingUp ? verticalOffset : -verticalOffset);
 
-        return rectTransform.sizeDelta.y;
+        return (int)rectTransform.sizeDelta.y;
     }
 
     private Color MapTargetTypeToColor(DamageLogSettings damageLogSettings, TargetType targetType)
