@@ -130,8 +130,6 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (IsOwner) { return; }
 
-        print("been here once");
-
         Game.Manager.GetPlayerCombatNetworkedFromNetworkObjectID(attackerNetworkID).SpawnDamageLog(targetType, damageDealt);
     }
 
