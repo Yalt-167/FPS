@@ -24,13 +24,13 @@ public class PlayerCombatNetworked : NetworkBehaviour
 
     //[ServerRpc] // called by a client to execute on the server; the caller MUST be the local player
     [Rpc(SendTo.Server)]
-    public void RequestAttackServerRpc(Vector3 shootingPos, Vector3 shootingDir)
+    public void RequestAttackServerRpc(short damage, Vector3 shootingPos, Vector3 shootingDir)
     {
-        ExecuteAttackClientRpc(shootingPos, shootingDir);
+        ExecuteAttackClientRpc(damage, shootingPos, shootingDir);
     }
 
     [Rpc(SendTo.ClientsAndHost)] // called by the server to execute on all clients
-    private void ExecuteAttackClientRpc(Vector3 shootingPos, Vector3 shootingDir)
+    private void ExecuteAttackClientRpc(short damage, Vector3 shootingPos, Vector3 shootingDir)
     {
         damageLogManager.UpdatePlayerSettings(playerHitMarkerSettings);
 

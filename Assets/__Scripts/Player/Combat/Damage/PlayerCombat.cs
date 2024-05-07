@@ -81,7 +81,7 @@ public class PlayerCombat : MonoBehaviour
             return;
         }
 
-        playerCombatNetworked.RequestAttackServerRpc(barrelEnd.position, cameraTransform.forward);
+        playerCombatNetworked.RequestAttackServerRpc(10, barrelEnd.position, cameraTransform.forward);
 
         StartCoroutine(ShootingCooldown());
     }
