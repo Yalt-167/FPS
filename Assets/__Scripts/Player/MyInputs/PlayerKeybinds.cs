@@ -84,6 +84,7 @@ public class MovementInputQuery : InputQuery
 public class CombatInputQuery : InputQuery
 {
     public FixedKeybind Shoot;
+    public FixedKeybind Reload;
     public FixedKeybind Slash;
     public FixedKeybind Parry;
     public FixedKeybind ChangeCrosshair;
@@ -91,6 +92,7 @@ public class CombatInputQuery : InputQuery
     public override void Init()
     {
         Shoot.Init();
+        Reload.Init();
         Slash.Init();
         Parry.Init();
 

@@ -591,7 +591,6 @@ public class PlayerMovement : MonoBehaviour, IEntity
     private IEnumerator Slide(bool chainedFromDash)
     {
         SetMovementMode(MovementMode.SLIDE);
-        if (chainedFromDash) print("fromDash");
         CapsuleCollider.height *= .5f;
         IsSliding = true;
 

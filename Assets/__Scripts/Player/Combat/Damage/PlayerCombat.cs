@@ -10,6 +10,8 @@ public class PlayerCombat : MonoBehaviour
     private Transform cameraTransform;
 
     [SerializeField] private CombatInputQuery InputQuery;
+    [SerializeField] private WeaponHandler weaponHandler;
+    private PlayerCombatNetworked playerCombatNetworked;
     [SerializeField] private LayerMask layersToHit;
 
     #region Shoot Setup
@@ -17,10 +19,9 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private float shootingCooldown;
     [SerializeField] private Transform barrelEnd;
     private bool shootingOnCooldown;
-    private readonly float shootBuffer = .1f;
+    private static readonly float shootBuffer = .1f;
     private float lastShootPressed;
     private bool HasBufferedShoot => lastShootPressed + shootBuffer > Time.time;
-
     #endregion  
 
 
@@ -34,7 +35,6 @@ public class PlayerCombat : MonoBehaviour
 
     [SerializeField] private BoxCaster[] katanaChecks;
     [SerializeField] private float slashSpeed;
-    private PlayerCombatNetworked playerCombatNetworked;
 
 
     #endregion
@@ -52,10 +52,16 @@ public class PlayerCombat : MonoBehaviour
         { 
             TryShoot(false);
         }
+        else if (InputQuery.Reload)
+        {
+            print("here");
+            weaponHandler.Reload();
+        }
         else if (HasBufferedShoot)
         {
             TryShoot(true);
         }
+
 
         //else if (InputQuery.Slash)
         //{
@@ -76,14 +82,15 @@ public class PlayerCombat : MonoBehaviour
             lastShootPressed = Time.time;
         }
 
-        if (shootingOnCooldown)
-        {
-            return;
-        }
+        //if (shootingOnCooldown)
+        //{
+        //    return;
+        //}
+        lastShootPressed = float.NegativeInfinity;
+        weaponHandler.Shoot();
+        //playerCombatNetworked.RequestAttackServerRpc(10, barrelEnd.position, cameraTransform.forward);
 
-        playerCombatNetworked.RequestAttackServerRpc(10, barrelEnd.position, cameraTransform.forward);
-
-        StartCoroutine(ShootingCooldown());
+        //StartCoroutine(ShootingCooldown());
     }
 
     private IEnumerator ShootingCooldown()
@@ -161,7 +168,3 @@ public class PlayerCombat : MonoBehaviour
 
 
 }
-
-// bullet bounce??
-
-

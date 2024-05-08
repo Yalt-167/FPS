@@ -9,7 +9,6 @@ public class SlashableCube : MonoBehaviour, ISlashable
     public void ReactSlash(Vector3 _)
     {
         if (OnImmunityAfterHit) return;
-        print("was slashed");
         StartCoroutine(StartCooldown());
     }
 

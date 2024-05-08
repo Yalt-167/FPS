@@ -10,7 +10,6 @@ public class ExplodeWhenShot : MonoBehaviour// , IShootable
     [SerializeField] private float verticalBoostCoefficient;
     public void ReactShotServerRpc(Vector3 _, Vector3 __)
     {
-        print("baboom");
         var vecPlayerBarrelSqrMagnitude = (PlayerMovement.Instance.transform.position - transform.position).sqrMagnitude;
         if (vecPlayerBarrelSqrMagnitude < explosionRadius * explosionRadius)
         {
@@ -19,8 +18,7 @@ public class ExplodeWhenShot : MonoBehaviour// , IShootable
             Vector3 direction = (PlayerMovement.Instance.transform.position - transform.position).normalized;
 
             // Calculate the distance factor using InverseLerp
-            //float distanceFactor = Mathf.Sqrt(Mathf.InverseLerp(0, explosionRadius * explosionRadius, vecPlayerBarrelSqrMagnitude));
-            //print(distanceFactor);
+            //float distanceFactor = Mathf.Sqrt(Mathf.InverseLerp(0, explosionRadius * explosionRadius, vecPlayerBarrelSqrMagnitude
 
             direction.y *= verticalBoostCoefficient;
             // Apply force with a magnitude that depends on the distance factor

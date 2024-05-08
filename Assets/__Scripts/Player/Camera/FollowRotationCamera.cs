@@ -10,8 +10,8 @@ public class FollowRotationCamera : MonoBehaviour
     private float xRotation = 0f; // Current rotation around the x-axis
     private float yRotation = 0f; // Current rotation around the y-axis
 
-    private readonly string MouseXAxis = "Mouse X";
-    private readonly string MouseYAxis = "Mouse Y";
+    private static readonly string MouseXAxis = "Mouse X";
+    private static readonly string MouseYAxis = "Mouse Y";
 
     private void Awake()
     {
