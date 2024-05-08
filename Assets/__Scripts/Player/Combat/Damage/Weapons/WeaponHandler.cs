@@ -98,6 +98,8 @@ public class WeaponHandler : NetworkBehaviour
         InitGun();
     }
 
+    #region Init
+
     public void InitGun()
     {
         ammos = currentWeapon.MagazineSize;
@@ -105,12 +107,12 @@ public class WeaponHandler : NetworkBehaviour
         canShoot = true;
         timeLastShotFired = float.MinValue;
 
-        SetShootingMethod(); // the actual shooting logic
-        SetShootingRequestsMethod(); // the rythm logic of the shots
+        SetShootingStyle(); // the actual shooting logic
+        SetShootingRequestRythm(); // the rythm logic of the shots
 
     }
 
-    private void SetShootingMethod()
+    private void SetShootingStyle()
     {
         shootingStyleMethod = currentWeapon.ShootingStyle switch
         {
@@ -125,7 +127,7 @@ public class WeaponHandler : NetworkBehaviour
         };
     }
 
-    private void SetShootingRequestsMethod()
+    private void SetShootingRequestRythm()
     {
         shootingRythmMethod = currentWeapon.ShootingRythm switch
         {
@@ -144,6 +146,18 @@ public class WeaponHandler : NetworkBehaviour
                 }
             ,
         };
+    }
+
+    #endregion
+
+    public void Shoot()
+    {
+        if (!canShoot)
+        {
+            return;
+        }
+
+        shootingRythmMethod();
     }
 
     [Rpc(SendTo.Server)]
@@ -169,17 +183,6 @@ public class WeaponHandler : NetworkBehaviour
         };
         if (doDebug) print(cd);
         return cd;
-    }
-    
-    public void Shoot()
-    {
-        if (!canShoot)
-        {
-            return;
-        }
-
-        shootingRythmMethod();
-        //RequestShotServerRpc();
     }
 
     private IEnumerator ShootBurst(int bullets)
@@ -277,15 +280,19 @@ public class WeaponHandler : NetworkBehaviour
         for(int i = 0; i < currentWeapon.ShotgunStats.PelletsCount; i++)
         {
             shotgunPelletsDirections[i] = (
-                barrelEnd.forward + barrelEnd.TransformDirection(
+                10 * barrelEnd.forward + barrelEnd.TransformDirection(
                     new Vector3(
                         Random.Range(-currentWeapon.ShotgunStats.PelletsSpread, currentWeapon.ShotgunStats.PelletsSpread),
                         Random.Range(-currentWeapon.ShotgunStats.PelletsSpread, currentWeapon.ShotgunStats.PelletsSpread),
                         0
                     )
+                    //(Random.insideUnitSphere * currentWeapon.ShotgunStats.PelletsSpread).Mask(1f, 1f, 0f).normalized
+
                 )
             ).normalized;
         }
+
+        
     }
 
     # region Reload

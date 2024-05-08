@@ -8,13 +8,15 @@ public class WeaponStats : ScriptableObject
 {
     public ushort Damage;
 
+    [Header("Magazine")]
     public ushort MagazineSize;
     // public bool NeedReload
     public float ReloadSpeed; // some that can reload one per one
     public ushort AmmoLeftInMagazineToWarn;
 
-
+    [Header("Shooting Style")]
     public ShootingStyle ShootingStyle;
+    [Space(8)]
     public ShotgunStats_ ShotgunStats;
     [Serializable]
     public struct ShotgunStats_
@@ -24,6 +26,7 @@ public class WeaponStats : ScriptableObject
         public float PelletsSpread;
         public float PelletsRange;
     }
+    [Space(4)]
     public SimpleShotStats_ SimpleShotStats;
     [Serializable]
     public struct SimpleShotStats_
@@ -32,11 +35,11 @@ public class WeaponStats : ScriptableObject
         public float SpreadAccumulatedPerShot;
         public float SpreadRegulationTime;
     }
-    
 
-
+    [Header("Shooting Rythm")]
     public ShootingRythm ShootingRythm;
     public float CooldownBetweenShots;
+    [Space(8)]
     public BurstStats_ BurstStats;
     [Serializable]
     public struct BurstStats_
@@ -44,8 +47,7 @@ public class WeaponStats : ScriptableObject
         public float CooldownBetweenShotsOfBurst;
         public ushort BulletsPerBurst;
     }
-    //RampUp
-
+    [Space(4)]
     public RampUpStats_ RampUpStats;
     [Serializable]
     public struct RampUpStats_
@@ -56,14 +58,17 @@ public class WeaponStats : ScriptableObject
         public float RampUpCooldownRegulationMultiplier;
     }
 
+    [Header("ADS and Scopes")]
     public float ADS_FOV; //perhaps just a cameraMove instead
     [Range(1, 5)][Tooltip("Set to 1 for no Scope")] public float ScopeMagnification;
     public float TimeToADS;
     public float TimeToUnADS;
 
+    [Header("Recoild")]
     public float RecoilForce;
     public float RecoilRegulationTime;
 
+    [Header("kickback")]
     public float WeaponKickBackPerShot;
     public float WeaponKickBackRegulationTime;
     public float FarthestPointBehindInitialPosition;
