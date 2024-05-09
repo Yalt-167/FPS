@@ -23,7 +23,7 @@ public class WeaponStats : ScriptableObject
     {
         public ushort PelletsDamage;
         public ushort PelletsCount;
-        public float PelletsSpread;
+        public float PelletsSpreadAngle;
         public float PelletsRange;
     }
     [Space(4)]

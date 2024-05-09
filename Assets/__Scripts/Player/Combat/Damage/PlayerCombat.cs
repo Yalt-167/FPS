@@ -54,7 +54,6 @@ public class PlayerCombat : MonoBehaviour
         }
         else if (InputQuery.Reload)
         {
-            print("here");
             weaponHandler.Reload();
         }
         else if (HasBufferedShoot)

@@ -255,7 +255,7 @@ public class WeaponHandler : NetworkBehaviour
             }
             else
             {
-                bulletTrail.Set(barrelEnd.position, barrelEnd.position + barrelEnd.forward * currentWeapon.ShotgunStats.PelletsRange);
+                bulletTrail.Set(barrelEnd.position, barrelEnd.position + shotgunPelletsDirections[i] * currentWeapon.ShotgunStats.PelletsRange);
             }
         }
 
@@ -264,7 +264,6 @@ public class WeaponHandler : NetworkBehaviour
         ammos--;
         bulletFiredthisBurst++;
 
-        
 
         //for (int i = 0; i < hits.Count; i++)
         //{
@@ -277,22 +276,26 @@ public class WeaponHandler : NetworkBehaviour
     private void SetShotgunPelletsDirections()
     {
         shotgunPelletsDirections = new Vector3[currentWeapon.ShotgunStats.PelletsCount];
-        for(int i = 0; i < currentWeapon.ShotgunStats.PelletsCount; i++)
+        /*Most fucked explanantion to ever cross the frontier of reality
+         / 45f -> to get value which we can use iun a vector instead of an angle
+        ex in 2D:  a vector that has a 45° angle above X has a (1, 1) direction
+        while the X has a (1, 0)
+        so we essentially brought the 45° to a value we could use as a direction in the vector
+         */
+        var spreadStrength = currentWeapon.ShotgunStats.PelletsSpreadAngle / 45f;
+        // perhaps do barrelEnd.forward * 45 instead for performances purposes
+        for (int i = 0; i < currentWeapon.ShotgunStats.PelletsCount; i++)
         {
             shotgunPelletsDirections[i] = (
-                10 * barrelEnd.forward + barrelEnd.TransformDirection(
+                barrelEnd.forward + barrelEnd.TransformDirection(
                     new Vector3(
-                        Random.Range(-currentWeapon.ShotgunStats.PelletsSpread, currentWeapon.ShotgunStats.PelletsSpread),
-                        Random.Range(-currentWeapon.ShotgunStats.PelletsSpread, currentWeapon.ShotgunStats.PelletsSpread),
+                        Random.Range(-spreadStrength, spreadStrength),
+                        Random.Range(-spreadStrength, spreadStrength),
                         0
                     )
-                    //(Random.insideUnitSphere * currentWeapon.ShotgunStats.PelletsSpread).Mask(1f, 1f, 0f).normalized
-
                 )
             ).normalized;
         }
-
-        
     }
 
     # region Reload
