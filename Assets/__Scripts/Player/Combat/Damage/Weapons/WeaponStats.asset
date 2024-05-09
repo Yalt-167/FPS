@@ -14,27 +14,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Damage: 0
   MagazineSize: 12000
-  ReloadSpeed: 0.7
+  ReloadSpeed: 2
   AmmoLeftInMagazineToWarn: 0
-  ShootingStyle: 0
+  ShootingStyle: 1
   ShotgunStats:
-    PelletsDamage: 0
-    PelletsCount: 32
-    PelletsSpread: 0.2
-    PelletsRange: 25
+    PelletsDamage: 1
+    PelletsCount: 100
+    PelletsSpreadAngle: 10
+    PelletsRange: 100
   SimpleShotStats:
     MaxSpread: 1
     SpreadAccumulatedPerShot: 0.1
     SpreadRegulationTime: 0.5
-  ShootingRythm: 2
-  CooldownBetweenShots: 0.2
+  ShootingRythm: 0
+  CooldownBetweenShots: 0.1
   BurstStats:
     CooldownBetweenShotsOfBurst: 0.1
     BulletsPerBurst: 5
   RampUpStats:
     RampUpMaxCooldownBetweenShots: 1
-    RampUpMinCooldownBetweenShots: 0.05
-    RampUpCooldownMultiplierPerShot: 0.95
+    RampUpMinCooldownBetweenShots: 0.07
+    RampUpCooldownMultiplierPerShot: 0.98
     RampUpCooldownRegulationMultiplier: 1.04
   ADS_FOV: 0
   ScopeMagnification: 1

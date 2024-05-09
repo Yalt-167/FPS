@@ -12,6 +12,8 @@ public class FollowRotationCamera : MonoBehaviour
 
     private static readonly string MouseXAxis = "Mouse X";
     private static readonly string MouseYAxis = "Mouse Y";
+    
+    [SerializeField] private AnimationCurve recoilCurve;
 
     private void Awake()
     {
@@ -29,6 +31,25 @@ public class FollowRotationCamera : MonoBehaviour
         // around y-axis
         yRotation += Input.GetAxis(MouseXAxis) * sensitivity;
         playerTransform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
+
+    }
+
+    public void ApplyRecoil(float recoilAmount, float recoilDuration)
+    {
+        //StartCoroutine(SetRecoil(recoil));
+        StartCoroutine(RecoilCoroutine(recoilAmount, recoilDuration));
+    }
+
+    private IEnumerator RecoilCoroutine(float recoilAmount, float recoilDuration)
+    {
+        var recoilStartTime = Time.time;
+        while (Time.time < recoilStartTime + recoilDuration)
+        {
+            var t = (Time.time - recoilStartTime) / recoilDuration;
+            var currentRecoil = Mathf.Lerp(0f, recoilAmount, recoilCurve.Evaluate(t));
+            transform.Rotate(Vector3.left, currentRecoil);
+            yield return null;
+        }
     }
 }
 

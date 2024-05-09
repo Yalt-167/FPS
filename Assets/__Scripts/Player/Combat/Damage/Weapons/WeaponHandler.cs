@@ -13,6 +13,7 @@ public class WeaponHandler : NetworkBehaviour
     #region References
 
     [SerializeField] private WeaponStats currentWeapon;
+    private FollowRotationCamera camera;
 
     [SerializeField] private Transform barrelEnd; // should have the same rotation as the camera
     [SerializeField] private Transform weaponTransform;
@@ -76,6 +77,7 @@ public class WeaponHandler : NetworkBehaviour
     private void Awake()
     {
         playerSettings = GetComponent<PlayerSettings>();
+        camera = transform.GetChild(0).GetComponent<FollowRotationCamera>();
         switchedThisFrame = false;
         InitGun();
     }
@@ -233,6 +235,8 @@ public class WeaponHandler : NetworkBehaviour
         shotThisFrame = true;
         ammos--;
         bulletFiredthisBurst++;
+
+        camera.ApplyRecoil(currentWeapon.RecoilForce, currentWeapon.RecoilRegulationTime);
     }
 
     [Rpc(SendTo.ClientsAndHost)] // called by the server to execute on all clients
@@ -263,6 +267,7 @@ public class WeaponHandler : NetworkBehaviour
         shotThisFrame = true;
         ammos--;
         bulletFiredthisBurst++;
+        camera.ApplyRecoil(currentWeapon.RecoilForce, currentWeapon.RecoilRegulationTime);
 
 
         //for (int i = 0; i < hits.Count; i++)

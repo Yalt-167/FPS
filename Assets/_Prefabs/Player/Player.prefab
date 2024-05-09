@@ -1169,6 +1169,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 5672603145184474037}
   sensitivity: 4
+  recoilRegulationRate: 0.99
+  recoilChange: 0.1
+  minConsideredRecoil: 0.1
+  recoilCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 2.3283064e-10
+      value: 0.0030534267
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.05
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.19945909
+      value: 0.0030534603
+      inSlope: -9.220222
+      outSlope: -9.220222
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.055542715
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &3880828712024166357
 MonoBehaviour:
   m_ObjectHideFlags: 0
