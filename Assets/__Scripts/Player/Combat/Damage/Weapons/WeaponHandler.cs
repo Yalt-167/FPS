@@ -236,7 +236,7 @@ public class WeaponHandler : NetworkBehaviour
         ammos--;
         bulletFiredthisBurst++;
 
-        camera.ApplyRecoil(currentWeapon.RecoilForce, currentWeapon.RecoilRegulationTime);
+        camera.ApplyRecoil(currentWeapon.RecoilStats.RecoilForce, currentWeapon.RecoilStats.RecoilRegulationTime);
     }
 
     [Rpc(SendTo.ClientsAndHost)] // called by the server to execute on all clients
@@ -267,7 +267,7 @@ public class WeaponHandler : NetworkBehaviour
         shotThisFrame = true;
         ammos--;
         bulletFiredthisBurst++;
-        camera.ApplyRecoil(currentWeapon.RecoilForce, currentWeapon.RecoilRegulationTime);
+        camera.ApplyRecoil(currentWeapon.RecoilStats.RecoilForce, currentWeapon.RecoilStats.RecoilRegulationTime);
 
 
         //for (int i = 0; i < hits.Count; i++)

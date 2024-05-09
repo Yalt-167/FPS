@@ -59,20 +59,35 @@ public class WeaponStats : ScriptableObject
     }
 
     [Header("ADS and Scopes")]
-    public float ADS_FOV; //perhaps just a cameraMove instead
-    [Range(1, 5)][Tooltip("Set to 1 for no Scope")] public float ScopeMagnification;
-    public float TimeToADS;
-    public float TimeToUnADS;
+    public ADSandScopeStats_ ADSandScopeStats;
+    [Serializable]
+    public struct ADSandScopeStats_
+    {
+        public float ADS_FOV; //perhaps just a cameraMove instead
+        [Range(1, 5)][Tooltip("Set to 1 for no Scope")] public float ScopeMagnification;
+        public float TimeToADS;
+        public float TimeToUnADS;
+    }
 
-    [Header("Recoild")]
-    public float RecoilForce;
-    public float RecoilRegulationTime;
+    [Header("Recoil")]
+    public RecoilStats_ RecoilStats;
+    [Serializable]
+    public struct RecoilStats_
+    {
+        public float RecoilForce;
+        public float RecoilRegulationTime;
+    }
 
-    [Header("kickback")]
-    public float WeaponKickBackPerShot;
-    public float WeaponKickBackRegulationTime;
-    public float FarthestPointBehindInitialPosition;
+    [Header("Kickback")]
+    public KickbackStats_ KickbackStats;
+    [Serializable]
+    public struct KickbackStats_
+    {
+        public float WeaponKickBackPerShot;
+        public float WeaponKickBackRegulationTime;
+        public float FarthestPointBehindInitialPosition;
 
+    }
     public bool CanBreakThings;
 }
 
@@ -87,6 +102,7 @@ public enum ShootingRythm : byte
     Single,
     Burst,
     RampUp,
+    Charge
 }
 
 public enum BulletTravelType : byte
