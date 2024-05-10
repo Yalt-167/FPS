@@ -35,7 +35,7 @@ public class Shield
         }
     }
 
-    public float TakeDamage(float damage)
+    public ushort TakeDamage(ushort damage)
     {
         while (damage > 0 && this)
         {

@@ -5,25 +5,25 @@ using UnityEngine;
 
 public class ShieldCell
 {
-    public float Shield;
-    private float maxShield;
+    public int Shield;
+    private int maxShield;
     private bool broken;
 
-    public ShieldCell(float maxShield_)
+    public ShieldCell(ushort maxShield_)
     {
         Shield = maxShield = maxShield_;
         broken = false;
     }
 
     
-    public float TakeDamage(float damage)
+    public ushort TakeDamage(int damage)
     {
         Shield -= damage;
         if (Shield <= 0)
         {
             damage = -Shield;
             Break();
-            return damage; // return excess damage to pass it onto the next shield cell
+            return (ushort)damage; // return excess damage to pass it onto the next shield cell
         }
         return 0;
     }
@@ -44,7 +44,7 @@ public class ShieldCell
         broken = !broken;
     }
 
-    public float Heal(float healProficiency, bool canReviveCell)
+    public ushort Heal(int healProficiency, bool canReviveCell)
     {
         if (broken && !canReviveCell) { return 0f; }
 
@@ -55,9 +55,9 @@ public class ShieldCell
         {
             healProficiency = Shield - maxShield;
             Shield = maxShield;
-            return healProficiency; // return the excess heal in order to pass it onto the next shield cell
+            return (ushort)healProficiency; // return the excess heal in order to pass it onto the next shield cell
         }
-        return 0f;
+        return 0;
         
     }
 
