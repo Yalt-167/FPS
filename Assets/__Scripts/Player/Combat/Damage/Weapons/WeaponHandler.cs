@@ -246,9 +246,8 @@ public class WeaponHandler : NetworkBehaviour
         if (Physics.Raycast(barrelEnd.position, barrelEnd.forward, out RaycastHit hit, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore))
         {
             bulletTrail.Set(barrelEnd.position, hit.point);
-            if (hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
+            if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
             {
-                print(hit.collider.gameObject.name);
                 shootableComponent.ReactShot(currentWeapon.Damage, hit.point, barrelEnd.forward, NetworkObjectId);
             }
 

@@ -18,7 +18,7 @@ public class BodyPart : NetworkBehaviour, IShootable
 
     public void ReactShot(ushort damage, Vector3 _, Vector3 __, ulong attackerNetworkID)
     {
-        if (!IsOwner) { return; }
+        //if (!IsOwner) { return; }
 
         var damageAfterMultiplier = GetDamageAfterMultipliers(damage);
 
