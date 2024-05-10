@@ -26,8 +26,8 @@ MonoBehaviour:
     MaxSpread: 1
     SpreadAccumulatedPerShot: 0.1
     SpreadRegulationTime: 0.5
-  ShootingRythm: 2
-  CooldownBetweenShots: 0.1
+  ShootingRythm: 0
+  CooldownBetweenShots: 0.15
   BurstStats:
     CooldownBetweenShotsOfBurst: 0.1
     BulletsPerBurst: 5
@@ -42,7 +42,7 @@ MonoBehaviour:
     TimeToADS: 0.1
     TimeToUnADS: 0.2
   RecoilStats:
-    RecoilForce: 1
+    RecoilForce: 1.5
     RecoilRegulationTime: 1
   KickbackStats:
     WeaponKickBackPerShot: 0

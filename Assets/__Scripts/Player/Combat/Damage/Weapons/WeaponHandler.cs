@@ -176,7 +176,14 @@ public class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void RequestShotServerRpc()
     {
-        print("called");
+        CheckCooldownsClientRpc();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void CheckCooldownsClientRpc()
+    {
+        if (!IsOwner) { return; }
+
         if (timeLastShotFired + GetRelevantCooldown(false) > Time.time) { return; }
 
         GetRelevantCooldown(true);
@@ -185,6 +192,7 @@ public class WeaponHandler : NetworkBehaviour
 
         shootingStyleMethod();
     }
+
 
     private float GetRelevantCooldown(bool doDebug)
     {
@@ -228,6 +236,10 @@ public class WeaponHandler : NetworkBehaviour
         if (IsOwner)
         {
             damageLogManager.UpdatePlayerSettings(DamageLogsSettings);
+            timeLastShotFired = Time.time;
+            shotThisFrame = true;
+            ammos--;
+            bulletFiredthisBurst++;
         }
 
         var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
@@ -236,6 +248,7 @@ public class WeaponHandler : NetworkBehaviour
             bulletTrail.Set(barrelEnd.position, hit.point);
             if (hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
             {
+                print(hit.collider.gameObject.name);
                 shootableComponent.ReactShot(currentWeapon.Damage, hit.point, barrelEnd.forward, NetworkObjectId);
             }
 
@@ -247,10 +260,7 @@ public class WeaponHandler : NetworkBehaviour
             bulletTrail.Set(barrelEnd.position, barrelEnd.position + barrelEnd.forward * 100);
         }
 
-        timeLastShotFired = Time.time;
-        shotThisFrame = true;
-        ammos--;
-        bulletFiredthisBurst++;
+        
 
         if(!IsOwner) { return; }
 
