@@ -6,10 +6,10 @@ using UnityEngine;
 public class Shield
 {
     private ShieldCell[] shieldCells;
-    private int shieldCellAmount;
-    private int shieldCellHealth;
-    private int lastHealthyShieldCellIndex;
-    private int LastHealthyShieldCellIndex
+    private ushort shieldCellAmount;
+    private ushort shieldCellHealth;
+    private ushort lastHealthyShieldCellIndex;
+    private ushort LastHealthyShieldCellIndex
     {
         get
         {
@@ -17,14 +17,14 @@ public class Shield
         }
         set
         {
-            lastHealthyShieldCellIndex = Mathf.Clamp(value, 0, shieldCellAmount - 1);
+            lastHealthyShieldCellIndex = (ushort)Mathf.Clamp(value, 0, shieldCellAmount - 1);
         }
     }
     private bool FullShield => shieldCells[shieldCellAmount - 1].Shield == shieldCellHealth;
-    public Shield(int shieldCellAmount_, int shieldCellHealth_)
+    public Shield(ushort shieldCellAmount_, ushort shieldCellHealth_)
     {
         shieldCellAmount = shieldCellAmount_;
-        LastHealthyShieldCellIndex = shieldCellAmount - 1;
+        LastHealthyShieldCellIndex = (ushort)(shieldCellAmount - 1);
 
         shieldCellHealth = shieldCellHealth_;
 
@@ -46,7 +46,7 @@ public class Shield
     }
 
 
-    public void Heal(float healProficiency, bool canReviveCell)
+    public void Heal(ushort healProficiency, bool canReviveCell)
     {
         while (healProficiency > 0 && !FullShield)
         {

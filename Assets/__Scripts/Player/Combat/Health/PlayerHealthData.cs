@@ -5,20 +5,20 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "PlayerHealthData", menuName = "ScriptableObjects/PlayerHealthData")]
 public class PlayerHealthData : ScriptableObject
 {
-    public int MaxHealth;
-    public int PassiveHealthRegenerationAmount;
-    public int HealthRegeneratedOnKill;
+    public ushort MaxHealth;
+    public ushort PassiveHealthRegenerationAmount;
+    public ushort HealthRegeneratedOnKill;
     public float PassiveHealthRegenerationRate;
     public float TimeBeforeInitiatingHealthRegeneration;
 
-    public int MaxShieldSlots;
-    public int ShieldSlotHealth;
-    public int PassiveShieldRegenerationAmount;
+    public ushort MaxShieldSlots;
+    public ushort ShieldSlotHealth;
+    public ushort PassiveShieldRegenerationAmount;
     public float PassiveShieldRegenerationRate;
-    public int ShieldRegeneratedOnKill;
+    public ushort ShieldRegeneratedOnKill;
     public float TimeBeforeInitiatingShieldRegeneration;
 
-    public int MaxBonusShieldSlots;
+    public ushort MaxBonusShieldSlots;
 }
 
 // the player has several gauges of shield

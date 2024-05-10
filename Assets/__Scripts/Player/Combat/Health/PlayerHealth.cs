@@ -93,23 +93,23 @@ public class PlayerHealth : NetworkBehaviour
     }
 
 
-    public void RawHeal(float healProficiency)
+    public void RawHeal(ushort healProficiency)
     {
         RegenerateShield(RegenerateHealth(healProficiency), true);
     }
 
-    public float RegenerateHealth(float healProficiency)
+    public ushort RegenerateHealth(ushort healProficiency)
     {
         CurrentHealth += healProficiency;
         if (CurrentHealth < HealthData.MaxHealth) { return 0; }
 
         var excessHeal = CurrentHealth - HealthData.MaxHealth;
         CurrentHealth = HealthData.MaxHealth;
-        return excessHeal;
+        return (ushort)excessHeal;
    
     }
 
-    public void RegenerateShield(float healProficiency, bool canReviveCell)
+    public void RegenerateShield(ushort healProficiency, bool canReviveCell)
     {
         Shield.Heal(healProficiency, canReviveCell);
     }
