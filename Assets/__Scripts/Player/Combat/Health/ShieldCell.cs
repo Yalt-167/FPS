@@ -46,7 +46,7 @@ public class ShieldCell
 
     public ushort Heal(int healProficiency, bool canReviveCell)
     {
-        if (broken && !canReviveCell) { return 0f; }
+        if (broken && !canReviveCell) { return 0; }
 
         Repair(); // doesn t make much sense but if arrived there then either the shield cell is ealready health or the canReviveCell flag is true
 
