@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.Netcode;
+using UnityEditor.Presets;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -13,7 +14,9 @@ public class WeaponHandler : NetworkBehaviour
     #region References
 
     [SerializeField] private WeaponStats currentWeapon;
-    private FollowRotationCamera camera;
+    private float cameraTransformInitialZ = 0f;
+    private Transform cameraTransform;
+    private new FollowRotationCamera camera;
 
     [SerializeField] private Transform barrelEnd; // should have the same rotation as the camera
     [SerializeField] private Transform weaponTransform;
@@ -39,6 +42,8 @@ public class WeaponHandler : NetworkBehaviour
     private Action shootingStyleMethod;
     private Action shootingRythmMethod;
     private Action updateMethod;
+
+    private bool isAiming = false;
 
     #endregion
 
@@ -78,6 +83,7 @@ public class WeaponHandler : NetworkBehaviour
     {
         playerSettings = GetComponent<PlayerSettings>();
         camera = transform.GetChild(0).GetComponent<FollowRotationCamera>();
+        cameraTransform = transform.GetChild(0).GetChild(0);
         switchedThisFrame = false;
         InitGun();
     }
@@ -87,6 +93,11 @@ public class WeaponHandler : NetworkBehaviour
         if (shotThisFrame) { return; }
 
         CurrentCooldownBetweenRampUpShots *= currentWeapon.RampUpStats.RampUpCooldownRegulationMultiplier;
+    }
+
+    private void Update()
+    {
+            
     }
 
     private void LateUpdate()
@@ -324,6 +335,55 @@ public class WeaponHandler : NetworkBehaviour
         if (switchedThisFrame) { yield break; }
 
         ammos = currentWeapon.MagazineSize;
+    }
+
+    #endregion
+
+    #region Aiming
+
+    public void UpdateAimingState(bool shoulbBeAiming)
+    {
+        if (isAiming != shoulbBeAiming)
+        {
+            isAiming = shoulbBeAiming;
+            //StartCoroutine(ToggleAim(shoulbBeAiming));
+            StartCoroutine(ToggleAimFOV(shoulbBeAiming));
+
+        }
+    }
+
+    private IEnumerator ToggleAim(bool shouldBeAiming)
+    {
+        var startingPointZ = cameraTransform.localPosition.z;
+        var elapsedTime = 0f;
+        var (targetZ, targetDuration) = shouldBeAiming ?
+            (currentWeapon.ADSandScopeStats.ADScameraMovement, currentWeapon.ADSandScopeStats.TimeToADS)
+            :
+            (cameraTransformInitialZ, currentWeapon.ADSandScopeStats.TimeToUnADS);
+        while (elapsedTime < targetDuration)
+        {
+            cameraTransform.localPosition = new(0f, 0f, Mathf.Lerp(startingPointZ, targetZ, elapsedTime / targetDuration));
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    private IEnumerator ToggleAimFOV(bool shouldBeAiming)
+    {
+        var cam = cameraTransform.GetComponent<Camera>();
+        var startingPoint = cam.fieldOfView;
+        var elapsedTime = 0f;
+        var (target, targetDuration) = shouldBeAiming ?
+            (currentWeapon.ADSandScopeStats.ADScameraMovement, currentWeapon.ADSandScopeStats.TimeToADS)
+            :
+            (60, currentWeapon.ADSandScopeStats.TimeToUnADS);
+        while (elapsedTime < targetDuration)
+        {
+            cam.fieldOfView = Mathf.Lerp(startingPoint, target, elapsedTime / targetDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
     }
 
     #endregion

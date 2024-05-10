@@ -12,21 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 291811625bdf4c7469ec3fd525b8de32, type: 3}
   m_Name: WeaponStats
   m_EditorClassIdentifier: 
-  Damage: 0
+  Damage: 1
   MagazineSize: 12000
   ReloadSpeed: 2
   AmmoLeftInMagazineToWarn: 0
-  ShootingStyle: 1
+  ShootingStyle: 0
   ShotgunStats:
     PelletsDamage: 1
     PelletsCount: 100
     PelletsSpreadAngle: 10
-    PelletsRange: 100
+    PelletsRange: 20
   SimpleShotStats:
     MaxSpread: 1
     SpreadAccumulatedPerShot: 0.1
     SpreadRegulationTime: 0.5
-  ShootingRythm: 0
+  ShootingRythm: 2
   CooldownBetweenShots: 0.1
   BurstStats:
     CooldownBetweenShotsOfBurst: 0.1
@@ -36,13 +36,16 @@ MonoBehaviour:
     RampUpMinCooldownBetweenShots: 0.07
     RampUpCooldownMultiplierPerShot: 0.98
     RampUpCooldownRegulationMultiplier: 1.04
-  ADS_FOV: 0
-  ScopeMagnification: 1
-  TimeToADS: 0
-  TimeToUnADS: 0
-  RecoilForce: 0
-  RecoilRegulationTime: 0
-  WeaponKickBackPerShot: 0
-  WeaponKickBackRegulationTime: 0
-  FarthestPointBehindInitialPosition: 0
+  ADSandScopeStats:
+    ADScameraMovement: 50
+    ScopeMagnification: 0
+    TimeToADS: 0.1
+    TimeToUnADS: 0.2
+  RecoilStats:
+    RecoilForce: 1
+    RecoilRegulationTime: 1
+  KickbackStats:
+    WeaponKickBackPerShot: 0
+    WeaponKickBackRegulationTime: 0
+    FarthestPointBehindInitialPosition: 0
   CanBreakThings: 0

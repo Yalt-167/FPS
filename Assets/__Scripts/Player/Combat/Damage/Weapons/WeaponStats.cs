@@ -63,7 +63,7 @@ public class WeaponStats : ScriptableObject
     [Serializable]
     public struct ADSandScopeStats_
     {
-        public float ADS_FOV; //perhaps just a cameraMove instead
+        public float ADScameraMovement; //perhaps just a cameraMove instead
         [Range(1, 5)][Tooltip("Set to 1 for no Scope")] public float ScopeMagnification;
         public float TimeToADS;
         public float TimeToUnADS;
@@ -88,7 +88,9 @@ public class WeaponStats : ScriptableObject
         public float FarthestPointBehindInitialPosition;
 
     }
+
     public bool CanBreakThings;
+    // add special spread while ADS
 }
 
 public enum ShootingStyle : byte

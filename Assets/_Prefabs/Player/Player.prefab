@@ -346,7 +346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3013796309
+  GlobalObjectIdHash: 870966366
   InScenePlacedSourceGlobalObjectIdHash: 870966366
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -552,8 +552,13 @@ MonoBehaviour:
       RelevantKey: 323
       howToActivate: 2
       holdForSeconds: 0
-    Reload:
+    Aim:
       RelevantKey: 324
+      howToActivate: 2
+      holdForSeconds: 0
+      allowedActivationTypes: 0200000003000000
+    Reload:
+      RelevantKey: 114
       howToActivate: 0
       holdForSeconds: 0
     Slash:
@@ -1169,9 +1174,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 5672603145184474037}
   sensitivity: 4
-  recoilRegulationRate: 0.99
-  recoilChange: 0.1
-  minConsideredRecoil: 0.1
   recoilCurve:
     serializedVersion: 2
     m_Curve:

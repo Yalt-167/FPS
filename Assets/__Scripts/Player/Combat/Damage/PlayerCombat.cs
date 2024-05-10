@@ -48,6 +48,9 @@ public class PlayerCombat : MonoBehaviour
 
     private void Update()
     {
+        weaponHandler.UpdateAimingState(InputQuery.Aim);
+
+
         if (InputQuery.Shoot)
         { 
             TryShoot(false);

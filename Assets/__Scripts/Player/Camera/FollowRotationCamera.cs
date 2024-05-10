@@ -36,7 +36,6 @@ public class FollowRotationCamera : MonoBehaviour
 
     public void ApplyRecoil(float recoilAmount, float recoilDuration)
     {
-        //StartCoroutine(SetRecoil(recoil));
         StartCoroutine(RecoilCoroutine(recoilAmount, recoilDuration));
     }
 
