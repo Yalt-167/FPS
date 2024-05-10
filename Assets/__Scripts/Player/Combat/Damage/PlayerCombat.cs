@@ -18,7 +18,6 @@ public class PlayerCombat : MonoBehaviour
 
     [SerializeField] private float shootingCooldown;
     [SerializeField] private Transform barrelEnd;
-    private bool shootingOnCooldown;
     private static readonly float shootBuffer = .1f;
     private float lastShootPressed;
     private bool HasBufferedShoot => lastShootPressed + shootBuffer > Time.time;
@@ -84,25 +83,11 @@ public class PlayerCombat : MonoBehaviour
             lastShootPressed = Time.time;
         }
 
-        //if (shootingOnCooldown)
-        //{
-        //    return;
-        //}
         lastShootPressed = float.NegativeInfinity;
         weaponHandler.Shoot();
-        //playerCombatNetworked.RequestAttackServerRpc(10, barrelEnd.position, cameraTransform.forward);
-
-        //StartCoroutine(ShootingCooldown());
     }
 
-    private IEnumerator ShootingCooldown()
-    {
-        shootingOnCooldown = true;
-
-        yield return new WaitForSeconds(shootingCooldown);
-
-        shootingOnCooldown = false;
-    }
+ 
 
     #endregion
 

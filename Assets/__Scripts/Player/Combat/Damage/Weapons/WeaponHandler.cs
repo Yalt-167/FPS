@@ -176,13 +176,13 @@ public class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void RequestShotServerRpc()
     {
+        print("called");
         if (timeLastShotFired + GetRelevantCooldown(false) > Time.time) { return; }
 
         GetRelevantCooldown(true);
 
         if (ammos <= 0) { return; }
 
-        //damageLogManager.UpdatePlayerSettings(DamageLogsSettings);
         shootingStyleMethod();
     }
 
@@ -225,6 +225,11 @@ public class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)] // called by the server to execute on all clients
     private void ExecuteSimpleShotClientRpc()
     {
+        if (IsOwner)
+        {
+            damageLogManager.UpdatePlayerSettings(DamageLogsSettings);
+        }
+
         var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
         if (Physics.Raycast(barrelEnd.position, barrelEnd.forward, out RaycastHit hit, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore))
         {
@@ -246,6 +251,8 @@ public class WeaponHandler : NetworkBehaviour
         shotThisFrame = true;
         ammos--;
         bulletFiredthisBurst++;
+
+        if(!IsOwner) { return; }
 
         camera.ApplyRecoil(currentWeapon.RecoilStats.RecoilForce, currentWeapon.RecoilStats.RecoilRegulationTime);
     }
@@ -278,6 +285,9 @@ public class WeaponHandler : NetworkBehaviour
         shotThisFrame = true;
         ammos--;
         bulletFiredthisBurst++;
+
+        if (!IsOwner) { return; }
+
         camera.ApplyRecoil(currentWeapon.RecoilStats.RecoilForce, currentWeapon.RecoilStats.RecoilRegulationTime);
 
 
