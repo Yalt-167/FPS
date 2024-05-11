@@ -688,11 +688,13 @@ public class PlayerMovement : MonoBehaviour, IEntity
         var slidOrJumped = false;
         timeDashTriggered = Time.time;
         followRotationCamera.enabled = false;
+        var dir = cameraTransform.TransformDirection(new(MyInput.GetAxis(inputQuery.Left, inputQuery.Right), 0f, MyInput.GetAxis(inputQuery.Back, inputQuery.Forward)));
         
         yield return new WaitUntil(
             () =>
                 {
-                    Rigidbody.velocity = dashVelocity * cameraTransform.forward; // perhaps do sth less brutal with gradual velocity loss
+                    //Rigidbody.velocity = dashVelocity * cameraTransform.forward; // perhaps do sth less brutal with gradual velocity loss
+                    Rigidbody.velocity = dashVelocity * dir; // perhaps do sth less brutal with gradual velocity loss
 
                     if (inputQuery.InitiateCrouch && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
                     {

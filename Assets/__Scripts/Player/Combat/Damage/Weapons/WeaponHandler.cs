@@ -274,8 +274,6 @@ public class WeaponHandler : NetworkBehaviour
 
         if(!IsOwner) { return; }
 
-        //camera.ApplyRecoil(currentWeapon.RecoilStats.RecoilForce, currentWeapon.RecoilStats.RecoilRegulationTime);
-
         ApplyRecoil();
     }
 
@@ -314,8 +312,6 @@ public class WeaponHandler : NetworkBehaviour
 
 
         if (!IsOwner) { return; }
-
-        //camera.ApplyRecoil(currentWeapon.RecoilStats.RecoilForce, currentWeapon.RecoilStats.RecoilRegulationTime);
 
         ApplyRecoil();
 
@@ -395,9 +391,9 @@ public class WeaponHandler : NetworkBehaviour
         var startingPointZ = cameraTransform.localPosition.z;
         var elapsedTime = 0f;
         var (targetZ, targetDuration) = shouldBeAiming ?
-            (currentWeapon.ADSandScopeStats.ADScameraMovement, currentWeapon.ADSandScopeStats.TimeToADS)
+            (currentWeapon.AimingAndScopeStats.AimingCameraMovement, currentWeapon.AimingAndScopeStats.TimeToADS)
             :
-            (cameraTransformInitialZ, currentWeapon.ADSandScopeStats.TimeToUnADS);
+            (cameraTransformInitialZ, currentWeapon.AimingAndScopeStats.TimeToUnADS);
         while (elapsedTime < targetDuration)
         {
             cameraTransform.localPosition = new(0f, 0f, Mathf.Lerp(startingPointZ, targetZ, elapsedTime / targetDuration));
@@ -412,9 +408,9 @@ public class WeaponHandler : NetworkBehaviour
         var startingPoint = cam.fieldOfView;
         var elapsedTime = 0f;
         var (target, targetDuration) = shouldBeAiming ?
-            (currentWeapon.ADSandScopeStats.ADScameraMovement, currentWeapon.ADSandScopeStats.TimeToADS)
+            (currentWeapon.AimingAndScopeStats.AimingCameraMovement, currentWeapon.AimingAndScopeStats.TimeToADS)
             :
-            (60, currentWeapon.ADSandScopeStats.TimeToUnADS);
+            (60, currentWeapon.AimingAndScopeStats.TimeToUnADS);
         while (elapsedTime < targetDuration)
         {
             cam.fieldOfView = Mathf.Lerp(startingPoint, target, elapsedTime / targetDuration);

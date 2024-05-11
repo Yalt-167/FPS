@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FollowRotationCamera : MonoBehaviour
 {
-    [SerializeField] private Transform playerTransform; // The GameObject whose rotation the camera will follow
+    private Transform playerTransform; // The GameObject whose rotation the camera will follow
     [SerializeField] private float sensitivity = 5f; // Sensitivity of camera rotation
 
     private float xRotation = 0f; // Current rotation around the x-axis
@@ -12,11 +12,11 @@ public class FollowRotationCamera : MonoBehaviour
 
     private static readonly string MouseXAxis = "Mouse X";
     private static readonly string MouseYAxis = "Mouse Y";
-    
-    [SerializeField] private AnimationCurve recoilCurve;
+   
 
     private void Awake()
     {
+        playerTransform = transform.parent;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -32,23 +32,6 @@ public class FollowRotationCamera : MonoBehaviour
         yRotation += Input.GetAxis(MouseXAxis) * sensitivity;
         playerTransform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
 
-    }
-
-    public void ApplyRecoil(float recoilAmount, float recoilDuration)
-    {
-        StartCoroutine(RecoilCoroutine(recoilAmount, recoilDuration));
-    }
-
-    private IEnumerator RecoilCoroutine(float recoilAmount, float recoilDuration)
-    {
-        var recoilStartTime = Time.time;
-        while (Time.time < recoilStartTime + recoilDuration)
-        {
-            var t = (Time.time - recoilStartTime) / recoilDuration;
-            var currentRecoil = Mathf.Lerp(0f, recoilAmount, recoilCurve.Evaluate(t));
-            transform.Rotate(Vector3.left, currentRecoil);
-            yield return null;
-        }
     }
 }
 

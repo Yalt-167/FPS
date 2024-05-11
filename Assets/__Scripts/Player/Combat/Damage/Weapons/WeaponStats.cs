@@ -35,7 +35,7 @@ public class WeaponStats : ScriptableObject
    
 
     [Header("ADS and Scopes")]
-    public ADSandScopeStats ADSandScopeStats;
+    public AimAndScopeStats AimingAndScopeStats;
     
 
     [Header("Recoil")]
@@ -86,9 +86,9 @@ public struct RampUpStats
 }
 
 [Serializable]
-public struct ADSandScopeStats
+public struct AimAndScopeStats
 {
-    public float ADScameraMovement; //perhaps just a cameraMove instead
+    public float AimingCameraMovement; //perhaps just a cameraMove instead
     [Range(1, 5)][Tooltip("Set to 1 for no Scope")] public float ScopeMagnification;
     public float TimeToADS;
     public float TimeToUnADS;
@@ -99,26 +99,16 @@ public struct KickbackStats
 {
     public float WeaponKickBackPerShot;
     public float WeaponKickBackRegulationTime;
-    public float FarthestPointBehindInitialPosition;
-
 }
 
 [Serializable]
 public struct RecoilStats
 {
-    public float RecoilForceX;
-    public float RecoilForceY;
-    public float RecoilForceZ;
+    [Tooltip("Upward recoil")] public float RecoilForceX;
+    [Tooltip("Sideway recoil")] public float RecoilForceY;
+    [Tooltip("Camera rotation on side (somewhat screen shake)")] public float RecoilForceZ;
     public float RecoilRegulationSpeed;
 }
-
-[Serializable]
-public struct LegacyRecoilStats
-{
-    public float RecoilForce;
-    public float RecoilRegulationTime;
-}
-
 
 public enum ShootingStyle : byte
 {
