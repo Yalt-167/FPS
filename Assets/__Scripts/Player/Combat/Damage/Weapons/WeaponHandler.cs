@@ -12,7 +12,8 @@ public class WeaponHandler : NetworkBehaviour
     [SerializeField] private WeaponStats currentWeapon;
     private float cameraTransformInitialZ = 0f;
     private Transform cameraTransform;
-    private new FollowRotationCamera camera;
+    private new Camera camera;
+    private int baseFOV = 60;
     private Transform recoilHandlerTransform;
 
     [SerializeField] private Transform barrelEnd; // should have the same rotation as the camera
@@ -93,9 +94,9 @@ public class WeaponHandler : NetworkBehaviour
     private void Awake()
     {
         playerSettings = GetComponent<PlayerSettings>();
-        camera = transform.GetChild(0).GetComponent<FollowRotationCamera>();
         recoilHandlerTransform = transform.GetChild(0).GetChild(0);
         cameraTransform = recoilHandlerTransform.GetChild(0);
+        camera = cameraTransform.GetComponent<Camera>();
         switchedThisFrame = false;
         InitGun();
     }
@@ -400,12 +401,12 @@ public class WeaponHandler : NetworkBehaviour
         }
     }
 
-    private IEnumerator ToggleAim(bool shouldBeAiming)
+    private IEnumerator ToggleAimMovement(bool shouldBeAiming)
     {
         var startingPointZ = cameraTransform.localPosition.z;
         var elapsedTime = 0f;
         var (targetZ, targetDuration) = shouldBeAiming ?
-            (currentWeapon.AimingAndScopeStats.AimingCameraMovement, currentWeapon.AimingAndScopeStats.TimeToADS)
+            (currentWeapon.AimingAndScopeStats.AimingFOV, currentWeapon.AimingAndScopeStats.TimeToADS)
             :
             (cameraTransformInitialZ, currentWeapon.AimingAndScopeStats.TimeToUnADS);
         while (elapsedTime < targetDuration)
@@ -418,20 +419,28 @@ public class WeaponHandler : NetworkBehaviour
 
     private IEnumerator ToggleAimFOV(bool shouldBeAiming)
     {
-        var cam = cameraTransform.GetComponent<Camera>();
-        var startingPoint = cam.fieldOfView;
+        var startingPoint = camera.fieldOfView;
         var elapsedTime = 0f;
         var (target, targetDuration) = shouldBeAiming ?
-            (currentWeapon.AimingAndScopeStats.AimingCameraMovement, currentWeapon.AimingAndScopeStats.TimeToADS)
+            (GetRelevantFOV(), currentWeapon.AimingAndScopeStats.TimeToADS)
             :
-            (60, currentWeapon.AimingAndScopeStats.TimeToUnADS);
+            (baseFOV, currentWeapon.AimingAndScopeStats.TimeToUnADS);
         while (elapsedTime < targetDuration)
         {
-            cam.fieldOfView = Mathf.Lerp(startingPoint, target, elapsedTime / targetDuration);
+            camera.fieldOfView = Mathf.Lerp(startingPoint, target, elapsedTime / targetDuration);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
+    }
+
+    private float GetRelevantFOV()
+    {
+        return currentWeapon.AimingAndScopeStats.ScopeMagnification == 1f ?
+            currentWeapon.AimingAndScopeStats.AimingFOV
+            :
+            baseFOV / currentWeapon.AimingAndScopeStats.ScopeMagnification
+            ;
     }
 
     #endregion
