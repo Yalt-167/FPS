@@ -37,8 +37,8 @@ MonoBehaviour:
     RampUpMinCooldownBetweenShots: 0.07
     RampUpCooldownMultiplierPerShot: 0.98
     RampUpCooldownRegulationMultiplier: 1.04
-  ADSandScopeStats:
-    ADScameraMovement: 50
+  AimingAndScopeStats:
+    AimingCameraMovement: 50
     ScopeMagnification: 0
     TimeToADS: 0.1
     TimeToUnADS: 0.2
@@ -55,5 +55,4 @@ MonoBehaviour:
   KickbackStats:
     WeaponKickBackPerShot: 0
     WeaponKickBackRegulationTime: 0
-    FarthestPointBehindInitialPosition: 0
   CanBreakThings: 0
