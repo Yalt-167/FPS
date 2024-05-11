@@ -1,12 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Unity.Netcode;
-using UnityEditor.Presets;
-using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
 
 public class WeaponHandler : NetworkBehaviour
@@ -48,6 +44,8 @@ public class WeaponHandler : NetworkBehaviour
 
     #endregion
 
+    #region Recoil Setup
+
     private Vector3 currentRecoilHandlerRotation = Vector3.zero;
     private Vector3 targetRecoilHandlerRotation = Vector3.zero;
     [SerializeField] private float recoilMovementSnappiness;
@@ -56,6 +54,9 @@ public class WeaponHandler : NetworkBehaviour
     private float recoilX = 0f;
     private float recoilY = 0f;
     private float recoilZ = 0f;
+
+    #endregion
+
 
     #region Shotgun Setup
 
@@ -109,6 +110,7 @@ public class WeaponHandler : NetworkBehaviour
     private void Update()
     {
         HandleRecoil();
+        HandleKickback();
     }
 
     private void LateUpdate()
@@ -148,6 +150,8 @@ public class WeaponHandler : NetworkBehaviour
                     ExecuteShotgunShotClientRpc();
                 }
             ,
+
+            _ => () => { },
         };
     }
 
@@ -169,6 +173,10 @@ public class WeaponHandler : NetworkBehaviour
                     CurrentCooldownBetweenRampUpShots *= currentWeapon.RampUpStats.RampUpCooldownMultiplierPerShot;
                 }
             ,
+
+            ShootingRythm.Charge => throw new NotImplementedException(),
+
+            _ => () => { },
         };
     }
 
@@ -197,7 +205,7 @@ public class WeaponHandler : NetworkBehaviour
 
         if (timeLastShotFired + GetRelevantCooldown(false) > Time.time) { return; }
 
-        GetRelevantCooldown(true);
+        _ = GetRelevantCooldown(true);
 
         if (ammos <= 0) { return; }
 
@@ -212,6 +220,8 @@ public class WeaponHandler : NetworkBehaviour
             ShootingRythm.Single => currentWeapon.CooldownBetweenShots,
             ShootingRythm.Burst => bulletFiredthisBurst == currentWeapon.BurstStats.BulletsPerBurst ? currentWeapon.CooldownBetweenShots : currentWeapon.BurstStats.CooldownBetweenShotsOfBurst,
             ShootingRythm.RampUp => CurrentCooldownBetweenRampUpShots,
+            ShootingRythm.Charge => throw new NotImplementedException(),
+            _ => 0f,
         };
         if (doDebug) print(cd);
         return cd;
@@ -226,6 +236,7 @@ public class WeaponHandler : NetworkBehaviour
         bulletFiredthisBurst = 0;
 
         canShoot = false;
+
         for (int i = 0; i < bullets; i++)
         {
             var timerStart = Time.time;
@@ -236,6 +247,7 @@ public class WeaponHandler : NetworkBehaviour
 
             RequestShotServerRpc();
         }
+
         canShoot = true;
     }
 
@@ -275,6 +287,7 @@ public class WeaponHandler : NetworkBehaviour
         if(!IsOwner) { return; }
 
         ApplyRecoil();
+        ApplyKickback();
     }
 
     [Rpc(SendTo.ClientsAndHost)] // called by the server to execute on all clients
@@ -314,6 +327,7 @@ public class WeaponHandler : NetworkBehaviour
         if (!IsOwner) { return; }
 
         ApplyRecoil();
+        ApplyKickback();
 
         //for (int i = 0; i < hits.Count; i++)
         //{
@@ -453,6 +467,21 @@ public class WeaponHandler : NetworkBehaviour
             )
             ;
     }
+
+    #endregion
+
+
+    #region Handle Kickback
+
+    private void ApplyKickback()
+    {
+        weaponTransform.localPosition -= new Vector3(0f, 0f, currentWeapon.KickbackStats.WeaponKickBackPerShot);
+    }
+
+    private void HandleKickback()
+    {
+        weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, Vector3.zero, currentWeapon.KickbackStats.WeaponKickBackRegulationTime * Time.time);
+    } 
 
     #endregion
 
