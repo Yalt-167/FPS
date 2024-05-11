@@ -17,6 +17,7 @@ public class WeaponHandler : NetworkBehaviour
     private float cameraTransformInitialZ = 0f;
     private Transform cameraTransform;
     private new FollowRotationCamera camera;
+    private Transform recoilHandlerTransform;
 
     [SerializeField] private Transform barrelEnd; // should have the same rotation as the camera
     [SerializeField] private Transform weaponTransform;
@@ -46,6 +47,15 @@ public class WeaponHandler : NetworkBehaviour
     private bool isAiming = false;
 
     #endregion
+
+    private Vector3 currentRecoilHandlerRotation = Vector3.zero;
+    private Vector3 targetRecoilHandlerRotation = Vector3.zero;
+    [SerializeField] private float recoilMovementSnappiness;
+    private float RecoilRegulationSpeed => isAiming ? currentWeapon.AimingRecoilStats.RecoilRegulationSpeed : currentWeapon.HipfireRecoilStats.RecoilRegulationSpeed;
+
+    private float recoilX = 0f;
+    private float recoilY = 0f;
+    private float recoilZ = 0f;
 
     #region Shotgun Setup
 
@@ -83,7 +93,8 @@ public class WeaponHandler : NetworkBehaviour
     {
         playerSettings = GetComponent<PlayerSettings>();
         camera = transform.GetChild(0).GetComponent<FollowRotationCamera>();
-        cameraTransform = transform.GetChild(0).GetChild(0);
+        recoilHandlerTransform = transform.GetChild(0).GetChild(0);
+        cameraTransform = recoilHandlerTransform.GetChild(0);
         switchedThisFrame = false;
         InitGun();
     }
@@ -97,7 +108,7 @@ public class WeaponHandler : NetworkBehaviour
 
     private void Update()
     {
-            
+        HandleRecoil();
     }
 
     private void LateUpdate()
@@ -263,12 +274,23 @@ public class WeaponHandler : NetworkBehaviour
 
         if(!IsOwner) { return; }
 
-        camera.ApplyRecoil(currentWeapon.RecoilStats.RecoilForce, currentWeapon.RecoilStats.RecoilRegulationTime);
+        //camera.ApplyRecoil(currentWeapon.RecoilStats.RecoilForce, currentWeapon.RecoilStats.RecoilRegulationTime);
+
+        ApplyRecoil();
     }
 
     [Rpc(SendTo.ClientsAndHost)] // called by the server to execute on all clients
     private void ExecuteShotgunShotClientRpc()
     {
+        if (IsOwner)
+        {
+            damageLogManager.UpdatePlayerSettings(DamageLogsSettings);
+            timeLastShotFired = Time.time;
+            shotThisFrame = true;
+            ammos--;
+            bulletFiredthisBurst++;
+        }
+
         //var hits = new List<ShotgunHitData>();
         for (int i = 0; i < currentWeapon.ShotgunStats.PelletsCount; i++)
         {
@@ -290,15 +312,12 @@ public class WeaponHandler : NetworkBehaviour
             }
         }
 
-        timeLastShotFired = Time.time;
-        shotThisFrame = true;
-        ammos--;
-        bulletFiredthisBurst++;
 
         if (!IsOwner) { return; }
 
-        camera.ApplyRecoil(currentWeapon.RecoilStats.RecoilForce, currentWeapon.RecoilStats.RecoilRegulationTime);
+        //camera.ApplyRecoil(currentWeapon.RecoilStats.RecoilForce, currentWeapon.RecoilStats.RecoilRegulationTime);
 
+        ApplyRecoil();
 
         //for (int i = 0; i < hits.Count; i++)
         //{
@@ -406,6 +425,41 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     #endregion
+
+    #region Handle Recoil
+
+    private void ApplyRecoil()
+    {
+        SetRelevantRecoil();
+        targetRecoilHandlerRotation += new Vector3(-recoilX, Random.Range(-recoilY, recoilY), Random.Range(-recoilZ, recoilZ));
+    }
+
+    private void HandleRecoil()
+    {
+        targetRecoilHandlerRotation = Vector3.Lerp(targetRecoilHandlerRotation, Vector3.zero, RecoilRegulationSpeed * Time.deltaTime);
+        currentRecoilHandlerRotation = Vector3.Slerp(currentRecoilHandlerRotation, targetRecoilHandlerRotation, recoilMovementSnappiness * Time.deltaTime);
+        recoilHandlerTransform.localRotation = Quaternion.Euler(currentRecoilHandlerRotation);
+    }
+
+    private void SetRelevantRecoil()
+    {
+        (recoilX, recoilY, recoilZ) = isAiming ?
+            (
+                currentWeapon.AimingRecoilStats.RecoilForceX,
+                currentWeapon.AimingRecoilStats.RecoilForceY,
+                currentWeapon.AimingRecoilStats.RecoilForceZ
+            )
+            :
+            (
+                currentWeapon.HipfireRecoilStats.RecoilForceX,
+                currentWeapon.HipfireRecoilStats.RecoilForceY,
+                currentWeapon.HipfireRecoilStats.RecoilForceZ
+            )
+            ;
+    }
+
+    #endregion
+
 }
 
 public struct ShotgunHitData

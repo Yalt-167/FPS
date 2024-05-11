@@ -7,6 +7,7 @@ using UnityEngine;
 public class WeaponStats : ScriptableObject
 {
     public ushort Damage;
+    public WeaponClass WeaponClass;
 
     [Header("Magazine")]
     public ushort MagazineSize;
@@ -17,81 +18,107 @@ public class WeaponStats : ScriptableObject
     [Header("Shooting Style")]
     public ShootingStyle ShootingStyle;
     [Space(8)]
-    public ShotgunStats_ ShotgunStats;
-    [Serializable]
-    public struct ShotgunStats_
-    {
-        public ushort PelletsDamage;
-        public ushort PelletsCount;
-        public float PelletsSpreadAngle;
-        public float PelletsRange;
-    }
+    public ShotgunStats ShotgunStats;
+    
     [Space(4)]
-    public SimpleShotStats_ SimpleShotStats;
-    [Serializable]
-    public struct SimpleShotStats_
-    {
-        public float MaxSpread;
-        public float SpreadAccumulatedPerShot;
-        public float SpreadRegulationTime;
-    }
+    public SimpleShotStats SimpleShotStats;
+   
 
     [Header("Shooting Rythm")]
     public ShootingRythm ShootingRythm;
     public float CooldownBetweenShots;
     [Space(8)]
-    public BurstStats_ BurstStats;
-    [Serializable]
-    public struct BurstStats_
-    {
-        public float CooldownBetweenShotsOfBurst;
-        public ushort BulletsPerBurst;
-    }
+    public BurstStats BurstStats;
+    
     [Space(4)]
-    public RampUpStats_ RampUpStats;
-    [Serializable]
-    public struct RampUpStats_
-    {
-        public float RampUpMaxCooldownBetweenShots;
-        public float RampUpMinCooldownBetweenShots;
-        public float RampUpCooldownMultiplierPerShot;
-        public float RampUpCooldownRegulationMultiplier;
-    }
+    public RampUpStats RampUpStats;
+   
 
     [Header("ADS and Scopes")]
-    public ADSandScopeStats_ ADSandScopeStats;
-    [Serializable]
-    public struct ADSandScopeStats_
-    {
-        public float ADScameraMovement; //perhaps just a cameraMove instead
-        [Range(1, 5)][Tooltip("Set to 1 for no Scope")] public float ScopeMagnification;
-        public float TimeToADS;
-        public float TimeToUnADS;
-    }
+    public ADSandScopeStats ADSandScopeStats;
+    
 
     [Header("Recoil")]
-    public RecoilStats_ RecoilStats;
-    [Serializable]
-    public struct RecoilStats_
-    {
-        public float RecoilForce;
-        public float RecoilRegulationTime;
-    }
+    public RecoilStats HipfireRecoilStats;
+    public RecoilStats AimingRecoilStats;
+
 
     [Header("Kickback")]
-    public KickbackStats_ KickbackStats;
-    [Serializable]
-    public struct KickbackStats_
-    {
-        public float WeaponKickBackPerShot;
-        public float WeaponKickBackRegulationTime;
-        public float FarthestPointBehindInitialPosition;
-
-    }
+    public KickbackStats KickbackStats;
+    
 
     public bool CanBreakThings;
     // add special spread while ADS
 }
+
+[Serializable]
+public struct SimpleShotStats
+{
+    public float MaxSpread;
+    public float SpreadAccumulatedPerShot;
+    public float SpreadRegulationTime;
+}
+
+[Serializable]
+public struct ShotgunStats
+{
+    public ushort PelletsDamage;
+    public ushort PelletsCount;
+    public float PelletsSpreadAngle;
+    public float PelletsRange;
+}
+
+[Serializable]
+public struct BurstStats
+{
+    public float CooldownBetweenShotsOfBurst;
+    public ushort BulletsPerBurst;
+}
+
+
+[Serializable]
+public struct RampUpStats
+{
+    public float RampUpMaxCooldownBetweenShots;
+    public float RampUpMinCooldownBetweenShots;
+    public float RampUpCooldownMultiplierPerShot;
+    public float RampUpCooldownRegulationMultiplier;
+}
+
+[Serializable]
+public struct ADSandScopeStats
+{
+    public float ADScameraMovement; //perhaps just a cameraMove instead
+    [Range(1, 5)][Tooltip("Set to 1 for no Scope")] public float ScopeMagnification;
+    public float TimeToADS;
+    public float TimeToUnADS;
+}
+
+[Serializable]
+public struct KickbackStats
+{
+    public float WeaponKickBackPerShot;
+    public float WeaponKickBackRegulationTime;
+    public float FarthestPointBehindInitialPosition;
+
+}
+
+[Serializable]
+public struct RecoilStats
+{
+    public float RecoilForceX;
+    public float RecoilForceY;
+    public float RecoilForceZ;
+    public float RecoilRegulationSpeed;
+}
+
+[Serializable]
+public struct LegacyRecoilStats
+{
+    public float RecoilForce;
+    public float RecoilRegulationTime;
+}
+
 
 public enum ShootingStyle : byte
 {
@@ -126,5 +153,24 @@ public enum BulletType : byte
     ThroughWalls,
     BounceOnWalls,
 }
+
+public enum WeaponClass
+{
+    Primary,
+    Secondary,
+    Melee,
+    // add duel weapon?
+}
+
+public enum Effect
+{
+    Fire,
+    Freeze,
+    Poison,
+    Slowness,
+    Obscurity,
+
+}
+
 // some InfernoDragon Style weapons
 // for weapons that can do several things according to sth simply do some shenangans to switch the weaponStats
