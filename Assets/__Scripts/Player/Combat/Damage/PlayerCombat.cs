@@ -18,9 +18,9 @@ public class PlayerCombat : MonoBehaviour
 
     [SerializeField] private float shootingCooldown;
     [SerializeField] private Transform barrelEnd;
-    private static readonly float shootBuffer = .1f;
+    //private static readonly float shootBuffer = .1f;
     private float lastShootPressed;
-    private bool HasBufferedShoot => lastShootPressed + shootBuffer > Time.time;
+    //private bool HasBufferedShoot => lastShootPressed + shootBuffer > Time.time;
     #endregion  
 
 
@@ -49,19 +49,26 @@ public class PlayerCombat : MonoBehaviour
     {
         weaponHandler.UpdateAimingState(InputQuery.Aim);
 
-
-        if (InputQuery.Shoot)
-        { 
-            TryShoot(false);
-        }
-        else if (InputQuery.Reload)
+        if (InputQuery.Reload)
         {
             weaponHandler.Reload();
         }
-        else if (HasBufferedShoot)
-        {
-            TryShoot(true);
-        }
+
+        weaponHandler.UpdateState(InputQuery.Shoot);
+
+
+        //if (InputQuery.Shoot)
+        //{ 
+        //    TryShoot(false);
+        //}
+        //else if (InputQuery.Reload)
+        //{
+        //    weaponHandler.Reload();
+        //}
+        //else if (HasBufferedShoot)
+        //{
+        //    TryShoot(true);
+        //}
 
 
         //else if (InputQuery.Slash)
@@ -84,7 +91,7 @@ public class PlayerCombat : MonoBehaviour
         }
 
         lastShootPressed = float.NegativeInfinity;
-        weaponHandler.Shoot();
+        //weaponHandler.UpdateState(InputQuery.Shoot);
     }
 
  

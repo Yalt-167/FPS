@@ -29,10 +29,13 @@ public class WeaponStats : ScriptableObject
     public float CooldownBetweenShots;
     [Space(8)]
     public BurstStats BurstStats;
-    
+
     [Space(4)]
     public RampUpStats RampUpStats;
-   
+
+    [Space(4)]
+    public ChargeStats ChargeStats;
+
 
     [Header("ADS and Scopes")]
     public AimAndScopeStats AimingAndScopeStats;
@@ -83,6 +86,14 @@ public struct RampUpStats
     public float RampUpMinCooldownBetweenShots;
     public float RampUpCooldownMultiplierPerShot;
     public float RampUpCooldownRegulationMultiplier;
+}
+
+[Serializable]
+public struct ChargeStats
+{
+    public float ChargeDuration;
+    public ushort AmmoConsumedByFullyChargedShot;
+    [Range(.1f, 1f)] public float MinChargeRatioToShoot;
 }
 
 [Serializable]

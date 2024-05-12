@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 public class WeaponHandler : NetworkBehaviour
@@ -29,7 +30,7 @@ public class WeaponHandler : NetworkBehaviour
 
     #region Global Setup
 
-    private float timeLastShotFired;
+    private float timeLastShotFired = float.NegativeInfinity;
     private bool switchedThisFrame;
     private bool shotThisFrame;
     private ushort ammos;
@@ -42,6 +43,10 @@ public class WeaponHandler : NetworkBehaviour
     private Action updateMethod;
 
     private bool isAiming = false;
+
+    private static readonly float shootBuffer = .1f;
+    private float lastShootPressed = float.NegativeInfinity;
+    private bool HasBufferedShoot => lastShootPressed + shootBuffer > Time.time;
 
     #endregion
 
@@ -65,6 +70,7 @@ public class WeaponHandler : NetworkBehaviour
 
     #endregion
 
+
     #region Burst Setup
 
     private ushort bulletFiredthisBurst;
@@ -86,6 +92,15 @@ public class WeaponHandler : NetworkBehaviour
             currentCooldownBetweenRampUpShots = Mathf.Clamp(value, currentWeapon.RampUpStats.RampUpMinCooldownBetweenShots, currentWeapon.RampUpStats.RampUpMaxCooldownBetweenShots);
         }
     }
+
+    #endregion
+
+    #region Charge Setup
+
+    private float timeStartedCharging;
+    private bool holdingAttackKey = false;
+
+
 
     #endregion
 
@@ -175,7 +190,8 @@ public class WeaponHandler : NetworkBehaviour
                 }
             ,
 
-            ShootingRythm.Charge => throw new NotImplementedException(),
+            ShootingRythm.Charge => () => { }
+            ,
 
             _ => () => { },
         };
@@ -183,9 +199,27 @@ public class WeaponHandler : NetworkBehaviour
 
     #endregion
 
-    public void Shoot()
+    public void UpdateState(bool holdingAttackKey_)
     {
-        if (!canShoot)
+        if (holdingAttackKey_ != holdingAttackKey)
+        {
+            holdingAttackKey = holdingAttackKey_;
+            if (holdingAttackKey_) // just started pressing the attack key
+            {
+                if (currentWeapon.ShootingRythm == ShootingRythm.Charge)
+                {
+                    StartCoroutine(ChargeShot());
+                    return;
+                }
+            }
+            else  // just released the attack key
+            {
+
+            }
+
+        }
+
+        if (!(canShoot && holdingAttackKey))
         {
             return;
         }
@@ -213,6 +247,25 @@ public class WeaponHandler : NetworkBehaviour
         shootingStyleMethod();
     }
 
+    [Rpc(SendTo.Server)]
+    public void RequestChargedShotServerRpc(float chargeRatio)
+    {
+        print("here");
+        CheckChargedShotCooldownsClientRpc(chargeRatio);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void CheckChargedShotCooldownsClientRpc(float chargeRatio)
+    {
+        if (!IsOwner) { return; }
+
+        if (timeLastShotFired + GetRelevantCooldown(false) > Time.time) { return; }
+
+        _ = GetRelevantCooldown(true);
+
+        print("finally");
+        ExecuteChargedShotClientRpc(chargeRatio);
+    }
 
     private float GetRelevantCooldown(bool doDebug)
     {
@@ -221,7 +274,7 @@ public class WeaponHandler : NetworkBehaviour
             ShootingRythm.Single => currentWeapon.CooldownBetweenShots,
             ShootingRythm.Burst => bulletFiredthisBurst == currentWeapon.BurstStats.BulletsPerBurst ? currentWeapon.CooldownBetweenShots : currentWeapon.BurstStats.CooldownBetweenShotsOfBurst,
             ShootingRythm.RampUp => CurrentCooldownBetweenRampUpShots,
-            ShootingRythm.Charge => throw new NotImplementedException(),
+            ShootingRythm.Charge => currentWeapon.CooldownBetweenShots,
             _ => 0f,
         };
         if (doDebug) print(cd);
@@ -250,6 +303,37 @@ public class WeaponHandler : NetworkBehaviour
         }
 
         canShoot = true;
+    }
+
+    private IEnumerator ChargeShot()
+    {
+        if (ammos <= 0) { yield break; }
+
+        if (timeLastShotFired + GetRelevantCooldown(false) > Time.time) { yield break; }
+
+        timeStartedCharging = Time.time;
+
+        yield return new WaitWhile(() => holdingAttackKey);
+
+        var timeCharged = Time.time - timeStartedCharging;
+        var chargeRatio = timeCharged / currentWeapon.ChargeStats.ChargeDuration;
+        print($"chargeRatio: {chargeRatio}");
+        if (chargeRatio >= currentWeapon.ChargeStats.MinChargeRatioToShoot)
+        {
+            print("been here");
+            var ammoConsumedByThisShot = (ushort)(currentWeapon.ChargeStats.AmmoConsumedByFullyChargedShot * chargeRatio);
+            if (ammos < ammoConsumedByThisShot)
+            {
+                print("0");
+                var newRatio = ammos / currentWeapon.ChargeStats.AmmoConsumedByFullyChargedShot;
+                RequestChargedShotServerRpc(newRatio);
+            }
+            else
+            {
+                print("1");
+                RequestChargedShotServerRpc(chargeRatio);
+            }
+        }
     }
 
     #region ExecuteShot
@@ -324,7 +408,6 @@ public class WeaponHandler : NetworkBehaviour
             }
         }
 
-
         if (!IsOwner) { return; }
 
         ApplyRecoil();
@@ -334,6 +417,40 @@ public class WeaponHandler : NetworkBehaviour
         //{
         //    hits[i].Victim.ReactShot(currentWeapon.ShotgunStats.PelletsDamage, hits[i].HitPoint, hits[i].HitDirection, NetworkObjectId);
         //}
+    }
+
+    [Rpc(SendTo.ClientsAndHost)] // called by the server to execute on all clients
+    private void ExecuteChargedShotClientRpc(float chargeRatio)
+    {
+        if (IsOwner)
+        {
+            damageLogManager.UpdatePlayerSettings(DamageLogsSettings);
+            timeLastShotFired = Time.time;
+            shotThisFrame = true;
+            ammos -= (ushort)(currentWeapon.ChargeStats.AmmoConsumedByFullyChargedShot * chargeRatio);
+        }
+
+        var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
+        if (Physics.Raycast(barrelEnd.position, barrelEnd.forward, out RaycastHit hit, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore))
+        {
+            bulletTrail.Set(barrelEnd.position, hit.point);
+            if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
+            {
+                shootableComponent.ReactShot((ushort)(currentWeapon.Damage * chargeRatio), hit.point, barrelEnd.forward, NetworkObjectId);
+            }
+
+            //Destroy(Instantiate(landingShotEffect, hit.point - shootingDir * .1f, Quaternion.identity), hitEffectLifetime);
+
+        }
+        else
+        {
+            bulletTrail.Set(barrelEnd.position, barrelEnd.position + barrelEnd.forward * 100);
+        }
+
+        if (!IsOwner) { return; }
+
+        ApplyRecoil(chargeRatio);
+        ApplyKickback(chargeRatio);
     }
 
     #endregion
@@ -392,13 +509,11 @@ public class WeaponHandler : NetworkBehaviour
 
     public void UpdateAimingState(bool shoulbBeAiming)
     {
-        if (isAiming != shoulbBeAiming)
-        {
-            isAiming = shoulbBeAiming;
-            //StartCoroutine(ToggleAim(shoulbBeAiming));
-            StartCoroutine(ToggleAimFOV(shoulbBeAiming));
+        if (isAiming == shoulbBeAiming) { return; }
 
-        }
+        isAiming = shoulbBeAiming;
+        //StartCoroutine(ToggleAim(shoulbBeAiming));
+        StartCoroutine(ToggleAimFOV(shoulbBeAiming));
     }
 
     private IEnumerator ToggleAimMovement(bool shouldBeAiming)
@@ -450,7 +565,20 @@ public class WeaponHandler : NetworkBehaviour
     private void ApplyRecoil()
     {
         SetRelevantRecoil();
-        targetRecoilHandlerRotation += new Vector3(-recoilX, Random.Range(-recoilY, recoilY), Random.Range(-recoilZ, recoilZ));
+        targetRecoilHandlerRotation += new Vector3(
+            -recoilX,
+            Random.Range(-recoilY, recoilY),
+            Random.Range(-recoilZ, recoilZ)
+        );
+    }
+    private void ApplyRecoil(float chargeRatio)
+    {
+        SetRelevantRecoil();
+        targetRecoilHandlerRotation += new Vector3(
+            -recoilX * chargeRatio,
+            Random.Range(-recoilY * chargeRatio, recoilY * chargeRatio),
+            Random.Range(-recoilZ * chargeRatio, recoilZ * chargeRatio)
+        );
     }
 
     private void HandleRecoil()
@@ -485,6 +613,10 @@ public class WeaponHandler : NetworkBehaviour
     private void ApplyKickback()
     {
         weaponTransform.localPosition -= new Vector3(0f, 0f, currentWeapon.KickbackStats.WeaponKickBackPerShot);
+    }
+    private void ApplyKickback(float chargeRatio)
+    {
+        weaponTransform.localPosition -= new Vector3(0f, 0f, currentWeapon.KickbackStats.WeaponKickBackPerShot * chargeRatio);
     }
 
     private void HandleKickback()
