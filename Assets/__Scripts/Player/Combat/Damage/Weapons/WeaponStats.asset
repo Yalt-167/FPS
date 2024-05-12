@@ -25,8 +25,8 @@ MonoBehaviour:
     PelletsRange: 20
   SimpleShotStats:
     MaxSpread: 1
-    SpreadAccumulatedPerShot: 0.1
-    SpreadRegulationTime: 0.5
+    SpreadAngleAddedPerShot: 1
+    SpreadRegulationSpeed: 0.001
   ShootingRythm: 0
   CooldownBetweenShots: 0.1
   BurstStats:
@@ -37,22 +37,26 @@ MonoBehaviour:
     RampUpMinCooldownBetweenShots: 0.07
     RampUpCooldownMultiplierPerShot: 0.98
     RampUpCooldownRegulationMultiplier: 1.04
+  ChargeStats:
+    ChargeDuration: 5
+    AmmoConsumedByFullyChargedShot: 10
+    MinChargeRatioToShoot: 0.01
   AimingAndScopeStats:
-    AimingCameraMovement: 50
-    ScopeMagnification: 0
+    AimingFOV: 50
+    ScopeMagnification: 1
     TimeToADS: 0.1
     TimeToUnADS: 0.2
   HipfireRecoilStats:
     RecoilForceX: 2
     RecoilForceY: 2
     RecoilForceZ: 0.15
-    RecoilRegulationSpeed: 2
+    RecoilRegulationSpeed: 6
   AimingRecoilStats:
     RecoilForceX: 0.7
     RecoilForceY: 0
     RecoilForceZ: 0.04666667
     RecoilRegulationSpeed: 2
   KickbackStats:
-    WeaponKickBackPerShot: 0
-    WeaponKickBackRegulationTime: 0
+    WeaponKickBackPerShot: 0.3
+    WeaponKickBackRegulationTime: 0.003
   CanBreakThings: 0
