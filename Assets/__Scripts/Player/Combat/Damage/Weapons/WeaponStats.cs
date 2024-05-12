@@ -58,8 +58,8 @@ public class WeaponStats : ScriptableObject
 public struct SimpleShotStats
 {
     public float MaxSpread;
-    public float SpreadAccumulatedPerShot;
-    public float SpreadRegulationTime;
+    public float SpreadAngleAddedPerShot;
+    public float SpreadRegulationSpeed;
 }
 
 [Serializable]

@@ -56,29 +56,6 @@ public class PlayerCombat : MonoBehaviour
 
         weaponHandler.UpdateState(InputQuery.Shoot);
 
-
-        //if (InputQuery.Shoot)
-        //{ 
-        //    TryShoot(false);
-        //}
-        //else if (InputQuery.Reload)
-        //{
-        //    weaponHandler.Reload();
-        //}
-        //else if (HasBufferedShoot)
-        //{
-        //    TryShoot(true);
-        //}
-
-
-        //else if (InputQuery.Slash)
-        //{
-        //    TrySlash(false);
-        //}
-        //else if (HasBufferedSlash)
-        //{
-        //    TrySlash(true);
-        //}
     }
 
     #region Shooting

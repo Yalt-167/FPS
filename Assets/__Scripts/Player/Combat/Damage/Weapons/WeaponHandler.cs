@@ -126,6 +126,7 @@ public class WeaponHandler : NetworkBehaviour
     private void Update()
     {
         HandleRecoil();
+        HandleSpead();
         HandleKickback();
     }
 
@@ -162,7 +163,7 @@ public class WeaponHandler : NetworkBehaviour
 
             ShootingStyle.Shotgun => () =>
                 {
-                    SetShotgunPelletsDirections();
+                    //SetShotgunPelletsDirections();
                     ExecuteShotgunShotClientRpc();
                 }
             ,
@@ -250,7 +251,6 @@ public class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void RequestChargedShotServerRpc(float chargeRatio)
     {
-        print("here");
         CheckChargedShotCooldownsClientRpc(chargeRatio);
     }
 
@@ -263,7 +263,6 @@ public class WeaponHandler : NetworkBehaviour
 
         _ = GetRelevantCooldown(true);
 
-        print("finally");
         ExecuteChargedShotClientRpc(chargeRatio);
     }
 
@@ -317,20 +316,16 @@ public class WeaponHandler : NetworkBehaviour
 
         var timeCharged = Time.time - timeStartedCharging;
         var chargeRatio = timeCharged / currentWeapon.ChargeStats.ChargeDuration;
-        print($"chargeRatio: {chargeRatio}");
         if (chargeRatio >= currentWeapon.ChargeStats.MinChargeRatioToShoot)
         {
-            print("been here");
             var ammoConsumedByThisShot = (ushort)(currentWeapon.ChargeStats.AmmoConsumedByFullyChargedShot * chargeRatio);
             if (ammos < ammoConsumedByThisShot)
             {
-                print("0");
                 var newRatio = ammos / currentWeapon.ChargeStats.AmmoConsumedByFullyChargedShot;
                 RequestChargedShotServerRpc(newRatio);
             }
             else
             {
-                print("1");
                 RequestChargedShotServerRpc(chargeRatio);
             }
         }
@@ -351,7 +346,8 @@ public class WeaponHandler : NetworkBehaviour
         }
 
         var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
-        if (Physics.Raycast(barrelEnd.position, barrelEnd.forward, out RaycastHit hit, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore))
+        var directionWithSpread = GetDirectionWithSpread(currentSpreadAngle, barrelEnd);
+        if (Physics.Raycast(barrelEnd.position, directionWithSpread, out RaycastHit hit, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore))
         {
             bulletTrail.Set(barrelEnd.position, hit.point);
             if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
@@ -364,15 +360,16 @@ public class WeaponHandler : NetworkBehaviour
         }
         else
         {
-            bulletTrail.Set(barrelEnd.position, barrelEnd.position + barrelEnd.forward * 100);
+            bulletTrail.Set(barrelEnd.position, barrelEnd.position + directionWithSpread * 100);
         }
 
         
 
         if(!IsOwner) { return; }
 
-        ApplyRecoil();
-        ApplyKickback();
+        AddRecoil();
+        AddSpread();
+        AddKickback();
     }
 
     [Rpc(SendTo.ClientsAndHost)] // called by the server to execute on all clients
@@ -387,6 +384,7 @@ public class WeaponHandler : NetworkBehaviour
             bulletFiredthisBurst++;
         }
 
+        SetShotgunPelletsDirections(barrelEnd);
         //var hits = new List<ShotgunHitData>();
         for (int i = 0; i < currentWeapon.ShotgunStats.PelletsCount; i++)
         {
@@ -410,8 +408,8 @@ public class WeaponHandler : NetworkBehaviour
 
         if (!IsOwner) { return; }
 
-        ApplyRecoil();
-        ApplyKickback();
+        AddRecoil();
+        AddKickback();
 
         //for (int i = 0; i < hits.Count; i++)
         //{
@@ -431,7 +429,8 @@ public class WeaponHandler : NetworkBehaviour
         }
 
         var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
-        if (Physics.Raycast(barrelEnd.position, barrelEnd.forward, out RaycastHit hit, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore))
+        var directionWithSpread = GetDirectionWithSpread(currentSpreadAngle, barrelEnd);
+        if (Physics.Raycast(barrelEnd.position, directionWithSpread, out RaycastHit hit, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore))
         {
             bulletTrail.Set(barrelEnd.position, hit.point);
             if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
@@ -444,39 +443,49 @@ public class WeaponHandler : NetworkBehaviour
         }
         else
         {
-            bulletTrail.Set(barrelEnd.position, barrelEnd.position + barrelEnd.forward * 100);
+            bulletTrail.Set(barrelEnd.position, barrelEnd.position + directionWithSpread * 100);
         }
 
         if (!IsOwner) { return; }
 
-        ApplyRecoil(chargeRatio);
-        ApplyKickback(chargeRatio);
+        AddRecoil(chargeRatio);
+        AddSpread();
+        AddKickback(chargeRatio);
     }
 
     #endregion
 
-    private void SetShotgunPelletsDirections()
+    //private void SetShotgunPelletsDirections()
+    //{
+    //    shotgunPelletsDirections = new Vector3[currentWeapon.ShotgunStats.PelletsCount];
+    //    /*Most fucked explanantion to ever cross the frontier of reality
+    //     / 45f -> to get value which we can use iun a vector instead of an angle
+    //    ex in 2D:  a vector that has a 45° angle above X has a (1, 1) direction
+    //    while the X has a (1, 0)
+    //    so we essentially brought the 45° to a value we could use as a direction in the vector
+    //     */
+    //    var spreadStrength = currentWeapon.ShotgunStats.PelletsSpreadAngle / 45f;
+    //    // perhaps do barrelEnd.forward * 45 instead for performances purposes
+    //    for (int i = 0; i < currentWeapon.ShotgunStats.PelletsCount; i++)
+    //    {
+    //        shotgunPelletsDirections[i] = (
+    //            barrelEnd.forward + barrelEnd.TransformDirection(
+    //                new Vector3(
+    //                    Random.Range(-spreadStrength, spreadStrength),
+    //                    Random.Range(-spreadStrength, spreadStrength),
+    //                    0
+    //                )
+    //            )
+    //        ).normalized;
+    //    }
+    //}
+
+    private void SetShotgunPelletsDirections(Transform directionTranform)
     {
         shotgunPelletsDirections = new Vector3[currentWeapon.ShotgunStats.PelletsCount];
-        /*Most fucked explanantion to ever cross the frontier of reality
-         / 45f -> to get value which we can use iun a vector instead of an angle
-        ex in 2D:  a vector that has a 45° angle above X has a (1, 1) direction
-        while the X has a (1, 0)
-        so we essentially brought the 45° to a value we could use as a direction in the vector
-         */
-        var spreadStrength = currentWeapon.ShotgunStats.PelletsSpreadAngle / 45f;
-        // perhaps do barrelEnd.forward * 45 instead for performances purposes
         for (int i = 0; i < currentWeapon.ShotgunStats.PelletsCount; i++)
         {
-            shotgunPelletsDirections[i] = (
-                barrelEnd.forward + barrelEnd.TransformDirection(
-                    new Vector3(
-                        Random.Range(-spreadStrength, spreadStrength),
-                        Random.Range(-spreadStrength, spreadStrength),
-                        0
-                    )
-                )
-            ).normalized;
+            shotgunPelletsDirections[i] = GetDirectionWithSpread(currentWeapon.ShotgunStats.PelletsSpreadAngle, directionTranform);
         }
     }
 
@@ -562,7 +571,7 @@ public class WeaponHandler : NetworkBehaviour
 
     #region Handle Recoil
 
-    private void ApplyRecoil()
+    private void AddRecoil()
     {
         SetRelevantRecoil();
         targetRecoilHandlerRotation += new Vector3(
@@ -571,7 +580,7 @@ public class WeaponHandler : NetworkBehaviour
             Random.Range(-recoilZ, recoilZ)
         );
     }
-    private void ApplyRecoil(float chargeRatio)
+    private void AddRecoil(float chargeRatio)
     {
         SetRelevantRecoil();
         targetRecoilHandlerRotation += new Vector3(
@@ -610,11 +619,11 @@ public class WeaponHandler : NetworkBehaviour
 
     #region Handle Kickback
 
-    private void ApplyKickback()
+    private void AddKickback()
     {
         weaponTransform.localPosition -= new Vector3(0f, 0f, currentWeapon.KickbackStats.WeaponKickBackPerShot);
     }
-    private void ApplyKickback(float chargeRatio)
+    private void AddKickback(float chargeRatio)
     {
         weaponTransform.localPosition -= new Vector3(0f, 0f, currentWeapon.KickbackStats.WeaponKickBackPerShot * chargeRatio);
     }
@@ -622,10 +631,46 @@ public class WeaponHandler : NetworkBehaviour
     private void HandleKickback()
     {
         weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, Vector3.zero, currentWeapon.KickbackStats.WeaponKickBackRegulationTime * Time.time);
-    } 
+    }
 
     #endregion
 
+    #region Handle Spread
+
+    private float currentSpreadAngle = 0f;
+
+    private void AddSpread()
+    {
+        currentSpreadAngle += currentWeapon.SimpleShotStats.SpreadAngleAddedPerShot;
+    }
+
+    private void HandleSpead()
+    {
+        currentSpreadAngle = Mathf.Lerp(currentSpreadAngle, 0f, currentWeapon.SimpleShotStats.SpreadRegulationSpeed * Time.time);
+    }
+
+    private Vector3 GetDirectionWithSpread(float spreadAngle, Transform directionTransform)
+    {
+        var spreadStrength = spreadAngle / 45f;
+        /*Most fucked explanantion to ever cross the frontier of reality
+         / 45f -> to get value which we can use iun a vector instead of an angle
+        ex in 2D:  a vector that has a 45° angle above X has a (1, 1) direction
+        while the X has a (1, 0)
+        so we essentially brought the 45° to a value we could use as a direction in the vector
+         */
+        // perhaps do directionTransform.forward * 45 instead of other / 45 (for performances purposes)
+        return (
+                directionTransform.forward + directionTransform.TransformDirection(
+                    new Vector3(
+                        Random.Range(-spreadStrength, spreadStrength),
+                        Random.Range(-spreadStrength, spreadStrength),
+                        0
+                    )
+                )
+            ).normalized;
+    }
+
+    #endregion
 }
 
 public struct ShotgunHitData
