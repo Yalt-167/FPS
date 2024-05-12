@@ -16,7 +16,7 @@ public class BodyPart : NetworkBehaviour, IShootable
         playerHealth = transform.parent.parent.GetComponent<PlayerHealth>();
     }
 
-    public void ReactShot(ushort damage, Vector3 _, Vector3 __, ulong attackerNetworkID)
+    public void ReactShot(ushort damage, Vector3 _, Vector3 __, ulong attackerNetworkID, bool ___)
     {
         //if (!IsOwner) { return; }
 

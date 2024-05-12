@@ -11,7 +11,7 @@ public class WeaponStats : ScriptableObject
 
     [Header("Magazine")]
     public ushort MagazineSize;
-    // public bool NeedReload
+    public bool NeedReload;
     public float ReloadSpeed; // some that can reload one per one
     public ushort AmmoLeftInMagazineToWarn;
 
@@ -147,7 +147,13 @@ public enum BulletTravelTypeBehaviour : byte
     NoDrop,
 }
 
-public enum BulletType : byte
+public enum BulletActionOnHitPlayer : byte
+{
+    PierceThrough,
+    Stop,
+}
+
+public enum BulletActionOnHitWall: byte
 {
     Classic,
     Explosive,
@@ -170,7 +176,6 @@ public enum Effect
     Poison,
     Slowness,
     Obscurity,
-
 }
 
 // some InfernoDragon Style weapons

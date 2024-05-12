@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 public class WeaponHandler : NetworkBehaviour
@@ -11,13 +10,13 @@ public class WeaponHandler : NetworkBehaviour
     #region References
 
     [SerializeField] private WeaponStats currentWeapon;
-    private float cameraTransformInitialZ = 0f;
+    private float cameraTransformInitialZ;
     private Transform cameraTransform;
     private new Camera camera;
     private int baseFOV = 60;
     private Transform recoilHandlerTransform;
 
-    [SerializeField] private Transform barrelEnd; // should have the same rotation as the camera
+    [SerializeField] private Transform barrelEnd;
     [SerializeField] private Transform weaponTransform;
     [SerializeField] private LayerMask layersToHit;
     [SerializeField] private GameObject bulletTrailPrefab;
@@ -42,7 +41,7 @@ public class WeaponHandler : NetworkBehaviour
     private Action shootingRythmMethod;
     private Action updateMethod;
 
-    private bool isAiming = false;
+    private bool isAiming;
 
     private static readonly float shootBuffer = .1f;
     private float lastShootPressed = float.NegativeInfinity;
@@ -336,6 +335,7 @@ public class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)] // called by the server to execute on all clients
     private void ExecuteSimpleShotClientRpc()
     {
+        var ammosBeforeShot = ammos;
         if (IsOwner)
         {
             damageLogManager.UpdatePlayerSettings(DamageLogsSettings);
@@ -352,7 +352,11 @@ public class WeaponHandler : NetworkBehaviour
             bulletTrail.Set(barrelEnd.position, hit.point);
             if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
             {
-                shootableComponent.ReactShot(currentWeapon.Damage, hit.point, barrelEnd.forward, NetworkObjectId);
+                if (ammosBeforeShot <= currentWeapon.AmmoLeftInMagazineToWarn)
+                {
+                    WarnThatMagazineIsRunningOut();
+                }
+                shootableComponent.ReactShot(currentWeapon.Damage, hit.point, barrelEnd.forward, NetworkObjectId, currentWeapon.CanBreakThings);
             }
 
             //Destroy(Instantiate(landingShotEffect, hit.point - shootingDir * .1f, Quaternion.identity), hitEffectLifetime);
@@ -394,7 +398,7 @@ public class WeaponHandler : NetworkBehaviour
                 bulletTrail.Set(barrelEnd.position, hit.point);
                 if (hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
                 {
-                    shootableComponent.ReactShot(currentWeapon.ShotgunStats.PelletsDamage, shotgunPelletsDirections[i], hit.point, NetworkObjectId);
+                    shootableComponent.ReactShot(currentWeapon.ShotgunStats.PelletsDamage, shotgunPelletsDirections[i], hit.point, NetworkObjectId, currentWeapon.CanBreakThings);
                     //hits.Add(new(shootableComponent, hit.point, shotgunPelletsDirections[i]));
                 }
 
@@ -420,6 +424,7 @@ public class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)] // called by the server to execute on all clients
     private void ExecuteChargedShotClientRpc(float chargeRatio)
     {
+        var ammosBeforeShot = ammos;
         if (IsOwner)
         {
             damageLogManager.UpdatePlayerSettings(DamageLogsSettings);
@@ -435,7 +440,11 @@ public class WeaponHandler : NetworkBehaviour
             bulletTrail.Set(barrelEnd.position, hit.point);
             if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
             {
-                shootableComponent.ReactShot((ushort)(currentWeapon.Damage * chargeRatio), hit.point, barrelEnd.forward, NetworkObjectId);
+                if (ammosBeforeShot <= currentWeapon.AmmoLeftInMagazineToWarn)
+                {
+                    WarnThatMagazineIsRunningOut();
+                }
+                shootableComponent.ReactShot((ushort)(currentWeapon.Damage * chargeRatio), hit.point, barrelEnd.forward, NetworkObjectId, currentWeapon.CanBreakThings);
             }
 
             //Destroy(Instantiate(landingShotEffect, hit.point - shootingDir * .1f, Quaternion.identity), hitEffectLifetime);
@@ -493,6 +502,8 @@ public class WeaponHandler : NetworkBehaviour
 
     public void Reload()
     {
+        if (!currentWeapon.NeedReload) { return; }
+
         StartCoroutine(ExecuteReload());
     }
 
@@ -511,6 +522,12 @@ public class WeaponHandler : NetworkBehaviour
 
         ammos = currentWeapon.MagazineSize;
     }
+
+    private void WarnThatMagazineIsRunningOut()
+    {
+        print("You ve been warned that ur magazine is near empty");
+    }
+
 
     #endregion
 
