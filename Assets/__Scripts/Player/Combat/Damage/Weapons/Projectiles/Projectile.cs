@@ -11,13 +11,15 @@ public class Projectile : MonoBehaviour
     protected float speed;
     protected float bulletDrop;
     protected ushort damage;
+    protected ulong attackerNetworkID;
     protected LayerMask layersToHit;
-    public virtual void Init(ushort damage_, float speed_, float bulletDrop_,  LayerMask layersToHit_)
+    public virtual void Init(ushort damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, LayerMask layersToHit_)
     {
         damage = damage_;
         layersToHit = layersToHit_;
         bulletDrop = bulletDrop_;
         speed = speed_;
+        attackerNetworkID = attackerNetworkID_;
 
         Destroy(gameObject, lifetime);
     }
