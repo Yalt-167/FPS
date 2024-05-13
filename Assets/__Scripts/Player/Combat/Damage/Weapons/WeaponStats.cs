@@ -9,6 +9,12 @@ public class WeaponStats : ScriptableObject
     public ushort Damage;
     public WeaponClass WeaponClass;
 
+    [Header("Bullet Travel Settings")]
+    public bool IsHitscan;
+    public HitscanBulletSettings HitscanBulletSettings;
+    public TravelTimeBulletSettings TravelTimeBulletSettings;
+
+
     [Header("Magazine")]
     public ushort MagazineSize;
     public bool NeedReload;
@@ -18,10 +24,12 @@ public class WeaponStats : ScriptableObject
     [Header("Shooting Style")]
     public ShootingStyle ShootingStyle;
     [Space(8)]
-    public ShotgunStats ShotgunStats;
+    public SimpleShotStats SimpleShotStats;
+    public SimpleShotStats AimingSimpleShotStats;
     
     [Space(4)]
-    public SimpleShotStats SimpleShotStats;
+    public ShotgunStats ShotgunStats;
+    public ShotgunStats AimingShotgunStats;
    
 
     [Header("Shooting Rythm")]
@@ -51,7 +59,14 @@ public class WeaponStats : ScriptableObject
     
 
     public bool CanBreakThings;
-    // add special spread while ADS
+}
+
+#region Shooting Style
+
+public enum ShootingStyle : byte
+{
+    Single,
+    Shotgun,
 }
 
 [Serializable]
@@ -71,13 +86,24 @@ public struct ShotgunStats
     public float PelletsRange;
 }
 
+#endregion 
+
+#region Shooting Rythm
+
+public enum ShootingRythm : byte
+{
+    Single,
+    Burst,
+    RampUp,
+    Charge
+}
+
 [Serializable]
 public struct BurstStats
 {
     public float CooldownBetweenShotsOfBurst;
     public ushort BulletsPerBurst;
 }
-
 
 [Serializable]
 public struct RampUpStats
@@ -94,6 +120,18 @@ public struct ChargeStats
     public float ChargeDuration;
     public ushort AmmoConsumedByFullyChargedShot;
     [Range(.1f, 1f)] public float MinChargeRatioToShoot;
+}
+
+#endregion
+
+#region Miscellaneous
+
+public enum WeaponClass
+{
+    Primary,
+    Secondary,
+    Melee,
+    // add duel weapon?
 }
 
 [Serializable]
@@ -121,54 +159,6 @@ public struct RecoilStats
     public float RecoilRegulationSpeed;
 }
 
-public enum ShootingStyle : byte
-{
-    Single,
-    Shotgun,
-}
-
-public enum ShootingRythm : byte
-{
-    Single,
-    Burst,
-    RampUp,
-    Charge
-}
-
-public enum BulletTravelType : byte
-{
-    Hitscan,
-    TravelTime,
-}
-
-public enum BulletTravelTypeBehaviour : byte
-{
-    BulletDrop,
-    NoDrop,
-}
-
-public enum BulletActionOnHitPlayer : byte
-{
-    PierceThrough,
-    Stop,
-}
-
-public enum BulletActionOnHitWall: byte
-{
-    Classic,
-    Explosive,
-    ThroughWalls,
-    BounceOnWalls,
-}
-
-public enum WeaponClass
-{
-    Primary,
-    Secondary,
-    Melee,
-    // add duel weapon?
-}
-
 public enum Effect
 {
     Fire,
@@ -178,5 +168,53 @@ public enum Effect
     Obscurity,
 }
 
+#endregion
+
+#region Bullet Settings
+
+#region Hitscan Bullet Settings
+
+[Serializable]
+public struct HitscanBulletSettings
+{
+    public HitscanBulletActionOnHitPlayer ActionOnHitPlayer;
+    public HitscanBulletActionOnHitWall ActionOnHitWall;
+}
+
+
+public enum HitscanBulletActionOnHitPlayer : byte
+{
+    Stop,
+    PierceThrough,
+}
+
+public enum HitscanBulletActionOnHitWall : byte
+{
+    Classic,
+    Explosive,
+    ThroughWalls,
+    BounceOnWalls,
+}
+
+#endregion
+
+#region Travel Time Bullet Settings
+
+[Serializable]
+public struct TravelTimeBulletSettings
+{
+    public GameObject BulletPrefab;
+    public float BulletDrop;
+    public float BulletSpeed;
+}
+
+#endregion
+
+#endregion
+
 // some InfernoDragon Style weapons
 // for weapons that can do several things according to sth simply do some shenangans to switch the weaponStats
+
+// add a second healthbar beneath the actual one for a lerping one that slowly goes toward your health
+//just for aesthetic
+// add a report bug key ingame
