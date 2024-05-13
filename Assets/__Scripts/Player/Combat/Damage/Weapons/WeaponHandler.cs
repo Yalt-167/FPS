@@ -526,7 +526,7 @@ public class WeaponHandler : NetworkBehaviour
 
         projectile.Init(
             (ushort)(currentWeapon.Damage * chargeRatio),
-            currentWeapon.TravelTimeBulletSettings.BulletSpeed,
+            currentWeapon.TravelTimeBulletSettings.BulletSpeed * chargeRatio,
             currentWeapon.TravelTimeBulletSettings.BulletDrop,
             NetworkObjectId,
             layersToHit
