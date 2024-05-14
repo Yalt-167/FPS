@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 291811625bdf4c7469ec3fd525b8de32, type: 3}
-  m_Name: WeaponStats
+  m_Name: TestStats
   m_EditorClassIdentifier: 
   Damage: 15
   WeaponClass: 0
@@ -27,7 +27,7 @@ MonoBehaviour:
   NeedReload: 0
   ReloadSpeed: 2
   AmmoLeftInMagazineToWarn: 0
-  ShootingStyle: 1
+  ShootingStyle: 0
   SimpleShotStats:
     MaxSpread: 1
     SpreadAngleAddedPerShot: 1
@@ -46,7 +46,7 @@ MonoBehaviour:
     PelletsCount: 32
     PelletsSpreadAngle: 5
     PelletsRange: 10
-  ShootingRythm: 3
+  ShootingRythm: 1
   CooldownBetweenShots: 0.1
   BurstStats:
     CooldownBetweenShotsOfBurst: 0.1
@@ -57,7 +57,7 @@ MonoBehaviour:
     RampUpCooldownMultiplierPerShot: 0.98
     RampUpCooldownRegulationMultiplier: 1.04
   ChargeStats:
-    ChargeDuration: 3
+    ChargeDuration: 1
     AmmoConsumedByFullyChargedShot: 10
     MinChargeRatioToShoot: 1
   AimingAndScopeStats:

@@ -11,18 +11,7 @@ public class PlayerCombat : MonoBehaviour
 
     [SerializeField] private CombatInputQuery InputQuery;
     [SerializeField] private WeaponHandler weaponHandler;
-    private PlayerCombatNetworked playerCombatNetworked;
     [SerializeField] private LayerMask layersToHit;
-
-    #region Shoot Setup
-
-    [SerializeField] private float shootingCooldown;
-    [SerializeField] private Transform barrelEnd;
-    //private static readonly float shootBuffer = .1f;
-    private float lastShootPressed;
-    //private bool HasBufferedShoot => lastShootPressed + shootBuffer > Time.time;
-    #endregion  
-
 
     #region Katana Setup
 
@@ -42,11 +31,15 @@ public class PlayerCombat : MonoBehaviour
     {
         cameraTransform = transform.GetChild(0).GetChild(0);
         InputQuery.Init();
-        playerCombatNetworked = GetComponent<PlayerCombatNetworked>();
     }
 
     private void Update()
     {
+        if (InputQuery.SwitchGun)
+        {
+            weaponHandler.InitGun(); // so far there might be an exploit -> initing gun after each shot effectively reseting its cd
+        }
+
         weaponHandler.UpdateAimingState(InputQuery.Aim);
 
         if (InputQuery.Reload)
@@ -55,25 +48,7 @@ public class PlayerCombat : MonoBehaviour
         }
 
         weaponHandler.UpdateState(InputQuery.Shoot);
-
     }
-
-    #region Shooting
-
-    private void TryShoot(bool fromBuffer)
-    {
-        if (!fromBuffer)
-        {
-            lastShootPressed = Time.time;
-        }
-
-        lastShootPressed = float.NegativeInfinity;
-        //weaponHandler.UpdateState(InputQuery.Shoot);
-    }
-
- 
-
-    #endregion
 
     #region Slashing
 

@@ -86,6 +86,7 @@ public class CombatInputQuery : InputQuery
     public FixedKeybind Shoot;
     public VariableKeybind Aim;
     public FixedKeybind Reload;
+    public FixedKeybind SwitchGun;
     public FixedKeybind Slash;
     public FixedKeybind Parry;
     public FixedKeybind ChangeCrosshair;
@@ -95,6 +96,7 @@ public class CombatInputQuery : InputQuery
         Shoot.Init();
         Aim.Init();
         Reload.Init();
+        SwitchGun.Init();
         Slash.Init();
         Parry.Init();
 

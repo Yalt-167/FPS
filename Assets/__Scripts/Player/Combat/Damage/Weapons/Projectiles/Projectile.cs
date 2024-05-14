@@ -51,8 +51,9 @@ public class Projectile : MonoBehaviour
     {
         var startTime = Time.time;
 
-        yield return new WaitUntil(() => startTime + lifetime > Time.time || !active);
+        yield return new WaitUntil(() => startTime + lifetime < Time.time || !active);
 
+        //print(active ? "lifetime" : "collision");
         Destroy(gameObject);
     }
 }
