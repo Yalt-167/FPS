@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//[RequireComponent(typeof(Rigidbody))]
 public class Projectile : MonoBehaviour
 {
     [SerializeField] protected float lifetime;
@@ -13,6 +12,7 @@ public class Projectile : MonoBehaviour
     protected ulong attackerNetworkID;
     protected bool canBreakThings;
     protected LayerMask layersToHit;
+    protected bool active;
 
     protected virtual void Awake()
     {
@@ -21,6 +21,7 @@ public class Projectile : MonoBehaviour
 
     public virtual void Init(ushort damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, bool canBreakThings_, LayerMask layersToHit_)
     {
+        active = true;
         damage = damage_;
         layersToHit = layersToHit_;
         bulletDrop = bulletDrop_;
@@ -28,16 +29,15 @@ public class Projectile : MonoBehaviour
         attackerNetworkID = attackerNetworkID_;
         canBreakThings = canBreakThings_;
 
-        Destroy(gameObject, lifetime);
+        StartCoroutine(CleanUp());
     }
 
     protected virtual void OnTriggerEnter(Collider other)
     {
-        print("found sth");
         if (other.TryGetComponent<IShootable>(out var shootableComponent))
         {
-            print("found match");
             shootableComponent.ReactShot(damage, transform.forward, Vector3.zero, attackerNetworkID, canBreakThings);
+            active = false;
         }
     }
 
@@ -45,5 +45,14 @@ public class Projectile : MonoBehaviour
     {
         transform.position += transform.forward * speed;
         transform.position -= transform.up * bulletDrop;
+    }
+
+    protected virtual IEnumerator CleanUp()
+    {
+        var startTime = Time.time;
+
+        yield return new WaitUntil(() => startTime + lifetime > Time.time || !active);
+
+        Destroy(gameObject);
     }
 }
