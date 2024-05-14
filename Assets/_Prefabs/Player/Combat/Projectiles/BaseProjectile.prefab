@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5995518767666329171}
   - component: {fileID: 1735649462399812594}
   - component: {fileID: 1334649406742630113}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BaseProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -118,6 +118,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f98e5a47b3a3c64ea41671bae3ae7e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2
-  bulletDrop: 0.05
   lifetime: 3

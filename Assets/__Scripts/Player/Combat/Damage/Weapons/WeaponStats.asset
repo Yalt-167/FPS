@@ -37,7 +37,7 @@ MonoBehaviour:
     SpreadAngleAddedPerShot: 0
     SpreadRegulationSpeed: 0
   ShotgunStats:
-    PelletsDamage: 1
+    PelletsDamage: 5
     PelletsCount: 100
     PelletsSpreadAngle: 3
     PelletsRange: 20
@@ -57,7 +57,7 @@ MonoBehaviour:
     RampUpCooldownMultiplierPerShot: 0.98
     RampUpCooldownRegulationMultiplier: 1.04
   ChargeStats:
-    ChargeDuration: 5
+    ChargeDuration: 3
     AmmoConsumedByFullyChargedShot: 10
     MinChargeRatioToShoot: 0.01
   AimingAndScopeStats:

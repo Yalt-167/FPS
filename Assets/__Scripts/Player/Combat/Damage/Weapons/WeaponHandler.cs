@@ -54,10 +54,16 @@ public class WeaponHandler : NetworkBehaviour
     private Vector3 currentRecoilHandlerRotation;
     private Vector3 targetRecoilHandlerRotation;
     [SerializeField] private float recoilMovementSnappiness;
+
     private float RecoilRegulationSpeed => isAiming ? currentWeapon.AimingRecoilStats.RecoilRegulationSpeed : currentWeapon.HipfireRecoilStats.RecoilRegulationSpeed;
 
     #endregion
 
+    #region Spread Setup
+    
+    private float currentSpreadAngle = 0f; 
+    
+    #endregion
 
     #region Shotgun Setup
 
@@ -260,6 +266,11 @@ public class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void CheckChargedShotCooldownsClientRpc(float chargeRatio)
     {
+        if (currentWeapon.ShootingStyle == ShootingStyle.Shotgun)
+        {
+            SetShotgunPelletsDirections(barrelEnd);
+        }
+
         if (!IsOwner) { return; }
 
         if (timeLastShotFired + GetRelevantCooldown(false) > Time.time) { return; }
@@ -270,7 +281,6 @@ public class WeaponHandler : NetworkBehaviour
         {
             if (currentWeapon.ShootingStyle == ShootingStyle.Shotgun)
             {
-                SetShotgunPelletsDirections(barrelEnd);
                 ExecuteChargedShotgunHitscanShotClientRpc(chargeRatio);
             }
             else
@@ -282,7 +292,6 @@ public class WeaponHandler : NetworkBehaviour
         {
             if (currentWeapon.ShootingStyle == ShootingStyle.Shotgun)
             {
-                SetShotgunPelletsDirections(barrelEnd);
                 ExecuteChargedShotgunTravelTimeShotClientRpc(chargeRatio);
             }
             else
@@ -520,6 +529,7 @@ public class WeaponHandler : NetworkBehaviour
             currentWeapon.TravelTimeBulletSettings.BulletSpeed,
             currentWeapon.TravelTimeBulletSettings.BulletDrop,
             NetworkObjectId,
+            currentWeapon.CanBreakThings,
             layersToHit
         );
 
@@ -546,6 +556,7 @@ public class WeaponHandler : NetworkBehaviour
                 currentWeapon.TravelTimeBulletSettings.BulletSpeed,
                 currentWeapon.TravelTimeBulletSettings.BulletDrop,
                 NetworkObjectId,
+                currentWeapon.CanBreakThings,
                 layersToHit
             );
             
@@ -573,6 +584,7 @@ public class WeaponHandler : NetworkBehaviour
             currentWeapon.TravelTimeBulletSettings.BulletSpeed * chargeRatio,
             currentWeapon.TravelTimeBulletSettings.BulletDrop,
             NetworkObjectId,
+            currentWeapon.CanBreakThings,
             layersToHit
         );
         
@@ -602,6 +614,7 @@ public class WeaponHandler : NetworkBehaviour
                 currentWeapon.TravelTimeBulletSettings.BulletSpeed,
                 currentWeapon.TravelTimeBulletSettings.BulletDrop,
                 NetworkObjectId,
+                currentWeapon.CanBreakThings,
                 layersToHit
             );
         }
@@ -615,31 +628,6 @@ public class WeaponHandler : NetworkBehaviour
     #endregion
 
     #endregion
-
-    //private void SetShotgunPelletsDirections()
-    //{
-    //    shotgunPelletsDirections = new Vector3[currentWeapon.ShotgunStats.PelletsCount];
-    //    /*Most fucked explanantion to ever cross the frontier of reality
-    //     / 45f -> to get value which we can use iun a vector instead of an angle
-    //    ex in 2D:  a vector that has a 45° angle above X has a (1, 1) direction
-    //    while the X has a (1, 0)
-    //    so we essentially brought the 45° to a value we could use as a direction in the vector
-    //     */
-    //    var spreadStrength = currentWeapon.ShotgunStats.PelletsSpreadAngle / 45f;
-    //    // perhaps do barrelEnd.forward * 45 instead for performances purposes
-    //    for (int i = 0; i < currentWeapon.ShotgunStats.PelletsCount; i++)
-    //    {
-    //        shotgunPelletsDirections[i] = (
-    //            barrelEnd.forward + barrelEnd.TransformDirection(
-    //                new Vector3(
-    //                    Random.Range(-spreadStrength, spreadStrength),
-    //                    Random.Range(-spreadStrength, spreadStrength),
-    //                    0
-    //                )
-    //            )
-    //        ).normalized;
-    //    }
-    //}
 
     private void SetShotgunPelletsDirections(Transform directionTranform)
     {
@@ -808,8 +796,6 @@ public class WeaponHandler : NetworkBehaviour
     #endregion
 
     #region Handle Spread
-
-    private float currentSpreadAngle = 0f;
 
     private void ApplySpread()
     {

@@ -136,6 +136,7 @@ public class PlayerHealth : NetworkBehaviour
             BodyParts.HEAD => hadShield ? TargetType.HEAD_SHIELDED : TargetType.HEAD,
             BodyParts.BODY => hadShield ? TargetType.BODY_SHIELDED : TargetType.BODY,
             BodyParts.LEGS => hadShield ? TargetType.LEGS_SHIELDED : TargetType.LEGS,
+            _ => throw new NotImplementedException(),
         };
     }
 }
