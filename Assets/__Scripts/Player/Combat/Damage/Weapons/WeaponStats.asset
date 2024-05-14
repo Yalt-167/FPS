@@ -33,19 +33,19 @@ MonoBehaviour:
     SpreadAngleAddedPerShot: 1
     SpreadRegulationSpeed: 0.001
   AimingSimpleShotStats:
-    MaxSpread: 0
-    SpreadAngleAddedPerShot: 0
-    SpreadRegulationSpeed: 0
+    MaxSpread: 0.5
+    SpreadAngleAddedPerShot: 0.5
+    SpreadRegulationSpeed: 0.001
   ShotgunStats:
     PelletsDamage: 5
-    PelletsCount: 100
-    PelletsSpreadAngle: 3
-    PelletsRange: 20
+    PelletsCount: 32
+    PelletsSpreadAngle: 5
+    PelletsRange: 10
   AimingShotgunStats:
-    PelletsDamage: 0
-    PelletsCount: 0
-    PelletsSpreadAngle: 0
-    PelletsRange: 0
+    PelletsDamage: 5
+    PelletsCount: 32
+    PelletsSpreadAngle: 5
+    PelletsRange: 10
   ShootingRythm: 3
   CooldownBetweenShots: 0.1
   BurstStats:
@@ -59,7 +59,7 @@ MonoBehaviour:
   ChargeStats:
     ChargeDuration: 3
     AmmoConsumedByFullyChargedShot: 10
-    MinChargeRatioToShoot: 0.01
+    MinChargeRatioToShoot: 1
   AimingAndScopeStats:
     AimingFOV: 50
     ScopeMagnification: 1
