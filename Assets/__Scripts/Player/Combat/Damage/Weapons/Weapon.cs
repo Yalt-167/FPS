@@ -8,7 +8,7 @@ public class Weapon : ScriptableObject
 {
     public WeaponStats Stats;
     public Mesh Model;
-    public Sounds Sounds;   
+    public Sounds Sounds;
 }
 
 [Serializable]
