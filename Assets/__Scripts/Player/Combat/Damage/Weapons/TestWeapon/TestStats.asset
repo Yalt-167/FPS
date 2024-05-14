@@ -46,7 +46,7 @@ MonoBehaviour:
     PelletsCount: 32
     PelletsSpreadAngle: 5
     PelletsRange: 10
-  ShootingRythm: 1
+  ShootingRythm: 0
   CooldownBetweenShots: 0.1
   BurstStats:
     CooldownBetweenShotsOfBurst: 0.1

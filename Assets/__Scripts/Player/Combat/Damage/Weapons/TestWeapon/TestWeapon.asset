@@ -15,6 +15,6 @@ MonoBehaviour:
   Stats: {fileID: 11400000, guid: 57e866d1fcbcfd147899a794ea76352c, type: 2}
   Model: {fileID: 0}
   Sounds:
-    ShootingSound: {fileID: 0}
+    ShootingSound: {fileID: 8300000, guid: 49aafd84ecb1f2d46917a267797fffec, type: 3}
     ReloadSound: {fileID: 0}
     NearEmptyMagazineShootSound: {fileID: 0}
