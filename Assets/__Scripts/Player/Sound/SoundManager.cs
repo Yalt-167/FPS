@@ -6,21 +6,21 @@ public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance;
 
-    public Dictionary<string, AudioClip> Sounds = new();
+    public Dictionary<string, AudioSource> AudioSources = new();
 
 
-    public void RegisterSound(string name, AudioClip sound)
+    public void RegisterSound(string name, AudioSource sound)
     {
-        Sounds.Add(name, sound);
+        AudioSources.Add(name, sound);
     }
 
     public void DiscardSound(string name)
     {
-        Sounds.Remove(name);
+        AudioSources.Remove(name);
     }
 
-    public void ManageSoundVolume(string name)
+    public void ManageSoundVolume(string name, int volumePercentage)
     {
-        //Sounds[name].
+        AudioSources[name].volume = volumePercentage / 100;
     }
 }

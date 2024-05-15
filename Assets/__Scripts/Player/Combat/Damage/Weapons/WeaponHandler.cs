@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -32,7 +31,7 @@ public class WeaponHandler : NetworkBehaviour
     #region Sound Setup
 
     private AudioSource audioSource;
-    private Sounds currentWeaponSounds;
+    private WeaponSounds currentWeaponSounds;
 
     #endregion
 
@@ -80,7 +79,6 @@ public class WeaponHandler : NetworkBehaviour
 
     #endregion
 
-
     #region Burst Setup
 
     private ushort bulletFiredthisBurst;
@@ -124,7 +122,7 @@ public class WeaponHandler : NetworkBehaviour
         camera = cameraTransform.GetComponent<Camera>();
         audioSource = GetComponent<AudioSource>();
         switchedThisFrame = false;
-        InitGun();
+        InitWeapon();
     }
 
     private void FixedUpdate()
@@ -149,12 +147,18 @@ public class WeaponHandler : NetworkBehaviour
 
     private void OnValidate()
     {
-        InitGun();
+        InitWeapon();
     }
 
     #region Init
 
-    public void InitGun()
+    public void SetWeapon(Weapon weapon)
+    {
+        currentWeapon = weapon;
+        InitWeapon();
+    }
+
+    public void InitWeapon()
     {
         currentWeaponStats = currentWeapon.Stats;
         currentWeaponSounds = currentWeapon.Sounds;

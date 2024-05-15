@@ -8,11 +8,11 @@ public class Weapon : ScriptableObject
 {
     public WeaponStats Stats;
     public Mesh Model;
-    public Sounds Sounds;
+    public WeaponSounds Sounds;
 }
 
 [Serializable]
-public struct Sounds
+public struct WeaponSounds
 {
     public AudioClip ShootingSound;
     public AudioClip ReloadSound;

@@ -9,9 +9,13 @@ public class PlayerCombat : MonoBehaviour
 {
     private Transform cameraTransform;
 
-    [SerializeField] private CombatInputQuery InputQuery;
-    [SerializeField] private WeaponHandler weaponHandler;
+    [SerializeField] private int allowedWeaponsCount = 3;
+    [SerializeField] private CombatInputQuery inputQuery;
+    [SerializeField] private Weapon[] weapons;
+    private WeaponHandler weaponHandler;
+    private int currentWeaponIndex;
     [SerializeField] private LayerMask layersToHit;
+    private static readonly string ScrollWheelAxis = "Mouse ScrollWheel";
 
     #region Katana Setup
 
@@ -27,27 +31,70 @@ public class PlayerCombat : MonoBehaviour
 
     #endregion
 
+    private void OnValidate()
+    {
+        if (weapons.Length > allowedWeaponsCount)
+        {
+            var temp = new Weapon[allowedWeaponsCount];
+            for (int i = 0; i < allowedWeaponsCount; i++)
+            {
+                temp[i] = weapons[i];
+            }
+            weapons = temp;
+        }
+    }
+
     private void Awake()
     {
         cameraTransform = transform.GetChild(0).GetChild(0);
-        InputQuery.Init();
+        weaponHandler = GetComponent<WeaponHandler>();
+        inputQuery.Init();
+        UpdateWeapon();
     }
+
+
 
     private void Update()
     {
-        if (InputQuery.SwitchGun)
-        {
-            weaponHandler.InitGun(); // so far there might be an exploit -> initing gun after each shot effectively reseting its cd
-        }
+        // so far there might be an exploit -> initing gun after each shot effectively reseting its cd
+        HandleWeaponSwitch();
 
-        weaponHandler.UpdateAimingState(InputQuery.Aim);
 
-        if (InputQuery.Reload)
+        weaponHandler.UpdateAimingState(inputQuery.Aim);
+
+        if (inputQuery.Reload)
         {
             weaponHandler.Reload();
         }
 
-        weaponHandler.UpdateState(InputQuery.Shoot);
+        weaponHandler.UpdateState(inputQuery.Shoot);
+    }
+
+    private void HandleWeaponSwitch()
+    {
+        if (inputQuery.FirstGun || inputQuery.SecondGun || inputQuery.ThirdGun)
+        {
+            if (inputQuery.FirstGun) currentWeaponIndex = 0;
+            else if (inputQuery.SecondGun) currentWeaponIndex = 1;
+            else if (inputQuery.ThirdGun) currentWeaponIndex = 2;
+
+            UpdateWeapon();
+
+            return;
+        }
+
+        var scrollWheelInput = Input.GetAxis(ScrollWheelAxis);
+        if (scrollWheelInput != 0f)
+        {
+            currentWeaponIndex = scrollWheelInput > 0f ? ++currentWeaponIndex % allowedWeaponsCount : --currentWeaponIndex % allowedWeaponsCount;
+            UpdateWeapon();
+        }
+    }
+
+
+    private void UpdateWeapon()
+    {
+        weaponHandler.SetWeapon(weapons[currentWeaponIndex]);
     }
 
     #region Slashing
