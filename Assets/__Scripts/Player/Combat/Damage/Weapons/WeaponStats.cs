@@ -178,15 +178,8 @@ public enum Effect
 [Serializable]
 public struct HitscanBulletSettings
 {
-    public HitscanBulletActionOnHitPlayer ActionOnHitPlayer;
+    public bool PierceThroughPlayers;
     public HitscanBulletActionOnHitWall ActionOnHitWall;
-}
-
-
-public enum HitscanBulletActionOnHitPlayer : byte
-{
-    Stop,
-    PierceThrough,
 }
 
 public enum HitscanBulletActionOnHitWall : byte
