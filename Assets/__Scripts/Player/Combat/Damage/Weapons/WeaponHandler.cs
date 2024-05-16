@@ -30,7 +30,9 @@ public class WeaponHandler : NetworkBehaviour
 
     #region Sound Setup
 
-    private AudioSource audioSource;
+    private List<AudioSource> audioSources = new();
+    private int audioSourcePoolSize;
+    private int currentAudioSourceIndex;
     private WeaponSounds currentWeaponSounds;
 
     #endregion
@@ -120,9 +122,13 @@ public class WeaponHandler : NetworkBehaviour
         recoilHandlerTransform = transform.GetChild(0).GetChild(0);
         cameraTransform = recoilHandlerTransform.GetChild(0);
         camera = cameraTransform.GetComponent<Camera>();
-        audioSource = GetComponent<AudioSource>();
-        switchedThisFrame = false;
+
         InitWeapon();
+        audioSourcePoolSize = 10;// (int)(Mathf.Max(currentWeaponSounds.ShootingSound.length, currentWeaponSounds.NearEmptyMagazineShootSound.length) / currentWeaponStats.CooldownBetweenShots);
+        for (int i = 0; i < audioSourcePoolSize; i++)
+        {
+            audioSources.Add(gameObject.AddComponent<AudioSource>());
+        }
     }
 
     private void FixedUpdate()
@@ -166,6 +172,7 @@ public class WeaponHandler : NetworkBehaviour
 
         canShoot = true;
         timeLastShotFired = float.MinValue;
+        switchedThisFrame = true;
 
         SetShootingStyle(); // the actual shooting logic
         SetShootingRequestRythm(); // the rythm logic of the shots
@@ -860,14 +867,35 @@ public class WeaponHandler : NetworkBehaviour
 
     private void PlayShootingSound(bool shouldWarn)
     {
-        audioSource.clip = shouldWarn ? currentWeaponSounds.NearEmptyMagazineShootSound : currentWeaponSounds.ShootingSound;
-        audioSource.Play();
+        for (int iteration = 0; iteration < audioSourcePoolSize; iteration++) // this loop ensures that we only do <audioSourcePoolSize> loops
+        {
+            currentAudioSourceIndex = ++currentAudioSourceIndex % audioSourcePoolSize; // while this index ensures that we continue where we left of and remain within the boundaries of the pool
+
+            if (!audioSources[currentAudioSourceIndex].isPlaying)
+            {
+                audioSources[currentAudioSourceIndex].clip = shouldWarn ? currentWeaponSounds.NearEmptyMagazineShootSound : currentWeaponSounds.ShootingSound;
+                audioSources[currentAudioSourceIndex].Play();
+                return;
+            }
+        }
+
+        // if reached this point there wasn t enough channels to play all the sounds concurrently so we allocate another one
+        audioSources.Add(gameObject.AddComponent<AudioSource>());
+        audioSourcePoolSize++;
+        audioSources[^1].clip = shouldWarn ? currentWeaponSounds.NearEmptyMagazineShootSound : currentWeaponSounds.ShootingSound;
+        audioSources[^1].Play();
     }
 
     private void PlayReloadSound()
     {
-        audioSource.clip = currentWeaponSounds.ShootingSound;
-        audioSource.Play();
+        // make the reload duration rely on the audio for its duration so no need to "eardrum it" (check for audioSource.isPlaying in the coroutine)
+        for (int i = 0; i < audioSources.Count; i++)
+        {
+            audioSources[i].Stop();
+        }
+
+        audioSources[0].clip = currentWeaponSounds.ReloadSound;
+        audioSources[0].Play();
     }
 
     #endregion

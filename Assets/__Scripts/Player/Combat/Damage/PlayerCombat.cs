@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
 [DefaultExecutionOrder(-6)]
@@ -52,8 +51,6 @@ public class PlayerCombat : MonoBehaviour
         UpdateWeapon();
     }
 
-
-
     private void Update()
     {
         // so far there might be an exploit -> initing gun after each shot effectively reseting its cd
@@ -86,10 +83,7 @@ public class PlayerCombat : MonoBehaviour
         var scrollWheelInput = Input.GetAxis(ScrollWheelAxis);
         if (scrollWheelInput != 0f)
         {
-            //print($"-1 % 3 = {-1 % 3}");
-            print($"before: {currentWeaponIndex}");
             currentWeaponIndex = Utility.ModuloThatWorksWithNegatives(scrollWheelInput > 0f ? ++currentWeaponIndex : --currentWeaponIndex, allowedWeaponsCount);
-            print($"after: {currentWeaponIndex}");
             UpdateWeapon();
         }
     }
