@@ -29,7 +29,7 @@ public class WeaponStats : ScriptableObject
     
     [Space(4)]
     public ShotgunStats ShotgunStats;
-    public ShotgunStats AimingShotgunStats;
+    //public ShotgunStats AimingShotgunStats;
    
 
     [Header("Shooting Rythm")]
@@ -83,6 +83,7 @@ public struct ShotgunStats
     public ushort PelletsDamage;
     public ushort PelletsCount;
     public float PelletsSpreadAngle;
+    public float AimingPelletsSpreadAngle;
     public float PelletsRange;
 }
 

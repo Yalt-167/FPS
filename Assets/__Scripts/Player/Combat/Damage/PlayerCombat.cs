@@ -86,7 +86,10 @@ public class PlayerCombat : MonoBehaviour
         var scrollWheelInput = Input.GetAxis(ScrollWheelAxis);
         if (scrollWheelInput != 0f)
         {
-            currentWeaponIndex = scrollWheelInput > 0f ? ++currentWeaponIndex % allowedWeaponsCount : --currentWeaponIndex % allowedWeaponsCount;
+            //print($"-1 % 3 = {-1 % 3}");
+            print($"before: {currentWeaponIndex}");
+            currentWeaponIndex = Utility.ModuloThatWorksWithNegatives(scrollWheelInput > 0f ? ++currentWeaponIndex : --currentWeaponIndex, allowedWeaponsCount);
+            print($"after: {currentWeaponIndex}");
             UpdateWeapon();
         }
     }

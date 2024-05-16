@@ -346,7 +346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3013796309
+  GlobalObjectIdHash: 870966366
   InScenePlacedSourceGlobalObjectIdHash: 870966366
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -547,10 +547,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed6a4b13445a27a449abf043fefdaed0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  allowedWeaponsCount: 3
   inputQuery:
     Shoot:
       RelevantKey: 323
-      howToActivate: 0
+      howToActivate: 2
       holdForSeconds: 0
     Aim:
       RelevantKey: 324
@@ -561,7 +562,15 @@ MonoBehaviour:
       RelevantKey: 114
       howToActivate: 0
       holdForSeconds: 0
-    SwitchGun:
+    FirstGun:
+      RelevantKey: 0
+      howToActivate: 0
+      holdForSeconds: 0
+    SecondGun:
+      RelevantKey: 0
+      howToActivate: 0
+      holdForSeconds: 0
+    ThirdGun:
       RelevantKey: 0
       howToActivate: 0
       holdForSeconds: 0
@@ -577,7 +586,10 @@ MonoBehaviour:
       RelevantKey: 0
       howToActivate: 0
       holdForSeconds: 0
-  weaponHandler: {fileID: 7879344369763397016}
+  weapons:
+  - {fileID: 11400000, guid: 04d6e4d4b098bf34a81282a3674c4d48, type: 2}
+  - {fileID: 11400000, guid: a433c898e9c4f23459862abe5b0d9826, type: 2}
+  - {fileID: 11400000, guid: c5fc43883d5114f43a755d112ceb46c1, type: 2}
   layersToHit:
     serializedVersion: 2
     m_Bits: 8

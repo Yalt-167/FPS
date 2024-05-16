@@ -644,7 +644,7 @@ public class WeaponHandler : NetworkBehaviour
         shotgunPelletsDirections = new Vector3[currentWeaponStats.ShotgunStats.PelletsCount];
         for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
         {
-            shotgunPelletsDirections[i] = GetDirectionWithSpread(isAiming ? currentWeaponStats.AimingShotgunStats.PelletsSpreadAngle : currentWeaponStats.ShotgunStats.PelletsSpreadAngle, directionTranform);
+            shotgunPelletsDirections[i] = GetDirectionWithSpread(isAiming ? currentWeaponStats.ShotgunStats.AimingPelletsSpreadAngle : currentWeaponStats.ShotgunStats.PelletsSpreadAngle, directionTranform);
         }
     }
 
@@ -704,6 +704,7 @@ public class WeaponHandler : NetworkBehaviour
 
     private IEnumerator ToggleAimFOV(bool shouldBeAiming)
     {
+        //print($"called with value: {}");
         var startingPoint = camera.fieldOfView;
         var elapsedTime = 0f;
         var (target, targetDuration) = shouldBeAiming ?
