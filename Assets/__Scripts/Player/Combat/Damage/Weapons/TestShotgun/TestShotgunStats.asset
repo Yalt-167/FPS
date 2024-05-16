@@ -16,7 +16,7 @@ MonoBehaviour:
   WeaponClass: 0
   IsHitscan: 0
   HitscanBulletSettings:
-    ActionOnHitPlayer: 0
+    PierceThroughPlayers: 0
     ActionOnHitWall: 0
   TravelTimeBulletSettings:
     BulletPrefab: {fileID: 1044930296373891420, guid: a8a6eb59afd9c154c9b3d707a0f672a8,
@@ -57,8 +57,8 @@ MonoBehaviour:
     AmmoConsumedByFullyChargedShot: 0
     MinChargeRatioToShoot: 0
   AimingAndScopeStats:
-    AimingFOV: 60
-    ScopeMagnification: 0
+    AimingFOV: 50
+    ScopeMagnification: 1
     TimeToADS: 0.1
     TimeToUnADS: 0.2
   HipfireRecoilStats:
@@ -72,6 +72,6 @@ MonoBehaviour:
     RecoilForceZ: 0.04666667
     RecoilRegulationSpeed: 2
   KickbackStats:
-    WeaponKickBackPerShot: 0.3
+    WeaponKickBackPerShot: 0.5
     WeaponKickBackRegulationTime: 0.003
   CanBreakThings: 0

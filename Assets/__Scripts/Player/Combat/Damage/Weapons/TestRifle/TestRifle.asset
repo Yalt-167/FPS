@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a181e8c6877e7a84e970e249a4b705f3, type: 3}
   m_Name: TestRifle
   m_EditorClassIdentifier: 
-  Stats: {fileID: 11400000, guid: 57e866d1fcbcfd147899a794ea76352c, type: 2}
+  Stats: {fileID: 11400000, guid: cc8ccac4a0c3dc8418410360f261655d, type: 2}
   Model: {fileID: 0}
   Sounds:
     ShootingSound: {fileID: 8300000, guid: 49aafd84ecb1f2d46917a267797fffec, type: 3}
