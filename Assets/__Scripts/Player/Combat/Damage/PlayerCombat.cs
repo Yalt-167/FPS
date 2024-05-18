@@ -53,7 +53,7 @@ public class PlayerCombat : MonoBehaviour
 
     private void Update()
     {
-        // so far there might be an exploit -> initing gun after each shot effectively reseting its cd
+        // so far there might be an exploit -> init gun after each shot effectively reseting its cd
         HandleWeaponSwitch(); // upon check: there is
 
 

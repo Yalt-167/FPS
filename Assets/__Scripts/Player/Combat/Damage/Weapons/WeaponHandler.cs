@@ -5,6 +5,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.Burst.CompilerServices;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Video;
 using Random = UnityEngine.Random;
 
 public class WeaponHandler : NetworkBehaviour
@@ -51,7 +52,7 @@ public class WeaponHandler : NetworkBehaviour
 
     private Action shootingStyleMethod;
     private Action shootingRythmMethod;
-    private Action<Vector3, RaycastHit, IHitscanBulletEffectSettings, ulong> onHitWallMethod; // to avoid throwing an error
+    private Action<ShotInfos, IHitscanBulletEffectSettings> onHitWallMethod;
 
     private bool isAiming;
 
@@ -118,6 +119,8 @@ public class WeaponHandler : NetworkBehaviour
 
     // methods
 
+    #region Unity Handled
+
     private void Awake()
     {
         playerSettings = GetComponent<PlayerSettings>();
@@ -157,6 +160,8 @@ public class WeaponHandler : NetworkBehaviour
     {
         InitWeapon();
     }
+
+    #endregion
 
     #region Init
 
@@ -236,11 +241,11 @@ public class WeaponHandler : NetworkBehaviour
     {
         onHitWallMethod = currentWeaponStats.HitscanBulletSettings.ActionOnHitWall switch
         {
-            HitscanBulletActionOnHitWall.Classic => (_, _, _, _) => { },
-            HitscanBulletActionOnHitWall.ThroughWalls => (_, _, _, _) => { },
-            HitscanBulletActionOnHitWall.Explosive => (_, _, _, _) => { },
-            HitscanBulletActionOnHitWall.BounceOnWalls => (_, _, _, _) => { },
-            _ => (_, _, _, _) => { },
+            HitscanBulletActionOnHitWall.Classic => (_, _) => { },
+            HitscanBulletActionOnHitWall.ThroughWalls => (_, _) => { },
+            HitscanBulletActionOnHitWall.Explosive => ExplodeUponWallHit,
+            HitscanBulletActionOnHitWall.BounceOnWalls => BounceUponWallHit,
+            _ => (_, _) => { },
         };
     }
 
@@ -285,9 +290,7 @@ public class WeaponHandler : NetworkBehaviour
     {
         if (!IsOwner) { return; }
 
-        if (timeLastShotFired + GetRelevantCooldown(false) > Time.time) { return; }
-
-        _ = GetRelevantCooldown(true);
+        if (timeLastShotFired + GetRelevantCooldown() > Time.time) { return; }
 
         if (ammos <= 0) { return; }
 
@@ -310,9 +313,7 @@ public class WeaponHandler : NetworkBehaviour
 
         if (!IsOwner) { return; }
 
-        if (timeLastShotFired + GetRelevantCooldown(false) > Time.time) { return; }
-
-        _ = GetRelevantCooldown(true);
+        if (timeLastShotFired + GetRelevantCooldown() > Time.time) { return; }
 
         if (currentWeaponStats.IsHitscan)
         {
@@ -338,9 +339,9 @@ public class WeaponHandler : NetworkBehaviour
         }
     }
 
-    private float GetRelevantCooldown(bool doDebug)
+    private float GetRelevantCooldown()
     {
-        var cd = currentWeaponStats.ShootingRythm switch
+        return currentWeaponStats.ShootingRythm switch
         {
             ShootingRythm.Single => currentWeaponStats.CooldownBetweenShots,
             ShootingRythm.Burst => bulletFiredthisBurst == currentWeaponStats.BurstStats.BulletsPerBurst ? currentWeaponStats.CooldownBetweenShots : currentWeaponStats.BurstStats.CooldownBetweenShotsOfBurst,
@@ -348,15 +349,13 @@ public class WeaponHandler : NetworkBehaviour
             ShootingRythm.Charge => currentWeaponStats.CooldownBetweenShots,
             _ => 0f,
         };
-        if (doDebug) print(cd);
-        return cd;
     }
 
     private IEnumerator ShootBurst(int bullets)
     {
         if (ammos <= 0) { yield break; }
 
-        if (timeLastShotFired + GetRelevantCooldown(false) > Time.time) { yield break; }
+        if (timeLastShotFired + GetRelevantCooldown() > Time.time) { yield break; }
 
         bulletFiredthisBurst = 0;
 
@@ -380,7 +379,7 @@ public class WeaponHandler : NetworkBehaviour
     {
         if (ammos <= 0) { yield break; }
 
-        if (timeLastShotFired + GetRelevantCooldown(false) > Time.time) { yield break; }
+        if (timeLastShotFired + GetRelevantCooldown() > Time.time) { yield break; }
 
         timeStartedCharging = Time.time;
 
@@ -526,7 +525,15 @@ public class WeaponHandler : NetworkBehaviour
                 }
                 else
                 {
-                    onHitWallMethod(directionWithSpread, hits[i], GetRelevantHitscanBulletSettings(), NetworkObjectId);
+                    onHitWallMethod(
+                        new(
+                            directionWithSpread,
+                            hits[i],
+                            NetworkObjectId,
+                            new(currentWeaponStats)
+                        ),
+                        GetRelevantHitscanBulletSettings()
+                    );
                 }
             }
         }
@@ -638,7 +645,15 @@ public class WeaponHandler : NetworkBehaviour
                         }
                         else
                         {
-                            onHitWallMethod(shotgunPelletsDirections[pelletIndex], hits[i], GetRelevantHitscanBulletSettings(), NetworkObjectId);
+                            onHitWallMethod(
+                                new(
+                                    shotgunPelletsDirections[pelletIndex],
+                                    hits[i],
+                                    NetworkObjectId,
+                                    new(currentWeaponStats)
+                                ),
+                                GetRelevantHitscanBulletSettings()
+                            );
                         }
                     }
                 }
@@ -749,7 +764,15 @@ public class WeaponHandler : NetworkBehaviour
                 }
                 else
                 {
-                    onHitWallMethod(directionWithSpread, hits[i], GetRelevantHitscanBulletSettings(), NetworkObjectId);
+                    onHitWallMethod(
+                        new(
+                            directionWithSpread,
+                            hits[i],
+                            NetworkObjectId,
+                            new(currentWeaponStats, chargeRatio)
+                        ),
+                        GetRelevantHitscanBulletSettings()
+                    );
                 }
             }
         }
@@ -863,7 +886,15 @@ public class WeaponHandler : NetworkBehaviour
                     }
                     else
                     {
-                        onHitWallMethod(shotgunPelletsDirections[pelletIndex], hits[i], GetRelevantHitscanBulletSettings(), NetworkObjectId);
+                        onHitWallMethod(
+                            new(
+                                shotgunPelletsDirections[pelletIndex],
+                                hits[i],
+                                NetworkObjectId,
+                                new(currentWeaponStats, chargeRatio)
+                                ),
+                            GetRelevantHitscanBulletSettings()
+                        );
                     }
                 }
             }
@@ -998,17 +1029,67 @@ public class WeaponHandler : NetworkBehaviour
     #endregion
 
 
-    private void ExplodeUponWallHit(Vector3 shotDirection, RaycastHit hit, IHitscanBulletEffectSettings hitscanBulletEffectSettings_, ulong attackerNetworkID)
+    private void ExplodeUponWallHit(ShotInfos shotInfos, IHitscanBulletEffectSettings hitscanBulletEffectSettings_)
     {
         var hitscanBulletEffectSettings = (ExplodingHitscanBulletsSettings)hitscanBulletEffectSettings_;
     }
 
 
-    private void BounceUponWallHit(Vector3 shotDirection, RaycastHit hit, IHitscanBulletEffectSettings hitscanBulletEffectSettings_, ulong attackerNetworkID)
+    private void BounceUponWallHit(ShotInfos shotInfos, IHitscanBulletEffectSettings hitscanBulletEffectSettings_)
     {
         var hitscanBulletEffectSettings = (BouncingHitscanBulletsSettings)hitscanBulletEffectSettings_;
 
-        var newShotDirection = ReflectVector(shotDirection, hit.normal);
+        if (hitscanBulletEffectSettings.BouncesAmount == 0) { return; }
+
+        var newShotDirection = ReflectVector(shotInfos.ShotDirection, shotInfos.Hit.normal);
+
+
+        var bulletTrail = Instantiate(bulletTrailPrefab, shotInfos.Hit.point, Quaternion.identity).GetComponent<BulletTrail>();
+        var endPoint = shotInfos.Hit.point + newShotDirection * 100;
+
+        var hits = Physics.RaycastAll(shotInfos.Hit.point, newShotDirection, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore);
+
+        Array.Sort(hits, new RaycastHitComparer());
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].collider.TryGetComponent<IShootable>(out var shootableComponent))
+            {
+                if (IsOwner)
+                {
+                    shootableComponent.ReactShot(shotInfos.WeaponInfos.Damage, hits[i].point, newShotDirection, NetworkObjectId, shotInfos.WeaponInfos.CanBreakThings);
+                }
+
+                if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
+                {
+                    endPoint = hits[i].point;
+                    break;
+                }
+            }
+            else // so far else is the wall but do proper checks later on
+            {
+                if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                {
+                    endPoint = hits[i].point;
+                    break;
+                }
+                else
+                {
+                    BounceUponWallHit(
+                        new(
+                            newShotDirection,
+                            hits[i],
+                            shotInfos.AttackerNetworkID,
+                            new(currentWeaponStats)
+                            ),
+                        --hitscanBulletEffectSettings
+                        );
+                }
+            }
+        }
+
+        bulletTrail.Set(barrelEnd.position, endPoint);
+
     }
 
     private Vector3 ReflectVector(Vector3 vectorToReflect, Vector3 normalVector)
@@ -1300,5 +1381,36 @@ public struct ShotgunHitData
         Victim = _victim;
         HitPoint = _hitPoint;
         HitDirection = _hitDirection;
+    }
+}
+
+
+public struct ShotInfos
+{
+    public Vector3 ShotDirection;
+    public RaycastHit Hit;
+    public WeaponInfos WeaponInfos;
+    public ulong AttackerNetworkID;
+
+    public ShotInfos(Vector3 shotDirection, RaycastHit hit, ulong attackerNetworkID, WeaponInfos weaponInfos)
+    {
+        ShotDirection = shotDirection;
+        Hit = hit;
+        WeaponInfos = weaponInfos;
+        AttackerNetworkID = attackerNetworkID;
+    }
+}
+
+public struct WeaponInfos
+{
+    public ushort Damage;
+    public bool CanBreakThings;
+    public Effects Effects;
+
+    public WeaponInfos(WeaponStats weaponStats, float chargeRatio = 1f)
+    {
+        Damage = (ushort)((weaponStats.ShootingStyle == ShootingStyle.Single ? weaponStats.Damage : weaponStats.ShotgunStats.PelletsDamage) * chargeRatio);
+        CanBreakThings = weaponStats.CanBreakThings;
+        Effects = weaponStats.EffectsInflicted;
     }
 }

@@ -59,6 +59,7 @@ public class WeaponStats : ScriptableObject
     
 
     public bool CanBreakThings;
+    public Effects EffectsInflicted;
 }
 
 #region Shooting Style
@@ -162,6 +163,7 @@ public struct RecoilStats
 
 public enum Effects
 {
+    None,
     Fire, // depletes shield & health (stacking until a certain threshold
     Freeze, // slows + increased damage when already frozen
     Bleeding, // depletes life
@@ -208,6 +210,17 @@ public interface IHitscanBulletEffectSettings { }
 public struct BouncingHitscanBulletsSettings : IHitscanBulletEffectSettings
 {
     public int BouncesAmount;
+
+    public BouncingHitscanBulletsSettings(int bouncesAmount)
+    {
+        BouncesAmount = bouncesAmount;
+    }
+
+
+    public static BouncingHitscanBulletsSettings operator --(BouncingHitscanBulletsSettings relevantStruct)
+    {
+        return new BouncingHitscanBulletsSettings(--relevantStruct.BouncesAmount);
+    }
 }
 
 [Serializable]
