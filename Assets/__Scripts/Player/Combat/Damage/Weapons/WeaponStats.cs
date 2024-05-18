@@ -160,7 +160,7 @@ public struct RecoilStats
     public float RecoilRegulationSpeed;
 }
 
-public enum Effect
+public enum Effects
 {
     Fire, // depletes shield & health (stacking until a certain threshold
     Freeze, // slows + increased damage when already frozen
@@ -176,9 +176,14 @@ public enum Effect
     Shock, // damage nearby players (chaining) + can make weapon jam ?
     // ex with a range of 3:
     // if u get shot and a teammate is less than 3units from u he gets shocked too (for less dmg) and if another teammate is less than 3units from him (not necessarily you) it chains too (the more depth of chaining the less dmg
+    Charm, // damage reduced on the one who inflicted you this
+    Curse, // damage boosted on the cursed 
+
+
 }
 
 public interface IEffectProficiency { } // interface for polymorphism on the effect data
+// have an override for * (for chargedWaps and influence on the proficiency of the effect)
 
 
 

@@ -428,7 +428,6 @@ public class WeaponHandler : NetworkBehaviour
             HitscanBulletActionOnHitWall.Classic => null,
             HitscanBulletActionOnHitWall.ThroughWalls => null,
             _ => null
-
         };
     }
 
@@ -491,14 +490,12 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void ExecuteSimpleHitscanShotClientRpc__()
+    private void _ExecuteSimpleHitscanShotClientRpc()
     {
         UpdateOwnerSettingsUponShot();
 
         var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
         var directionWithSpread = GetDirectionWithSpread(currentSpreadAngle, barrelEnd);
-
-
         var endPoint = barrelEnd.position + directionWithSpread * 100;
 
         var hits = Physics.RaycastAll(barrelEnd.position, directionWithSpread, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore);
@@ -554,8 +551,7 @@ public class WeaponHandler : NetworkBehaviour
             for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
             {
                 var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
-
-                var endPoint = barrelEnd.position + shotgunPelletsDirections[i];
+                var endPoint = barrelEnd.position + shotgunPelletsDirections[i] * 100;
 
                 var hits = Physics.RaycastAll(barrelEnd.position, shotgunPelletsDirections[i], currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
                 Array.Sort(hits, new RaycastHitComparer());
@@ -606,16 +602,14 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void ExecuteShotgunHitscanShotClientRpc__()
+    private void _ExecuteShotgunHitscanShotClientRpc()
     {
         UpdateOwnerSettingsUponShot();
 
-        
         for (int pelletIndex = 0; pelletIndex < currentWeaponStats.ShotgunStats.PelletsCount; pelletIndex++)
         {
             var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
-
-            var endPoint = barrelEnd.position + shotgunPelletsDirections[pelletIndex];
+            var endPoint = barrelEnd.position + shotgunPelletsDirections[pelletIndex] * 100;
 
             var hits = Physics.RaycastAll(barrelEnd.position, shotgunPelletsDirections[pelletIndex], currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
             Array.Sort(hits, new RaycastHitComparer());
@@ -719,14 +713,12 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void ExecuteChargedHitscanShotClientRpc__(float chargeRatio)
+    private void _ExecuteChargedHitscanShotClientRpc(float chargeRatio)
     {
         UpdateOwnerSettingsUponShot();
 
         var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
         var directionWithSpread = GetDirectionWithSpread(currentSpreadAngle, barrelEnd);
-
-        
         var endPoint = barrelEnd.position + directionWithSpread * 100;
 
         var hits = Physics.RaycastAll(barrelEnd.position, directionWithSpread, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore);
@@ -782,8 +774,8 @@ public class WeaponHandler : NetworkBehaviour
             for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
             {
                 var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
+                var endPoint = barrelEnd.position + shotgunPelletsDirections[i] * 100;
 
-                var endPoint = barrelEnd.position + shotgunPelletsDirections[i];
 
                 var hits = Physics.RaycastAll(barrelEnd.position, shotgunPelletsDirections[i], currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
                 Array.Sort(hits, new RaycastHitComparer());
@@ -834,16 +826,15 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void ExecuteChargedShotgunHitscanShotClientRpc__(float chargeRatio)
+    private void _ExecuteChargedShotgunHitscanShotClientRpc(float chargeRatio)
     {
         UpdateOwnerSettingsUponShot();
 
-        
         for (int pelletIndex = 0; pelletIndex < currentWeaponStats.ShotgunStats.PelletsCount; pelletIndex++)
         {
             var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
+            var endPoint = barrelEnd.position + shotgunPelletsDirections[pelletIndex] * 100;
 
-            var endPoint = barrelEnd.position + shotgunPelletsDirections[pelletIndex];
 
             var hits = Physics.RaycastAll(barrelEnd.position, shotgunPelletsDirections[pelletIndex], currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
             Array.Sort(hits, new RaycastHitComparer());
@@ -1036,9 +1027,12 @@ public class WeaponHandler : NetworkBehaviour
     private void SetShotgunPelletsDirections(Transform directionTranform)
     {
         shotgunPelletsDirections = new Vector3[currentWeaponStats.ShotgunStats.PelletsCount];
+
+        var relevantSpread = isAiming ? currentWeaponStats.ShotgunStats.AimingPelletsSpreadAngle : currentWeaponStats.ShotgunStats.PelletsSpreadAngle;
+
         for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
         {
-            shotgunPelletsDirections[i] = GetDirectionWithSpread(isAiming ? currentWeaponStats.ShotgunStats.AimingPelletsSpreadAngle : currentWeaponStats.ShotgunStats.PelletsSpreadAngle, directionTranform);
+            shotgunPelletsDirections[i] = GetDirectionWithSpread(relevantSpread, directionTranform);
         }
     }
 
