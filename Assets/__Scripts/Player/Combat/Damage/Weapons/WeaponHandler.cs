@@ -522,11 +522,14 @@ public class WeaponHandler : NetworkBehaviour
             }
             else // so far else is the wall but do proper checks later on
             {
-                onHitWallMethod(directionWithSpread, hits[i], GetRelevantHitscanBulletSettings(), NetworkObjectId);
                 if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                 {
                     endPoint = hits[i].point;
                     break;
+                }
+                else
+                {
+                    onHitWallMethod(directionWithSpread, hits[i], GetRelevantHitscanBulletSettings(), NetworkObjectId);
                 }
             }
         }
@@ -634,11 +637,14 @@ public class WeaponHandler : NetworkBehaviour
 
                     else
                     {
-                        onHitWallMethod(shotgunPelletsDirections[pelletIndex], hits[i], GetRelevantHitscanBulletSettings(), NetworkObjectId);
                         if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                         {
                             endPoint = hits[i].point;
                             break;
+                        }
+                        else
+                        {
+                            onHitWallMethod(shotgunPelletsDirections[pelletIndex], hits[i], GetRelevantHitscanBulletSettings(), NetworkObjectId);
                         }
                     }
                 }
@@ -744,11 +750,14 @@ public class WeaponHandler : NetworkBehaviour
             }
             else // so far else is the wall but do proper checks later on
             {
-                onHitWallMethod(directionWithSpread, hits[i], GetRelevantHitscanBulletSettings(), NetworkObjectId);
                 if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                 {
                     endPoint = hits[i].point;
                     break;
+                }
+                else
+                {
+                    onHitWallMethod(directionWithSpread, hits[i], GetRelevantHitscanBulletSettings(), NetworkObjectId);
                 }
             }
         }
@@ -786,8 +795,7 @@ public class WeaponHandler : NetworkBehaviour
                         if (IsOwner)
                         {
                             shootableComponent.ReactShot((ushort)(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio), shotgunPelletsDirections[i], hits[j].point, NetworkObjectId, currentWeaponStats.CanBreakThings);
-                        }
-                        
+                        } 
                     }
                     else
                     {
@@ -849,10 +857,22 @@ public class WeaponHandler : NetworkBehaviour
                         shootableComponent.ReactShot((ushort)(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio), shotgunPelletsDirections[pelletIndex], hits[i].point, NetworkObjectId, currentWeaponStats.CanBreakThings);
                     }
 
-                    else
+                    if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
                     {
                         endPoint = hits[i].point;
                         break;
+                    }
+                }
+                else
+                {
+                    if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                    {
+                        endPoint = hits[i].point;
+                        break;
+                    }
+                    else
+                    {
+                        onHitWallMethod(shotgunPelletsDirections[pelletIndex], hits[i], GetRelevantHitscanBulletSettings(), NetworkObjectId);
                     }
                 }
             }
