@@ -523,18 +523,17 @@ public class WeaponHandler : NetworkBehaviour
                     endPoint = hits[i].point;
                     break;
                 }
-                else
-                {
-                    onHitWallMethod(
-                        new(
-                            directionWithSpread,
-                            hits[i],
-                            NetworkObjectId,
-                            new(currentWeaponStats)
-                        ),
-                        GetRelevantHitscanBulletSettings()
-                    );
-                }
+                
+                onHitWallMethod(
+                    new(
+                        directionWithSpread,
+                        hits[i],
+                        NetworkObjectId,
+                        new(currentWeaponStats)
+                    ),
+                    GetRelevantHitscanBulletSettings()
+                );
+                
             }
         }
 
@@ -643,18 +642,16 @@ public class WeaponHandler : NetworkBehaviour
                             endPoint = hits[i].point;
                             break;
                         }
-                        else
-                        {
-                            onHitWallMethod(
-                                new(
-                                    shotgunPelletsDirections[pelletIndex],
-                                    hits[i],
-                                    NetworkObjectId,
-                                    new(currentWeaponStats)
-                                ),
-                                GetRelevantHitscanBulletSettings()
-                            );
-                        }
+                        
+                        onHitWallMethod(
+                            new(
+                                shotgunPelletsDirections[pelletIndex],
+                                hits[i],
+                                NetworkObjectId,
+                                new(currentWeaponStats)
+                            ),
+                            GetRelevantHitscanBulletSettings()
+                        );
                     }
                 }
             }
@@ -762,18 +759,16 @@ public class WeaponHandler : NetworkBehaviour
                     endPoint = hits[i].point;
                     break;
                 }
-                else
-                {
-                    onHitWallMethod(
-                        new(
-                            directionWithSpread,
-                            hits[i],
-                            NetworkObjectId,
-                            new(currentWeaponStats, chargeRatio)
-                        ),
-                        GetRelevantHitscanBulletSettings()
-                    );
-                }
+                
+                onHitWallMethod(
+                    new(
+                        directionWithSpread,
+                        hits[i],
+                        NetworkObjectId,
+                        new(currentWeaponStats, chargeRatio)
+                    ),
+                    GetRelevantHitscanBulletSettings()
+                );
             }
         }
 
@@ -884,18 +879,16 @@ public class WeaponHandler : NetworkBehaviour
                         endPoint = hits[i].point;
                         break;
                     }
-                    else
-                    {
-                        onHitWallMethod(
-                            new(
-                                shotgunPelletsDirections[pelletIndex],
-                                hits[i],
-                                NetworkObjectId,
-                                new(currentWeaponStats, chargeRatio)
-                                ),
-                            GetRelevantHitscanBulletSettings()
-                        );
-                    }
+                    
+                    onHitWallMethod(
+                        new(
+                            shotgunPelletsDirections[pelletIndex],
+                            hits[i],
+                            NetworkObjectId,
+                            new(currentWeaponStats, chargeRatio)
+                            ),
+                        GetRelevantHitscanBulletSettings()
+                    );
                 }
             }
 
