@@ -1280,6 +1280,16 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     #endregion
+
+    #region Handle Damage Logs
+
+    public void SpawnDamageLog(TargetType targetType, ushort damage)
+    {
+        //if (!IsOwner) { return; }
+        damageLogManager.SummonDamageLog(Vector3.zero, targetType, damage);
+    }
+
+    #endregion
 }
 
 public struct ShotgunHitData
