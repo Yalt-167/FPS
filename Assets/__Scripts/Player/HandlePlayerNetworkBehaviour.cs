@@ -33,7 +33,7 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
             Destroy(gameObj);
         }
 
-        Game.Manager.AddPlayerCombatNetworked(GetComponent<PlayerCombatNetworked>());
+        Game.Manager.AddNetworkedWeaponHandler(GetComponent<WeaponHandler>());
     }
 
     #endregion

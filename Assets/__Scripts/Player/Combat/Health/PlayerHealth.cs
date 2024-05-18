@@ -125,7 +125,7 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (IsOwner) { return; }
 
-        Game.Manager.GetPlayerCombatNetworkedFromNetworkObjectID(attackerNetworkID).SpawnDamageLog(targetType, damageDealt);
+        Game.Manager.GetNetworkedWeaponHandlerFromNetworkObjectID(attackerNetworkID).SpawnDamageLog(targetType, damageDealt);
     }
 
 

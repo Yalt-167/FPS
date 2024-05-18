@@ -17,39 +17,39 @@ public class Game : MonoBehaviour
 
     #region Player Combat List
 
-    private List<PlayerCombatNetworked> playerCombatNetworked = new();
+    private List<WeaponHandler> networkedWeaponHandlers = new();
 
-    public void AddPlayerCombatNetworked(PlayerCombatNetworked playerNetworked)
+    public void AddNetworkedWeaponHandler(WeaponHandler networkedWeaponHandler)
     {
-        playerCombatNetworked.Add(playerNetworked);
+        networkedWeaponHandlers.Add(networkedWeaponHandler);
     }
 
-    public void RemovePlayerCombatNetworked(PlayerCombatNetworked playerNetworked)
+    public void DiscardNetworkedWeaponHandler(WeaponHandler networkedWeaponHandler)
     {
-        if (!playerCombatNetworked.Contains(playerNetworked)) { return; }
+        if (!networkedWeaponHandlers.Contains(networkedWeaponHandler)) { return; }
 
-        playerCombatNetworked.Add(playerNetworked);
+        networkedWeaponHandlers.Add(networkedWeaponHandler);
     }
-    public PlayerCombatNetworked GetPlayerCombatNetworkedFromNetworkObjectID(ulong playerObjectID)
+    public WeaponHandler GetNetworkedWeaponHandlerFromNetworkObjectID(ulong playerObjectID) // make it so they are sorted -> slower upon adding it but faster to select it still
     {
-        var size = playerCombatNetworked.Count;
+        var size = networkedWeaponHandlers.Count;
         for (int i = 0; i < size; i++)
         {
-            if (playerCombatNetworked[i].NetworkObjectId == playerObjectID)
+            if (networkedWeaponHandlers[i].NetworkObjectId == playerObjectID)
             {
-                return playerCombatNetworked[i];
+                return networkedWeaponHandlers[i];
             }
         }
 
         return null;
     }
 
-    public IEnumerable<PlayerCombatNetworked>PlayersCombatNetworked()
+    public IEnumerable<WeaponHandler> PlayersCombatNetworked()
     {
-        var size = playerCombatNetworked.Count;
+        var size = networkedWeaponHandlers.Count;
         for (int i = 0; i < size; i++)
         {
-            yield return playerCombatNetworked[i];
+            yield return networkedWeaponHandlers[i];
         }
     }
 
