@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Damage: 15
   WeaponClass: 0
-  IsHitscan: 0
+  IsHitscan: 1
   HitscanBulletSettings:
     PierceThroughPlayers: 0
     ActionOnHitWall: 0

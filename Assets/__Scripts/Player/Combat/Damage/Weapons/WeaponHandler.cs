@@ -50,7 +50,7 @@ public class WeaponHandler : NetworkBehaviour
 
     private Action shootingStyleMethod;
     private Action shootingRythmMethod;
-    private Action updateMethod;
+    private Action<Vector3, RaycastHit, IHitscanBulletEffectSettings, ulong> onHitWallMethod = (_, _, _, _) => { }; // to avoid throwing an error
 
     private bool isAiming;
 
@@ -228,6 +228,11 @@ public class WeaponHandler : NetworkBehaviour
 
             _ => () => { },
         };
+    }
+
+    private void SetOnHitWallMethod()
+    {
+        //onHitWallMethod = 
     }
 
     #endregion
@@ -455,6 +460,59 @@ public class WeaponHandler : NetworkBehaviour
                 bulletTrail.Set(barrelEnd.position, barrelEnd.position + directionWithSpread * 100);
             }
         }
+
+        if (!IsOwner) { return; }
+
+        ApplyRecoil();
+        ApplySpread();
+        ApplyKickback();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void ExecuteSimpleHitscanShotClientRpc__()
+    {
+        UpdateOwnerSettingsUponShot();
+
+        var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
+        var directionWithSpread = GetDirectionWithSpread(currentSpreadAngle, barrelEnd);
+
+
+        var endPoint = barrelEnd.position + directionWithSpread * 100;
+
+        var hits = Physics.RaycastAll(barrelEnd.position, directionWithSpread, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore);
+
+        Array.Sort(hits, new RaycastHitComparer());
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].collider.TryGetComponent<IShootable>(out var shootableComponent))
+            {
+                if (IsOwner)
+                {
+                    shootableComponent.ReactShot(currentWeaponStats.Damage, hits[i].point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                }
+
+                if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
+                {
+                    endPoint = hits[i].point;
+                    break;
+                }
+            }
+            else // so far else is the wall but do proper checks later on
+            {
+                onHitWallMethod(directionWithSpread, hits[i], , );
+                if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                {
+                    endPoint = hits[i].point;
+                    break;
+                }
+                
+            }
+        }
+
+        bulletTrail.Set(barrelEnd.position, endPoint);
+
+      
 
         if (!IsOwner) { return; }
 
@@ -762,6 +820,32 @@ public class WeaponHandler : NetworkBehaviour
     #endregion
 
     #endregion
+
+
+    private void ExplodeUponWallHit(Vector3 shotDirection, RaycastHit hit, int bounceLeft, ulong attackerNetworkID)
+    {
+
+    }
+
+
+    private void BounceUponWallHit(Vector3 shotDirection, RaycastHit hit, int bounceLeft, ulong attackerNetworkID)
+    {
+        var normal = hit.normal;
+        var newDirection = Vector3.zero;
+    }
+
+    private Vector3 ReflectVector(Vector3 vectorToReflect, Vector3 normalVector)
+    {
+        var normalizedNormal = normalVector.normalized;
+
+        var dotProduct = Vector3.Dot(vectorToReflect, normalizedNormal);
+
+        return vectorToReflect - 2 * dotProduct * normalizedNormal;
+    }
+
+
+
+
 
     private void SetShotgunPelletsDirections(Transform directionTranform)
     {
