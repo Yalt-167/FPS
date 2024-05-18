@@ -1007,16 +1007,17 @@ public class WeaponHandler : NetworkBehaviour
     #endregion
 
 
-    private void ExplodeUponWallHit(Vector3 shotDirection, RaycastHit hit, int bounceLeft, ulong attackerNetworkID)
+    private void ExplodeUponWallHit(Vector3 shotDirection, RaycastHit hit, IHitscanBulletEffectSettings hitscanBulletEffectSettings_, ulong attackerNetworkID)
     {
-
+        var hitscanBulletEffectSettings = (ExplodingHitscanBulletsSettings)hitscanBulletEffectSettings_;
     }
 
 
-    private void BounceUponWallHit(Vector3 shotDirection, RaycastHit hit, int bounceLeft, ulong attackerNetworkID)
+    private void BounceUponWallHit(Vector3 shotDirection, RaycastHit hit, IHitscanBulletEffectSettings hitscanBulletEffectSettings_, ulong attackerNetworkID)
     {
-        var normal = hit.normal;
-        var newDirection = Vector3.zero;
+        var hitscanBulletEffectSettings = (BouncingHitscanBulletsSettings)hitscanBulletEffectSettings_;
+
+        var newShotDirection = ReflectVector(shotDirection, hit.normal);
     }
 
     private Vector3 ReflectVector(Vector3 vectorToReflect, Vector3 normalVector)

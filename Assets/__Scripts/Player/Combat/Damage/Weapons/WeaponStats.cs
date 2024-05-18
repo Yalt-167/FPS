@@ -162,14 +162,25 @@ public struct RecoilStats
 
 public enum Effect
 {
-    Fire,
-    Freeze,
-    Bleeding,
-    Poison,
-    Slowness,
-    Obscurity,
-    Fading
+    Fire, // depletes shield & health (stacking until a certain threshold
+    Freeze, // slows + increased damage when already frozen
+    Bleeding, // depletes life
+    Poison, // deplete life
+            // some character have resistance on one but not both
+            // &&
+            // some heal may fix one but not both
+    Slowness, // slows
+    Obscurity, // blindness
+    Fading, // reduce your Vital Essence (instant -> not lingering) (not replenishing) (when no more Vital Essence -> dead) (get a new Vital Essence gauge when respawning)
+    // ex when shot u lose say 50% of ur Vital Essence even if you heal the next shot will drop that gauge to 0 -> you die next Fading Shot
+    Shock, // damage nearby players (chaining) + can make weapon jam ?
+    // ex with a range of 3:
+    // if u get shot and a teammate is less than 3units from u he gets shocked too (for less dmg) and if another teammate is less than 3units from him (not necessarily you) it chains too (the more depth of chaining the less dmg
 }
+
+public interface IEffectProficiency { } // interface for polymorphism on the effect data
+
+
 
 #endregion
 
@@ -184,7 +195,6 @@ public struct HitscanBulletSettings
     public HitscanBulletActionOnHitWall ActionOnHitWall;
     public BouncingHitscanBulletsSettings BouncingBulletsSettings;
     public ExplodingHitscanBulletsSettings ExplodingBulletsSettings;
-    
 }
 
 public interface IHitscanBulletEffectSettings { }
