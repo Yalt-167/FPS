@@ -1021,9 +1021,6 @@ public class WeaponHandler : NetworkBehaviour
     }
 
 
-
-
-
     private void SetShotgunPelletsDirections(Transform directionTranform)
     {
         shotgunPelletsDirections = new Vector3[currentWeaponStats.ShotgunStats.PelletsCount];

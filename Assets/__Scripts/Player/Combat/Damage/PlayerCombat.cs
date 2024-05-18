@@ -54,7 +54,7 @@ public class PlayerCombat : MonoBehaviour
     private void Update()
     {
         // so far there might be an exploit -> initing gun after each shot effectively reseting its cd
-        HandleWeaponSwitch();
+        HandleWeaponSwitch(); // upon check: there is
 
 
         weaponHandler.UpdateAimingState(inputQuery.Aim);
