@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.Burst.CompilerServices;
 using Unity.Netcode;
 using UnityEngine;
@@ -50,7 +51,7 @@ public class WeaponHandler : NetworkBehaviour
 
     private Action shootingStyleMethod;
     private Action shootingRythmMethod;
-    private Action<Vector3, RaycastHit, IHitscanBulletEffectSettings, ulong> onHitWallMethod = (_, _, _, _) => { }; // to avoid throwing an error
+    private Action<Vector3, RaycastHit, IHitscanBulletEffectSettings, ulong> onHitWallMethod; // to avoid throwing an error
 
     private bool isAiming;
 
@@ -177,6 +178,7 @@ public class WeaponHandler : NetworkBehaviour
 
         SetShootingStyle(); // the actual shooting logic
         SetShootingRequestRythm(); // the rythm logic of the shots
+        SetOnHitWallMethod();
     }
 
     private void SetShootingStyle()
@@ -232,7 +234,14 @@ public class WeaponHandler : NetworkBehaviour
 
     private void SetOnHitWallMethod()
     {
-        //onHitWallMethod = 
+        onHitWallMethod = currentWeaponStats.HitscanBulletSettings.ActionOnHitWall switch
+        {
+            HitscanBulletActionOnHitWall.Classic => (_, _, _, _) => { },
+            HitscanBulletActionOnHitWall.ThroughWalls => (_, _, _, _) => { },
+            HitscanBulletActionOnHitWall.Explosive => (_, _, _, _) => { },
+            HitscanBulletActionOnHitWall.BounceOnWalls => (_, _, _, _) => { },
+            _ => (_, _, _, _) => { },
+        };
     }
 
     #endregion
@@ -410,6 +419,19 @@ public class WeaponHandler : NetworkBehaviour
 
     #region Execute Shot Hitscan
 
+    private IHitscanBulletEffectSettings GetRelevantHitscanBulletSettings()
+    {
+        return currentWeaponStats.HitscanBulletSettings.ActionOnHitWall switch
+        {
+            HitscanBulletActionOnHitWall.Explosive => currentWeaponStats.HitscanBulletSettings.ExplodingBulletsSettings,
+            HitscanBulletActionOnHitWall.BounceOnWalls => currentWeaponStats.HitscanBulletSettings.BouncingBulletsSettings,
+            HitscanBulletActionOnHitWall.Classic => null,
+            HitscanBulletActionOnHitWall.ThroughWalls => null,
+            _ => null
+
+        };
+    }
+
     [Rpc(SendTo.ClientsAndHost)]
     private void ExecuteSimpleHitscanShotClientRpc()
     {
@@ -500,7 +522,7 @@ public class WeaponHandler : NetworkBehaviour
             }
             else // so far else is the wall but do proper checks later on
             {
-                onHitWallMethod(directionWithSpread, hits[i], , );
+                onHitWallMethod(directionWithSpread, hits[i], GetRelevantHitscanBulletSettings(), NetworkObjectId);
                 if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                 {
                     endPoint = hits[i].point;

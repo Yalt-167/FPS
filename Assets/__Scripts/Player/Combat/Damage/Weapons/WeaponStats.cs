@@ -182,9 +182,9 @@ public struct HitscanBulletSettings
 {
     public bool PierceThroughPlayers;
     public HitscanBulletActionOnHitWall ActionOnHitWall;
+    public BouncingHitscanBulletsSettings BouncingBulletsSettings;
+    public ExplodingHitscanBulletsSettings ExplodingBulletsSettings;
     
-    public int ExplosionRadius;
-    public int ExplosionDamage;
 }
 
 public interface IHitscanBulletEffectSettings { }
@@ -195,13 +195,20 @@ public struct BouncingHitscanBulletsSettings : IHitscanBulletEffectSettings
     public int BouncesAmount;
 }
 
+[Serializable]
+public struct ExplodingHitscanBulletsSettings : IHitscanBulletEffectSettings
+{
+    public int ExplosionRadius;
+    public int ExplosionDamage;
+}
+
 // redo hit sequence when not piercing player as we should account for walls and bullet effect still
 public enum HitscanBulletActionOnHitWall : byte
 {
     Classic, // exit
     Explosive, // do exit for same reason 
     ThroughWalls, // don t exit
-    BounceOnWalls, // do exit cah those caught so far are prolly ont in the bounce too so that would be unfair
+    BounceOnWalls, // do exit cah those caught so far are prolly not in the bounce too so that would be unfair
 }
 
 #endregion
