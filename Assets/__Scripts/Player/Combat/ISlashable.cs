@@ -4,9 +4,10 @@ using UnityEngine;
 
 public interface ISlashable
 {
-    public void ReactSlash(Vector3 directionPlayerFaced);
+    public void ReactSlash(ushort damage, Vector3 directionPlayerFaced, ulong attackerNetworkID);
 
     public IEnumerator StartCooldown();
 
-    public bool OnImmunityAfterHit {  get; set; }
+    public bool OnImmunityAfterHit { get; set; }
+    public float ImmunityAfterHitDuration { get; set; }
 }

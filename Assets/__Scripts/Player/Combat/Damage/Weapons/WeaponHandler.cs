@@ -1025,6 +1025,16 @@ public class WeaponHandler : NetworkBehaviour
     private void ExplodeUponWallHit(ShotInfos shotInfos, IHitscanBulletEffectSettings hitscanBulletEffectSettings_)
     {
         var hitscanBulletEffectSettings = (ExplodingHitscanBulletsSettings)hitscanBulletEffectSettings_;
+
+        var inRange = Physics.OverlapSphere(shotInfos.Hit.point, hitscanBulletEffectSettings.ExplosionRadius);
+
+        for (int i = 0; i < inRange.Length; i++)
+        {
+            if (inRange[i].TryGetComponent<IShootable>(out var shootableComponent))
+            {
+
+            }
+        }
     }
 
 
