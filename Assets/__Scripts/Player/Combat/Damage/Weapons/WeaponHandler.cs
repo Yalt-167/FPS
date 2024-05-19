@@ -1063,7 +1063,7 @@ public class WeaponHandler : NetworkBehaviour
                     shootableComponent.ReactShot(shotInfos.WeaponInfos.Damage, hits[i].point, newShotDirection, NetworkObjectId, shotInfos.WeaponInfos.CanBreakThings);
                 }
 
-                if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
+                if (!shotInfos.WeaponInfos.PierceThroughPlayers)
                 {
                     endPoint = hits[i].point;
                     break;
@@ -1071,7 +1071,7 @@ public class WeaponHandler : NetworkBehaviour
             }
             else // so far else is the wall but do proper checks later on
             {
-                if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                if (shotInfos.WeaponInfos.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                 {
                     endPoint = hits[i].point;
                     break;
@@ -1091,7 +1091,7 @@ public class WeaponHandler : NetworkBehaviour
             }
         }
 
-        bulletTrail.Set(barrelEnd.position, endPoint);
+        bulletTrail.Set(shotInfos.Hit.point, endPoint);
 
     }
 
@@ -1409,11 +1409,15 @@ public struct WeaponInfos
     public ushort Damage;
     public bool CanBreakThings;
     public Effects Effects;
+    public bool PierceThroughPlayers;
+    public HitscanBulletActionOnHitWall ActionOnHitWall;
 
     public WeaponInfos(WeaponStats weaponStats, float chargeRatio = 1f)
     {
         Damage = (ushort)((weaponStats.ShootingStyle == ShootingStyle.Single ? weaponStats.Damage : weaponStats.ShotgunStats.PelletsDamage) * chargeRatio);
         CanBreakThings = weaponStats.CanBreakThings;
         Effects = weaponStats.EffectsInflicted;
+        PierceThroughPlayers = weaponStats.HitscanBulletSettings.PierceThroughPlayers;
+        ActionOnHitWall = weaponStats.HitscanBulletSettings.ActionOnHitWall;
     }
 }
