@@ -124,7 +124,7 @@ public class PlayerCombat : MonoBehaviour
                 {
                     if (collider.gameObject.TryGetComponent<ISlashable>(out var slashableComponent))
                     {
-                        slashableComponent.ReactSlash(cameraTransform.forward);
+                        //slashableComponent.ReactSlash(cameraTransform.forward);
                     }
                 }
             }

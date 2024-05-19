@@ -198,7 +198,7 @@ public interface IEffectProficiency { } // interface for polymorphism on the eff
 [Serializable]
 public struct HitscanBulletSettings
 {
-    public bool PierceThroughPlayers;
+    public bool PierceThroughPlayers; // account for that
     public HitscanBulletActionOnHitWall ActionOnHitWall;
     public BouncingHitscanBulletsSettings BouncingBulletsSettings;
     public ExplodingHitscanBulletsSettings ExplodingBulletsSettings;
