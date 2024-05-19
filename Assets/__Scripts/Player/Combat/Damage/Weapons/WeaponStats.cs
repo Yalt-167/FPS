@@ -18,7 +18,8 @@ public class WeaponStats : ScriptableObject
     [Header("Magazine")]
     public ushort MagazineSize;
     public bool NeedReload;
-    public float ReloadSpeed; // some that can reload one per one
+    public float ReloadSpeed; 
+    public float TimeToReloadOneRound; // some that can reload one per one -> only consider when non-zero
     public ushort AmmoLeftInMagazineToWarn;
 
     [Header("Shooting Style")]
@@ -29,7 +30,6 @@ public class WeaponStats : ScriptableObject
     
     [Space(4)]
     public ShotgunStats ShotgunStats;
-    //public ShotgunStats AimingShotgunStats;
    
 
     [Header("Shooting Rythm")]
@@ -126,71 +126,6 @@ public struct ChargeStats
 
 #endregion
 
-#region Miscellaneous
-
-public enum WeaponClass
-{
-    Primary,
-    Secondary,
-    Melee,
-    // add duel weapon?
-}
-
-[Serializable]
-public struct AimAndScopeStats
-{
-    public float AimingFOV; //perhaps just a cameraMove instead
-    [Range(1, 5)][Tooltip("Set to 1 for no Scope")] public float ScopeMagnification;
-    public float TimeToADS;
-    public float TimeToUnADS;
-}
-
-[Serializable]
-public struct KickbackStats
-{
-    public float WeaponKickBackPerShot;
-    public float WeaponKickBackRegulationTime;
-}
-
-[Serializable]
-public struct RecoilStats
-{
-    [Tooltip("Upward recoil")] public float RecoilForceX;
-    [Tooltip("Sideway recoil")] public float RecoilForceY;
-    [Tooltip("Camera rotation on side (somewhat screen shake)")] public float RecoilForceZ;
-    public float RecoilRegulationSpeed;
-}
-
-public enum Effects
-{
-    None,
-    Fire, // depletes shield & health (stacking until a certain threshold
-    Freeze, // slows + increased damage when already frozen
-    Bleeding, // depletes life
-    Poison, // deplete life
-            // some character have resistance on one but not both
-            // &&
-            // some heal may fix one but not both
-    Slowness, // slows
-    Obscurity, // blindness
-    Fading, // reduce your Vital Essence (instant -> not lingering) (not replenishing) (when no more Vital Essence -> dead) (get a new Vital Essence gauge when respawning)
-    // ex when shot u lose say 50% of ur Vital Essence even if you heal the next shot will drop that gauge to 0 -> you die next Fading Shot
-    Shock, // damage nearby players (chaining) + can make weapon jam ?
-    // ex with a range of 3:
-    // if u get shot and a teammate is less than 3units from u he gets shocked too (for less dmg) and if another teammate is less than 3units from him (not necessarily you) it chains too (the more depth of chaining the less dmg
-    Charm, // damage reduced on the one who inflicted you this
-    Curse, // damage boosted on the cursed 
-
-
-}
-
-public interface IEffectProficiency { } // interface for polymorphism on the effect data
-// have an override for * (for chargedWaps and influence on the proficiency of the effect)
-
-
-
-#endregion
-
 #region Bullet Settings
 
 #region Hitscan Bullet Settings
@@ -254,6 +189,71 @@ public struct TravelTimeBulletSettings
 }
 
 #endregion
+
+#endregion
+
+#region Miscellaneous
+
+public enum WeaponClass
+{
+    Primary,
+    Secondary,
+    Melee,
+    // add duel weapon?
+}
+
+[Serializable]
+public struct AimAndScopeStats
+{
+    public float AimingFOV; //perhaps just a cameraMove instead
+    [Range(1, 5)][Tooltip("Set to 1 for no Scope")] public float ScopeMagnification;
+    public float TimeToADS;
+    public float TimeToUnADS;
+}
+
+[Serializable]
+public struct KickbackStats
+{
+    public float WeaponKickBackPerShot;
+    public float WeaponKickBackRegulationTime;
+}
+
+[Serializable]
+public struct RecoilStats
+{
+    [Tooltip("Upward recoil")] public float RecoilForceX;
+    [Tooltip("Sideway recoil")] public float RecoilForceY;
+    [Tooltip("Camera rotation on side (somewhat screen shake)")] public float RecoilForceZ;
+    public float RecoilRegulationSpeed;
+}
+
+public enum Effects
+{
+    None,
+    Fire, // depletes shield & health (stacking until a certain threshold
+    Freeze, // slows + increased damage when already frozen
+    Bleeding, // depletes life
+    Poison, // deplete life
+            // some character have resistance on one but not both
+            // &&
+            // some heal may fix one but not both
+    Slowness, // slows
+    Obscurity, // blindness
+    Fading, // reduce your Vital Essence (instant -> not lingering) (not replenishing) (when no more Vital Essence -> dead) (get a new Vital Essence gauge when respawning)
+    // ex when shot u lose say 50% of ur Vital Essence even if you heal the next shot will drop that gauge to 0 -> you die next Fading Shot
+    Shock, // damage nearby players (chaining) + can make weapon jam ?
+    // ex with a range of 3:
+    // if u get shot and a teammate is less than 3units from u he gets shocked too (for less dmg) and if another teammate is less than 3units from him (not necessarily you) it chains too (the more depth of chaining the less dmg
+    Charm, // damage reduced on the one who inflicted you this
+    Curse, // damage boosted on the cursed 
+
+
+}
+
+public interface IEffectProficiency { } // interface for polymorphism on the effect data
+// have an override for * (for chargedWaps and influence on the proficiency of the effect)
+
+
 
 #endregion
 

@@ -5,6 +5,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.Burst.CompilerServices;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UIElements;
 using UnityEngine.Video;
 using Random = UnityEngine.Random;
 
@@ -1042,7 +1043,6 @@ public class WeaponHandler : NetworkBehaviour
         }
     }
 
-
     private void BounceUponWallHit(ShotInfos shotInfos, IHitscanBulletEffectSettings hitscanBulletEffectSettings_)
     {
         var hitscanBulletEffectSettings = (BouncingHitscanBulletsSettings)hitscanBulletEffectSettings_;
@@ -1126,13 +1126,13 @@ public class WeaponHandler : NetworkBehaviour
     {
         if (!currentWeaponStats.NeedReload) { return; }
 
-        StartCoroutine(ExecuteReload());
+        if (ammos == currentWeaponStats.MagazineSize) { return; } // already fully loaded
+
+        StartCoroutine(currentWeaponStats.TimeToReloadOneRound == 0f ? ExecuteReload() : ExecuteReloadRoundPerRound());
     }
 
     private IEnumerator ExecuteReload()
     {
-        if (ammos == currentWeaponStats.MagazineSize) { yield break; } // already fully loaded
-
         canShoot = false;
 
         var timerStart = Time.time;
@@ -1143,6 +1143,36 @@ public class WeaponHandler : NetworkBehaviour
         if (switchedThisFrame) { yield break; }
 
         ammos = currentWeaponStats.MagazineSize;
+    }
+
+    private IEnumerator ExecuteReloadRoundPerRound()
+    {
+        var ammosToReload = currentWeaponStats.MagazineSize - ammos;
+
+        var placeHolderBufferInput = false;
+        for (int i = 0; i < ammosToReload; i++)
+        {
+            var timerStart = Time.time;
+            yield return new WaitUntil(() => timerStart + currentWeaponStats.TimeToReloadOneRound < Time.time || switchedThisFrame); // + buffer a shoot input that would interrupt the reload
+
+            if (switchedThisFrame) { yield break; }
+
+            if (placeHolderBufferInput)
+            {
+                if (currentWeaponStats.ShootingRythm == ShootingRythm.Charge)
+                {
+                    StartCoroutine(ChargeShot());
+                }
+                else
+                {
+                    shootingRythmMethod();
+                }
+
+                yield break;
+            }
+
+            ammos++;
+        }
     }
 
     #endregion
