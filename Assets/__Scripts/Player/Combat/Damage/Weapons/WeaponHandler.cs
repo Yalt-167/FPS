@@ -1030,9 +1030,14 @@ public class WeaponHandler : NetworkBehaviour
 
         for (int i = 0; i < inRange.Length; i++)
         {
-            if (inRange[i].TryGetComponent<IShootable>(out var shootableComponent))
+            if (inRange[i].TryGetComponent<IExplodable>(out var explodableComponent))
             {
-
+                explodableComponent.ReactExplosion(
+                    hitscanBulletEffectSettings.ExplosionDamage,
+                    shotInfos.Hit.point,
+                    shotInfos.AttackerNetworkID,
+                    shotInfos.WeaponInfos.CanBreakThings
+                    );
             }
         }
     }
@@ -1045,7 +1050,6 @@ public class WeaponHandler : NetworkBehaviour
         if (hitscanBulletEffectSettings.BouncesAmount == 0) { return; }
 
         var newShotDirection = ReflectVector(shotInfos.ShotDirection, shotInfos.Hit.normal);
-
 
         var bulletTrail = Instantiate(bulletTrailPrefab, shotInfos.Hit.point, Quaternion.identity).GetComponent<BulletTrail>();
         var endPoint = shotInfos.Hit.point + newShotDirection * 100;
@@ -1092,7 +1096,6 @@ public class WeaponHandler : NetworkBehaviour
         }
 
         bulletTrail.Set(shotInfos.Hit.point, endPoint);
-
     }
 
     private Vector3 ReflectVector(Vector3 vectorToReflect, Vector3 normalVector)

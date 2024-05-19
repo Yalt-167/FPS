@@ -227,7 +227,7 @@ public struct BouncingHitscanBulletsSettings : IHitscanBulletEffectSettings
 public struct ExplodingHitscanBulletsSettings : IHitscanBulletEffectSettings
 {
     public int ExplosionRadius;
-    public int ExplosionDamage;
+    public ushort ExplosionDamage; // should it add up ? (hitting directly + explosion) -> yes
 }
 
 // redo hit sequence when not piercing player as we should account for walls and bullet effect still
