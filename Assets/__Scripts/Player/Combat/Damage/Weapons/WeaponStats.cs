@@ -198,7 +198,7 @@ public interface IEffectProficiency { } // interface for polymorphism on the eff
 [Serializable]
 public struct HitscanBulletSettings
 {
-    public bool PierceThroughPlayers; // account for that
+    public bool PierceThroughPlayers;
     public HitscanBulletActionOnHitWall ActionOnHitWall;
     public BouncingHitscanBulletsSettings BouncingBulletsSettings;
     public ExplodingHitscanBulletsSettings ExplodingBulletsSettings;
@@ -227,16 +227,18 @@ public struct BouncingHitscanBulletsSettings : IHitscanBulletEffectSettings
 public struct ExplodingHitscanBulletsSettings : IHitscanBulletEffectSettings
 {
     public int ExplosionRadius;
-    public ushort ExplosionDamage; // should it add up ? (hitting directly + explosion) -> yes
+    public ushort ExplosionDamage;
+    // should it add up ? (hitting directly + explosion) -> yes
+    // should it account for different part of the body (? avoid stacking ?)
 }
 
 // redo hit sequence when not piercing player as we should account for walls and bullet effect still
 public enum HitscanBulletActionOnHitWall : byte
 {
-    Classic, // exit
-    Explosive, // do exit for same reason 
+    Classic, // do exit
+    Explosive, // do exit
     ThroughWalls, // don t exit
-    BounceOnWalls, // do exit cah those caught so far are prolly not in the bounce too so that would be unfair
+    BounceOnWalls, // do exit
 }
 
 #endregion
