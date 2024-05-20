@@ -259,6 +259,7 @@ public class WeaponHandler : NetworkBehaviour
             holdingAttackKey = holdingAttackKey_;
             if (holdingAttackKey_) // just started pressing the attack key
             {
+                lastShootPressed = Time.time;
                 if (currentWeaponStats.ShootingRythm == ShootingRythm.Charge)
                 {
                     StartCoroutine(ChargeShot());
@@ -1149,15 +1150,18 @@ public class WeaponHandler : NetworkBehaviour
     {
         var ammosToReload = currentWeaponStats.MagazineSize - ammos;
 
-        var placeHolderBufferInput = false;
         for (int i = 0; i < ammosToReload; i++)
         {
             var timerStart = Time.time;
-            yield return new WaitUntil(() => timerStart + currentWeaponStats.TimeToReloadOneRound < Time.time || switchedThisFrame); // + buffer a shoot input that would interrupt the reload
+            yield return new WaitUntil(
+                () => timerStart + currentWeaponStats.TimeToReloadOneRound < Time.time ||
+                switchedThisFrame ||
+                HasBufferedShoot
+                ); // + buffer a shoot input that would interrupt the reload
 
             if (switchedThisFrame) { yield break; }
 
-            if (placeHolderBufferInput)
+            if (HasBufferedShoot)
             {
                 if (currentWeaponStats.ShootingRythm == ShootingRythm.Charge)
                 {
