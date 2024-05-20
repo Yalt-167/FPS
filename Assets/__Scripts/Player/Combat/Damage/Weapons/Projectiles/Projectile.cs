@@ -6,7 +6,7 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     public Vector3 Position => transform.position;
-
+    public Vector3 Direction => transform.forward;
 
     [SerializeField] protected float lifetime;
 
@@ -71,5 +71,10 @@ public class Projectile : MonoBehaviour
         yield return new WaitUntil(() => startTime + lifetime < Time.time || !active);
 
         Destroy(gameObject);
+    }
+
+    public void SetDirection(Vector3 newDirection)
+    {
+        transform.LookAt(newDirection);
     }
 }

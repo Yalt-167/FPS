@@ -433,7 +433,7 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void ExecuteSimpleHitscanShotClientRpc()
+    private void _ExecuteSimpleHitscanShotClientRpc()
     {
         UpdateOwnerSettingsUponShot();
 
@@ -491,7 +491,7 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void _ExecuteSimpleHitscanShotClientRpc()
+    private void ExecuteSimpleHitscanShotClientRpc()
     {
         UpdateOwnerSettingsUponShot();
 
@@ -520,12 +520,6 @@ public class WeaponHandler : NetworkBehaviour
             }
             else // so far else is the wall but do proper checks later on
             {
-                if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
-                {
-                    endPoint = hits[i].point;
-                    break;
-                }
-                
                 onHitWallMethod(
                     new(
                         directionWithSpread,
@@ -535,6 +529,12 @@ public class WeaponHandler : NetworkBehaviour
                     ),
                     GetRelevantHitscanBulletSettings()
                 );
+                
+                if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                {
+                    endPoint = hits[i].point;
+                    break;
+                }
                 
             }
         }
@@ -550,7 +550,7 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void ExecuteShotgunHitscanShotClientRpc()
+    private void _ExecuteShotgunHitscanShotClientRpc()
     {
         UpdateOwnerSettingsUponShot();
 
@@ -610,7 +610,7 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void _ExecuteShotgunHitscanShotClientRpc()
+    private void ExecuteShotgunHitscanShotClientRpc()
     {
         UpdateOwnerSettingsUponShot();
 
@@ -639,12 +639,7 @@ public class WeaponHandler : NetworkBehaviour
 
                     else
                     {
-                        if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
-                        {
-                            endPoint = hits[i].point;
-                            break;
-                        }
-                        
+
                         onHitWallMethod(
                             new(
                                 shotgunPelletsDirections[pelletIndex],
@@ -654,6 +649,13 @@ public class WeaponHandler : NetworkBehaviour
                             ),
                             GetRelevantHitscanBulletSettings()
                         );
+                        
+                        if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                        {
+                            endPoint = hits[i].point;
+                            break;
+                        }
+                        
                     }
                 }
             }
@@ -668,7 +670,7 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void ExecuteChargedHitscanShotClientRpc(float chargeRatio)
+    private void _ExecuteChargedHitscanShotClientRpc(float chargeRatio)
     {
         UpdateOwnerSettingsUponShot();
 
@@ -727,7 +729,7 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void _ExecuteChargedHitscanShotClientRpc(float chargeRatio)
+    private void ExecuteChargedHitscanShotClientRpc(float chargeRatio)
     {
         UpdateOwnerSettingsUponShot();
 
@@ -756,12 +758,6 @@ public class WeaponHandler : NetworkBehaviour
             }
             else // so far else is the wall but do proper checks later on
             {
-                if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
-                {
-                    endPoint = hits[i].point;
-                    break;
-                }
-                
                 onHitWallMethod(
                     new(
                         directionWithSpread,
@@ -771,6 +767,13 @@ public class WeaponHandler : NetworkBehaviour
                     ),
                     GetRelevantHitscanBulletSettings()
                 );
+
+                if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                {
+                    endPoint = hits[i].point;
+                    break;
+                }
+                
             }
         }
 
@@ -785,7 +788,7 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void ExecuteChargedShotgunHitscanShotClientRpc(float chargeRatio)
+    private void _ExecuteChargedShotgunHitscanShotClientRpc(float chargeRatio)
     {
         UpdateOwnerSettingsUponShot();
 
@@ -846,7 +849,7 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void _ExecuteChargedShotgunHitscanShotClientRpc(float chargeRatio)
+    private void ExecuteChargedShotgunHitscanShotClientRpc(float chargeRatio)
     {
         UpdateOwnerSettingsUponShot();
 
@@ -876,12 +879,6 @@ public class WeaponHandler : NetworkBehaviour
                 }
                 else
                 {
-                    if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
-                    {
-                        endPoint = hits[i].point;
-                        break;
-                    }
-                    
                     onHitWallMethod(
                         new(
                             shotgunPelletsDirections[pelletIndex],
@@ -891,6 +888,13 @@ public class WeaponHandler : NetworkBehaviour
                             ),
                         GetRelevantHitscanBulletSettings()
                     );
+
+                    if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                    {
+                        endPoint = hits[i].point;
+                        break;
+                    }
+                    
                 }
             }
 
@@ -1050,7 +1054,7 @@ public class WeaponHandler : NetworkBehaviour
 
         if (hitscanBulletEffectSettings.BouncesAmount == 0) { return; }
 
-        var newShotDirection = ReflectVector(shotInfos.ShotDirection, shotInfos.Hit.normal);
+        var newShotDirection = Utility.ReflectVector(shotInfos.ShotDirection, shotInfos.Hit.normal);
 
         var bulletTrail = Instantiate(bulletTrailPrefab, shotInfos.Hit.point, Quaternion.identity).GetComponent<BulletTrail>();
         var endPoint = shotInfos.Hit.point + newShotDirection * 100;
@@ -1076,14 +1080,7 @@ public class WeaponHandler : NetworkBehaviour
             }
             else // so far else is the wall but do proper checks later on
             {
-                if (shotInfos.WeaponInfos.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
-                {
-                    endPoint = hits[i].point;
-                    break;
-                }
-                else
-                {
-                    BounceUponWallHit(
+                BounceUponWallHit(
                         new(
                             newShotDirection,
                             hits[i],
@@ -1092,20 +1089,17 @@ public class WeaponHandler : NetworkBehaviour
                             ),
                         --hitscanBulletEffectSettings
                         );
+
+                if (shotInfos.WeaponInfos.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                {
+                    endPoint = hits[i].point;
+                    break;
                 }
+                
             }
         }
 
         bulletTrail.Set(shotInfos.Hit.point, endPoint);
-    }
-
-    private Vector3 ReflectVector(Vector3 vectorToReflect, Vector3 normalVector)
-    {
-        var normalizedNormal = normalVector.normalized;
-
-        var dotProduct = Vector3.Dot(vectorToReflect, normalizedNormal);
-
-        return vectorToReflect - 2 * dotProduct * normalizedNormal;
     }
 
 

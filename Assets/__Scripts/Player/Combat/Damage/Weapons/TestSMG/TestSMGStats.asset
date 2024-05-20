@@ -18,6 +18,11 @@ MonoBehaviour:
   HitscanBulletSettings:
     PierceThroughPlayers: 0
     ActionOnHitWall: 0
+    BouncingBulletsSettings:
+      BouncesAmount: 0
+    ExplodingBulletsSettings:
+      ExplosionRadius: 0
+      ExplosionDamage: 0
   TravelTimeBulletSettings:
     BulletPrefab: {fileID: 1044930296373891420, guid: a8a6eb59afd9c154c9b3d707a0f672a8,
       type: 3}
@@ -26,6 +31,7 @@ MonoBehaviour:
   MagazineSize: 24
   NeedReload: 1
   ReloadSpeed: 2
+  TimeToReloadOneRound: 0
   AmmoLeftInMagazineToWarn: 0
   ShootingStyle: 0
   SimpleShotStats:
@@ -43,9 +49,9 @@ MonoBehaviour:
     AimingPelletsSpreadAngle: 0
     PelletsRange: 10
   ShootingRythm: 1
-  CooldownBetweenShots: 0.7
+  CooldownBetweenShots: 0.4
   BurstStats:
-    CooldownBetweenShotsOfBurst: 0.07
+    CooldownBetweenShotsOfBurst: 0.04
     BulletsPerBurst: 3
   RampUpStats:
     RampUpMaxCooldownBetweenShots: 1
@@ -75,3 +81,4 @@ MonoBehaviour:
     WeaponKickBackPerShot: 0.3
     WeaponKickBackRegulationTime: 0.003
   CanBreakThings: 0
+  EffectsInflicted: 0
