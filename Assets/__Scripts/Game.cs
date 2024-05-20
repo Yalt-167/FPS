@@ -30,7 +30,7 @@ public class Game : MonoBehaviour
 
         networkedWeaponHandlers.Add(networkedWeaponHandler);
     }
-    public WeaponHandler GetNetworkedWeaponHandlerFromNetworkObjectID(ulong playerObjectID) // make it so they are sorted -> slower upon adding it but faster to select it still
+    public WeaponHandler GetNetworkedWeaponHandlerFromNetworkObjectID(ulong playerObjectID) // ? make it so they are sorted ? -> slower upon adding it but faster to select it still
     {
         var size = networkedWeaponHandlers.Count;
         for (int i = 0; i < size; i++)
@@ -44,10 +44,9 @@ public class Game : MonoBehaviour
         return null;
     }
 
-    public IEnumerable<WeaponHandler> PlayersCombatNetworked()
+    public IEnumerable<WeaponHandler> GetNetworkedWeaponHandlers()
     {
-        var size = networkedWeaponHandlers.Count;
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < networkedWeaponHandlers.Count; i++)
         {
             yield return networkedWeaponHandlers[i];
         }
@@ -71,7 +70,7 @@ public class Game : MonoBehaviour
     {
         Cursor.visible = false;
         //Cursor.lockState = CursorLockMode.Locked;
-        Application.targetFrameRate = 120;
+        //Application.targetFrameRate = 120;
     }
 
     

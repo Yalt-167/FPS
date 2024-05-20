@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +14,8 @@ public class Projectile : MonoBehaviour
     protected bool canBreakThings;
     protected LayerMask layersToHit;
     protected bool active;
+    [SerializeField] protected ProjectileOnHitWallBehaviour projectileOnHitWallBehaviour;
+    [SerializeField] protected ProjectileOnHitPlayerBehaviour projectileOnHiPlayerBehaviour;
 
     protected virtual void Awake()
     {
@@ -37,7 +40,18 @@ public class Projectile : MonoBehaviour
         if (other.TryGetComponent<IShootable>(out var shootableComponent))
         {
             shootableComponent.ReactShot(damage, transform.forward, Vector3.zero, attackerNetworkID, canBreakThings);
+            if (projectileOnHiPlayerBehaviour != null)
+            {
+                projectileOnHiPlayerBehaviour.OnHitPlayer();
+            }
             active = false;
+        }
+        else if (other.TryGetComponent<Ground>(out var _))
+        {
+            if (projectileOnHitWallBehaviour != null)
+            {
+                projectileOnHitWallBehaviour.OnHitWall();
+            }
         }
     }
 
