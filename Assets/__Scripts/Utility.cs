@@ -19,11 +19,3 @@ public static class Utility
         return vectorToReflect - 2 * dotProduct * normalizedNormal;
     }
 }
-
-public class RaycastHitComparer : IComparer<RaycastHit>
-{
-    public int Compare(RaycastHit hit1, RaycastHit hit2)
-    {
-        return hit1.distance.CompareTo(hit2.distance);
-    }
-}

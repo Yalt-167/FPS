@@ -19,7 +19,7 @@ MonoBehaviour:
     PierceThroughPlayers: 0
     ActionOnHitWall: 3
     BouncingBulletsSettings:
-      BouncesAmount: 0
+      BouncesAmount: 2
     ExplodingBulletsSettings:
       ExplosionRadius: 0
       ExplosionDamage: 0
