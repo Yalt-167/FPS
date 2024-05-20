@@ -70,7 +70,7 @@ public class Game : MonoBehaviour
     {
         Cursor.visible = false;
         //Cursor.lockState = CursorLockMode.Locked;
-        //Application.targetFrameRate = 120;
+        Application.targetFrameRate = 120;
     }
 
     

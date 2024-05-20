@@ -84,7 +84,7 @@ public class PlayerHealth : NetworkBehaviour
 
         if (!ignoreShield && Shield)
         {
-            damage = (ushort)Shield.TakeDamage(damage);
+            damage = Shield.TakeDamage(damage);
         }
 
         if (damage <= 0) { return; }

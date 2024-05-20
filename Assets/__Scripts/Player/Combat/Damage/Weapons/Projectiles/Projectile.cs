@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
+    public Vector3 Position => transform.position;
+
+
     [SerializeField] protected float lifetime;
 
     protected float speed;
@@ -42,7 +45,7 @@ public class Projectile : MonoBehaviour
             shootableComponent.ReactShot(damage, transform.forward, Vector3.zero, attackerNetworkID, canBreakThings);
             if (projectileOnHiPlayerBehaviour != null)
             {
-                projectileOnHiPlayerBehaviour.OnHitPlayer();
+                projectileOnHiPlayerBehaviour.OnHitPlayer(this, shootableComponent);
             }
             active = false;
         }
@@ -50,7 +53,7 @@ public class Projectile : MonoBehaviour
         {
             if (projectileOnHitWallBehaviour != null)
             {
-                projectileOnHitWallBehaviour.OnHitWall();
+                projectileOnHitWallBehaviour.OnHitWall(this, other);
             }
         }
     }
