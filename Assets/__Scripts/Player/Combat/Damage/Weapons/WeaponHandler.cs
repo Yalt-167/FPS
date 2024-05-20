@@ -252,6 +252,8 @@ public class WeaponHandler : NetworkBehaviour
 
     #endregion
 
+    #region Server Request & Validation
+
     public void UpdateState(bool holdingAttackKey_)
     {
         if (holdingAttackKey_ != holdingAttackKey)
@@ -402,6 +404,8 @@ public class WeaponHandler : NetworkBehaviour
             }
         }
     }
+
+    #endregion
 
     #region Execute Shot
 
@@ -1027,6 +1031,7 @@ public class WeaponHandler : NetworkBehaviour
 
     #endregion
 
+    #region Hitscan Wall Hit Effects
 
     private void ExplodeUponWallHit(ShotInfos shotInfos, IHitscanBulletEffectSettings hitscanBulletEffectSettings_)
     {
@@ -1102,6 +1107,7 @@ public class WeaponHandler : NetworkBehaviour
         bulletTrail.Set(shotInfos.Hit.point, endPoint);
     }
 
+    #endregion
 
     private void SetShotgunPelletsDirections(Transform directionTranform)
     {
