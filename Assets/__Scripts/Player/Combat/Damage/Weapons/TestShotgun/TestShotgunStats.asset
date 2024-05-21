@@ -18,14 +18,20 @@ MonoBehaviour:
   HitscanBulletSettings:
     PierceThroughPlayers: 0
     ActionOnHitWall: 0
+    BouncingBulletsSettings:
+      BouncesAmount: 0
+    ExplodingBulletsSettings:
+      ExplosionRadius: 0
+      ExplosionDamage: 0
   TravelTimeBulletSettings:
-    BulletPrefab: {fileID: 1044930296373891420, guid: a8a6eb59afd9c154c9b3d707a0f672a8,
+    BulletPrefab: {fileID: 1044930296373891420, guid: 3c00fe0ea4a85d34286e5279bb5748a2,
       type: 3}
     BulletDrop: 0
-    BulletSpeed: 3
+    BulletSpeed: 1
   MagazineSize: 10
   NeedReload: 1
   ReloadSpeed: 1
+  TimeToReloadOneRound: 0
   AmmoLeftInMagazineToWarn: 0
   ShootingStyle: 1
   SimpleShotStats:
@@ -75,3 +81,4 @@ MonoBehaviour:
     WeaponKickBackPerShot: 0.5
     WeaponKickBackRegulationTime: 0.003
   CanBreakThings: 0
+  EffectsInflicted: 0

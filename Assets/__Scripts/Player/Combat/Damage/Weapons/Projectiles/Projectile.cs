@@ -17,12 +17,13 @@ public class Projectile : MonoBehaviour
     protected bool canBreakThings;
     protected LayerMask layersToHit;
     protected bool active;
-    [SerializeField] protected ProjectileOnHitWallBehaviour projectileOnHitWallBehaviour;
-    [SerializeField] protected ProjectileOnHitPlayerBehaviour projectileOnHiPlayerBehaviour;
+    protected ProjectileOnHitWallBehaviour projectileOnHitWallBehaviour;
+    protected ProjectileOnHitPlayerBehaviour projectileOnHiPlayerBehaviour;
 
     protected virtual void Awake()
     {
-        GetComponent<Collider>().isTrigger = true;
+        projectileOnHitWallBehaviour = GetComponent<ProjectileOnHitWallBehaviour>();
+        projectileOnHiPlayerBehaviour = GetComponent<ProjectileOnHitPlayerBehaviour>();
     }
 
     public virtual void Init(ushort damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, bool canBreakThings_, LayerMask layersToHit_)
@@ -38,9 +39,10 @@ public class Projectile : MonoBehaviour
         StartCoroutine(CleanUp());
     }
 
-    protected virtual void OnTriggerEnter(Collider other)
+    protected void OnCollisionEnter(Collision collision)
     {
-        if (other.TryGetComponent<IShootable>(out var shootableComponent))
+        var col = collision.collider;
+        if (col.TryGetComponent<IShootable>(out var shootableComponent))
         {
             shootableComponent.ReactShot(damage, transform.forward, Vector3.zero, attackerNetworkID, canBreakThings);
             if (projectileOnHiPlayerBehaviour != null)
@@ -49,11 +51,11 @@ public class Projectile : MonoBehaviour
             }
             active = false;
         }
-        else if (other.TryGetComponent<Ground>(out var _))
+        else if (col.TryGetComponent<Ground>(out var _))
         {
             if (projectileOnHitWallBehaviour != null)
             {
-                projectileOnHitWallBehaviour.OnHitWall(this, other);
+                projectileOnHitWallBehaviour.OnHitWall(this, col);
             }
         }
     }
@@ -75,6 +77,6 @@ public class Projectile : MonoBehaviour
 
     public void SetDirection(Vector3 newDirection)
     {
-        transform.LookAt(newDirection);
+        transform.LookAt(transform.position + newDirection); ;
     }
 }
