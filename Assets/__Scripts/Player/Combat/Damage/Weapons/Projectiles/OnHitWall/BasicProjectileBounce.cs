@@ -12,16 +12,14 @@ public class BasicProjectileBounce : ProjectileOnHitWallBehaviour
         if (bounces == maxBounces) { return; }
 
         var closestPoint = relevantWall.ClosestPoint(relevantProjectile.Position);
-        //if (Physics.Raycast(relevantProjectile.Position - (relevantProjectile.Position - closestPoint), relevantProjectile.Position - closestPoint, out var hit, 3f, Layers.Ground, QueryTriggerInteraction.Ignore))
         if (Physics.Raycast(relevantProjectile.Position, closestPoint - relevantProjectile.Position , out var hit, 3f, Layers.Ground, QueryTriggerInteraction.Ignore))
         {
-            print(hit.normal);
             relevantProjectile.SetDirection(Utility.ReflectVector(relevantProjectile.Direction, hit.normal));
             bounces++;
         }
         else
         {
-            print("Shouldn t have reached there");
+            //print("Shouldn t have reached there");
             return;
         }
     }
