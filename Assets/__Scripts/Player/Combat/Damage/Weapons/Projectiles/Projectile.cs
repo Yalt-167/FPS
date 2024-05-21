@@ -79,4 +79,9 @@ public class Projectile : MonoBehaviour
     {
         transform.LookAt(transform.position + newDirection); ;
     }
+
+    public void Deactivate()
+    {
+        active = false;
+    }
 }
