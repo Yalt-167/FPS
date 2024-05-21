@@ -7,6 +7,8 @@ public class Projectile : MonoBehaviour
 {
     public Vector3 Position => transform.position;
     public Vector3 Direction => transform.forward;
+    public ulong Owner => attackerNetworkID;
+    public bool CanBreakThings => canBreakThings;
 
     [SerializeField] protected float lifetime;
 
