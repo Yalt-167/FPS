@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class ProjectileOnHitWallBehaviour : MonoBehaviour
+[Serializable]
+public abstract class ProjectileOnHitWallBehaviour
 {
     public abstract void OnHitWall(Projectile relevantProjectile, Collider relevantWall);
 }

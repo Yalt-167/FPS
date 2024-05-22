@@ -19,16 +19,11 @@ public class Projectile : MonoBehaviour
     protected bool canBreakThings;
     protected LayerMask layersToHit;
     protected bool active;
-    protected ProjectileOnHitWallBehaviour projectileOnHitWallBehaviour;
-    protected ProjectileOnHitPlayerBehaviour projectileOnHiPlayerBehaviour;
+    protected ProjectileOnHitWallBehaviour onHitWallBehaviour;
+    protected ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour;
 
-    protected virtual void Awake()
-    {
-        projectileOnHitWallBehaviour = GetComponent<ProjectileOnHitWallBehaviour>();
-        projectileOnHiPlayerBehaviour = GetComponent<ProjectileOnHitPlayerBehaviour>();
-    }
-
-    public virtual void Init(ushort damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, bool canBreakThings_, LayerMask layersToHit_)
+    public virtual void Init(ushort damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, bool canBreakThings_, LayerMask layersToHit_,
+        ProjectileOnHitWallBehaviour onHitWallBehaviour_, ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour_)
     {
         active = true;
         damage = damage_;
@@ -37,6 +32,10 @@ public class Projectile : MonoBehaviour
         speed = speed_;
         attackerNetworkID = attackerNetworkID_;
         canBreakThings = canBreakThings_;
+
+        onHitPlayerBehaviour = onHitPlayerBehaviour_;
+        onHitWallBehaviour = onHitWallBehaviour_;
+
 
         StartCoroutine(CleanUp());
     }
@@ -47,18 +46,12 @@ public class Projectile : MonoBehaviour
         if (col.TryGetComponent<IShootable>(out var shootableComponent))
         {
             shootableComponent.ReactShot(damage, transform.forward, Vector3.zero, attackerNetworkID, canBreakThings);
-            if (projectileOnHiPlayerBehaviour != null)
-            {
-                projectileOnHiPlayerBehaviour.OnHitPlayer(this, shootableComponent);
-            }
+            onHitPlayerBehaviour.OnHitPlayer(this, shootableComponent);
             active = false;
         }
         else if (col.TryGetComponent<Ground>(out var _))
         {
-            if (projectileOnHitWallBehaviour != null)
-            {
-                projectileOnHitWallBehaviour.OnHitWall(this, col);
-            }
+            onHitWallBehaviour.OnHitWall(this, col);
         }
     }
 

@@ -151,7 +151,6 @@ public struct BouncingHitscanBulletsSettings : IHitscanBulletEffectSettings
         BouncesAmount = bouncesAmount;
     }
 
-
     public static BouncingHitscanBulletsSettings operator --(BouncingHitscanBulletsSettings relevantStruct)
     {
         return new BouncingHitscanBulletsSettings(--relevantStruct.BouncesAmount);
@@ -186,6 +185,8 @@ public struct TravelTimeBulletSettings
     public GameObject BulletPrefab;
     public float BulletDrop;
     public float BulletSpeed;
+    public ProjectileOnHitWallBehaviour OnHitWallBehaviour;
+    public ProjectileOnHitPlayerBehaviour OnHitPlayerBehaviour;
 }
 
 #endregion
