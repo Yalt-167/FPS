@@ -7,11 +7,11 @@ public class BasicProjectilePierceOnHitPlayer : ProjectileOnHitPlayerBehaviour
     [SerializeField] protected ushort maxPlayerPierceAmount;
     protected ushort currentPiercedPlayerCount;
 
-    public override void OnHitPlayer(Projectile relevantprojectile, IShootable relevantPlayer)
+    public override void OnHitPlayer(Projectile relevantProjectile, IShootable relevantPlayer)
     {
         if (currentPiercedPlayerCount == maxPlayerPierceAmount)
         {
-            relevantprojectile.Deactivate();
+            relevantProjectile.Deactivate();
             return;
         }
 

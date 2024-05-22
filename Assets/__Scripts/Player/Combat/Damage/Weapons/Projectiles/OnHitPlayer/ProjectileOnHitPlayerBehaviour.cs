@@ -4,5 +4,5 @@ using UnityEngine;
 
 public abstract class ProjectileOnHitPlayerBehaviour : MonoBehaviour
 {
-    public abstract void OnHitPlayer(Projectile relevantprojectile, IShootable relevantPlayer);
+    public abstract void OnHitPlayer(Projectile relevantProjectile, IShootable relevantPlayer);
 }

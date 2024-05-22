@@ -17,5 +17,7 @@ public class BasicProjectileExplodeOnHitPlayer : ProjectileOnHitPlayerBehaviour
                 explodableComponent.ReactExplosion(explosionDamage, relevantProjectile.Position, relevantProjectile.Owner, relevantProjectile.CanBreakThings);
             }
         }
+
+        relevantProjectile.Deactivate();
     }
 }

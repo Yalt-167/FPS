@@ -18,6 +18,8 @@ public class BasicProjectileExplodeOnHitWall : ProjectileOnHitWallBehaviour
                 explodableComponent.ReactExplosion(explosionDamage, relevantProjectile.Position, relevantProjectile.Owner, relevantProjectile.CanBreakThings);
             }
         }
+
+        relevantProjectile.Deactivate();
     }
 
 }

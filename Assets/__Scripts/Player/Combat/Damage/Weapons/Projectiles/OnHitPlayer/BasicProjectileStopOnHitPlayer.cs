@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class BasicProjectileStopOnHitPlayer : ProjectileOnHitPlayerBehaviour
 {
-    public override void OnHitPlayer(Projectile relevantprojectile, IShootable _)
+    public override void OnHitPlayer(Projectile relevantProjectile, IShootable _)
     {
-        relevantprojectile.Deactivate();
+        relevantProjectile.Deactivate();
     }
 }
