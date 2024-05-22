@@ -7,8 +7,7 @@ public class BasicProjectilePierceOnHitWall : ProjectileOnHitWallBehaviour
     [SerializeField] protected ushort maxWallAmountToPierce;
     protected ushort wallPierced;
 
-
-    // if several coliders on a singular wall it would count all colliders so keep that in check
+    // if several colliders on a singular wall it would count all colliders so keep that in check
     public override void OnHitWall(Projectile relevantProjectile, Collider __)
     {
         if (wallPierced == maxWallAmountToPierce)
