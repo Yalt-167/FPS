@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Video;
 
-public class BasicProjectileExplodeOnHitWall : ProjectileOnHitWallBehaviour
+public class ProjectileExplodeOnHitWall : ProjectileOnHitWallBehaviour
 {
     [SerializeField] protected float explosionRadius;
     [SerializeField] protected ushort explosionDamage;

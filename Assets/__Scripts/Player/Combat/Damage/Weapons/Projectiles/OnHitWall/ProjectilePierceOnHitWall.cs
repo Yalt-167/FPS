@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BasicProjectilePierceOnHitWall : ProjectileOnHitWallBehaviour
+public class ProjectilePierceOnHitWall : ProjectileOnHitWallBehaviour
 {
     [SerializeField] protected ushort maxWallAmountToPierce;
     protected ushort wallPierced;

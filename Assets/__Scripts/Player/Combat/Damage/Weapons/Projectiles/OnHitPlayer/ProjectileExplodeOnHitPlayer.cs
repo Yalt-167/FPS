@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BasicProjectileExplodeOnHitPlayer : ProjectileOnHitPlayerBehaviour
+public class ProjectileExplodeOnHitPlayer : ProjectileOnHitPlayerBehaviour
 {
     [SerializeField] protected float explosionRadius;
     [SerializeField] protected ushort explosionDamage;

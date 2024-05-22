@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BasicProjectileBounceOnHitWall : ProjectileOnHitWallBehaviour
+public class ProjectileBounceOnHitWall : ProjectileOnHitWallBehaviour
 {
     [SerializeField] protected int maxBounces;
     protected int bounces;
