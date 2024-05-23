@@ -185,8 +185,20 @@ public struct TravelTimeBulletSettings
     public GameObject BulletPrefab;
     public float BulletDrop;
     public float BulletSpeed;
-    public ProjectileOnHitWallBehaviour OnHitWallBehaviour;
-    public ProjectileOnHitPlayerBehaviour OnHitPlayerBehaviour;
+    public ProjectileBehaviourOnHitWall OnHitWallBehaviour;
+    public ProjectileBehaviourOnHitPlayer OnHiPlayerBehaviour;
+}
+
+[Serializable]
+public struct ProjectileBehaviourOnHitWall
+{
+
+}
+
+[Serializable]
+public struct ProjectileBehaviourOnHitPlayer
+{
+
 }
 
 #endregion
@@ -252,6 +264,7 @@ public enum Effects
 }
 
 public interface IEffectProficiency { } // interface for polymorphism on the effect data
+
 // have an override for * (for chargedWaps and influence on the proficiency of the effect)
 
 

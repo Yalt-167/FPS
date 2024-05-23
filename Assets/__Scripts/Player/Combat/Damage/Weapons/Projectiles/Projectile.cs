@@ -19,11 +19,16 @@ public class Projectile : MonoBehaviour
     protected bool canBreakThings;
     protected LayerMask layersToHit;
     protected bool active;
-    [SerializeField] protected ProjectileOnHitWallBehaviour onHitWallBehaviour;
-    [SerializeField] protected ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour;
+    protected ProjectileOnHitWallBehaviour onHitWallBehaviour;
+    protected ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour;
 
-    public virtual void Init(ushort damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, bool canBreakThings_, LayerMask layersToHit_,
-        ProjectileOnHitWallBehaviour onHitWallBehaviour_, ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour_)
+    protected void Awake()
+    {
+        onHitWallBehaviour = GetComponent<ProjectileOnHitWallBehaviour>();
+        onHitPlayerBehaviour = GetComponent<ProjectileOnHitPlayerBehaviour>();
+    }
+
+    public virtual void Init(ushort damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, bool canBreakThings_, LayerMask layersToHit_)
     {
         active = true;
         damage = damage_;
@@ -32,9 +37,6 @@ public class Projectile : MonoBehaviour
         speed = speed_;
         attackerNetworkID = attackerNetworkID_;
         canBreakThings = canBreakThings_;
-
-        onHitPlayerBehaviour = onHitPlayerBehaviour_;
-        onHitWallBehaviour = onHitWallBehaviour_;
 
 
         StartCoroutine(CleanUp());

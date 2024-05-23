@@ -932,9 +932,7 @@ public class WeaponHandler : NetworkBehaviour
             currentWeaponStats.TravelTimeBulletSettings.BulletDrop,
             NetworkObjectId,
             currentWeaponStats.CanBreakThings,
-            layersToHit,
-            currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviour ?? throw new Exception("You didn t specify how the projectile should react upon hitting a wall"),
-            currentWeaponStats.TravelTimeBulletSettings.OnHitPlayerBehaviour ?? throw new Exception("You didn t specify how the projectile should react upon hitting a player")
+            layersToHit
         );
 
         ApplyRecoil();
@@ -961,9 +959,7 @@ public class WeaponHandler : NetworkBehaviour
                 currentWeaponStats.TravelTimeBulletSettings.BulletDrop,
                 NetworkObjectId,
                 currentWeaponStats.CanBreakThings,
-                layersToHit,
-                currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviour ?? throw new Exception("You didn t specify how the projectile should react upon hitting a wall"),
-                currentWeaponStats.TravelTimeBulletSettings.OnHitPlayerBehaviour ?? throw new Exception("You didn t specify how the projectile should react upon hitting a player")
+                layersToHit
             );
             
         }
@@ -991,9 +987,7 @@ public class WeaponHandler : NetworkBehaviour
             currentWeaponStats.TravelTimeBulletSettings.BulletDrop,
             NetworkObjectId,
             currentWeaponStats.CanBreakThings,
-            layersToHit,
-            currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviour ?? throw new Exception("You didn t specify how the projectile should react upon hitting a wall"),
-            currentWeaponStats.TravelTimeBulletSettings.OnHitPlayerBehaviour ?? throw new Exception("You didn t specify how the projectile should react upon hitting a player")
+            layersToHit
         );
         
 
@@ -1023,9 +1017,7 @@ public class WeaponHandler : NetworkBehaviour
                 currentWeaponStats.TravelTimeBulletSettings.BulletDrop,
                 NetworkObjectId,
                 currentWeaponStats.CanBreakThings,
-                layersToHit,
-                currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviour ?? throw new Exception("You didn t specify how the projectile should react upon hitting a wall"),
-                currentWeaponStats.TravelTimeBulletSettings.OnHitPlayerBehaviour ?? throw new Exception("You didn t specify how the projectile should react upon hitting a player")
+                layersToHit
             );
         }
 

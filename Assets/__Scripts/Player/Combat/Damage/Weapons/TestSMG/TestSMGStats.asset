@@ -28,6 +28,10 @@ MonoBehaviour:
       type: 3}
     BulletDrop: 0.05
     BulletSpeed: 2
+    OnHitWallBehaviour: {fileID: 690627354986215328, guid: ecfe2683c53c24342a9e99c2c6dae538,
+      type: 3}
+    OnHitPlayerBehaviour: {fileID: 401333589367754150, guid: 12a4e2547b268254f9680fd3387c912a,
+      type: 3}
   MagazineSize: 24
   NeedReload: 1
   ReloadSpeed: 2
