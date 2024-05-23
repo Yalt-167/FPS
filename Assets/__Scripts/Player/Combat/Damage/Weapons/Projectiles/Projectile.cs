@@ -19,8 +19,8 @@ public class Projectile : MonoBehaviour
     protected bool canBreakThings;
     protected LayerMask layersToHit;
     protected bool active;
-    protected ProjectileOnHitWallBehaviour onHitWallBehaviour;
-    protected ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour;
+    [SerializeField] protected ProjectileOnHitWallBehaviour onHitWallBehaviour;
+    [SerializeField] protected ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour;
 
     public virtual void Init(ushort damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, bool canBreakThings_, LayerMask layersToHit_,
         ProjectileOnHitWallBehaviour onHitWallBehaviour_, ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour_)

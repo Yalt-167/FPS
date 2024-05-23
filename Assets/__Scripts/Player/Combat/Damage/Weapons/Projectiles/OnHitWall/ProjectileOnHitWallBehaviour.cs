@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public abstract class ProjectileOnHitWallBehaviour
+public class ProjectileOnHitWallBehaviour : MonoBehaviour
 {
-    public abstract void OnHitWall(Projectile relevantProjectile, Collider relevantWall);
+    public virtual void OnHitWall(Projectile relevantProjectile, Collider relevantWall) { }
 }
