@@ -28,10 +28,22 @@ MonoBehaviour:
       type: 3}
     BulletDrop: 0.05
     BulletSpeed: 2
-    OnHitWallBehaviour: {fileID: 690627354986215328, guid: ecfe2683c53c24342a9e99c2c6dae538,
-      type: 3}
-    OnHitPlayerBehaviour: {fileID: 2687089819978847733, guid: e8972aa3e0de3f14aac4ea5255e36bd5,
-      type: 3}
+    OnHitWallBehaviour: 2
+    OnHitWallBehaviourParams:
+      ProjectileWallPierceParams:
+        MaxWallsToPierce: 0
+      ProjectileWallBounceParams:
+        MaxBounces: 2
+      ProjectileWallExplodeParams:
+        ExplosionRadius: 0
+        ExplosionDamage: 0
+    OnHitPlayerBehaviour: 0
+    OnHitPlayerBehaviourParams:
+      ProjectilePlayerPierceParams:
+        MaxPlayersToPierce: 0
+      ProjectilePlayerExplodeParams:
+        ExplosionRadius: 0
+        ExplosionDamage: 0
   MagazineSize: 45
   NeedReload: 1
   ReloadSpeed: 2

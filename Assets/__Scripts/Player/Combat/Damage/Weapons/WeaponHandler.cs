@@ -932,7 +932,9 @@ public class WeaponHandler : NetworkBehaviour
             currentWeaponStats.TravelTimeBulletSettings.BulletDrop,
             NetworkObjectId,
             currentWeaponStats.CanBreakThings,
-            layersToHit
+            layersToHit,
+            GetRelevantHitWallBehaviour(),
+            GetRelevantHitPlayerBehaviour()
         );
 
         ApplyRecoil();
@@ -959,7 +961,9 @@ public class WeaponHandler : NetworkBehaviour
                 currentWeaponStats.TravelTimeBulletSettings.BulletDrop,
                 NetworkObjectId,
                 currentWeaponStats.CanBreakThings,
-                layersToHit
+                layersToHit,
+                GetRelevantHitWallBehaviour(),
+                GetRelevantHitPlayerBehaviour()
             );
             
         }
@@ -987,7 +991,9 @@ public class WeaponHandler : NetworkBehaviour
             currentWeaponStats.TravelTimeBulletSettings.BulletDrop,
             NetworkObjectId,
             currentWeaponStats.CanBreakThings,
-            layersToHit
+            layersToHit,
+            GetRelevantHitWallBehaviour(),
+            GetRelevantHitPlayerBehaviour()
         );
         
 
@@ -1017,7 +1023,9 @@ public class WeaponHandler : NetworkBehaviour
                 currentWeaponStats.TravelTimeBulletSettings.BulletDrop,
                 NetworkObjectId,
                 currentWeaponStats.CanBreakThings,
-                layersToHit
+                layersToHit,
+                GetRelevantHitWallBehaviour(),
+                GetRelevantHitPlayerBehaviour()
             );
         }
 
@@ -1109,28 +1117,28 @@ public class WeaponHandler : NetworkBehaviour
 
     #endregion
 
-    #region Travel Time  Hit Effects
+    #region Travel Time Hit Effects
 
-    private IProjectileBehaviourOnHitWallParam GetRelevantHitWallBehaviourParam()
+    private ProjectileOnHitWallBehaviour GetRelevantHitWallBehaviour()
     {
         return currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviour switch
         {
-            ProjectileBehaviourOnHitWall.Stop => null,
-            ProjectileBehaviourOnHitWall.Pierce => currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallPierceParams,
-            ProjectileBehaviourOnHitWall.Bounce => currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallBounceParams,
-            ProjectileBehaviourOnHitWall.Explode => currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallExplodeParams,
+            ProjectileBehaviourOnHitWall.Stop => new ProjectileStopOnHitWall(null),
+            ProjectileBehaviourOnHitWall.Pierce => new ProjectilePierceOnHitWall(currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallPierceParams),
+            ProjectileBehaviourOnHitWall.Bounce => new ProjectileBounceOnHitWall(currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallBounceParams),
+            ProjectileBehaviourOnHitWall.Explode => new ProjectileExplodeOnHitWall(currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallExplodeParams),
             _ => throw new NotImplementedException(),
         };
     }
 
 
-    private IProjectileBehaviourOnHitPlayerParam GetRelevantHitPlayerBehaviourParam()
+    private ProjectileOnHitPlayerBehaviour GetRelevantHitPlayerBehaviour()
     {
         return currentWeaponStats.TravelTimeBulletSettings.OnHitPlayerBehaviour switch
         {
-            ProjectileBehaviourOnHitPlayer.Stop => null,
-            ProjectileBehaviourOnHitPlayer.Pierce => currentWeaponStats.TravelTimeBulletSettings.OnHitPlayerBehaviourParams.ProjectilePlayerPierceParams,
-            ProjectileBehaviourOnHitPlayer.Explode => currentWeaponStats.TravelTimeBulletSettings.OnHitPlayerBehaviourParams.ProjectilePlayerExplodeParams,
+            ProjectileBehaviourOnHitPlayer.Stop => new ProjectileStopOnHitPlayer(null),
+            ProjectileBehaviourOnHitPlayer.Pierce => new ProjectilePierceOnHitPlayer(currentWeaponStats.TravelTimeBulletSettings.OnHitPlayerBehaviourParams.ProjectilePlayerPierceParams),
+            ProjectileBehaviourOnHitPlayer.Explode => new ProjectileExplodeOnHitPlayer(currentWeaponStats.TravelTimeBulletSettings.OnHitPlayerBehaviourParams.ProjectilePlayerExplodeParams),
             _ => throw new NotImplementedException(),
         };
     }

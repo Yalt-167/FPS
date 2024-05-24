@@ -9,7 +9,7 @@ public class ProjectileExplodeOnHitPlayer : ProjectileOnHitPlayerBehaviour
     [SerializeField] protected float explosionRadius;
     [SerializeField] protected ushort explosionDamage;
 
-    public override void Init(IProjectileBehaviourOnHitPlayerParam param_)
+    public ProjectileExplodeOnHitPlayer(IProjectileBehaviourOnHitPlayerParam param_)
     {
         var param = (ProjectilePlayerExplodeParams)param_;
 

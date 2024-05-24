@@ -9,7 +9,7 @@ public class ProjectilePierceOnHitPlayer : ProjectileOnHitPlayerBehaviour
     protected ushort maxPlayerPierceAmount;
     protected ushort currentPiercedPlayerCount;
 
-    public override void Init(IProjectileBehaviourOnHitPlayerParam param_)
+    public ProjectilePierceOnHitPlayer(IProjectileBehaviourOnHitPlayerParam param_)
     {
         var param = (ProjectilePlayerPierceParams)param_;
 

@@ -9,7 +9,7 @@ public class ProjectileExplodeOnHitWall : ProjectileOnHitWallBehaviour
     protected float explosionRadius;
     protected ushort explosionDamage;
 
-    public override void Init(IProjectileBehaviourOnHitWallParam param_)
+    public ProjectileExplodeOnHitWall(IProjectileBehaviourOnHitWallParam param_)
     {
         var param = (ProjectileWallExplodeParams)param_;
 

@@ -22,13 +22,11 @@ public class Projectile : MonoBehaviour
     protected ProjectileOnHitWallBehaviour onHitWallBehaviour;
     protected ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour;
 
-    protected void Awake()
-    {
-        onHitWallBehaviour = GetComponent<ProjectileOnHitWallBehaviour>();
-        onHitPlayerBehaviour = GetComponent<ProjectileOnHitPlayerBehaviour>();
-    }
-
-    public virtual void Init(ushort damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, bool canBreakThings_, LayerMask layersToHit_)
+    public virtual void Init(
+        ushort damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, bool canBreakThings_, LayerMask layersToHit_,
+        ProjectileOnHitWallBehaviour onHitWallBehaviour_,
+        ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour_
+        )
     {
         active = true;
         damage = damage_;
@@ -38,6 +36,8 @@ public class Projectile : MonoBehaviour
         attackerNetworkID = attackerNetworkID_;
         canBreakThings = canBreakThings_;
 
+        onHitWallBehaviour = onHitWallBehaviour_;
+        onHitPlayerBehaviour = onHitPlayerBehaviour_;
 
         StartCoroutine(CleanUp());
     }

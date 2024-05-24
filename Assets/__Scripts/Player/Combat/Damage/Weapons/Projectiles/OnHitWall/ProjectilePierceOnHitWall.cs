@@ -9,7 +9,7 @@ public class ProjectilePierceOnHitWall : ProjectileOnHitWallBehaviour
     protected ushort maxWallAmountToPierce;
     protected ushort wallPierced;
 
-    public override void Init(IProjectileBehaviourOnHitWallParam param_)
+    public ProjectilePierceOnHitWall(IProjectileBehaviourOnHitWallParam param_)
     {
         var param = (ProjectileWallPierceParams)param_;
 

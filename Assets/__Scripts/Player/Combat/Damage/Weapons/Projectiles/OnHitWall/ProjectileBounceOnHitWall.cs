@@ -9,7 +9,7 @@ public class ProjectileBounceOnHitWall : ProjectileOnHitWallBehaviour
     protected int maxBounces;
     protected int bounces;
 
-    public override void Init(IProjectileBehaviourOnHitWallParam param_)
+    public ProjectileBounceOnHitWall(IProjectileBehaviourOnHitWallParam param_)
     {
         var param = (ProjectileWallBounceParams)param_;
 
