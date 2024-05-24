@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Damage: 15
   WeaponClass: 0
-  IsHitscan: 1
+  IsHitscan: 0
   HitscanBulletSettings:
     PierceThroughPlayers: 0
     ActionOnHitWall: 3
@@ -33,7 +33,7 @@ MonoBehaviour:
       ProjectileWallPierceParams:
         MaxWallsToPierce: 0
       ProjectileWallBounceParams:
-        MaxBounces: 2
+        MaxBounces: 1
       ProjectileWallExplodeParams:
         ExplosionRadius: 0
         ExplosionDamage: 0

@@ -24,7 +24,7 @@ MonoBehaviour:
       ExplosionRadius: 0
       ExplosionDamage: 0
   TravelTimeBulletSettings:
-    BulletPrefab: {fileID: 1044930296373891420, guid: 3c00fe0ea4a85d34286e5279bb5748a2,
+    BulletPrefab: {fileID: 1044930296373891420, guid: a8a6eb59afd9c154c9b3d707a0f672a8,
       type: 3}
     BulletDrop: 0
     BulletSpeed: 1
