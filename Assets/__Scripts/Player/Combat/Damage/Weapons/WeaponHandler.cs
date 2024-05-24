@@ -1,12 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.Burst.CompilerServices;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEngine.Video;
 using Random = UnityEngine.Random;
 
 public class WeaponHandler : NetworkBehaviour
@@ -924,8 +920,13 @@ public class WeaponHandler : NetworkBehaviour
             currentWeaponStats.TravelTimeBulletSettings.BulletPrefab,
             barrelEnd.position,
             Quaternion.LookRotation(GetDirectionWithSpread(currentSpreadAngle, barrelEnd))
-            ).GetComponent<Projectile>() ?? throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it");
-        
+            ).GetComponent<Projectile>();
+            
+        if (projectile == null)
+        {
+            throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it");
+        }
+
         projectile.Init(
             currentWeaponStats.Damage,
             currentWeaponStats.TravelTimeBulletSettings.BulletSpeed,
@@ -953,7 +954,12 @@ public class WeaponHandler : NetworkBehaviour
                 currentWeaponStats.TravelTimeBulletSettings.BulletPrefab,
                 barrelEnd.position,
                 Quaternion.LookRotation(shotgunPelletsDirections[i])
-            ).GetComponent<Projectile>() ?? throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it");
+            ).GetComponent<Projectile>();
+
+            if (projectile == null)
+            {
+                throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it");
+            }
 
             projectile.Init(
                 currentWeaponStats.ShotgunStats.PelletsDamage,
@@ -983,7 +989,12 @@ public class WeaponHandler : NetworkBehaviour
             currentWeaponStats.TravelTimeBulletSettings.BulletPrefab,
             barrelEnd.position,
             Quaternion.LookRotation(GetDirectionWithSpread(currentSpreadAngle, barrelEnd))
-        ).GetComponent<Projectile>() ?? throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it");
+        ).GetComponent<Projectile>();
+
+        if (projectile == null)
+        {
+            throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it");
+        }
 
         projectile.Init(
             (ushort)(currentWeaponStats.Damage * chargeRatio),
@@ -1015,7 +1026,12 @@ public class WeaponHandler : NetworkBehaviour
                 currentWeaponStats.TravelTimeBulletSettings.BulletPrefab,
                 barrelEnd.position,
                 Quaternion.LookRotation(shotgunPelletsDirections[i])
-            ).GetComponent<Projectile>() ?? throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it");
+            ).GetComponent<Projectile>();
+
+            if (projectile == null)
+            {
+                throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it");
+            }
 
             projectile.Init(
                 (ushort)(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio),
