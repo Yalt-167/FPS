@@ -6,8 +6,15 @@ using UnityEngine;
 [Serializable]
 public class ProjectileBounceOnHitWall : ProjectileOnHitWallBehaviour
 {
-    [SerializeField] protected int maxBounces;
+    protected int maxBounces;
     protected int bounces;
+
+    public override void Init(IProjectileBehaviourOnHitWallParam param_)
+    {
+        var param = (ProjectileWallBounceParams)param_;
+
+        maxBounces = param.MaxBounces;
+    }
 
     public override void OnHitWall(Projectile relevantProjectile, Collider relevantWall)
     {

@@ -6,8 +6,15 @@ using UnityEngine;
 [Serializable]
 public class ProjectilePierceOnHitPlayer : ProjectileOnHitPlayerBehaviour
 {
-    [SerializeField] protected ushort maxPlayerPierceAmount;
+    protected ushort maxPlayerPierceAmount;
     protected ushort currentPiercedPlayerCount;
+
+    public override void Init(IProjectileBehaviourOnHitPlayerParam param_)
+    {
+        var param = (ProjectilePlayerPierceParams)param_;
+
+        maxPlayerPierceAmount = param.MaxPlayersToPierce;
+    }
 
     public override void OnHitPlayer(Projectile relevantProjectile, IShootable relevantPlayer)
     {

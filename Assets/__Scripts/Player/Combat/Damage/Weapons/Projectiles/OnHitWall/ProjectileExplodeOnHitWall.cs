@@ -6,8 +6,16 @@ using UnityEngine;
 [Serializable]
 public class ProjectileExplodeOnHitWall : ProjectileOnHitWallBehaviour
 {
-    [SerializeField] protected float explosionRadius;
-    [SerializeField] protected ushort explosionDamage;
+    protected float explosionRadius;
+    protected ushort explosionDamage;
+
+    public override void Init(IProjectileBehaviourOnHitWallParam param_)
+    {
+        var param = (ProjectileWallExplodeParams)param_;
+
+        explosionRadius = param.ExplosionRadius;
+        explosionDamage = param.ExplosionDamage;
+    }
 
     public override void OnHitWall(Projectile relevantProjectile, Collider relevantWall)
     {
@@ -22,5 +30,4 @@ public class ProjectileExplodeOnHitWall : ProjectileOnHitWallBehaviour
 
         relevantProjectile.Deactivate();
     }
-
 }

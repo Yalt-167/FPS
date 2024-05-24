@@ -6,8 +6,15 @@ using UnityEngine;
 [Serializable]
 public class ProjectilePierceOnHitWall : ProjectileOnHitWallBehaviour
 {
-    [SerializeField] protected ushort maxWallAmountToPierce;
+    protected ushort maxWallAmountToPierce;
     protected ushort wallPierced;
+
+    public override void Init(IProjectileBehaviourOnHitWallParam param_)
+    {
+        var param = (ProjectileWallPierceParams)param_;
+
+        maxWallAmountToPierce = param.MaxWallsToPierce;
+    }
 
     // if several colliders on a singular wall it would count all colliders so keep that in check
     public override void OnHitWall(Projectile relevantProjectile, Collider __)

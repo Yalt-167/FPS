@@ -9,6 +9,14 @@ public class ProjectileExplodeOnHitPlayer : ProjectileOnHitPlayerBehaviour
     [SerializeField] protected float explosionRadius;
     [SerializeField] protected ushort explosionDamage;
 
+    public override void Init(IProjectileBehaviourOnHitPlayerParam param_)
+    {
+        var param = (ProjectilePlayerExplodeParams)param_;
+
+        explosionDamage = param.ExplosionDamage;
+        explosionRadius = param.ExplosionRadius;
+    }
+
     public override void OnHitPlayer(Projectile relevantProjectile, IShootable relevantPlayer)
     {
         var hits = Physics.OverlapSphere(relevantProjectile.Position, explosionRadius, Layers.PlayerHitBoxes, QueryTriggerInteraction.Ignore);
