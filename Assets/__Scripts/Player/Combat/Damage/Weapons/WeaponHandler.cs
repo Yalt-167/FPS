@@ -1109,6 +1109,34 @@ public class WeaponHandler : NetworkBehaviour
 
     #endregion
 
+    #region Travel Time  Hit Effects
+
+    private IProjectileBehaviourOnHitWallParam GetRelevantHitWallBehaviourParam()
+    {
+        return currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviour switch
+        {
+            ProjectileBehaviourOnHitWall.Stop => null,
+            ProjectileBehaviourOnHitWall.Pierce => currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallPierceParams,
+            ProjectileBehaviourOnHitWall.Bounce => currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallBounceParams,
+            ProjectileBehaviourOnHitWall.Explode => currentWeaponStats.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallExplodeParams,
+            _ => throw new NotImplementedException(),
+        };
+    }
+
+
+    private IProjectileBehaviourOnHitPlayerParam GetRelevantHitPlayerBehaviourParam()
+    {
+        return currentWeaponStats.TravelTimeBulletSettings.OnHitPlayerBehaviour switch
+        {
+            ProjectileBehaviourOnHitPlayer.Stop => null,
+            ProjectileBehaviourOnHitPlayer.Pierce => currentWeaponStats.TravelTimeBulletSettings.OnHitPlayerBehaviourParams.ProjectilePlayerPierceParams,
+            ProjectileBehaviourOnHitPlayer.Explode => currentWeaponStats.TravelTimeBulletSettings.OnHitPlayerBehaviourParams.ProjectilePlayerExplodeParams,
+            _ => throw new NotImplementedException(),
+        };
+    }
+
+    #endregion
+
     private void SetShotgunPelletsDirections(Transform directionTranform)
     {
         shotgunPelletsDirections = new Vector3[currentWeaponStats.ShotgunStats.PelletsCount];
@@ -1286,7 +1314,6 @@ public class WeaponHandler : NetworkBehaviour
     }
 
     #endregion
-
 
     #region Handle Kickback
 

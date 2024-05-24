@@ -187,8 +187,8 @@ public struct TravelTimeBulletSettings
     public float BulletSpeed;
     public ProjectileBehaviourOnHitWall OnHitWallBehaviour;
     public ProjectileBehaviourOnHitWallParams OnHitWallBehaviourParams;
-    public ProjectileBehaviourOnHitPlayer OnHiPlayerBehaviour;
-    public ProjectileBehaviourOnHitPlayerParams OnHiPlayerBehaviourParams;
+    public ProjectileBehaviourOnHitPlayer OnHitPlayerBehaviour;
+    public ProjectileBehaviourOnHitPlayerParams OnHitPlayerBehaviourParams;
 }
 
 # region On Hit Wall Behaviour
