@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+// add tooltips to make the things clearer
 [CreateAssetMenu(fileName = "WeaponStats", menuName = "ScriptableObjects/WeaponStats")]
 public class WeaponStats : ScriptableObject
 {
@@ -186,20 +186,85 @@ public struct TravelTimeBulletSettings
     public float BulletDrop;
     public float BulletSpeed;
     public ProjectileBehaviourOnHitWall OnHitWallBehaviour;
+    public ProjectileBehaviourOnHitWallParams OnHitWallBehaviourParams;
     public ProjectileBehaviourOnHitPlayer OnHiPlayerBehaviour;
+    public ProjectileBehaviourOnHitPlayerParams OnHiPlayerBehaviourParams;
+}
+
+# region On Hit Wall Behaviour
+
+public enum ProjectileBehaviourOnHitWall : byte
+{
+    Stop,
+    Pierce,
+    Bounce,
+    Explode,
 }
 
 [Serializable]
-public struct ProjectileBehaviourOnHitWall
+public struct ProjectileBehaviourOnHitWallParams // main structs that groups all the small param structs
 {
+    public ProjectileWallPierceParams ProjectileWallPierceParams;
+    public ProjectileWallBounceParams ProjectileWallBounceParams;
+    public ProjectileWallExplodeParams ProjectileWallExplodeParams;
+}
 
+public interface IProjectileBehaviourOnHitWallParam { } // type for delegate
+
+[Serializable]
+public struct ProjectileWallPierceParams : IProjectileBehaviourOnHitWallParam
+{
+    public ushort MaxWallsToPierce;
 }
 
 [Serializable]
-public struct ProjectileBehaviourOnHitPlayer
+public struct ProjectileWallBounceParams : IProjectileBehaviourOnHitWallParam
 {
-
+    public ushort MaxBounces;
 }
+
+[Serializable]
+public struct ProjectileWallExplodeParams : IProjectileBehaviourOnHitWallParam
+{
+    public ushort ExplosionRadius;
+    public ushort ExplosionDamage;
+}
+
+# endregion
+
+#region On Hit Player Behviour
+
+public enum ProjectileBehaviourOnHitPlayer : byte
+{
+    Stop,
+    Pierce,
+    Explode,
+}
+
+[Serializable]
+public struct ProjectileBehaviourOnHitPlayerParams
+{
+    public ProjectilePlayerPierceParams ProjectilePlayerPierceParams;
+    public ProjectilePlayerExplodeParams ProjectilePlayerExplodeParams;
+}
+
+public interface IProjectileBehaviourOnHitPlayerParam { } // type for delegate
+
+[Serializable]
+public struct ProjectilePlayerPierceParams : IProjectileBehaviourOnHitPlayerParam
+{
+    public ushort MaxPlayersToPierce;
+}
+
+[Serializable]
+public struct ProjectilePlayerExplodeParams : IProjectileBehaviourOnHitPlayerParam
+{
+    public ushort ExplosionRadius;
+    public ushort ExplosionDamage;
+}
+
+#endregion
+
 
 #endregion
 
