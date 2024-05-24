@@ -7,7 +7,11 @@ using UnityEngine;
 public class Weapon : ScriptableObject
 {
     public WeaponStats Stats;
+
+    [Space(12)]
     public Mesh Model;
+
+    [Space(12)]
     public WeaponSounds Sounds;
 }
 

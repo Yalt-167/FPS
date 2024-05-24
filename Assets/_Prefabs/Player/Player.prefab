@@ -345,7 +345,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 870966366
+  GlobalObjectIdHash: 3013796309
   InScenePlacedSourceGlobalObjectIdHash: 870966366
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -753,7 +753,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70e386591dc753842807b0c94cf01a7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentWeapon: {fileID: 11400000, guid: 90f707e4cf53dbe47953c5e2143b150a, type: 2}
+  currentWeapon: {fileID: 11400000, guid: 04d6e4d4b098bf34a81282a3674c4d48, type: 2}
   barrelEnd: {fileID: 1591060445127322865}
   weaponTransform: {fileID: 6045898168804568672}
   layersToHit:

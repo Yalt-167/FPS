@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 // add tooltips to make the things clearer
-[CreateAssetMenu(fileName = "WeaponStats", menuName = "ScriptableObjects/WeaponStats")]
-public class WeaponStats : ScriptableObject
+
+[Serializable]
+public struct WeaponStats
 {
     public ushort Damage;
     public WeaponClass WeaponClass;
