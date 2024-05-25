@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-// add tooltips to make the things clearer
 
 [Serializable]
 public struct WeaponStats
@@ -341,7 +340,7 @@ public interface IEffectProficiency { } // interface for polymorphism on the eff
 #endregion
 
 // some InfernoDragon Style weapons
-// for weapons that can do several things according to sth simply do some shenangans to switch the weaponStats
+// for weapons that can do several things according to sth simply do some shenanigans to switch the weaponStats
 
 // add a second healthbar beneath the actual one for a lerping one that slowly goes toward your health
 //just for aesthetic

@@ -139,4 +139,19 @@ public class PlayerHealth : NetworkBehaviour
             _ => throw new NotImplementedException(),
         };
     }
+
+    [Rpc(SendTo.Server)]
+    private void RequestRespawnServerRpc()
+    {
+        RespawnClientRpc();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void RespawnClientRpc()
+    {
+        transform.position = new Vector3(0, 100, 0);
+    }
+
+
+
 }

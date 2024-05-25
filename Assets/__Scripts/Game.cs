@@ -30,6 +30,7 @@ public class Game : MonoBehaviour
 
         networkedWeaponHandlers.Add(networkedWeaponHandler);
     }
+
     public WeaponHandler GetNetworkedWeaponHandlerFromNetworkObjectID(ulong playerObjectID) // ? make it so they are sorted ? -> slower upon adding it but faster to select it still
     {
         var size = networkedWeaponHandlers.Count;
@@ -54,6 +55,7 @@ public class Game : MonoBehaviour
 
 
     #endregion
+
 
 
     [field: SerializeField] public Settings GameSettings { get; private set; }

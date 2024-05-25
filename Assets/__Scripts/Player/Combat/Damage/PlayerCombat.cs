@@ -6,8 +6,6 @@ using UnityEngine;
 [DefaultExecutionOrder(-6)]
 public class PlayerCombat : MonoBehaviour
 {
-    private Transform cameraTransform;
-
     [SerializeField] private int allowedWeaponsCount = 3;
     [SerializeField] private CombatInputQuery inputQuery;
     [SerializeField] private Weapon[] weapons;
@@ -45,7 +43,7 @@ public class PlayerCombat : MonoBehaviour
 
     private void Awake()
     {
-        cameraTransform = transform.GetChild(0).GetChild(0);
+        //cameraTransform = transform.GetChild(0).GetChild(0);
         weaponHandler = GetComponent<WeaponHandler>();
         inputQuery.Init();
         UpdateWeapon();

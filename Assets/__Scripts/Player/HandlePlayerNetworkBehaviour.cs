@@ -17,7 +17,7 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
 
     #region Networking & Tears
 
-    public override void OnNetworkSpawn() // also fix spawn in ground
+    public override void OnNetworkSpawn()
     {
         transform.position = new(transform.position.x, 2, transform.position.z);
 
@@ -34,6 +34,12 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
         }
 
         Game.Manager.AddNetworkedWeaponHandler(GetComponent<WeaponHandler>());
+    }
+
+
+    public override void OnNetworkDespawn()
+    {
+        Game.Manager.DiscardNetworkedWeaponHandler(GetComponent<WeaponHandler>());
     }
 
     #endregion
