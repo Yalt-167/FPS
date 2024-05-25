@@ -61,6 +61,9 @@ public struct WeaponStats
 
     public bool CanBreakThings;
     public Effects EffectsInflicted;
+
+    [Header("Mobility")]
+    [Tooltip("Will define how fast teh player can move and how high he can jump")]public float Weight;
 }
 
 #region Shooting Style
