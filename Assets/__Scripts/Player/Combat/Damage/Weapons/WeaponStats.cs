@@ -7,43 +7,43 @@ using UnityEngine;
 [Serializable]
 public struct WeaponStats
 {
-    public ushort Damage;
+    [Tooltip("The damage dealt by the shot (Will be overriden by PelletDamage) if the weapon is a shotgun")] public ushort Damage;
     public WeaponClass WeaponClass;
 
     [Header("Bullet Travel Settings")]
     public bool IsHitscan;
-    public HitscanBulletSettings HitscanBulletSettings;
-    public TravelTimeBulletSettings TravelTimeBulletSettings;
+    [Tooltip("Define how the bullet should act (Only considered is the IsHitscan param above is true)")] public HitscanBulletSettings HitscanBulletSettings;
+    [Tooltip("Define how the bullet should act (Only considered is the IsHitscan param above is false)")] public TravelTimeBulletSettings TravelTimeBulletSettings;
 
 
     [Header("Magazine")]
     public ushort MagazineSize;
     public bool NeedReload;
-    public float ReloadSpeed; 
-    public float TimeToReloadOneRound; // some that can reload one per one -> only consider when non-zero
+    public float ReloadSpeed;
+    [Tooltip("If the weapon can reload one round by one round else leave it at 0")] public float TimeToReloadOneRound; // some that can reload one per one -> only consider when non-zero
     public ushort AmmoLeftInMagazineToWarn;
 
     [Header("Shooting Style")]
-    public ShootingStyle ShootingStyle;
+    [Tooltip("Wether it shoots simples shots of shotgun shots")] public ShootingStyle ShootingStyle;
     [Space(8)]
-    public SimpleShotStats SimpleShotStats;
-    public SimpleShotStats AimingSimpleShotStats;
+    [Tooltip("Stats of the simple shots (Only considered when the ShootingStyle selected is Simple)")] public SimpleShotStats SimpleShotStats;
+    [Tooltip("Stats of the simple shots (Only considered when the ShootingStyle selected is Simple)")] public SimpleShotStats AimingSimpleShotStats;
     
     [Space(4)]
-    public ShotgunStats ShotgunStats;
+    [Tooltip("Stats of the shotgun shots (Only considered when the ShootingStyle selected is Shotgun)")] public ShotgunStats ShotgunStats;
    
 
     [Header("Shooting Rythm")]
     public ShootingRythm ShootingRythm;
     public float CooldownBetweenShots;
     [Space(8)]
-    public BurstStats BurstStats;
+    [Tooltip("Only considered when the ShootingRythm selected is Burst")] public BurstStats BurstStats;
 
     [Space(4)]
-    public RampUpStats RampUpStats;
+    [Tooltip("Only considered when the ShootingRythm selected is RampUp")] public RampUpStats RampUpStats;
 
     [Space(4)]
-    public ChargeStats ChargeStats;
+    [Tooltip("Only considered when the ShootingRythm selected is Charge")] public ChargeStats ChargeStats;
 
 
     [Header("ADS and Scopes")]
@@ -303,9 +303,9 @@ public struct KickbackStats
 [Serializable]
 public struct RecoilStats
 {
-    [Tooltip("Upward recoil")] public float RecoilForceX;
+    [Tooltip("Upward recoil (Muzzle Climb)")] public float RecoilForceX;
     [Tooltip("Sideway recoil")] public float RecoilForceY;
-    [Tooltip("Camera rotation on side (somewhat screen shake)")] public float RecoilForceZ;
+    [Tooltip("Camera rotation on side (somewhat screen shake) (Should stay really low)")] public float RecoilForceZ;
     public float RecoilRegulationSpeed;
 }
 
