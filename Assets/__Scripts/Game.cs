@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 [DefaultExecutionOrder(-10)]
 public class Game : MonoBehaviour
@@ -56,7 +57,51 @@ public class Game : MonoBehaviour
 
     #endregion
 
+    #region Respawn Logic
 
+    private Dictionary<ushort, List<SpawnPoint>> spawnPoints = new Dictionary<ushort, List<SpawnPoint>>();
+
+
+    public void AddRespawnPoint(SpawnPoint spawnPoint)
+    {
+        if (!spawnPoints.ContainsKey(spawnPoint.TeamID))
+        {
+            spawnPoints.Add(spawnPoint.TeamID, new());
+        }
+
+        spawnPoints[spawnPoint.TeamID].Add(spawnPoint);
+    }
+
+
+    public void DiscardRespawnPoint(SpawnPoint spawnPoint)
+    {
+        spawnPoints[spawnPoint.TeamID].Remove(spawnPoint);
+    }
+
+    [Obsolete]
+    public Vector3 GetSpawnPosition(ushort teamID)
+    {
+        var relevantSpawnPoints = spawnPoints[teamID];
+        var relevantSpawnPointsCount = relevantSpawnPoints.Count;
+
+        // filtering the active ones
+        var activeRelevantSpawnPoints = new List<SpawnPoint>();
+        var activeRelevantSpawnPointsIndex = 0;
+        for (int i = 0; i < relevantSpawnPointsCount; i++)
+        {
+            if (relevantSpawnPoints[i].Active)
+            {
+                activeRelevantSpawnPoints[activeRelevantSpawnPointsIndex++] = relevantSpawnPoints[i];
+            }
+        }
+
+        var activeRelevantSpawnPointsCount = activeRelevantSpawnPoints.Count;
+        if (activeRelevantSpawnPointsCount == 0) { throw new Exception($"There s no checkpoint available for this player with team ID: {teamID}"); }
+
+        return activeRelevantSpawnPoints[Random.Range(0, activeRelevantSpawnPointsCount - 1)].SpawnPosition;
+    }
+
+    #endregion
 
     [field: SerializeField] public Settings GameSettings { get; private set; }
 
