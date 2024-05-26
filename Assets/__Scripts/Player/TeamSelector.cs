@@ -28,7 +28,7 @@ public class TeamSelector : MonoBehaviour
     private void OnTeamSelected(ushort teamID)
     {
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        Cursor.visible = false; // those two may cause issues when destroying the script on remote players
         GetComponent<PlayerHealthNetworked>().RequestSetTeamServerRpc(teamID);
         Destroy(this);
     }
