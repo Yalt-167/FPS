@@ -80,22 +80,24 @@ public class Game : MonoBehaviour
 
     public Vector3 GetSpawnPosition(ushort teamID)
     {
+        print(0);
         var relevantSpawnPoints = spawnPoints[teamID];
         var relevantSpawnPointsCount = relevantSpawnPoints.Count;
+        print(1);
 
         // filtering the active ones
         var activeRelevantSpawnPoints = new List<SpawnPoint>();
-        var activeRelevantSpawnPointsIndex = 0;
         for (int i = 0; i < relevantSpawnPointsCount; i++)
         {
             if (relevantSpawnPoints[i].Active)
             {
-                activeRelevantSpawnPoints[activeRelevantSpawnPointsIndex++] = relevantSpawnPoints[i];
+                activeRelevantSpawnPoints.Add(relevantSpawnPoints[i]);
             }
         }
-
+        print(2);
         var activeRelevantSpawnPointsCount = activeRelevantSpawnPoints.Count;
         if (activeRelevantSpawnPointsCount == 0) { throw new Exception($"There s no checkpoint available for this player with team ID: {teamID}"); }
+        print(3);
 
         return activeRelevantSpawnPoints[Random.Range(0, activeRelevantSpawnPointsCount - 1)].SpawnPosition;
     }
