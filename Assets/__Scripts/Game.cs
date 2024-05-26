@@ -78,7 +78,6 @@ public class Game : MonoBehaviour
         spawnPoints[spawnPoint.TeamID].Remove(spawnPoint);
     }
 
-    [Obsolete]
     public Vector3 GetSpawnPosition(ushort teamID)
     {
         var relevantSpawnPoints = spawnPoints[teamID];

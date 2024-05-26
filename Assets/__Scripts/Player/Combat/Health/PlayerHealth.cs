@@ -20,6 +20,8 @@ public class PlayerHealth : NetworkBehaviour
     
     private bool Alive => CurrentHealth > 0;
 
+    private ushort teamID = 0;
+
     private void Awake()
     {
         ResetHealth();
@@ -56,10 +58,9 @@ public class PlayerHealth : NetworkBehaviour
 
     private void Update()
     {
-        if (!Alive)
+        if (!Alive || Input.GetKeyDown(KeyCode.C))
         {
-            ResetHealth();
-            transform.position = Vector3.up * 100;
+            RequestRespawnServerRpc();
             return;
         }
     }
@@ -131,13 +132,21 @@ public class PlayerHealth : NetworkBehaviour
 
     private TargetType MapBodyPartToTargetType(BodyParts bodyPart, bool hadShield)
     {
-        return bodyPart switch
+        //return bodyPart switch
+        //{
+        //    BodyParts.HEAD => hadShield ? TargetType.HEAD_SHIELDED : TargetType.HEAD,
+        //    BodyParts.BODY => hadShield ? TargetType.BODY_SHIELDED : TargetType.BODY,
+        //    BodyParts.LEGS => hadShield ? TargetType.LEGS_SHIELDED : TargetType.LEGS,
+        //    _ => throw new NotImplementedException(),
+        //};
+
+        return (TargetType)(bodyPart switch
         {
-            BodyParts.HEAD => hadShield ? TargetType.HEAD_SHIELDED : TargetType.HEAD,
-            BodyParts.BODY => hadShield ? TargetType.BODY_SHIELDED : TargetType.BODY,
-            BodyParts.LEGS => hadShield ? TargetType.LEGS_SHIELDED : TargetType.LEGS,
+            BodyParts.HEAD =>  (int)TargetType.HEAD,
+            BodyParts.BODY => (int)TargetType.BODY,
+            BodyParts.LEGS => (int)TargetType.LEGS,
             _ => throw new NotImplementedException(),
-        };
+        } - (hadShield ? 3 : 0));
     }
 
     [Rpc(SendTo.Server)]
@@ -149,9 +158,7 @@ public class PlayerHealth : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void RespawnClientRpc()
     {
-        transform.position = new Vector3(0, 100, 0);
+        ResetHealth();
+        transform.position = Game.Manager.GetSpawnPosition(teamID);
     }
-
-
-
 }
