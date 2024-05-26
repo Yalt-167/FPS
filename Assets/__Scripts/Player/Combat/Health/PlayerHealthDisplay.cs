@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class PlayerHealthDisplay : MonoBehaviour
 {
-    private PlayerHealth playerHealth;
+    private PlayerHealthNetworked playerHealth;
     private Slider healthSlider;
     private Slider[] shieldCellsSliders;
     private PlayerHealthData HealthData => playerHealth.HealthData;
@@ -23,7 +23,7 @@ public class PlayerHealthDisplay : MonoBehaviour
 
     private void Awake()
     {
-        playerHealth = GetComponent<PlayerHealth>();
+        playerHealth = GetComponent<PlayerHealthNetworked>();
         healthSlider = transform.GetChild(4).GetChild(0).GetComponent<Slider>();
         SetupHealthBar();
     }

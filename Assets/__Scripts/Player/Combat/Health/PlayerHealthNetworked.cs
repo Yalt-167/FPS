@@ -7,7 +7,7 @@ using UnityEditor;
 using Unity.VisualScripting;
 
 [DefaultExecutionOrder(-4)]
-public class PlayerHealth : NetworkBehaviour
+public class PlayerHealthNetworked : NetworkBehaviour
 {
     [field: SerializeField] public PlayerHealthData HealthData { get; private set; }
 
@@ -72,6 +72,18 @@ public class PlayerHealth : NetworkBehaviour
         currentShieldSlotRemainingPower = HealthData.ShieldSlotHealth;
 
         Shield = new(HealthData.MaxShieldSlots, HealthData.ShieldSlotHealth);
+    }
+
+    [Rpc(SendTo.Server)]
+    public void RequestSetTeamServerRpc(ushort teamID)
+    {
+        SetTeamClientRpc(teamID);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void SetTeamClientRpc(ushort _teamID)
+    {
+        teamID = _teamID;
     }
 
     [Rpc(SendTo.ClientsAndHost)]

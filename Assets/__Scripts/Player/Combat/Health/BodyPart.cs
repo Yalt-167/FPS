@@ -9,7 +9,7 @@ using System;
 public class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlashable
 {
     [SerializeField] private BodyParts bodyPart;
-    private PlayerHealth playerHealth;
+    private PlayerHealthNetworked playerHealth;
     public ulong OwnerHealthNetworkID => playerHealth.NetworkObjectId;
 
     public bool OnImmunityAfterHit { get; set; }
@@ -17,7 +17,7 @@ public class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlashable
 
     private void Awake()
     {
-        playerHealth = transform.parent.parent.GetComponent<PlayerHealth>();
+        playerHealth = transform.parent.parent.GetComponent<PlayerHealthNetworked>();
     }
 
     private ushort GetDamageAfterMultipliers(ushort rawDamage)

@@ -203,9 +203,10 @@ GameObject:
   - component: {fileID: 6865873029081377145}
   - component: {fileID: 8008324741424589376}
   - component: {fileID: -5576412062431197468}
-  - component: {fileID: 8430323774073140898}
   - component: {fileID: 8620312614544550616}
   - component: {fileID: 7879344369763397016}
+  - component: {fileID: 8471839803964524711}
+  - component: {fileID: 6942959066650927657}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -345,7 +346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3013796309
+  GlobalObjectIdHash: 870966366
   InScenePlacedSourceGlobalObjectIdHash: 870966366
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -708,24 +709,11 @@ MonoBehaviour:
   - {fileID: 8620312614544550616}
   - {fileID: 7715329695785719329}
   - {fileID: 2189134874924269601}
+  - {fileID: 6942959066650927657}
   gameObjectsToKillOnForeignPlayers:
   - {fileID: 7803131807664606466}
   componentsToKillOnLocalPlayers: []
   gameObjectsToKillOnLocalPlayers: []
---- !u!114 &8430323774073140898
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 615695314538812458}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d57e5a6e3b1f4048bdd413ce44ca15f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <HealthData>k__BackingField: {fileID: 11400000, guid: 31b3be51212c77744b1e8161efdb4a23,
-    type: 2}
 --- !u!114 &8620312614544550616
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -763,6 +751,32 @@ MonoBehaviour:
     type: 3}
   damageLogManager: {fileID: 6404117653549858473}
   recoilMovementSnappiness: 6
+--- !u!114 &8471839803964524711
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 615695314538812458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8118ea921d640e94abdc9c105f8275f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <HealthData>k__BackingField: {fileID: 11400000, guid: 31b3be51212c77744b1e8161efdb4a23,
+    type: 2}
+--- !u!114 &6942959066650927657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 615695314538812458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86f5b23c8a318a148a7254f3140773da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &888805865160700714
 GameObject:
   m_ObjectHideFlags: 0

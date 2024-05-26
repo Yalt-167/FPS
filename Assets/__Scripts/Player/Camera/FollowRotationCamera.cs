@@ -17,8 +17,6 @@ public class FollowRotationCamera : MonoBehaviour
     private void Awake()
     {
         playerTransform = transform.parent;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
     }
 
     private void Update()
