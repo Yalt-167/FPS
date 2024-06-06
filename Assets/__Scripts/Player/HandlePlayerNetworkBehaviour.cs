@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -14,6 +15,9 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
     [Header("ToKillOnSelf")]
     [SerializeField] private List<Component> componentsToKillOnLocalPlayers;
     [SerializeField] private List<GameObject> gameObjectsToKillOnLocalPlayers;
+
+
+    public ushort PlayerID { get; private set; }
 
     #region Networking & Tears
 
@@ -34,6 +38,16 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
         }
 
         Game.Manager.AddNetworkedWeaponHandler(GetComponent<WeaponHandler>());
+
+        PlayerID = Game.Manager.RegisterPlayer(
+            new(
+                GetComponent<NetworkObject>(),
+                GetComponent<ClientNetworkTransform>(),
+                GetComponent<HandlePlayerNetworkBehaviour>(),
+                GetComponent<WeaponHandler>(),
+                GetComponent<PlayerHealthNetworked>()
+            )
+        );
     }
 
 

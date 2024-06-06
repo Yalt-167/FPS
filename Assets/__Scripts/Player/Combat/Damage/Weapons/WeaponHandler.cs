@@ -1092,9 +1092,9 @@ public class WeaponHandler : NetworkBehaviour
 
         Array.Sort(hits, new RaycastHitComparer());
 
-        for (int i = 0; i < hits.Length; i++)
+        foreach (var hit in hits)
         {
-            if (hits[i].collider.TryGetComponent<IShootable>(out var shootableComponent))
+            if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
             {
                 if (IsOwner)
                 {
@@ -1103,7 +1103,7 @@ public class WeaponHandler : NetworkBehaviour
 
                 if (!shotInfos.WeaponInfos.PierceThroughPlayers)
                 {
-                    endPoint = hits[i].point;
+                    endPoint = hit.point;
                     break;
                 }
             }
@@ -1112,7 +1112,7 @@ public class WeaponHandler : NetworkBehaviour
                 BounceUponWallHit(
                         new(
                             newShotDirection,
-                            hits[i],
+                            hit,
                             shotInfos.AttackerNetworkID,
                             new(currentWeaponStats)
                             ),
@@ -1121,7 +1121,7 @@ public class WeaponHandler : NetworkBehaviour
 
                 if (shotInfos.WeaponInfos.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                 {
-                    endPoint = hits[i].point;
+                    endPoint = hit.point;
                     break;
                 }
                 
