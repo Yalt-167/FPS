@@ -78,9 +78,9 @@ public class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlashable
         if (components.Count < 2) return true;
 
         var firstComponentNetworkID = components[0].OwnerHealthNetworkID;
-        for (int i = 1; i < components.Count; i++)
+        foreach (var component in components)
         {
-            if (components[i].OwnerHealthNetworkID != firstComponentNetworkID)
+            if (component.OwnerHealthNetworkID != firstComponentNetworkID)
             {
                 return false;
             }

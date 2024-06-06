@@ -1439,9 +1439,9 @@ public class WeaponHandler : NetworkBehaviour
     private void PlayReloadSound()
     {
         // make the reload duration rely on the audio for its duration so no need to "eardrum it" (check for audioSource.isPlaying in the coroutine)
-        for (int i = 0; i < audioSources.Count; i++)
+        foreach (var audioSource in audioSources)
         {
-            audioSources[i].Stop();
+            audioSource.Stop();
         }
 
         audioSources[0].clip = currentWeaponSounds.ReloadSound;

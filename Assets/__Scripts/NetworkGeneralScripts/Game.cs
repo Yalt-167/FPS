@@ -5,6 +5,7 @@ using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Linq;
 using Random = UnityEngine.Random;
 
 [DefaultExecutionOrder(-10)]
@@ -20,7 +21,63 @@ public sealed class Game : MonoBehaviour
 
     #region Player List
 
-    private readonly List<Game> players;    
+    private readonly List<NetworkedPlayer> players;
+
+    /// <summary>
+    ///  returns ur absolute ID (fancy word for index in playerList)<br/>
+    ///  this ID ensure faster
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns></returns>
+    public ushort RegisterPlayer(NetworkedPlayer player)
+    {
+        players.Add(player);
+        return (ushort)(players.Count - 1);
+    }
+
+    public void DiscardPlayer(NetworkedPlayer player) // send notice to all the above players that their index is no longer the correct one  
+    {
+        players.Remove(player);
+    }
+
+    /// <summary>
+    /// <paramref name="whichComponentID"/> basically refers to which component ID was passed in the function.<br/>
+    /// For instance if the ID we have is the weaponHandler ID and we passed it we should also pass the relevant enum member 
+    /// </summary>
+    /// <param name="objectID"></param>
+    /// <param name="whichComponentID"></param>
+    public NetworkedPlayer RetrievePlayer(ulong objectID, NetworkedComponent whichComponentID)
+    {
+        return whichComponentID switch
+        {
+            NetworkedComponent.NetworkObject => players.First(each => ((NetworkObject)each).NetworkObjectId == objectID),
+
+            NetworkedComponent.ClientNetworkTransform => players.First(each => ((ClientNetworkTransform)each).NetworkObjectId == objectID),
+
+            NetworkedComponent.HandlePlayerNetworkBehaviour => players.First(each => ((HandlePlayerNetworkBehaviour)each).NetworkObjectId == objectID),
+
+            NetworkedComponent.WeaponHandler => players.First(each => ((WeaponHandler)each).NetworkObjectId == objectID),
+
+            NetworkedComponent.PlayerHealthNetworked => players.First(each => ((PlayerHealthNetworked)each).NetworkObjectId == objectID),
+
+            _ => throw new Exception("This component provided does not match anything"),
+        };
+        
+    }
+
+    public NetworkedPlayer RetrievePlayerFromAbsoluteID(ushort ID)
+    {
+        return players[ID];
+    }
+
+    public IEnumerable<NetworkedPlayer> GetPlayers()
+    {
+        foreach (var player in players)
+        {
+            yield return player;
+        }
+    }
+
 
     #endregion
 
@@ -35,19 +92,16 @@ public sealed class Game : MonoBehaviour
 
     public void DiscardNetworkedWeaponHandler(WeaponHandler networkedWeaponHandler)
     {
-        if (!networkedWeaponHandlers.Contains(networkedWeaponHandler)) { return; }
-
-        networkedWeaponHandlers.Add(networkedWeaponHandler);
+        networkedWeaponHandlers.Remove(networkedWeaponHandler);
     }
 
     public WeaponHandler GetNetworkedWeaponHandlerFromNetworkObjectID(ulong playerObjectID) // ? make it so they are sorted ? -> slower upon adding it but faster to select it still
     {
-        var size = networkedWeaponHandlers.Count;
-        for (int i = 0; i < size; i++)
+        foreach (var networkHandler in networkedWeaponHandlers)
         {
-            if (networkedWeaponHandlers[i].NetworkObjectId == playerObjectID)
+            if (networkHandler.NetworkObjectId == playerObjectID)
             {
-                return networkedWeaponHandlers[i];
+                return networkHandler;
             }
         }
 
@@ -56,9 +110,9 @@ public sealed class Game : MonoBehaviour
 
     public IEnumerable<WeaponHandler> GetNetworkedWeaponHandlers()
     {
-        for (int i = 0; i < networkedWeaponHandlers.Count; i++)
+        foreach (var networkHandler in networkedWeaponHandlers)
         {
-            yield return networkedWeaponHandlers[i];
+            yield return networkHandler;
         }
     }
 
@@ -134,14 +188,13 @@ public sealed class Game : MonoBehaviour
     {
         if (debugBottomPlane)
         {
-
             Gizmos.color = Color.red;
             var origin = new Vector3(transform.position.x, -30, transform.position.z);
             var debugDist = 100f; // how far the plane with be rendered
 
             var sideward = Vector3.right * debugDist;
             var forward = Vector3.forward * debugDist;
-            for (int offset = -100; offset < 101; offset += 10)
+            for (int offset = -100; offset <= 100; offset += 10)
             {
                 var forwardOffsetVec = new Vector3(0, 0, offset);
                 Gizmos.DrawLine(origin - sideward + forwardOffsetVec, origin + sideward + forwardOffsetVec);
@@ -185,8 +238,6 @@ public struct NetworkedPlayer
         Health = health;
     }
 
-
-
     #region QoL
 
     #region Practical Getters
@@ -200,4 +251,14 @@ public struct NetworkedPlayer
     #endregion
 
     #endregion
+}
+
+
+public enum NetworkedComponent : byte
+{
+    NetworkObject,
+    ClientNetworkTransform,
+    HandlePlayerNetworkBehaviour,
+    WeaponHandler,
+    PlayerHealthNetworked
 }
