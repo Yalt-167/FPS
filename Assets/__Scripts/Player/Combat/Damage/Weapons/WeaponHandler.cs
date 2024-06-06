@@ -1098,7 +1098,7 @@ public class WeaponHandler : NetworkBehaviour
             {
                 if (IsOwner)
                 {
-                    shootableComponent.ReactShot(shotInfos.WeaponInfos.Damage, hits[i].point, newShotDirection, NetworkObjectId, shotInfos.WeaponInfos.CanBreakThings);
+                    shootableComponent.ReactShot(shotInfos.WeaponInfos.Damage, hit.point, newShotDirection, NetworkObjectId, shotInfos.WeaponInfos.CanBreakThings);
                 }
 
                 if (!shotInfos.WeaponInfos.PierceThroughPlayers)

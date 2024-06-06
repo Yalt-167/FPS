@@ -21,7 +21,7 @@ public sealed class Game : MonoBehaviour
 
     #region Player List
 
-    private readonly List<NetworkedPlayer> players;
+    private readonly List<NetworkedPlayer> players = new();
 
     /// <summary>
     ///  returns ur absolute ID (fancy word for index in playerList)<br/>
