@@ -1,12 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 [DefaultExecutionOrder(-10)]
-public class Game : MonoBehaviour
+public sealed class Game : MonoBehaviour
 {
     public static Game Manager;
 
@@ -16,9 +18,15 @@ public class Game : MonoBehaviour
 
     #endregion
 
+    #region Player List
+
+    private readonly List<Game> players;    
+
+    #endregion
+
     #region Player Combat List
 
-    private List<WeaponHandler> networkedWeaponHandlers = new();
+    private readonly List<WeaponHandler> networkedWeaponHandlers = new();
 
     public void AddNetworkedWeaponHandler(WeaponHandler networkedWeaponHandler)
     {
@@ -146,7 +154,50 @@ public class Game : MonoBehaviour
 }
 
 [Serializable]
-public struct Settings // try having a save on load
+public struct Settings
 {
     public bool viewBobbing;
+}
+
+
+
+
+public struct NetworkedPlayer
+{
+    public NetworkObject Object;
+    public ClientNetworkTransform Transform;
+    public HandlePlayerNetworkBehaviour BehaviourHandler;
+    public WeaponHandler WeaponHandler;
+    public PlayerHealthNetworked Health;
+
+    public NetworkedPlayer(
+        NetworkObject object_,
+        ClientNetworkTransform transform_,
+        HandlePlayerNetworkBehaviour behaviourHandler,
+        WeaponHandler weaponHandler,
+        PlayerHealthNetworked health
+    )
+    {
+        Object = object_;
+        Transform = transform_;
+        BehaviourHandler = behaviourHandler;
+        WeaponHandler = weaponHandler;
+        Health = health;
+    }
+
+
+
+    #region QoL
+
+    #region Practical Getters
+
+    public static explicit operator NetworkObject(NetworkedPlayer relevantPlayer) => relevantPlayer.Object;
+    public static explicit operator ClientNetworkTransform(NetworkedPlayer relevantPlayer) => relevantPlayer.Transform;
+    public static explicit operator HandlePlayerNetworkBehaviour(NetworkedPlayer relevantPlayer) => relevantPlayer.BehaviourHandler;
+    public static explicit operator WeaponHandler(NetworkedPlayer relevantPlayer) => relevantPlayer.WeaponHandler;
+    public static explicit operator PlayerHealthNetworked(NetworkedPlayer relevantPlayer) => relevantPlayer.Health; 
+
+    #endregion
+
+    #endregion
 }
