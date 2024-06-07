@@ -448,18 +448,18 @@ public class WeaponHandler : NetworkBehaviour
 
             Array.Sort(hits, new RaycastHitComparer());
 
-            for (int i = 0; i < hits.Length; i++)
+            foreach (var hit in hits)
             {
-                if (hits[i].collider.TryGetComponent<IShootable>(out var shootableComponent))
+                if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
                 {
                     if (IsOwner)
                     {
-                        shootableComponent.ReactShot(currentWeaponStats.Damage, hits[i].point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeaponStats.Damage, hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
                     }
                 }
                 else // so far else is the wall but do proper checks later on
                 {
-                    endPoint = hits[i].point;
+                    endPoint = hit.point;
                     break;
                 }
             }
@@ -503,18 +503,18 @@ public class WeaponHandler : NetworkBehaviour
 
         Array.Sort(hits, new RaycastHitComparer());
 
-        for (int i = 0; i < hits.Length; i++)
+        foreach (var hit in hits)
         {
-            if (hits[i].collider.TryGetComponent<IShootable>(out var shootableComponent))
+            if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
             {
                 if (IsOwner)
                 {
-                    shootableComponent.ReactShot(currentWeaponStats.Damage, hits[i].point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                    shootableComponent.ReactShot(currentWeaponStats.Damage, hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
                 }
 
                 if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
                 {
-                    endPoint = hits[i].point;
+                    endPoint = hit.point;
                     break;
                 }
             }
@@ -523,7 +523,7 @@ public class WeaponHandler : NetworkBehaviour
                 onHitWallMethod(
                     new(
                         directionWithSpread,
-                        hits[i],
+                        hit,
                         NetworkObjectId,
                         new(currentWeaponStats)
                     ),
@@ -532,7 +532,7 @@ public class WeaponHandler : NetworkBehaviour
                 
                 if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                 {
-                    endPoint = hits[i].point;
+                    endPoint = hit.point;
                     break;
                 }
                 
@@ -564,17 +564,17 @@ public class WeaponHandler : NetworkBehaviour
                 var hits = Physics.RaycastAll(barrelEnd.position, shotgunPelletsDirections[i], currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
                 Array.Sort(hits, new RaycastHitComparer());
 
-                for (int j = 0; j < hits.Length; j++)
+                foreach (var hit in hits)
                 {
-                    if (hits[j].collider.TryGetComponent<IShootable>(out var shootableComponent))
+                    if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
                     {
                         if (IsOwner)
                         {
-                            shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[i], hits[j].point, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                            shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[i], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
                         }
                         else
                         {
-                            endPoint = hits[j].point;
+                            endPoint = hit.point;
                             break;
                         }
                     }
@@ -622,18 +622,18 @@ public class WeaponHandler : NetworkBehaviour
             var hits = Physics.RaycastAll(barrelEnd.position, shotgunPelletsDirections[pelletIndex], currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
             Array.Sort(hits, new RaycastHitComparer());
 
-            for (int i = 0; i < hits.Length; i++)
+            foreach (var hit in hits)
             {
-                if (hits[i].collider.TryGetComponent<IShootable>(out var shootableComponent))
+                if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
                 {
                     if (IsOwner)
                     {
-                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[pelletIndex], hits[i].point, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
                     }
 
                     if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
                     {
-                        endPoint = hits[i].point;
+                        endPoint = hit.point;
                         break;
                     }
 
@@ -643,7 +643,7 @@ public class WeaponHandler : NetworkBehaviour
                         onHitWallMethod(
                             new(
                                 shotgunPelletsDirections[pelletIndex],
-                                hits[i],
+                                hit,
                                 NetworkObjectId,
                                 new(currentWeaponStats)
                             ),
@@ -652,7 +652,7 @@ public class WeaponHandler : NetworkBehaviour
                         
                         if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                         {
-                            endPoint = hits[i].point;
+                            endPoint = hit.point;
                             break;
                         }
                         
@@ -685,18 +685,18 @@ public class WeaponHandler : NetworkBehaviour
 
             Array.Sort(hits, new RaycastHitComparer());
 
-            for (int i = 0; i < hits.Length; i++)
+            foreach (var hit in hits)   
             {
-                if (hits[i].collider.TryGetComponent<IShootable>(out var shootableComponent))
+                if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
                 {
                     if (IsOwner)
                     {
-                        shootableComponent.ReactShot((ushort)(currentWeaponStats.Damage * chargeRatio), hits[i].point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot((ushort)(currentWeaponStats.Damage * chargeRatio), hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
                     }
                 }
                 else // so far else is the wall but do proper checks later on
                 {
-                    endPoint = hits[i].point;
+                    endPoint = hit.point;
                     break;
                 }
             }
@@ -741,18 +741,18 @@ public class WeaponHandler : NetworkBehaviour
 
         Array.Sort(hits, new RaycastHitComparer());
 
-        for (int i = 0; i < hits.Length; i++)
+        foreach (var hit in hits)
         {
-            if (hits[i].collider.TryGetComponent<IShootable>(out var shootableComponent))
+            if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
             {
                 if (IsOwner)
                 {
-                    shootableComponent.ReactShot((ushort)(currentWeaponStats.Damage * chargeRatio), hits[i].point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                    shootableComponent.ReactShot((ushort)(currentWeaponStats.Damage * chargeRatio), hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
                 }
 
                 if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
                 {
-                    endPoint = hits[i].point;
+                    endPoint = hit.point;
                     break;
                 }
             }
@@ -761,7 +761,7 @@ public class WeaponHandler : NetworkBehaviour
                 onHitWallMethod(
                     new(
                         directionWithSpread,
-                        hits[i],
+                        hit,
                         NetworkObjectId,
                         new(currentWeaponStats, chargeRatio)
                     ),
@@ -770,7 +770,7 @@ public class WeaponHandler : NetworkBehaviour
 
                 if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                 {
-                    endPoint = hits[i].point;
+                    endPoint = hit.point;
                     break;
                 }
                 
@@ -803,18 +803,18 @@ public class WeaponHandler : NetworkBehaviour
                 var hits = Physics.RaycastAll(barrelEnd.position, shotgunPelletsDirections[i], currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
                 Array.Sort(hits, new RaycastHitComparer());
 
-                for (int j = 0; j < hits.Length; j++)
+                foreach (var hit in hits)
                 {
-                    if (hits[j].collider.TryGetComponent<IShootable>(out var shootableComponent))
+                    if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
                     {
                         if (IsOwner)
                         {
-                            shootableComponent.ReactShot((ushort)(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio), shotgunPelletsDirections[i], hits[j].point, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                            shootableComponent.ReactShot((ushort)(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio), shotgunPelletsDirections[i], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
                         } 
                     }
                     else
                     {
-                        endPoint = hits[j].point;
+                        endPoint = hit.point;
                         break;
                     }
                 }
@@ -862,18 +862,18 @@ public class WeaponHandler : NetworkBehaviour
             var hits = Physics.RaycastAll(barrelEnd.position, shotgunPelletsDirections[pelletIndex], currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
             Array.Sort(hits, new RaycastHitComparer());
 
-            for (int i = 0; i < hits.Length; i++)
+            foreach (var hit in hits)   
             {
-                if (hits[i].collider.TryGetComponent<IShootable>(out var shootableComponent))
+                if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
                 {
                     if (IsOwner)
                     {
-                        shootableComponent.ReactShot((ushort)(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio), shotgunPelletsDirections[pelletIndex], hits[i].point, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot((ushort)(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio), shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
                     }
 
                     if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
                     {
-                        endPoint = hits[i].point;
+                        endPoint = hit.point;
                         break;
                     }
                 }
@@ -882,7 +882,7 @@ public class WeaponHandler : NetworkBehaviour
                     onHitWallMethod(
                         new(
                             shotgunPelletsDirections[pelletIndex],
-                            hits[i],
+                            hit,
                             NetworkObjectId,
                             new(currentWeaponStats, chargeRatio)
                             ),
@@ -891,7 +891,7 @@ public class WeaponHandler : NetworkBehaviour
 
                     if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                     {
-                        endPoint = hits[i].point;
+                        endPoint = hit.point;
                         break;
                     }
                     
