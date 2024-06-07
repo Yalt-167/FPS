@@ -6,7 +6,7 @@ using UnityEngine;
 [Serializable]
 public struct WeaponStats
 {
-    [Tooltip("The damage dealt by the shot (Will be overriden by PelletDamage) if the weapon is a shotgun")] public ushort Damage;
+    [Tooltip("The damage dealt by the shot (Will be overriden by PelletDamage) if the weapon is a shotgun")] public DamageDealt Damage;
     public WeaponClass WeaponClass;
 
     [Header("Bullet Travel Settings")]
@@ -63,6 +63,15 @@ public struct WeaponStats
 
     [Header("Mobility")]
     [Tooltip("Will define how fast teh player can move and how high he can jump")]public float Weight;
+}
+
+
+[Serializable]
+public struct DamageDealt
+{
+    public ushort HighDamage;
+    public ushort Damage;
+    public ushort LowDamage;
 }
 
 #region Shooting Style
