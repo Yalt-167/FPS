@@ -14,7 +14,7 @@ public class Projectile : MonoBehaviour
 
     protected float speed;
     protected float bulletDrop;
-    protected ushort damage;
+    protected DamageDealt damage;
     protected ulong attackerNetworkID;
     protected bool canBreakThings;
     protected LayerMask layersToHit;
@@ -23,7 +23,7 @@ public class Projectile : MonoBehaviour
     protected ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour;
 
     public virtual void Init(
-        ushort damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, bool canBreakThings_, LayerMask layersToHit_,
+        DamageDealt damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, bool canBreakThings_, LayerMask layersToHit_,
         ProjectileOnHitWallBehaviour onHitWallBehaviour_,
         ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour_
         )

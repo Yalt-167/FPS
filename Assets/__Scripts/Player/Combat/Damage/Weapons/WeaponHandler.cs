@@ -691,7 +691,7 @@ public class WeaponHandler : NetworkBehaviour
                 {
                     if (IsOwner)
                     {
-                        shootableComponent.ReactShot((ushort)(currentWeaponStats.Damage * chargeRatio), hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
                     }
                 }
                 else // so far else is the wall but do proper checks later on
@@ -711,7 +711,7 @@ public class WeaponHandler : NetworkBehaviour
                 bulletTrail.Set(barrelEnd.position, hit.point);
                 if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
                 {
-                    shootableComponent.ReactShot((ushort)(currentWeaponStats.Damage * chargeRatio), hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                    shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
                 }
 
             }
@@ -747,7 +747,7 @@ public class WeaponHandler : NetworkBehaviour
             {
                 if (IsOwner)
                 {
-                    shootableComponent.ReactShot((ushort)(currentWeaponStats.Damage * chargeRatio), hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                    shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
                 }
 
                 if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
@@ -809,7 +809,7 @@ public class WeaponHandler : NetworkBehaviour
                     {
                         if (IsOwner)
                         {
-                            shootableComponent.ReactShot((ushort)(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio), shotgunPelletsDirections[i], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                            shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[i], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
                         } 
                     }
                     else
@@ -832,7 +832,7 @@ public class WeaponHandler : NetworkBehaviour
                     bulletTrail.Set(barrelEnd.position, hit.point);
                     if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
                     {
-                        shootableComponent.ReactShot((ushort)(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio), shotgunPelletsDirections[i], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[i], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
                     }
                 }
                 else
@@ -868,7 +868,7 @@ public class WeaponHandler : NetworkBehaviour
                 {
                     if (IsOwner)
                     {
-                        shootableComponent.ReactShot((ushort)(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio), shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
                     }
 
                     if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
@@ -997,7 +997,7 @@ public class WeaponHandler : NetworkBehaviour
         }
 
         projectile.Init(
-            (ushort)(currentWeaponStats.Damage * chargeRatio),
+            currentWeaponStats.Damage * chargeRatio,
             currentWeaponStats.TravelTimeBulletSettings.BulletSpeed * chargeRatio,
             currentWeaponStats.TravelTimeBulletSettings.BulletDrop,
             NetworkObjectId,
@@ -1034,7 +1034,7 @@ public class WeaponHandler : NetworkBehaviour
             }
 
             projectile.Init(
-                (ushort)(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio),
+                currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio,
                 currentWeaponStats.TravelTimeBulletSettings.BulletSpeed,
                 currentWeaponStats.TravelTimeBulletSettings.BulletDrop,
                 NetworkObjectId,
@@ -1494,7 +1494,7 @@ public struct ShotInfos
 
 public struct WeaponInfos
 {
-    public ushort Damage;
+    public DamageDealt Damage;
     public bool CanBreakThings;
     public Effects Effects;
     public bool PierceThroughPlayers;
@@ -1502,7 +1502,7 @@ public struct WeaponInfos
 
     public WeaponInfos(WeaponStats weaponStats, float chargeRatio = 1f)
     {
-        Damage = (ushort)((weaponStats.ShootingStyle == ShootingStyle.Single ? weaponStats.Damage : weaponStats.ShotgunStats.PelletsDamage) * chargeRatio);
+        Damage = (weaponStats.ShootingStyle == ShootingStyle.Single ? weaponStats.Damage : weaponStats.ShotgunStats.PelletsDamage) * chargeRatio;
         CanBreakThings = weaponStats.CanBreakThings;
         Effects = weaponStats.EffectsInflicted;
         PierceThroughPlayers = weaponStats.HitscanBulletSettings.PierceThroughPlayers;

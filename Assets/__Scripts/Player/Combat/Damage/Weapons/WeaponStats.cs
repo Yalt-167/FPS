@@ -1,6 +1,8 @@
 using System;
+using System.Buffers.Text;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [Serializable]
@@ -69,9 +71,34 @@ public struct WeaponStats
 [Serializable]
 public struct DamageDealt
 {
+    public ushort CriticalDamage;
     public ushort HighDamage;
-    public ushort Damage;
+    public ushort BaseDamage;
     public ushort LowDamage;
+    public ushort NegatedDamage;
+
+    public DamageDealt(ushort crit, ushort high, ushort base_, ushort low_, ushort negated_)
+    {
+        CriticalDamage = crit;
+        HighDamage = high;
+        BaseDamage = base_;
+        LowDamage = low_;
+        NegatedDamage = negated_;
+    }
+
+    public DamageDealt(DamageDealt previousStruct, float coefficient)
+    {
+        CriticalDamage  = (ushort)(previousStruct.CriticalDamage * coefficient);
+        HighDamage  = (ushort)(previousStruct.HighDamage * coefficient);
+        BaseDamage  = (ushort)(previousStruct.BaseDamage * coefficient);
+        LowDamage = (ushort)(previousStruct.LowDamage * coefficient);
+        NegatedDamage = (ushort)(previousStruct.NegatedDamage * coefficient);
+    }
+
+    public static DamageDealt operator *(DamageDealt relevantStruct, float coefficient)
+    {
+        return new(relevantStruct, coefficient);
+    }
 }
 
 #region Shooting Style
@@ -93,7 +120,7 @@ public struct SimpleShotStats
 [Serializable]
 public struct ShotgunStats
 {
-    public ushort PelletsDamage;
+    public DamageDealt PelletsDamage;
     public ushort PelletsCount;
     public float PelletsSpreadAngle;
     public float AimingPelletsSpreadAngle;

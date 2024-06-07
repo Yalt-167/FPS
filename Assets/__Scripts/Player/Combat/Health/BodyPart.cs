@@ -20,22 +20,22 @@ public class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlashable
         playerHealth = transform.parent.parent.GetComponent<PlayerHealthNetworked>();
     }
 
-    private ushort GetDamageAfterMultipliers(ushort rawDamage)
+    private ushort GetEffectiveDamage(DamageDealt rawDamage)
     {
         return bodyPart switch
         {
-            BodyParts.HEAD => (ushort)(rawDamage * 2),
-            BodyParts.BODY => rawDamage,
-            BodyParts.LEGS => (ushort)(.5f * rawDamage),
-            _ => rawDamage,
+            BodyParts.HEAD => rawDamage.HighDamage,
+            BodyParts.BODY => rawDamage.BaseDamage,
+            BodyParts.LEGS => rawDamage.LowDamage,
+            _ => rawDamage.BaseDamage,
         };
     }
 
-    public void ReactShot(ushort damage, Vector3 _, Vector3 __, ulong attackerNetworkID, bool ___)
+    public void ReactShot(DamageDealt damage, Vector3 _, Vector3 __, ulong attackerNetworkID, bool ___)
     {
         //if (!IsOwner) { return; }
 
-        var damageAfterMultiplier = GetDamageAfterMultipliers(damage);
+        var damageAfterMultiplier = GetEffectiveDamage(damage);
 
         DamageTargetServerRpc(damageAfterMultiplier, bodyPart, attackerNetworkID);
     }
