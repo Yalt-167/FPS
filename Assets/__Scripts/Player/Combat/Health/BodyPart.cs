@@ -1,10 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-using UnityEngine.UI;
-using System.Diagnostics;
-using System;
 
 public class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlashable
 {
@@ -35,9 +33,7 @@ public class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlashable
     {
         //if (!IsOwner) { return; }
 
-        var damageAfterMultiplier = GetEffectiveDamage(damage);
-
-        DamageTargetServerRpc(damageAfterMultiplier, bodyPart, attackerNetworkID);
+        DamageTargetServerRpc(GetEffectiveDamage(damage), bodyPart, attackerNetworkID);
     }
 
     public void ReactExplosion(ushort damage, Vector3 _, ulong attackerNetworkID, bool __)
