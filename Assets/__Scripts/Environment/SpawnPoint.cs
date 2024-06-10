@@ -8,7 +8,7 @@ public class SpawnPoint : MonoBehaviour
     public bool Active;
     public Vector3 SpawnPosition => transform.position + Vector3.up;
 
-    private void Awake()
+    private void OnEnable()
     {
         Game.Manager.AddRespawnPoint(this);
     }

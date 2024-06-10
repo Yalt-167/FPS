@@ -7,6 +7,9 @@ using Random = UnityEngine.Random;
 
 public class WeaponHandler : NetworkBehaviour
 {
+    #warning PlaceHolderValue to remove here
+    private ushort _____placeHolderTeamID = 0;
+
     #region References
 
     [SerializeField] private Weapon currentWeapon;
@@ -454,7 +457,7 @@ public class WeaponHandler : NetworkBehaviour
                 {
                     if (IsOwner)
                     {
-                        shootableComponent.ReactShot(currentWeaponStats.Damage, hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeaponStats.Damage, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
                     }
                 }
                 else // so far else is the wall but do proper checks later on
@@ -474,7 +477,7 @@ public class WeaponHandler : NetworkBehaviour
                 bulletTrail.Set(barrelEnd.position, hit.point);
                 if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
                 {
-                    shootableComponent.ReactShot(currentWeaponStats.Damage, hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                    shootableComponent.ReactShot(currentWeaponStats.Damage, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
                 }
             }
             else
@@ -509,7 +512,7 @@ public class WeaponHandler : NetworkBehaviour
             {
                 if (IsOwner)
                 {
-                    shootableComponent.ReactShot(currentWeaponStats.Damage, hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                    shootableComponent.ReactShot(currentWeaponStats.Damage, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
                 }
 
                 if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
@@ -570,7 +573,7 @@ public class WeaponHandler : NetworkBehaviour
                     {
                         if (IsOwner)
                         {
-                            shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[i], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                            shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[i], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
                         }
                         else
                         {
@@ -593,7 +596,7 @@ public class WeaponHandler : NetworkBehaviour
                     bulletTrail.Set(barrelEnd.position, hit.point);
                     if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
                     {
-                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[i], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[i], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
                     }
                 }
                 else
@@ -628,7 +631,7 @@ public class WeaponHandler : NetworkBehaviour
                 {
                     if (IsOwner)
                     {
-                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
                     }
 
                     if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
@@ -691,7 +694,7 @@ public class WeaponHandler : NetworkBehaviour
                 {
                     if (IsOwner)
                     {
-                        shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
                     }
                 }
                 else // so far else is the wall but do proper checks later on
@@ -711,7 +714,7 @@ public class WeaponHandler : NetworkBehaviour
                 bulletTrail.Set(barrelEnd.position, hit.point);
                 if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
                 {
-                    shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                    shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
                 }
 
             }
@@ -747,7 +750,7 @@ public class WeaponHandler : NetworkBehaviour
             {
                 if (IsOwner)
                 {
-                    shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                    shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
                 }
 
                 if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
@@ -809,7 +812,7 @@ public class WeaponHandler : NetworkBehaviour
                     {
                         if (IsOwner)
                         {
-                            shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[i], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                            shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[i], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
                         } 
                     }
                     else
@@ -832,7 +835,7 @@ public class WeaponHandler : NetworkBehaviour
                     bulletTrail.Set(barrelEnd.position, hit.point);
                     if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
                     {
-                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[i], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[i], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
                     }
                 }
                 else
@@ -868,7 +871,7 @@ public class WeaponHandler : NetworkBehaviour
                 {
                     if (IsOwner)
                     {
-                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
                     }
 
                     if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
@@ -1098,7 +1101,7 @@ public class WeaponHandler : NetworkBehaviour
             {
                 if (IsOwner)
                 {
-                    shootableComponent.ReactShot(shotInfos.WeaponInfos.Damage, hit.point, newShotDirection, NetworkObjectId, shotInfos.WeaponInfos.CanBreakThings);
+                    shootableComponent.ReactShot(shotInfos.WeaponInfos.Damage, hit.point, newShotDirection, NetworkObjectId, _____placeHolderTeamID, shotInfos.WeaponInfos.CanBreakThings);
                 }
 
                 if (!shotInfos.WeaponInfos.PierceThroughPlayers)

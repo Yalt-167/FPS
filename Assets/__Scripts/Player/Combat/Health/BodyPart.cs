@@ -9,6 +9,7 @@ public class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlashable
     [SerializeField] private BodyParts bodyPart;
     private PlayerHealthNetworked playerHealth;
     public ulong OwnerHealthNetworkID => playerHealth.NetworkObjectId;
+    public ushort OwnerTeamID => playerHealth.TeamID;
 
     public bool OnImmunityAfterHit { get; set; }
     public float ImmunityAfterHitDuration { get; set; } = .3f;
@@ -29,9 +30,14 @@ public class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlashable
         };
     }
 
-    public void ReactShot(DamageDealt damage, Vector3 _, Vector3 __, ulong attackerNetworkID, bool ___)
+    public void ReactShot(DamageDealt damage, Vector3 _, Vector3 __, ulong attackerNetworkID, ushort attackerTeamID, bool ___)
     {
         //if (!IsOwner) { return; }
+
+        if (attackerTeamID == OwnerTeamID)
+        {
+            return;
+        }
 
         DamageTargetServerRpc(GetEffectiveDamage(damage), bodyPart, attackerNetworkID);
     }

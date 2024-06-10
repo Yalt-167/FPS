@@ -7,6 +7,10 @@ using UnityEngine;
 [DefaultExecutionOrder(-1000)]
 public class HandlePlayerNetworkBehaviour : NetworkBehaviour
 {
+
+    private PlayerFrame playerFrame;
+
+
     [Header("ToKillOnForeign")]
     [SerializeField] private List<Component> componentsToKillOnForeignPlayers;
     [SerializeField] private List<GameObject> gameObjectsToKillOnForeignPlayers;
@@ -17,12 +21,12 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
     [SerializeField] private List<GameObject> gameObjectsToKillOnLocalPlayers;
 
 
-    public ushort PlayerID { get; private set; }
 
     #region Networking & Tears
 
     public override void OnNetworkSpawn()
     {
+        
         transform.position = new(transform.position.x, 2, transform.position.z);
 
         var (componentsToKill, gameObjectsToKill) = IsOwner ? (componentsToKillOnLocalPlayers, gameObjectsToKillOnLocalPlayers) : (componentsToKillOnForeignPlayers, gameObjectsToKillOnForeignPlayers);
@@ -39,13 +43,15 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
 
         Game.Manager.AddNetworkedWeaponHandler(GetComponent<WeaponHandler>());
 
-        PlayerID = Game.Manager.RegisterPlayer(
-            new(
-                GetComponent<NetworkObject>(),
-                GetComponent<ClientNetworkTransform>(),
-                GetComponent<HandlePlayerNetworkBehaviour>(),
-                GetComponent<WeaponHandler>(),
-                GetComponent<PlayerHealthNetworked>()
+        GetComponent<PlayerFrame>().SetPlayerID(
+            Game.Manager.RegisterPlayer(
+                new(
+                    GetComponent<NetworkObject>(),
+                    GetComponent<ClientNetworkTransform>(),
+                    GetComponent<HandlePlayerNetworkBehaviour>(),
+                    GetComponent<WeaponHandler>(),
+                    GetComponent<PlayerHealthNetworked>()
+                )
             )
         );
     }
@@ -54,6 +60,8 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
         Game.Manager.DiscardNetworkedWeaponHandler(GetComponent<WeaponHandler>());
+
+        Game.Manager.DiscardPlayer(GetComponent<PlayerFrame>().PlayerID);
     }
 
     #endregion

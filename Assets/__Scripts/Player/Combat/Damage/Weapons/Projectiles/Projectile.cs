@@ -5,12 +5,15 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
+    #warning PlaceHolderValue to remove here
+    private ushort _____placeHolderTeamID;
+
     public Vector3 Position => transform.position;
     public Vector3 Direction => transform.forward;
     public ulong Owner => attackerNetworkID;
     public bool CanBreakThings => canBreakThings;
 
-    [SerializeField] protected float lifetime;
+    [SerializeField] protected float lifetime; 
 
     protected float speed;
     protected float bulletDrop;
@@ -47,7 +50,7 @@ public class Projectile : MonoBehaviour
         var col = collision.collider;
         if (col.TryGetComponent<IShootable>(out var shootableComponent))
         {
-            shootableComponent.ReactShot(damage, transform.forward, Vector3.zero, attackerNetworkID, canBreakThings);
+            shootableComponent.ReactShot(damage, transform.forward, Vector3.zero, attackerNetworkID, _____placeHolderTeamID, canBreakThings);
             onHitPlayerBehaviour.OnHitPlayer(this, shootableComponent);
             active = false;
         }

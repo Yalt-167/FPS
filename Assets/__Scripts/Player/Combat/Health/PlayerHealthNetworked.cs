@@ -18,9 +18,9 @@ public class PlayerHealthNetworked : NetworkBehaviour
 
     public Shield Shield { get; private set; }
     
-    private bool Alive => CurrentHealth > 0;
+    public bool Alive => CurrentHealth > 0;
 
-    private ushort teamID = 0;
+    public ushort TeamID;
 
     private void Awake()
     {
@@ -81,16 +81,19 @@ public class PlayerHealthNetworked : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    public void SetTeamClientRpc(ushort _teamID)
+    public void SetTeamClientRpc(ushort teamID)
     {
-        teamID = _teamID;
+        TeamID = teamID;
     }
 
     [Rpc(SendTo.ClientsAndHost)]
     public void TakeDamageClientRpc(ushort damage, BodyParts bodyPartShot, bool ignoreShield, ulong attackerNetworkID) // add shield only modifier ?
     {
         // send the info about wether shielded here (bool)Shield
-        if (IsOwner) { SendDamageLogInfosServerRpc(MapBodyPartToTargetType(bodyPartShot, Shield), damage, attackerNetworkID); }
+        if (IsOwner)
+        {
+            SendDamageLogInfosServerRpc(MapBodyPartToTargetType(bodyPartShot, Shield), damage, attackerNetworkID);
+        }
 
         if (damage <= 0) { return; }
 
@@ -171,6 +174,6 @@ public class PlayerHealthNetworked : NetworkBehaviour
     private void RespawnClientRpc()
     {
         ResetHealth();
-        transform.position = Game.Manager.GetSpawnPosition(teamID);
+        transform.position = Game.Manager.GetSpawnPosition(TeamID);
     }
 }

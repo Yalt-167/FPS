@@ -21,11 +21,12 @@ public sealed class Game : MonoBehaviour
 
     #region Player List
 
+    private readonly NetworkedPlayer NO_PLAYER = new();
     private readonly List<NetworkedPlayer> players = new();
 
     /// <summary>
     ///  returns ur absolute ID (fancy word for index in playerList)<br/>
-    ///  this ID ensure faster
+    ///  this ID ensure faster retrieval
     /// </summary>
     /// <param name="player"></param>
     /// <returns></returns>
@@ -35,30 +36,30 @@ public sealed class Game : MonoBehaviour
         return (ushort)(players.Count - 1);
     }
 
-    public void DiscardPlayer(NetworkedPlayer player) // send notice to all the above players that their index is no longer the correct one  
+    public void DiscardPlayer(ushort playerID)
     {
-        players.Remove(player);
+        players[playerID] = NO_PLAYER;
     }
 
     /// <summary>
     /// <paramref name="whichComponentID"/> basically refers to which component ID was passed in the function.<br/>
     /// For instance if the ID we have is the weaponHandler ID and we passed it we should also pass the relevant enum member 
     /// </summary>
-    /// <param name="objectID"></param>
+    /// <param name="componentID"></param>
     /// <param name="whichComponentID"></param>
-    public NetworkedPlayer RetrievePlayer(ulong objectID, NetworkedComponent whichComponentID)
+    public NetworkedPlayer RetrievePlayerFromComponentID(ulong componentID, NetworkedComponent whichComponentID)
     {
         return whichComponentID switch
         {
-            NetworkedComponent.NetworkObject => players.First(each => ((NetworkObject)each).NetworkObjectId == objectID),
+            NetworkedComponent.NetworkObject => players.First(each => ((NetworkObject)each).NetworkObjectId == componentID),
 
-            NetworkedComponent.ClientNetworkTransform => players.First(each => ((ClientNetworkTransform)each).NetworkObjectId == objectID),
+            NetworkedComponent.ClientNetworkTransform => players.First(each => ((ClientNetworkTransform)each).NetworkObjectId == componentID),
 
-            NetworkedComponent.HandlePlayerNetworkBehaviour => players.First(each => ((HandlePlayerNetworkBehaviour)each).NetworkObjectId == objectID),
+            NetworkedComponent.HandlePlayerNetworkBehaviour => players.First(each => ((HandlePlayerNetworkBehaviour)each).NetworkObjectId == componentID),
 
-            NetworkedComponent.WeaponHandler => players.First(each => ((WeaponHandler)each).NetworkObjectId == objectID),
+            NetworkedComponent.WeaponHandler => players.First(each => ((WeaponHandler)each).NetworkObjectId == componentID),
 
-            NetworkedComponent.PlayerHealthNetworked => players.First(each => ((PlayerHealthNetworked)each).NetworkObjectId == objectID),
+            NetworkedComponent.PlayerHealthNetworked => players.First(each => ((PlayerHealthNetworked)each).NetworkObjectId == componentID),
 
             _ => throw new Exception("This component provided does not match anything"),
         };
@@ -77,7 +78,6 @@ public sealed class Game : MonoBehaviour
             yield return player;
         }
     }
-
 
     #endregion
 

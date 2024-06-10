@@ -195,6 +195,7 @@ GameObject:
   - component: {fileID: 5672603145184474037}
   - component: {fileID: 3440198134253247520}
   - component: {fileID: 7064677973404644992}
+  - component: {fileID: 3665765903195688934}
   - component: {fileID: 2189134874924269601}
   - component: {fileID: 5566541058021640135}
   - component: {fileID: 521819420687787585}
@@ -284,6 +285,18 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3665765903195688934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 615695314538812458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76b8400fd8a83f64988129bb2e605760, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!136 &2189134874924269601
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -765,6 +778,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <HealthData>k__BackingField: {fileID: 11400000, guid: 31b3be51212c77744b1e8161efdb4a23,
     type: 2}
+  TeamID: 0
 --- !u!114 &6942959066650927657
 MonoBehaviour:
   m_ObjectHideFlags: 0
