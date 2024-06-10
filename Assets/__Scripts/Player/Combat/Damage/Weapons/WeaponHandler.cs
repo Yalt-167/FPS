@@ -953,10 +953,11 @@ public class WeaponHandler : NetworkBehaviour
 
         for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
         {
+            var rot = Quaternion.LookRotation(shotgunPelletsDirections[i]);
             var projectile = Instantiate(
                 currentWeaponStats.TravelTimeBulletSettings.BulletPrefab,
                 barrelEnd.position,
-                Quaternion.LookRotation(shotgunPelletsDirections[i])
+                rot
             ).GetComponent<Projectile>();
 
             if (projectile == null)
