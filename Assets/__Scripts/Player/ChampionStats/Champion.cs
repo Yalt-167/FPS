@@ -7,18 +7,31 @@ public abstract class Champion : MonoBehaviour
 {
     private ChampionStats championStats;
 
-    private delegate void PrimaryAbility();
-    private event PrimaryAbility onPrimaryAbilityTriggered;
+    public interface IPrimaryAbililtyParam { }
+    private delegate void PrimaryAbility(IPrimaryAbililtyParam param);
+    private event PrimaryAbility OnPrimaryAbilityTriggered;
 
-    private delegate void SecondaryAbility();
-    private event SecondaryAbility onSecondaryAbilityTriggered;
+    public interface ISecondaryAbiltyParam { }
+    private delegate void SecondaryAbility(ISecondaryAbiltyParam param);
+    private event SecondaryAbility OnSecondaryAbilityTriggered;
 
-    private delegate void JumpEvent();
-    private event JumpEvent onJump;
+    public interface IOnJumpParam { }
+    private delegate void JumpEvent(IOnJumpParam param);
+    private event JumpEvent OnJump;
 
-    private delegate void LandEvent();
-    private event LandEvent onLand;
+    public interface IOnLandParam { }
+    private delegate void LandEvent(IOnLandParam param);
+    private event LandEvent OnLand;
+
+    public interface IOnDashParam { }
+    private delegate void DashEvent(IOnDashParam param);
+    private event DashEvent OnDash;
 }
-}
+
+
+
+
+
+
 
 
