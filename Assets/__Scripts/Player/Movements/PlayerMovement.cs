@@ -14,7 +14,7 @@ public class PlayerMovement : MonoBehaviour
 
     #region References
 
-    public static PlayerMovement Instance; // fix ASAP
+    //public static PlayerMovement Instance; // fix ASAP
     [SerializeField] private MovementInputQuery inputQuery;
     private Rigidbody Rigidbody;
     private CapsuleCollider CapsuleCollider;
@@ -282,7 +282,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        //Instance = this;
 
         inputQuery.Init();
 

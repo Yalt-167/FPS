@@ -8,7 +8,7 @@ public class EnemyShootHitscanAfterTime : MonoBehaviour //, IShootable
     [SerializeField] private float viewDistance;
     private bool isLockedIn;
     [SerializeField] private LayerMask groundAndPlayerLayers;
-    private Vector3 PlayerPosition => PlayerMovement.Instance.Position;
+    private Vector3 PlayerPosition => Vector3.zero; // PlayerMovement.Instance.Position;
 
     private LineRenderer lineRenderer;
 
