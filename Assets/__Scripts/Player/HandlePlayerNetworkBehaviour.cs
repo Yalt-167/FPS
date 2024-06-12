@@ -26,7 +26,6 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        
         transform.position = new(transform.position.x, 2, transform.position.z);
 
         var (componentsToKill, gameObjectsToKill) = IsOwner ? (componentsToKillOnLocalPlayers, gameObjectsToKillOnLocalPlayers) : (componentsToKillOnForeignPlayers, gameObjectsToKillOnForeignPlayers);

@@ -5,7 +5,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 [DefaultExecutionOrder(-7)]
-public class PlayerMovement : MonoBehaviour, IEntity
+public class PlayerMovement : MonoBehaviour
 {
     public VelocityDebug GlobalVelocityDebug;
     public VelocityDebug LocalVelocityDebug;
@@ -994,11 +994,6 @@ public class PlayerMovement : MonoBehaviour, IEntity
         //    transform.position,
         //    bodyCheckSize
         //    );
-    }
-
-    public void OnHurt()
-    {
-        throw new NotImplementedException();
     }
 }
 

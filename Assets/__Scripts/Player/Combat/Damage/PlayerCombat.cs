@@ -6,6 +6,8 @@ using UnityEngine;
 [DefaultExecutionOrder(-6)]
 public class PlayerCombat : MonoBehaviour
 {
+    private PlayerFrame playerFrame;
+
     [SerializeField] private int allowedWeaponsCount = 3;
     [SerializeField] private CombatInputQuery inputQuery;
     [SerializeField] private Weapon[] weapons;
@@ -45,6 +47,7 @@ public class PlayerCombat : MonoBehaviour
     {
         //cameraTransform = transform.GetChild(0).GetChild(0);
         weaponHandler = GetComponent<WeaponHandler>();
+        playerFrame = GetComponent<PlayerFrame>();
         inputQuery.Init();
         UpdateWeapon();
     }

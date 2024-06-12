@@ -48,7 +48,7 @@ public class EnemyShootHitscanAfterTime : MonoBehaviour //, IShootable
 
         if (startTime + timeToShoot < Time.time) // if left because time is over
         {
-            PlayerMovement.Instance.OnHurt();
+            // actual shooting logic when I ll bother to do it
         }
 
         isLockedIn = false;

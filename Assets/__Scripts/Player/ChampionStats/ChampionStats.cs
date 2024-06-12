@@ -7,7 +7,7 @@ using UnityEngine;
 public class ChampionStats : ScriptableObject
 {
     public ChampionMovementStats MovementStats;
-
+    public ChampionCooldowns Cooldowns;
 }
 
 
@@ -44,6 +44,14 @@ public struct ChampionDashStats
     public bool HasDash;
     public float DashVelocity;
     public float DashDuration;
+}
+
+
+[Serializable]
+public struct ChampionCooldowns
+{
+    public float PrimaryAbilityCooldown;
+    public float SecondaryAbilityCooldown;
 }
 
 

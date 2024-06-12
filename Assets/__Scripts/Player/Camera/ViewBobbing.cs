@@ -10,16 +10,16 @@ public class ViewBobbing : MonoBehaviour
     [SerializeField] private Transform cameraTransform; // Reference to the camera transform
     private Vector3 originalPosition; // Original position of the camera
 
-    private float BobbingSpeed =>
-        PlayerMovement.Instance.IsGrounded ?
-            PlayerMovement.Instance.IsSliding || PlayerMovement.Instance.IsDashing ?
-                0f
-                :
-                PlayerMovement.Instance.CurrentSpeed > 5f ?
-                    10f
-                    : 1f
-            :
-        0f;
+    private float BobbingSpeed => 0f;
+        //PlayerMovement.Instance.IsGrounded ?
+        //    PlayerMovement.Instance.IsSliding || PlayerMovement.Instance.IsDashing ?
+        //        0f
+        //        :
+        //        PlayerMovement.Instance.CurrentSpeed > 5f ?
+        //            10f
+        //            : 1f
+        //    :
+        //0f;
 
     private Coroutine bobbingCoroutine;
 

@@ -5,6 +5,7 @@ using UnityEngine;
 public class FollowRotationCamera : MonoBehaviour
 {
     private Transform playerTransform; // The GameObject whose rotation the camera will follow
+    private PlayerMovement playerMovement;
     [SerializeField] private float sensitivity = 5f; // Sensitivity of camera rotation
 
     private float xRotation = 0f; // Current rotation around the x-axis
@@ -17,6 +18,7 @@ public class FollowRotationCamera : MonoBehaviour
     private void Awake()
     {
         playerTransform = transform.parent;
+        playerMovement = playerMovement.GetComponent<PlayerMovement>();
     }
 
     private void Update()
@@ -24,7 +26,7 @@ public class FollowRotationCamera : MonoBehaviour
         // around x-axis(and z with the cameraTilt thingy)
         xRotation -= Input.GetAxis(MouseYAxis) * sensitivity;
         xRotation = Mathf.Clamp(xRotation, -89f, 89f); // Clamp in order to avoid doing a flip when looking up/down too intensely
-        transform.localRotation = Quaternion.Euler(xRotation, 0f, PlayerMovement.Instance.CurrentWallRunCameraTilt);
+        transform.localRotation = Quaternion.Euler(xRotation, 0f, playerMovement.CurrentWallRunCameraTilt);
 
         // around y-axis
         yRotation += Input.GetAxis(MouseXAxis) * sensitivity;
