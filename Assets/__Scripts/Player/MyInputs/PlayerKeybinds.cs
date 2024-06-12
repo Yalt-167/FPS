@@ -93,9 +93,15 @@ public class CombatInputQuery : InputQuery
     public FixedKeybind SecondGun;
     public FixedKeybind ThirdGun;
 
+    public FixedKeybind PrimaryAbility;
+    public FixedKeybind SecondaryAbility;
+    public FixedKeybind Ultimate;
+    
+
     public FixedKeybind Slash;
     public FixedKeybind Parry;
     public FixedKeybind ChangeCrosshair;
+
 
     public override void Init()
     {
@@ -105,9 +111,15 @@ public class CombatInputQuery : InputQuery
 
         //NextWeapon.Init();
         //PreviousWeapon.Init();
+
         FirstGun.Init();
         SecondGun.Init();
         ThirdGun.Init();
+
+        PrimaryAbility.Init();
+        SecondaryAbility.Init();
+        Ultimate.Init();
+
         Slash.Init();
         Parry.Init();
 
