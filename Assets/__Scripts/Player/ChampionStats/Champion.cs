@@ -7,25 +7,50 @@ public abstract class Champion : MonoBehaviour
 {
     private ChampionStats championStats;
 
-    public interface IPrimaryAbililtyParam { }
-    private delegate void PrimaryAbility(IPrimaryAbililtyParam param);
-    private event PrimaryAbility OnPrimaryAbilityTriggered;
+    public interface IPrimaryAbilityParam { }
+    public delegate void PrimaryAbility(IPrimaryAbilityParam param);
+    public event PrimaryAbility OnPrimaryAbilityTriggered;
 
-    public interface ISecondaryAbiltyParam { }
-    private delegate void SecondaryAbility(ISecondaryAbiltyParam param);
-    private event SecondaryAbility OnSecondaryAbilityTriggered;
+    public void TriggerPrimaryAbility(IPrimaryAbilityParam param)
+    {
+        OnPrimaryAbilityTriggered?.Invoke(param);
+    }
+
+    public interface ISecondaryAbilityParam { }
+    public delegate void SecondaryAbility(ISecondaryAbilityParam param);
+    public event SecondaryAbility OnSecondaryAbilityTriggered;
+
+    public void TriggerSecondaryAbility(ISecondaryAbilityParam param)
+    {
+        OnSecondaryAbilityTriggered?.Invoke(param);
+    }
 
     public interface IOnJumpParam { }
-    private delegate void JumpEvent(IOnJumpParam param);
-    private event JumpEvent OnJump;
+    public delegate void JumpEvent(IOnJumpParam param);
+    public event JumpEvent OnJump;
+
+    public void TriggerJump(IOnJumpParam param)
+    {
+        OnJump?.Invoke(param);
+    }
 
     public interface IOnLandParam { }
-    private delegate void LandEvent(IOnLandParam param);
-    private event LandEvent OnLand;
+    public delegate void LandEvent(IOnLandParam param);
+    public event LandEvent OnLand;
+
+    public void TriggerLand(IOnLandParam param)
+    {
+        OnLand?.Invoke(param);
+    }
 
     public interface IOnDashParam { }
-    private delegate void DashEvent(IOnDashParam param);
-    private event DashEvent OnDash;
+    public delegate void DashEvent(IOnDashParam param);
+    public event DashEvent OnDash;
+
+    public void TriggerDash(IOnDashParam param)
+    {
+        OnDash?.Invoke(param);
+    }
 }
 
 
