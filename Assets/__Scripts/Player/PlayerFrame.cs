@@ -29,7 +29,6 @@ public class PlayerFrame : MonoBehaviour
 
     private void Awake()
     {
-        print("was called");
         playerCombat = GetComponent<PlayerCombat>();
         playerHealth = GetComponent<PlayerHealthNetworked>();
         playerMovement = GetComponent<PlayerMovement>();
