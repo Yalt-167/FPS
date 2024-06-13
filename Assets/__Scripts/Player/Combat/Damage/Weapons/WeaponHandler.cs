@@ -435,63 +435,63 @@ public class WeaponHandler : NetworkBehaviour
         };
     }
 
-    [Rpc(SendTo.ClientsAndHost)]
-    private void _ExecuteSimpleHitscanShotClientRpc()
-    {
-        UpdateOwnerSettingsUponShot();
+    //[Rpc(SendTo.ClientsAndHost)]
+    //private void _ExecuteSimpleHitscanShotClientRpc()
+    //{
+    //    UpdateOwnerSettingsUponShot();
 
-        var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
-        var directionWithSpread = GetDirectionWithSpread(currentSpreadAngle, barrelEnd);
+    //    var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
+    //    var directionWithSpread = GetDirectionWithSpread(currentSpreadAngle, barrelEnd);
 
-        if (currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
-        {
-            var endPoint = barrelEnd.position + directionWithSpread * 100;
+    //    if (currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
+    //    {
+    //        var endPoint = barrelEnd.position + directionWithSpread * 100;
             
-            var hits = Physics.RaycastAll(barrelEnd.position, directionWithSpread, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore);
+    //        var hits = Physics.RaycastAll(barrelEnd.position, directionWithSpread, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore);
 
-            Array.Sort(hits, new RaycastHitComparer());
+    //        Array.Sort(hits, new RaycastHitComparer());
 
-            foreach (var hit in hits)
-            {
-                if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
-                {
-                    if (IsOwner)
-                    {
-                        shootableComponent.ReactShot(currentWeaponStats.Damage, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
-                    }
-                }
-                else // so far else is the wall but do proper checks later on
-                {
-                    endPoint = hit.point;
-                    break;
-                }
-            }
+    //        foreach (var hit in hits)
+    //        {
+    //            if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
+    //            {
+    //                if (IsOwner)
+    //                {
+    //                    shootableComponent.ReactShot(currentWeaponStats.Damage, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
+    //                }
+    //            }
+    //            else // so far else is the wall but do proper checks later on
+    //            {
+    //                endPoint = hit.point;
+    //                break;
+    //            }
+    //        }
 
-            bulletTrail.Set(barrelEnd.position, endPoint);
+    //        bulletTrail.Set(barrelEnd.position, endPoint);
 
-        }
-        else
-        {
-            if (Physics.Raycast(barrelEnd.position, directionWithSpread, out RaycastHit hit, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore))
-            {
-                bulletTrail.Set(barrelEnd.position, hit.point);
-                if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
-                {
-                    shootableComponent.ReactShot(currentWeaponStats.Damage, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
-                }
-            }
-            else
-            {
-                bulletTrail.Set(barrelEnd.position, barrelEnd.position + directionWithSpread * 100);
-            }
-        }
+    //    }
+    //    else
+    //    {
+    //        if (Physics.Raycast(barrelEnd.position, directionWithSpread, out RaycastHit hit, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore))
+    //        {
+    //            bulletTrail.Set(barrelEnd.position, hit.point);
+    //            if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
+    //            {
+    //                shootableComponent.ReactShot(currentWeaponStats.Damage, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
+    //            }
+    //        }
+    //        else
+    //        {
+    //            bulletTrail.Set(barrelEnd.position, barrelEnd.position + directionWithSpread * 100);
+    //        }
+    //    }
 
-        if (!IsOwner) { return; }
+    //    if (!IsOwner) { return; }
 
-        ApplyRecoil();
-        ApplySpread();
-        ApplyKickback();
-    }
+    //    ApplyRecoil();
+    //    ApplySpread();
+    //    ApplyKickback();
+    //}
 
     [Rpc(SendTo.ClientsAndHost)]
     private void ExecuteSimpleHitscanShotClientRpc()
@@ -552,65 +552,65 @@ public class WeaponHandler : NetworkBehaviour
         ApplyKickback();
     }
 
-    [Rpc(SendTo.ClientsAndHost)]
-    private void _ExecuteShotgunHitscanShotClientRpc()
-    {
-        UpdateOwnerSettingsUponShot();
+    //[Rpc(SendTo.ClientsAndHost)]
+    //private void _ExecuteShotgunHitscanShotClientRpc()
+    //{
+    //    UpdateOwnerSettingsUponShot();
 
-        if (currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
-        {
-            for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
-            {
-                var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
-                var endPoint = barrelEnd.position + shotgunPelletsDirections[i] * 100;
+    //    if (currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
+    //    {
+    //        for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
+    //        {
+    //            var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
+    //            var endPoint = barrelEnd.position + shotgunPelletsDirections[i] * 100;
 
-                var hits = Physics.RaycastAll(barrelEnd.position, shotgunPelletsDirections[i], currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
-                Array.Sort(hits, new RaycastHitComparer());
+    //            var hits = Physics.RaycastAll(barrelEnd.position, shotgunPelletsDirections[i], currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
+    //            Array.Sort(hits, new RaycastHitComparer());
 
-                foreach (var hit in hits)
-                {
-                    if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
-                    {
-                        if (IsOwner)
-                        {
-                            shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[i], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
-                        }
-                        else
-                        {
-                            endPoint = hit.point;
-                            break;
-                        }
-                    }
-                }
+    //            foreach (var hit in hits)
+    //            {
+    //                if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
+    //                {
+    //                    if (IsOwner)
+    //                    {
+    //                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[i], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
+    //                    }
+    //                    else
+    //                    {
+    //                        endPoint = hit.point;
+    //                        break;
+    //                    }
+    //                }
+    //            }
 
-                bulletTrail.Set(barrelEnd.position, endPoint);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
-            {
-                var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
-                if (Physics.Raycast(barrelEnd.position, shotgunPelletsDirections[i], out RaycastHit hit, currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore))
-                {
-                    bulletTrail.Set(barrelEnd.position, hit.point);
-                    if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
-                    {
-                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[i], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
-                    }
-                }
-                else
-                {
-                    bulletTrail.Set(barrelEnd.position, barrelEnd.position + shotgunPelletsDirections[i] * currentWeaponStats.ShotgunStats.PelletsRange);
-                }
-            }
-        }
+    //            bulletTrail.Set(barrelEnd.position, endPoint);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
+    //        {
+    //            var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
+    //            if (Physics.Raycast(barrelEnd.position, shotgunPelletsDirections[i], out RaycastHit hit, currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore))
+    //            {
+    //                bulletTrail.Set(barrelEnd.position, hit.point);
+    //                if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
+    //                {
+    //                    shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[i], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
+    //                }
+    //            }
+    //            else
+    //            {
+    //                bulletTrail.Set(barrelEnd.position, barrelEnd.position + shotgunPelletsDirections[i] * currentWeaponStats.ShotgunStats.PelletsRange);
+    //            }
+    //        }
+    //    }
 
-        if (!IsOwner) { return; }
+    //    if (!IsOwner) { return; }
 
-        ApplyRecoil();
-        ApplyKickback();
-    }
+    //    ApplyRecoil();
+    //    ApplyKickback();
+    //}
 
     [Rpc(SendTo.ClientsAndHost)]
     private void ExecuteShotgunHitscanShotClientRpc()
@@ -672,64 +672,64 @@ public class WeaponHandler : NetworkBehaviour
         ApplyKickback();
     }
 
-    [Rpc(SendTo.ClientsAndHost)]
-    private void _ExecuteChargedHitscanShotClientRpc(float chargeRatio)
-    {
-        UpdateOwnerSettingsUponShot();
+    //[Rpc(SendTo.ClientsAndHost)]
+    //private void _ExecuteChargedHitscanShotClientRpc(float chargeRatio)
+    //{
+    //    UpdateOwnerSettingsUponShot();
 
-        var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
-        var directionWithSpread = GetDirectionWithSpread(currentSpreadAngle, barrelEnd);
+    //    var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
+    //    var directionWithSpread = GetDirectionWithSpread(currentSpreadAngle, barrelEnd);
 
-        if (currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
-        {
-            var endPoint = barrelEnd.position + directionWithSpread * 100;
+    //    if (currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
+    //    {
+    //        var endPoint = barrelEnd.position + directionWithSpread * 100;
 
-            var hits = Physics.RaycastAll(barrelEnd.position, directionWithSpread, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore);
+    //        var hits = Physics.RaycastAll(barrelEnd.position, directionWithSpread, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore);
 
-            Array.Sort(hits, new RaycastHitComparer());
+    //        Array.Sort(hits, new RaycastHitComparer());
 
-            foreach (var hit in hits)   
-            {
-                if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
-                {
-                    if (IsOwner)
-                    {
-                        shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
-                    }
-                }
-                else // so far else is the wall but do proper checks later on
-                {
-                    endPoint = hit.point;
-                    break;
-                }
-            }
+    //        foreach (var hit in hits)   
+    //        {
+    //            if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
+    //            {
+    //                if (IsOwner)
+    //                {
+    //                    shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
+    //                }
+    //            }
+    //            else // so far else is the wall but do proper checks later on
+    //            {
+    //                endPoint = hit.point;
+    //                break;
+    //            }
+    //        }
 
-            bulletTrail.Set(barrelEnd.position, endPoint);
+    //        bulletTrail.Set(barrelEnd.position, endPoint);
 
-        }
-        else
-        {
-            if (Physics.Raycast(barrelEnd.position, directionWithSpread, out RaycastHit hit, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore))
-            {
-                bulletTrail.Set(barrelEnd.position, hit.point);
-                if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
-                {
-                    shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
-                }
+    //    }
+    //    else
+    //    {
+    //        if (Physics.Raycast(barrelEnd.position, directionWithSpread, out RaycastHit hit, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore))
+    //        {
+    //            bulletTrail.Set(barrelEnd.position, hit.point);
+    //            if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
+    //            {
+    //                shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
+    //            }
 
-            }
-            else
-            {
-                bulletTrail.Set(barrelEnd.position, barrelEnd.position + directionWithSpread * 100);
-            }
-        }
+    //        }
+    //        else
+    //        {
+    //            bulletTrail.Set(barrelEnd.position, barrelEnd.position + directionWithSpread * 100);
+    //        }
+    //    }
 
-        if (!IsOwner) { return; }
+    //    if (!IsOwner) { return; }
 
-        ApplyRecoil(chargeRatio);
-        ApplySpread();
-        ApplyKickback(chargeRatio);
-    }
+    //    ApplyRecoil(chargeRatio);
+    //    ApplySpread();
+    //    ApplyKickback(chargeRatio);
+    //}
 
     [Rpc(SendTo.ClientsAndHost)]
     private void ExecuteChargedHitscanShotClientRpc(float chargeRatio)
@@ -790,66 +790,66 @@ public class WeaponHandler : NetworkBehaviour
         ApplyKickback(chargeRatio);
     }
 
-    [Rpc(SendTo.ClientsAndHost)]
-    private void _ExecuteChargedShotgunHitscanShotClientRpc(float chargeRatio)
-    {
-        UpdateOwnerSettingsUponShot();
+    //[Rpc(SendTo.ClientsAndHost)]
+    //private void _ExecuteChargedShotgunHitscanShotClientRpc(float chargeRatio)
+    //{
+    //    UpdateOwnerSettingsUponShot();
 
-        if (currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
-        {
-            for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
-            {
-                var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
-                var endPoint = barrelEnd.position + shotgunPelletsDirections[i] * 100;
+    //    if (currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
+    //    {
+    //        for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
+    //        {
+    //            var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
+    //            var endPoint = barrelEnd.position + shotgunPelletsDirections[i] * 100;
 
 
-                var hits = Physics.RaycastAll(barrelEnd.position, shotgunPelletsDirections[i], currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
-                Array.Sort(hits, new RaycastHitComparer());
+    //            var hits = Physics.RaycastAll(barrelEnd.position, shotgunPelletsDirections[i], currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
+    //            Array.Sort(hits, new RaycastHitComparer());
 
-                foreach (var hit in hits)
-                {
-                    if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
-                    {
-                        if (IsOwner)
-                        {
-                            shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[i], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
-                        } 
-                    }
-                    else
-                    {
-                        endPoint = hit.point;
-                        break;
-                    }
-                }
+    //            foreach (var hit in hits)
+    //            {
+    //                if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
+    //                {
+    //                    if (IsOwner)
+    //                    {
+    //                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[i], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
+    //                    } 
+    //                }
+    //                else
+    //                {
+    //                    endPoint = hit.point;
+    //                    break;
+    //                }
+    //            }
 
-                bulletTrail.Set(barrelEnd.position, endPoint);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
-            {
-                var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
-                if (Physics.Raycast(barrelEnd.position, shotgunPelletsDirections[i], out RaycastHit hit, currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore))
-                {
-                    bulletTrail.Set(barrelEnd.position, hit.point);
-                    if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
-                    {
-                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[i], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
-                    }
-                }
-                else
-                {
-                    bulletTrail.Set(barrelEnd.position, barrelEnd.position + shotgunPelletsDirections[i] * currentWeaponStats.ShotgunStats.PelletsRange);
-                }
-            }
-        }
+    //            bulletTrail.Set(barrelEnd.position, endPoint);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
+    //        {
+    //            var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
+    //            if (Physics.Raycast(barrelEnd.position, shotgunPelletsDirections[i], out RaycastHit hit, currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore))
+    //            {
+    //                bulletTrail.Set(barrelEnd.position, hit.point);
+    //                if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
+    //                {
+    //                    shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[i], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
+    //                }
+    //            }
+    //            else
+    //            {
+    //                bulletTrail.Set(barrelEnd.position, barrelEnd.position + shotgunPelletsDirections[i] * currentWeaponStats.ShotgunStats.PelletsRange);
+    //            }
+    //        }
+    //    }
 
-        if (!IsOwner) { return; }
+    //    if (!IsOwner) { return; }
 
-        ApplyRecoil();
-        ApplyKickback();
-    }
+    //    ApplyRecoil();
+    //    ApplyKickback();
+    //}
 
     [Rpc(SendTo.ClientsAndHost)]
     private void ExecuteChargedShotgunHitscanShotClientRpc(float chargeRatio)
@@ -953,11 +953,11 @@ public class WeaponHandler : NetworkBehaviour
 
         for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
         {
-            var rotation = Quaternion.LookRotation(shotgunPelletsDirections[i]);
+            
             var projectile = Instantiate(
                 currentWeaponStats.TravelTimeBulletSettings.BulletPrefab,
                 barrelEnd.position,
-                rotation
+                Quaternion.LookRotation(shotgunPelletsDirections[i])
             ).GetComponent<Projectile>();
 
             if (projectile == null)
@@ -1165,6 +1165,8 @@ public class WeaponHandler : NetworkBehaviour
 
     #endregion
 
+    #region Setting up Shotgun Shot
+
     private void SetShotgunPelletsDirections(Transform directionTranform)
     {
         shotgunPelletsDirections = new Vector3[currentWeaponStats.ShotgunStats.PelletsCount];
@@ -1191,7 +1193,9 @@ public class WeaponHandler : NetworkBehaviour
         shotgunPelletsDirections = directions;
     }
 
-    # region Reload
+    #endregion
+
+    #region Reload
 
     public void Reload()
     {

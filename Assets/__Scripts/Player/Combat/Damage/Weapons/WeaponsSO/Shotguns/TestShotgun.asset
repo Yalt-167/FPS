@@ -13,9 +13,14 @@ MonoBehaviour:
   m_Name: TestShotgun
   m_EditorClassIdentifier: 
   Stats:
-    Damage: 0
+    Damage:
+      CriticalDamage: 0
+      HighDamage: 0
+      BaseDamage: 0
+      LowDamage: 0
+      NegatedDamage: 0
     WeaponClass: 0
-    IsHitscan: 0
+    IsHitscan: 1
     HitscanBulletSettings:
       PierceThroughPlayers: 0
       ActionOnHitWall: 0
@@ -60,7 +65,12 @@ MonoBehaviour:
       SpreadAngleAddedPerShot: 0
       SpreadRegulationSpeed: 0
     ShotgunStats:
-      PelletsDamage: 2
+      PelletsDamage:
+        CriticalDamage: 0
+        HighDamage: 0
+        BaseDamage: 0
+        LowDamage: 0
+        NegatedDamage: 0
       PelletsCount: 32
       PelletsSpreadAngle: 15
       AimingPelletsSpreadAngle: 10
@@ -99,6 +109,7 @@ MonoBehaviour:
       WeaponKickBackRegulationTime: 0.003
     CanBreakThings: 1
     EffectsInflicted: 0
+    Weight: 0
   Model: {fileID: 0}
   Sounds:
     ShootingSound: {fileID: 0}
