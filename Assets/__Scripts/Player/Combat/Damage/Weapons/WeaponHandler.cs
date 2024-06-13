@@ -953,11 +953,11 @@ public class WeaponHandler : NetworkBehaviour
 
         for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
         {
-            var rot = Quaternion.LookRotation(shotgunPelletsDirections[i]);
+            var rotation = Quaternion.LookRotation(shotgunPelletsDirections[i]);
             var projectile = Instantiate(
                 currentWeaponStats.TravelTimeBulletSettings.BulletPrefab,
                 barrelEnd.position,
-                rot
+                rotation
             ).GetComponent<Projectile>();
 
             if (projectile == null)
@@ -1175,6 +1175,20 @@ public class WeaponHandler : NetworkBehaviour
         {
             shotgunPelletsDirections[i] = GetDirectionWithSpread(relevantSpread, directionTranform);
         }
+
+        RequestUpdateShotgunPelletsDirectionServerRpc(shotgunPelletsDirections);
+    }
+
+    [Rpc(SendTo.Server)]
+    private void RequestUpdateShotgunPelletsDirectionServerRpc(Vector3[] directions)
+    {
+        UpdateShotgunPelletDirectionClientRpc(directions);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void UpdateShotgunPelletDirectionClientRpc(Vector3[] directions)
+    {
+        shotgunPelletsDirections = directions;
     }
 
     # region Reload

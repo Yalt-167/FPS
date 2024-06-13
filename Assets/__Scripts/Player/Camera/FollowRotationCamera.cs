@@ -18,7 +18,7 @@ public class FollowRotationCamera : MonoBehaviour
     private void Awake()
     {
         playerTransform = transform.parent;
-        playerMovement = playerMovement.GetComponent<PlayerMovement>();
+        playerMovement = playerTransform.GetComponent<PlayerMovement>();
     }
 
     private void Update()
