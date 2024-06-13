@@ -4,6 +4,7 @@ using UnityEngine;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.SceneManagement;
+using System.Runtime.Serialization;
 
 public static class SaveAndLoad
 {
@@ -15,6 +16,15 @@ public static class SaveAndLoad
         FileStream file = new(path, FileMode.Create);
 
         binaryFormater.Serialize(file, totalTime);
+        file.Close();
+    }
+    public static void Save(ISerializable data, string name)
+    {
+        BinaryFormatter binaryFormater = new();
+        string path = Application.persistentDataPath + $"/{name}.coolStuff";
+
+        FileStream file = new(path, FileMode.Create);
+        binaryFormater.Serialize(file, data);
         file.Close();
     }
 
