@@ -3,50 +3,40 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using UnityEngine.SceneManagement;
-using System.Runtime.Serialization;
 
 public static class SaveAndLoad
 {
-    public static void Save(float totalTime)
+    public static void Save(object data, string name)
     {
         BinaryFormatter binaryFormater = new();
-        string path = Application.persistentDataPath + $"/{SceneManager.GetActiveScene().name}.coolStuff";
+        string path = $"{Application.persistentDataPath}/{name}.data";
 
-        FileStream file = new(path, FileMode.Create);
-
-        binaryFormater.Serialize(file, totalTime);
-        file.Close();
-    }
-    public static void Save(ISerializable data, string name)
-    {
-        BinaryFormatter binaryFormater = new();
-        string path = Application.persistentDataPath + $"/{name}.coolStuff";
-
-        FileStream file = new(path, FileMode.Create);
-        binaryFormater.Serialize(file, data);
-        file.Close();
+        using (FileStream file = new(path, FileMode.Create))
+        {
+            binaryFormater.Serialize(file, data);
+        }
     }
 
 
-    public static float Load()
+    public static object Load(string name)
     {
-        string path = Application.persistentDataPath + $"/{SceneManager.GetActiveScene().name}.coolStuff";
+        string path = $"{Application.persistentDataPath}/{name}.data";
 
-        if (File.Exists(path))
+        if (!File.Exists(path))
         {
-            BinaryFormatter binaryFormater = new();
-            FileStream file = new(path, FileMode.Open);
+            Debug.Log($"No save file found for path: {path}");
+            return null;
+        }
+        
+        BinaryFormatter binaryFormater = new();
 
-            float totalTime = (float)binaryFormater.Deserialize(file);
-            file.Close();
-            return totalTime;
-        }
-        else
+        object data;
+        using (FileStream file = new(path, FileMode.Open))
         {
-            Debug.Log("No save file found");
-            return -1f;
+            data = binaryFormater.Deserialize(file);
         }
+
+        return data;
 
     }
 }
