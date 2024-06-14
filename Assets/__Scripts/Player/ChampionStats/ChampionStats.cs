@@ -26,7 +26,6 @@ public struct ChampionSpeedStats
     public float StrafingSpeed;
     public float BackwardSpeed;
     public float WallRunningSpeed;
-    public float Acceleration;
 }
 
 [Serializable]

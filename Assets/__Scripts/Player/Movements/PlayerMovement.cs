@@ -345,8 +345,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void SetMovementMode(MovementMode movementMode)
     {
-        currentMovementMode = movementMode;
-        switch (currentMovementMode)
+        switch (currentMovementMode = movementMode)
         {
             case MovementMode.RUN:
                 currentGravityForce = baseGravity;
@@ -603,6 +602,7 @@ public class PlayerMovement : MonoBehaviour
 
         yield return new WaitUntil(() => isCollidingDown || !inputQuery.HoldCrouch);
 
+
         if (!inputQuery.HoldCrouch)
         {
             CommonSlideExit(MovementMode.RUN);
@@ -612,49 +612,52 @@ public class PlayerMovement : MonoBehaviour
         var dir = new Vector3(MyInput.GetAxis(inputQuery.Left, inputQuery.Right), 0f, MyInput.GetAxis(inputQuery.Back, inputQuery.Forward));
         horizontalVelocityBoost +=
             (chainedFromDash ? dashIntoSlideVelocityBoost : 1f) * initialSlideBoost * (dir == Vector3.zero ?
-                transform.TransformDirection(transform.InverseTransformDirection(Rigidbody.velocity).Mask(1f, 0, 1f)).normalized
+                Rigidbody.velocity.Mask(1f, 0, 1f).normalized
                 :
                 transform.TransformDirection(dir)).normalized;
 
         cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, .5f, 1f);
+
         var dashed = false;
+        var jumped = false;
 
-        yield return new WaitUntil(() =>
-        {
-            if (isCollidingDown)
-            {
-                Rigidbody.AddForce(slideDownwardForce * Time.deltaTime * -transform.up, ForceMode.Force);
-            }
+        yield return new WaitUntil(
+            () =>
+                {
+                    if (isCollidingDown)
+                    {
+                        Rigidbody.AddForce(slideDownwardForce * Time.deltaTime * -transform.up, ForceMode.Force);
+                    }
 
-            /* -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized -> gets the opposite of the velocity while ignoring verticality */
-            Rigidbody.AddForce(slideSlowdownForce * Time.deltaTime * -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Force);
+                    /* -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized -> gets the opposite of the velocity while ignoring verticality */
+                    Rigidbody.AddForce(slideSlowdownForce * Time.deltaTime * -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Force);
 
-            dashed = DashUsable && inputQuery.Dash;
+                    if (DashUsable && inputQuery.Dash)
+                    {
+                        CommonSlideExit(MovementMode.DASH);
+                        StartCoroutine(Dash());
+                        return dashed = true;
+                    }
 
-            return
-                Rigidbody.velocity.magnitude < slideCancelThreshold ||
-                !inputQuery.HoldCrouch ||
-                HandleJump(true, true, InDashVelocityBoostWindow) ||
-                dashed
-                ;
-        });
+                    jumped = HandleJump(true, true, InDashVelocityBoostWindow);
 
-        cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, 2f, 1f);
+                    return
+                        Rigidbody.velocity.magnitude < slideCancelThreshold ||
+                        !inputQuery.HoldCrouch ||
+                        jumped
+                        ;
+                }
+        );
 
-        if (dashed)
-        {
-            CommonSlideExit(MovementMode.DASH);
-            StartCoroutine(Dash());
-        }
-        else
-        {
-            CommonSlideExit(MovementMode.RUN);
-        }
+        if (dashed) { yield break; }
+
+        CommonSlideExit(MovementMode.RUN);
         
     }
 
     private void CommonSlideExit(MovementMode newMovementMode)
     {
+        cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, 2f, 1f);
         IsSliding = false;
         CapsuleCollider.height *= 2;
         timeStoppedSlide = Time.time;
@@ -689,7 +692,8 @@ public class PlayerMovement : MonoBehaviour
         dashReady = false;
         ResetVelocityBoost();
 
-        var slidOrJumped = false;
+        var slid = false;
+        var jumped = false;
         timeDashTriggered = Time.time;
         followRotationCamera.enabled = false;
         var dir = cameraTransform.TransformDirection(new(MyInput.GetAxis(inputQuery.Left, inputQuery.Right), 0f, MyInput.GetAxis(inputQuery.Back, inputQuery.Forward)));
@@ -702,34 +706,42 @@ public class PlayerMovement : MonoBehaviour
 
                     if (inputQuery.InitiateCrouch && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
                     {
-                        slidOrJumped = true;
+                        slid = true;
                         CommonDashExit(MovementMode.SLIDE);
-                        StartCoroutine(Slide(true));
+                        StartCoroutine(Slide(true));    
+                        return true;
                     }
 
                     if (HandleJump(false, InSlideJumpBoostWindow, true))
                     {
-                        slidOrJumped = true;
+                        jumped = true;
                         CommonDashExit(MovementMode.RUN);
+                        return true;
                     }
-                    return timeDashTriggered + dashDuration < Time.time || slidOrJumped;
+
+                    return timeDashTriggered + dashDuration < Time.time;
                 }
         );
 
-        if (!slidOrJumped)
+        if (slid || jumped) { yield break; }
+        
+        var shouldWallrunLeftRight = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
+        if (shouldWallrunLeftRight != 0f && !isCollidingDown)
         {
-            var shouldWallrunLeftRight = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
-            if (shouldWallrunLeftRight != 0f && !isCollidingDown)
-            {
-                StartCoroutine(Wallrun(shouldWallrunLeftRight));
-                CommonDashExit(MovementMode.WALLRUN);
-            }
-            else
-            {
-                CommonDashExit(MovementMode.RUN);
-            }
+            CommonDashExit(MovementMode.WALLRUN);
+            StartCoroutine(Wallrun(shouldWallrunLeftRight));
         }
+        else
+        {
+            CommonDashExit(MovementMode.RUN);
+        }
+    }
 
+    private void CommonDashExit(MovementMode newMovementMode)
+    {
+        followRotationCamera.enabled = true;
+        IsDashing = false;
+        SetMovementMode(newMovementMode);
         StartCoroutine(StartDashCooldown());
     }
 
@@ -740,12 +752,6 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(dashCooldown);
 
         dashOnCooldown = false;
-    }
-
-    private void CommonDashExit(MovementMode newMovementMode)
-    {
-        followRotationCamera.enabled = true;
-        SetMovementMode(newMovementMode);
     }
 
     private void TryReplenishDash()
