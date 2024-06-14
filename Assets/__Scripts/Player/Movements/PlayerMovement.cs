@@ -199,8 +199,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector3[] cameraTransformPositions = new Vector3[2] { new(0f, .6f, 0f), new(0f, 2f, -5f) };
     private int currentCameraTransformPositionIndex = 0;
 
-    private float cameraTransformBaseHeight = .6f;
-    private float cameraTransformSlidingHeight = .3f;
+    private readonly float cameraTransformBaseHeight = .6f;
+    private readonly float cameraTransformSlidingHeight = .3f;
 
 
     #endregion
@@ -457,7 +457,7 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator ResetJumping()
     {
         yield return new WaitUntil(
-                () => Rigidbody.velocity.y < 0f || (int) currentMovementMode > 1
+                () => Rigidbody.velocity.y < 0f/* || (int) currentMovementMode > 1*/
             );
         IsJumping = false;
     }
@@ -478,7 +478,10 @@ public class PlayerMovement : MonoBehaviour
             Run(isBhopping);
         }
 
-        HandleJump(true, InSlideJumpBoostWindow, InDashVelocityBoostWindow);
+        if (HandleJump(true, InSlideJumpBoostWindow, InDashVelocityBoostWindow))
+        {
+            return;
+        }
         
         if (DashUsable && inputQuery.Dash)
         {
@@ -865,35 +868,31 @@ public class PlayerMovement : MonoBehaviour
 
                 if (inputQuery.InitiateJump)
                 {
-                    leftEarly = true;
                     CommonWallRunExit(MovementMode.RUN, onRight);
                     WallJump(!onRight, onRight ? inputQuery.Left : inputQuery.Right);
-                    return true;
+                    return leftEarly = true;
                 }
 
                 if (dashReady && inputQuery.Dash)
-                {
-                    leftEarly = true;
+                {   
                     CommonWallRunExit(MovementMode.DASH, onRight);
                     StartCoroutine(Dash());
-                    return true;
+                    return leftEarly = true;
                 }
 
                 
                 if (CheckLedgeClimb(out var ledgesEncountered))
                 {
-                    leftEarly = true;
                     CommonWallRunExit(MovementMode.LEDGE_CLIMB, onRight);
                     LedgeClimb(ledgesEncountered);
-                    return true;
+                    return leftEarly = true;
                 }
 
                 if (inputQuery.InitiateCrouch)
                 {
-                    leftEarly = true;
                     CommonWallRunExit(MovementMode.SLIDE, onRight);
                     StartCoroutine(Slide(false));
-                    return true;
+                    return leftEarly = true;
                 }
 
                 if (!isCollidingOnAnySide) { return true; } // out of the final return bc didn t work for reasons that are beyond me

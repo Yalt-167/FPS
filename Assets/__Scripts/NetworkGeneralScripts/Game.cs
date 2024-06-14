@@ -175,7 +175,7 @@ public sealed class Game : MonoBehaviour
 
     private void Start()
     {
-        //Application.targetFrameRate = 60;
+        Application.targetFrameRate = 60;
     }
 
     
