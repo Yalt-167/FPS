@@ -207,7 +207,7 @@ GameObject:
   - component: {fileID: 8620312614544550616}
   - component: {fileID: 7879344369763397016}
   - component: {fileID: 8471839803964524711}
-  - component: {fileID: 6942959066650927657}
+  - component: {fileID: 8115924278459489588}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -297,6 +297,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76b8400fd8a83f64988129bb2e605760, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PlayerID: 0
 --- !u!136 &2189134874924269601
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -587,6 +588,18 @@ MonoBehaviour:
       RelevantKey: 51
       howToActivate: 0
       holdForSeconds: 0
+    PrimaryAbility:
+      RelevantKey: 0
+      howToActivate: 0
+      holdForSeconds: 0
+    SecondaryAbility:
+      RelevantKey: 0
+      howToActivate: 0
+      holdForSeconds: 0
+    Ultimate:
+      RelevantKey: 0
+      howToActivate: 0
+      holdForSeconds: 0
     Slash:
       RelevantKey: 0
       howToActivate: 0
@@ -722,7 +735,7 @@ MonoBehaviour:
   - {fileID: 8620312614544550616}
   - {fileID: 7715329695785719329}
   - {fileID: 2189134874924269601}
-  - {fileID: 6942959066650927657}
+  - {fileID: 0}
   gameObjectsToKillOnForeignPlayers:
   - {fileID: 7803131807664606466}
   componentsToKillOnLocalPlayers: []
@@ -779,7 +792,7 @@ MonoBehaviour:
   <HealthData>k__BackingField: {fileID: 11400000, guid: 31b3be51212c77744b1e8161efdb4a23,
     type: 2}
   TeamID: 0
---- !u!114 &6942959066650927657
+--- !u!114 &8115924278459489588
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -788,7 +801,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 615695314538812458}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86f5b23c8a318a148a7254f3140773da, type: 3}
+  m_Script: {fileID: 11500000, guid: 6853627262153d34ba7f63743756ed92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &888805865160700714

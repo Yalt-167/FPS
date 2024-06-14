@@ -8,8 +8,8 @@ using UnityEngine.SceneManagement;
 using System.Linq;
 using Random = UnityEngine.Random;
 
-[DefaultExecutionOrder(-10)]
-public sealed class Game : MonoBehaviour
+[DefaultExecutionOrder(-1002)]
+public sealed class Game : NetworkBehaviour
 {
     public static Game Manager;
 
@@ -30,11 +30,18 @@ public sealed class Game : MonoBehaviour
     /// </summary>
     /// <param name="player"></param>
     /// <returns></returns>
-    public ushort RegisterPlayer(NetworkedPlayer player)
+    [Rpc(SendTo.Server)]
+    public void RegisterPlayerServerRpc(NetworkedPlayer player)
+    {
+        RegisterPlayerInternalClientRpc(player);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void RegisterPlayerInternalClientRpc(NetworkedPlayer player)
     {
         players.Add(player);
-        return (ushort)(players.Count - 1);
     }
+
 
     public void DiscardPlayer(ushort playerID)
     {
@@ -77,6 +84,35 @@ public sealed class Game : MonoBehaviour
         {
             yield return player;
         }
+    }
+    
+    public IEnumerable<NetworkedPlayer> GetPlayersOfTeam(ushort teamID)
+    {
+        foreach (var player in players)
+        {
+            if (player.TeamID == teamID)
+            {
+                yield return player;
+            }
+        }
+    }
+
+    public bool PlayerWithNameExist(string name)
+    {
+        return GetPlayerWithName(name) != null;
+    }
+
+    public NetworkedPlayer? GetPlayerWithName(string name)
+    {
+        try
+        {
+            return players.First(each => each.Name == name);
+        }
+        catch
+        {
+            return null;
+        }
+
     }
 
     #endregion
@@ -214,9 +250,11 @@ public struct Settings
 
 
 
-
+[Serializable]
 public struct NetworkedPlayer
 {
+    public string Name;
+    public ushort TeamID;
     public NetworkObject Object;
     public ClientNetworkTransform Transform;
     public HandlePlayerNetworkBehaviour BehaviourHandler;
@@ -224,6 +262,8 @@ public struct NetworkedPlayer
     public PlayerHealthNetworked Health;
 
     public NetworkedPlayer(
+        string name,
+        ushort teamID,
         NetworkObject object_,
         ClientNetworkTransform transform_,
         HandlePlayerNetworkBehaviour behaviourHandler,
@@ -231,6 +271,8 @@ public struct NetworkedPlayer
         PlayerHealthNetworked health
     )
     {
+        Name = name;
+        TeamID = teamID;
         Object = object_;
         Transform = transform_;
         BehaviourHandler = behaviourHandler;
@@ -242,6 +284,8 @@ public struct NetworkedPlayer
 
     #region Practical Getters
 
+    public static explicit operator string(NetworkedPlayer relevantPlayer) => relevantPlayer.Name;
+    public static explicit operator ushort(NetworkedPlayer relevantPlayer) => relevantPlayer.TeamID;
     public static explicit operator NetworkObject(NetworkedPlayer relevantPlayer) => relevantPlayer.Object;
     public static explicit operator ClientNetworkTransform(NetworkedPlayer relevantPlayer) => relevantPlayer.Transform;
     public static explicit operator HandlePlayerNetworkBehaviour(NetworkedPlayer relevantPlayer) => relevantPlayer.BehaviourHandler;
@@ -249,7 +293,6 @@ public struct NetworkedPlayer
     public static explicit operator PlayerHealthNetworked(NetworkedPlayer relevantPlayer) => relevantPlayer.Health; 
 
     #endregion
-
 
     #endregion
 }

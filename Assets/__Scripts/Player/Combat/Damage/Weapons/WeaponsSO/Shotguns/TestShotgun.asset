@@ -20,7 +20,7 @@ MonoBehaviour:
       LowDamage: 0
       NegatedDamage: 0
     WeaponClass: 0
-    IsHitscan: 1
+    IsHitscan: 0
     HitscanBulletSettings:
       PierceThroughPlayers: 0
       ActionOnHitWall: 0

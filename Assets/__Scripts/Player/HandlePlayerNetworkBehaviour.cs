@@ -10,7 +10,6 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
 
     private PlayerFrame playerFrame;
 
-
     [Header("ToKillOnForeign")]
     [SerializeField] private List<Component> componentsToKillOnForeignPlayers;
     [SerializeField] private List<GameObject> gameObjectsToKillOnForeignPlayers;
@@ -42,17 +41,7 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
 
         Game.Manager.AddNetworkedWeaponHandler(GetComponent<WeaponHandler>());
 
-        GetComponent<PlayerFrame>().SetPlayerID(
-            Game.Manager.RegisterPlayer(
-                new(
-                    GetComponent<NetworkObject>(),
-                    GetComponent<ClientNetworkTransform>(),
-                    GetComponent<HandlePlayerNetworkBehaviour>(),
-                    GetComponent<WeaponHandler>(),
-                    GetComponent<PlayerHealthNetworked>()
-                )
-            )
-        );
+        
     }
 
 
