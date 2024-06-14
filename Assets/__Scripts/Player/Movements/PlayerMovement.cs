@@ -14,12 +14,10 @@ public class PlayerMovement : MonoBehaviour
 
     #region References
 
-    //public static PlayerMovement Instance; // fix ASAP
     [SerializeField] private MovementInputQuery inputQuery;
     private Rigidbody Rigidbody;
     private CapsuleCollider CapsuleCollider;
     private FollowRotationCamera followRotationCamera;
-    private Transform cameraTransform;
     public Vector3 Position => transform.position;
     public float CurrentSpeed => new Vector3(Rigidbody.velocity.x, 0f, Rigidbody.velocity.z).magnitude;
     public bool IsSliding { get; private set; }
@@ -197,11 +195,9 @@ public class PlayerMovement : MonoBehaviour
     private float timeStartedWallRunning;
     private bool ShouldStartTiltingCamera => timeStartedWallRunning + timeOnWallBeforeTiltingCamera < Time.time;
 
-    //private Coroutine adjustCameraTiltCoroutine;
-    
-    private Transform cameraRoot;
-    private Vector3[] cameraRootPosition = new Vector3[2] { new(0f, .6f, 0f), new(0f, 2f, -5f) };
-    private int currentCameraRootPositionIndex = 0;
+    private Transform cameraTransform;
+    private Vector3[] cameraTransformPositions = new Vector3[2] { new(0f, .6f, 0f), new(0f, 2f, -5f) };
+    private int currentCameraTransformPositionIndex = 0;
 
     private float cameraTransformBaseHeight = .6f;
     private float cameraTransformSlidingHeight = .3f;
@@ -273,7 +269,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void SwitchCameraPosition()
     {
-        cameraRoot.localPosition = cameraRootPosition[++currentCameraRootPositionIndex % 2];
+        cameraTransform.localPosition = cameraTransformPositions[++currentCameraTransformPositionIndex % 2];
     }
 
     #endregion
@@ -288,11 +284,11 @@ public class PlayerMovement : MonoBehaviour
 
         Rigidbody = GetComponent<Rigidbody>();
         CapsuleCollider = GetComponent<CapsuleCollider>();
-        cameraRoot = transform.GetChild(0).GetComponent<Transform>();
+        cameraTransform = transform.GetChild(0).GetComponent<Transform>();
         followRotationCamera = transform.GetChild(0).GetComponent<FollowRotationCamera>();
         cameraTransform = transform.GetChild(0);
 
-        cameraRoot.localPosition = cameraRootPosition[0];
+        cameraTransform.localPosition = cameraTransformPositions[0];
         SetMovementMode(MovementMode.RUN);
     }
 
@@ -340,7 +336,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void ApplyGravity()
     {
-        Rigidbody.AddForce(-transform.up * currentGravityForce * Time.deltaTime, ForceMode.Force);
+        Rigidbody.AddForce(currentGravityForce * Time.deltaTime * -transform.up, ForceMode.Force);
         if (Rigidbody.velocity.y < terminalVelocity)
         {
             Rigidbody.velocity = new(Rigidbody.velocity.x, terminalVelocity, Rigidbody.velocity.y);
@@ -388,8 +384,17 @@ public class PlayerMovement : MonoBehaviour
 
     #region Jump
 
+    /// <summary>
+    /// Returns wether a jump occured
+    /// </summary>
+    /// <param name="coyoteThresholdAllowed"></param>
+    /// <param name="afterSlide"></param>
+    /// <param name="afterDash"></param>
+    /// <returns></returns>
     private bool HandleJump(bool coyoteThresholdAllowed, bool afterSlide, bool afterDash)
     {
+        if (IsJumping) { return false; }
+
         if (inputQuery.InitiateJump)
         {
             lastJumpPressed = Time.time; // for jump buffer
@@ -421,6 +426,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump(bool fullJump, bool afterSlide, bool afterDash)
     {
+        print("jumped");
         CommonJumpStart();
         horizontalVelocityBoost +=
             (afterSlide ? slideIntoJumpVelocityBoost : 1f) *
@@ -610,9 +616,7 @@ public class PlayerMovement : MonoBehaviour
                 :
                 transform.TransformDirection(dir)).normalized;
 
-        //StartCoroutine(LerpCameraHeight(false));
-        cameraRoot.localPosition = cameraRoot.localPosition.Mask(1f, .5f, 1f);
-        //new(cameraRoot.localPosition.x, .5f * cameraRoot.localPosition.y, cameraRoot.localPosition.z);
+        cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, .5f, 1f);
         var dashed = false;
 
         yield return new WaitUntil(() =>
@@ -622,6 +626,7 @@ public class PlayerMovement : MonoBehaviour
                 Rigidbody.AddForce(slideDownwardForce * Time.deltaTime * -transform.up, ForceMode.Force);
             }
 
+            /* -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized -> gets the opposite of the velocity while ignoring verticality */
             Rigidbody.AddForce(slideSlowdownForce * Time.deltaTime * -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Force);
 
             dashed = DashUsable && inputQuery.Dash;
@@ -634,9 +639,8 @@ public class PlayerMovement : MonoBehaviour
                 ;
         });
 
-        //StartCoroutine(LerpCameraHeight(true));
-        cameraRoot.localPosition = cameraRoot.localPosition.Mask(1f, 2f, 1f);
-        //new(cameraRoot.localPosition.x, 2f * cameraRoot.localPosition.y, cameraRoot.localPosition.z);
+        cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, 2f, 1f);
+
         if (dashed)
         {
             CommonSlideExit(MovementMode.DASH);
@@ -659,14 +663,14 @@ public class PlayerMovement : MonoBehaviour
 
     private IEnumerator LerpCameraHeight(bool isReset)
     {
-        var startingPoint = cameraRoot.localPosition.y;
+        var startingPoint = cameraTransform.localPosition.y;
         var goal = isReset ? cameraTransformBaseHeight : cameraTransformSlidingHeight;
         var upperBound = Mathf.Max(startingPoint, goal);
         var lowerBound = Mathf.Min(startingPoint, goal);
         var elapsedTime = 0f;
         while (elapsedTime < slideCameraHeightAdjustmentDuration)
         {
-            cameraRoot.localPosition = new(cameraRoot.localPosition.x, Mathf.Lerp(lowerBound, upperBound, elapsedTime / slideCameraHeightAdjustmentDuration), cameraRoot.localPosition.z);
+            cameraTransform.localPosition = new(cameraTransform.localPosition.x, Mathf.Lerp(lowerBound, upperBound, elapsedTime / slideCameraHeightAdjustmentDuration), cameraTransform.localPosition.z);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
@@ -1019,7 +1023,7 @@ public enum MovementMode
 
 // simple ennemies (aim at you (shoot on you but bullet with travel time)) && hitscan but shoot after seeing u for X seconds
 
-// fiox the bug when jumping left/right forever untils it keeps one or the other direction even though I press the
+// fix the bug when jumping left/right forever untils it keeps one or the other direction even though I press the
 // other
 
 # region Debug
