@@ -700,6 +700,8 @@ public class PlayerMovement : MonoBehaviour
         timeDashTriggered = Time.time;
         followRotationCamera.enabled = false;
         var dir = cameraTransform.TransformDirection(new(MyInput.GetAxis(inputQuery.Left, inputQuery.Right), 0f, MyInput.GetAxis(inputQuery.Back, inputQuery.Forward)));
+
+        dir = dir == Vector3.zero ? cameraTransform.forward : dir;
         
         yield return new WaitUntil(
             () =>

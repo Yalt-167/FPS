@@ -8,12 +8,11 @@ public static class SaveAndLoad
 {
     public static void Save(object data, string name)
     {
-        BinaryFormatter binaryFormater = new();
         string path = $"{Application.persistentDataPath}/{name}.data";
 
         using (FileStream file = new(path, FileMode.Create))
         {
-            binaryFormater.Serialize(file, data);
+            new BinaryFormatter().Serialize(file, data);
         }
     }
 
@@ -27,13 +26,11 @@ public static class SaveAndLoad
             Debug.Log($"No save file found for path: {path}");
             return null;
         }
-        
-        BinaryFormatter binaryFormater = new();
 
         object data;
         using (FileStream file = new(path, FileMode.Open))
         {
-            data = binaryFormater.Deserialize(file);
+            data = new BinaryFormatter().Deserialize(file);
         }
 
         return data;
