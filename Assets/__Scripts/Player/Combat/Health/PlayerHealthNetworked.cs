@@ -7,6 +7,7 @@ using UnityEditor;
 using Unity.VisualScripting;
 
 [DefaultExecutionOrder(-4)]
+[Serializable]
 public class PlayerHealthNetworked : NetworkBehaviour
 {
     [field: SerializeField] public PlayerHealthData HealthData { get; private set; }

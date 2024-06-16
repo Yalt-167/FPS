@@ -5,6 +5,7 @@ using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+[Serializable]
 public class WeaponHandler : NetworkBehaviour
 {
     #warning PlaceHolderValue to remove here

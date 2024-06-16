@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
@@ -5,6 +6,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 [DefaultExecutionOrder(-1000)]
+[Serializable]
 public class HandlePlayerNetworkBehaviour : NetworkBehaviour
 {
 

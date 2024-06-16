@@ -32,17 +32,26 @@ public class TeamSelector : MonoBehaviour
         PlayerHealthNetworked healthComponent;
         Cursor.lockState = CursorLockMode.Locked; //
         Cursor.visible = false; // those two may cause issues when destroying the script on remote players // chekc when loggin concurrently
+
+        healthComponent = GetComponent<PlayerHealthNetworked>();
+
         Game.Manager.RegisterPlayerServerRpc(
             new(
                 PlayerName,
                 teamID,
-                GetComponent<NetworkObject>(),
-                GetComponent<ClientNetworkTransform>(),
-                GetComponent<HandlePlayerNetworkBehaviour>(),
-                GetComponent<WeaponHandler>(),
-                healthComponent = GetComponent<PlayerHealthNetworked>()
-            )
+                GetComponent<NetworkObject>().NetworkObjectId
+                )
+        //new(
+        //    PlayerName,
+        //    teamID,
+        //    GetComponent<NetworkObject>(),
+        //    GetComponent<ClientNetworkTransform>(),
+        //    GetComponent<HandlePlayerNetworkBehaviour>(),
+        //    GetComponent<WeaponHandler>(),
+        //    healthComponent = GetComponent<PlayerHealthNetworked>()
+        //)
         );
+        print("reached here");
         healthComponent.RequestSetTeamServerRpc(teamID);
         Destroy(this);
     }

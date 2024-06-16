@@ -31,15 +31,17 @@ public sealed class Game : NetworkBehaviour
     /// <param name="player"></param>
     /// <returns></returns>
     [Rpc(SendTo.Server)]
-    public void RegisterPlayerServerRpc(NetworkedPlayer player)
+    public void RegisterPlayerServerRpc(NetworkedPlayerPrimitive player)
     {
+        print("no problem so far");
         RegisterPlayerInternalClientRpc(player);
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void RegisterPlayerInternalClientRpc(NetworkedPlayer player)
+    private void RegisterPlayerInternalClientRpc(NetworkedPlayerPrimitive player)
     {
-        players.Add(player);
+        print("no problem so far");
+        players.Add(player.ToNetworkedPlayer());
     }
 
 
@@ -297,6 +299,41 @@ public struct NetworkedPlayer
     #endregion
 }
 
+[Serializable]
+public struct NetworkedPlayerPrimitive : INetworkSerializable
+{
+    public string Name;
+    public ushort TeamID;
+    public ulong ObjectNetworkID;
+
+    public NetworkedPlayerPrimitive(string name, ushort teamID, ulong objectNetworkID)
+    {
+        Name = name;
+        TeamID = teamID;
+        ObjectNetworkID = objectNetworkID;
+    }
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Name);
+        serializer.SerializeValue(ref TeamID);
+        serializer.SerializeValue(ref ObjectNetworkID);
+    }
+
+    public readonly NetworkedPlayer ToNetworkedPlayer()
+    {
+        NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(ObjectNetworkID, out var networkObject);
+        return new NetworkedPlayer(
+                Name,
+                TeamID,
+                networkObject,
+                networkObject.GetComponent<ClientNetworkTransform>(),
+                networkObject.GetComponent<HandlePlayerNetworkBehaviour>(),
+                networkObject.GetComponent<WeaponHandler>(),
+                networkObject.GetComponent<PlayerHealthNetworked>()
+            );
+    }
+}
 
 public enum NetworkedComponent : byte
 {
