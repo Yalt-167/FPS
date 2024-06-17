@@ -21,14 +21,8 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
     [SerializeField] private List<Component> componentsToKillOnLocalPlayers;
     [SerializeField] private List<GameObject> gameObjectsToKillOnLocalPlayers;
 
-
-
-    #region Networking & Tears
-
-    public override void OnNetworkSpawn()
+    public void ManageFiles()
     {
-        transform.position = new(transform.position.x, 2, transform.position.z);
-
         var (componentsToKill, gameObjectsToKill) = IsOwner ? (componentsToKillOnLocalPlayers, gameObjectsToKillOnLocalPlayers) : (componentsToKillOnForeignPlayers, gameObjectsToKillOnForeignPlayers);
 
         foreach (var component in componentsToKill)
@@ -42,16 +36,21 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
         }
 
         Game.Manager.AddNetworkedWeaponHandler(GetComponent<WeaponHandler>());
+    }
 
-        
+    #region Networking & Tears
+
+    public override void OnNetworkSpawn()
+    {
+        transform.position = new(transform.position.x, 2, transform.position.z);
+
+        ManageFiles();
     }
 
 
     public override void OnNetworkDespawn()
     {
-        Game.Manager.DiscardNetworkedWeaponHandler(GetComponent<WeaponHandler>());
 
-        Game.Manager.DiscardPlayer(GetComponent<PlayerFrame>().PlayerID);
     }
 
     #endregion

@@ -20,16 +20,13 @@ public class PlayerCombatNetworked : NetworkBehaviour
     [SerializeField] private DamageLogManager damageLogManager;
 
 
-    // Rpc -> remote procedure call
-
-    //[ServerRpc] // called by a client to execute on the server; the caller MUST be the local player
     [Rpc(SendTo.Server)]
     public void RequestAttackServerRpc(short damage, Vector3 shootingPos, Vector3 shootingDir)
     {
         ExecuteAttackClientRpc(damage, shootingPos, shootingDir);
     }
 
-    [Rpc(SendTo.ClientsAndHost)] // called by the server to execute on all clients
+    [Rpc(SendTo.ClientsAndHost)]
     private void ExecuteAttackClientRpc(short damage, Vector3 shootingPos, Vector3 shootingDir)
     {
         damageLogManager.UpdatePlayerSettings(playerHitMarkerSettings);

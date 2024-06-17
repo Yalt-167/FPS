@@ -41,17 +41,7 @@ public class TeamSelector : MonoBehaviour
                 teamID,
                 GetComponent<NetworkObject>().NetworkObjectId
                 )
-        //new(
-        //    PlayerName,
-        //    teamID,
-        //    GetComponent<NetworkObject>(),
-        //    GetComponent<ClientNetworkTransform>(),
-        //    GetComponent<HandlePlayerNetworkBehaviour>(),
-        //    GetComponent<WeaponHandler>(),
-        //    healthComponent = GetComponent<PlayerHealthNetworked>()
-        //)
         );
-        print("reached here");
         healthComponent.RequestSetTeamServerRpc(teamID);
         Destroy(this);
     }

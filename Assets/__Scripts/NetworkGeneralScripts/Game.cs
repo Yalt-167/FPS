@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Linq;
 using Random = UnityEngine.Random;
+using UnityEditor;
 
 [DefaultExecutionOrder(-1002)]
 public sealed class Game : NetworkBehaviour
@@ -22,7 +23,7 @@ public sealed class Game : NetworkBehaviour
     #region Player List
 
     private readonly NetworkedPlayer NO_PLAYER = new();
-    private readonly List<NetworkedPlayer> players = new();
+    public readonly List<NetworkedPlayer> players = new();
 
     /// <summary>
     ///  returns ur absolute ID (fancy word for index in playerList)<br/>
@@ -33,14 +34,12 @@ public sealed class Game : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void RegisterPlayerServerRpc(NetworkedPlayerPrimitive player)
     {
-        print("no problem so far");
         RegisterPlayerInternalClientRpc(player);
     }
 
     [Rpc(SendTo.ClientsAndHost)]
     private void RegisterPlayerInternalClientRpc(NetworkedPlayerPrimitive player)
     {
-        print("no problem so far");
         players.Add(player.ToNetworkedPlayer());
     }
 
@@ -116,6 +115,16 @@ public sealed class Game : NetworkBehaviour
         }
 
     }
+
+    [MenuItem("Developper/DebugPlayerList")]
+    public static void DebugPlayerList()
+    {
+        foreach (var player in Manager.players)
+        {
+            Debug.Log(player.GetInfos());
+        }
+    }
+
 
     #endregion
 
@@ -282,6 +291,12 @@ public struct NetworkedPlayer
         Health = health;
     }
 
+    public string GetInfos()
+    {
+        return $"Player: {Name} / Team: {TeamID}";
+    }
+
+
     #region QoL
 
     #region Practical Getters
@@ -333,6 +348,7 @@ public struct NetworkedPlayerPrimitive : INetworkSerializable
                 networkObject.GetComponent<PlayerHealthNetworked>()
             );
     }
+
 }
 
 public enum NetworkedComponent : byte

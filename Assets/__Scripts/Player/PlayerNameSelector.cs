@@ -10,14 +10,9 @@ public class PlayerNameSelector : NetworkBehaviour
     private string message = "";
 
     GUIStyle labelStyle;
-
-    // Define the style for the button
     GUIStyle buttonStyle;
-
-    // Define the style for the text field
     GUIStyle textFieldStyle;
 
-    
     private static readonly int screenWidth = Screen.width;
     private static readonly int screenHeight = Screen.height;
 
@@ -50,25 +45,25 @@ public class PlayerNameSelector : NetworkBehaviour
         {
             fontSize = 20
         };
+
+        if (!IsOwner)
+        {
+            print("Destroyed parasite Awake");
+            Destroy(this);
+        }
     }
+
     private void OnGUI()
     {
-        // Define the style for the label
-
-        // Display the label
         GUI.Label(new Rect((screenWidth - labelWidth) / 2, screenHeight / 2 - 60, labelWidth, labelHeight), "Enter your name:", labelStyle);
 
-        // Display the text field
         playerName = GUI.TextField(new Rect((screenWidth - textFieldWidth) / 2, screenHeight / 2 - 20, textFieldWidth, textFieldHeight), playerName, textFieldStyle);
 
-        // Display the button
         if (GUI.Button(new Rect((screenWidth - buttonWidth) / 2, screenHeight / 2 + 20, buttonWidth, buttonHeight), "Login", buttonStyle))
         {
-            // Handle the button click
             if (!string.IsNullOrEmpty(playerName))
             {
                 CheckWetherNameAvailableServerRpc();
-                message = $"Welcome, {playerName} !";
             }
             else
             {
@@ -76,8 +71,11 @@ public class PlayerNameSelector : NetworkBehaviour
             }
         }
 
-        // Display the message
-        GUI.Label(new Rect((screenWidth - messageWidth) / 2, screenHeight / 2 + 60, messageWidth, messageHeight), message, labelStyle);
+        GUI.Label(
+            new Rect((screenWidth - messageWidth) / 2, screenHeight / 2 + 60, messageWidth, messageHeight),
+            message,
+            labelStyle
+            );
     }
 
     [Rpc(SendTo.Server)]
@@ -85,7 +83,7 @@ public class PlayerNameSelector : NetworkBehaviour
     {
         if (Game.Manager.PlayerWithNameExist(playerName))
         {
-
+            message = $"Name {playerName} is already in use!";
         }
         else
         {
@@ -95,6 +93,7 @@ public class PlayerNameSelector : NetworkBehaviour
 
     private void ContinueOntoTeamSelector()
     {
+        print("tried been there");
         var teamSelectorComponent = gameObject.AddComponent<TeamSelector>();
         teamSelectorComponent.PlayerName = playerName;
         Destroy(this);
