@@ -1,11 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using Unity.Netcode;
 using UnityEngine;
 
-[DefaultExecutionOrder(-1000)]
+[DefaultExecutionOrder(-97)]
 [Serializable]
 public class HandlePlayerNetworkBehaviour : NetworkBehaviour
 {
@@ -44,6 +43,8 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
     {
         transform.position = new(transform.position.x, 2, transform.position.z);
 
+
+        ToggleControls(false);
         ManageFiles();
     }
 
@@ -51,6 +52,14 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
 
+    }
+
+
+    public void ToggleControls(bool towardOn)
+    {
+        transform.GetChild(0).GetComponent<FollowRotationCamera>().enabled = towardOn;
+        GetComponent<PlayerCombat>().enabled = towardOn;
+        GetComponent<PlayerMovement>().enabled = towardOn;
     }
 
     #endregion

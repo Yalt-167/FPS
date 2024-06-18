@@ -7,7 +7,7 @@ using UnityEngine;
 /// <summary>
 /// Class that links all the player s classes for better communication between scripts and ease of access
 /// </summary>
-[DefaultExecutionOrder(-1001)]
+[DefaultExecutionOrder(-98)]
 public class PlayerFrame : MonoBehaviour
 {
     private PlayerCombat playerCombat;

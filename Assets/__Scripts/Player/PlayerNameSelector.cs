@@ -8,6 +8,7 @@ public class PlayerNameSelector : NetworkBehaviour
 {
     private string playerName = "";
     private string message = "";
+    private bool wasInitialized = false;
 
     GUIStyle labelStyle;
     GUIStyle buttonStyle;
@@ -16,20 +17,47 @@ public class PlayerNameSelector : NetworkBehaviour
     private static readonly int screenWidth = Screen.width;
     private static readonly int screenHeight = Screen.height;
 
+    #region Label
+
     private static readonly int labelWidth = 200;
     private static readonly int labelHeight = 30;
+    private static readonly Rect labelRect = new((screenWidth - labelWidth) / 2, screenHeight / 2 - 60, labelWidth, labelHeight);
+    private static readonly string label = "Enter your name:";
 
-    private static readonly int textFieldWidth = 200;
-    private static readonly int textFieldHeight = 30;
+    #endregion
 
-    private static readonly int buttonWidth = 100;
-    private static readonly int buttonHeight = 30;
+    #region Input Field
+
+    private static readonly int inputFieldWidth = 200;
+    private static readonly int inputFieldHeight = 30;
+    private static readonly Rect inputFieldRect = new((screenWidth - inputFieldWidth) / 2, screenHeight / 2 - 20, inputFieldWidth, inputFieldHeight);
+
+    #endregion
+
+    #region Login Button
+
+    private static readonly int loginButtonWidth = 100;
+    private static readonly int loginButtonHeight = 30;
+    private static readonly Rect loginButtonRect = new((screenWidth - loginButtonWidth) / 2, screenHeight / 2 + 20, loginButtonWidth, loginButtonHeight);
+    private static readonly string loginButtonText = "Login";
+
+    #endregion
+
+    #region Feedback Message
 
     private static readonly int messageWidth = 300;
     private static readonly int messageHeight = 30;
+    private static readonly Rect messageRect = new((screenWidth - messageWidth) / 2, screenHeight / 2 + 60, messageWidth, messageHeight);
 
-    private void Awake()
+    private static readonly string noNameEnteredMessage = "Please enter a name.";
+
+    #endregion
+
+
+    private void Init()
     {
+        wasInitialized = true;
+
         labelStyle = new(GUI.skin.label)
         {
             fontSize = 20,
@@ -46,6 +74,10 @@ public class PlayerNameSelector : NetworkBehaviour
             fontSize = 20
         };
 
+        print(IsOwner);
+        print(GetComponent<NetworkObject>().OwnerClientId);
+        print(NetworkManager.Singleton.LocalClientId);
+        print(OwnerClientId);
         if (!IsOwner)
         {
             print("Destroyed parasite Awake");
@@ -55,11 +87,17 @@ public class PlayerNameSelector : NetworkBehaviour
 
     private void OnGUI()
     {
-        GUI.Label(new Rect((screenWidth - labelWidth) / 2, screenHeight / 2 - 60, labelWidth, labelHeight), "Enter your name:", labelStyle);
 
-        playerName = GUI.TextField(new Rect((screenWidth - textFieldWidth) / 2, screenHeight / 2 - 20, textFieldWidth, textFieldHeight), playerName, textFieldStyle);
+        if (!wasInitialized)
+        {
+            Init();
+        }
 
-        if (GUI.Button(new Rect((screenWidth - buttonWidth) / 2, screenHeight / 2 + 20, buttonWidth, buttonHeight), "Login", buttonStyle))
+        GUI.Label(labelRect, label, labelStyle);
+
+        playerName = GUI.TextField(inputFieldRect, playerName, textFieldStyle);
+
+        if (GUI.Button(loginButtonRect, loginButtonText, buttonStyle))
         {
             if (!string.IsNullOrEmpty(playerName))
             {
@@ -67,12 +105,12 @@ public class PlayerNameSelector : NetworkBehaviour
             }
             else
             {
-                message = "Please enter a name.";
+                message = noNameEnteredMessage;
             }
         }
 
         GUI.Label(
-            new Rect((screenWidth - messageWidth) / 2, screenHeight / 2 + 60, messageWidth, messageHeight),
+            messageRect,
             message,
             labelStyle
             );
@@ -93,7 +131,7 @@ public class PlayerNameSelector : NetworkBehaviour
 
     private void ContinueOntoTeamSelector()
     {
-        print("tried been there");
+        print("been there");
         var teamSelectorComponent = gameObject.AddComponent<TeamSelector>();
         teamSelectorComponent.PlayerName = playerName;
         Destroy(this);

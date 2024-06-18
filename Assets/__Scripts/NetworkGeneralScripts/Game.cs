@@ -9,7 +9,7 @@ using System.Linq;
 using Random = UnityEngine.Random;
 using UnityEditor;
 
-[DefaultExecutionOrder(-1002)]
+[DefaultExecutionOrder(-99)]
 public sealed class Game : NetworkBehaviour
 {
     public static Game Manager;

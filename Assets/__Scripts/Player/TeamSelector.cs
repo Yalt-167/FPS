@@ -43,6 +43,9 @@ public class TeamSelector : MonoBehaviour
                 )
         );
         healthComponent.RequestSetTeamServerRpc(teamID);
+
+        GetComponent<HandlePlayerNetworkBehaviour>().ToggleControls(true);
+
         Destroy(this);
     }
 
