@@ -74,10 +74,6 @@ public class PlayerNameSelector : NetworkBehaviour
             fontSize = 20
         };
 
-        print(IsOwner);
-        print(GetComponent<NetworkObject>().OwnerClientId);
-        print(NetworkManager.Singleton.LocalClientId);
-        print(OwnerClientId);
         if (!IsOwner)
         {
             print("Destroyed parasite Awake");
