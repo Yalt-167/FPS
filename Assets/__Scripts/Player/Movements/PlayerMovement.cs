@@ -38,10 +38,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     [Header("Movements")]
     [SerializeField] private float targetSpeed;
-    [SerializeField] private float sprintSpeed = 8f; // in m/s
-    [SerializeField] private float strafeSpeed = 7f;
-    [SerializeField] private float backwardSpeed = 5f;
-    [SerializeField] private float wallRunSpeed = 9f;
+    // in m/s
+    private float RunningSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.RunningSpeed ?? 8f;
+    private float StrafingSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeed ?? 7f;
+    private float BackwardSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.BackwardSpeed ?? 5f;
+    private float WallRunSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.WallRunningSpeed ?? 9f;
 
     [SerializeField] private float acceleration;
     [SerializeField] private float stopDecceleration; // deceleration when no key held
@@ -596,7 +597,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private float CalculateTargetSpeed(Vector2 wantedMoveVec)
     {
-        return wantedMoveVec.x == 0f ? wantedMoveVec.y == 0f ? 0f : wantedMoveVec.y < 0f ? backwardSpeed : sprintSpeed : wantedMoveVec.y < 0f ? backwardSpeed : strafeSpeed;
+        return wantedMoveVec.x == 0f ? wantedMoveVec.y == 0f ? 0f : wantedMoveVec.y < 0f ? BackwardSpeed : RunningSpeed : wantedMoveVec.y < 0f ? BackwardSpeed : StrafingSpeed;
     }
 
     #endregion
@@ -877,8 +878,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                     StartCoroutine(SetCameraTilt(onRight, false));
                 }
 
-                Rigidbody.AddForce(wallRunForceCoefficient * wallRunSpeed * Time.deltaTime * directionAlongWall, ForceMode.Force);
-                Rigidbody.velocity = Vector3.ClampMagnitude(Rigidbody.velocity.Mask(1f, 0f, 1f), wallRunSpeed);
+                Rigidbody.AddForce(wallRunForceCoefficient * WallRunSpeed * Time.deltaTime * directionAlongWall, ForceMode.Force);
+                Rigidbody.velocity = Vector3.ClampMagnitude(Rigidbody.velocity.Mask(1f, 0f, 1f), WallRunSpeed);
 
                 if (inputQuery.InitiateJump)
                 {

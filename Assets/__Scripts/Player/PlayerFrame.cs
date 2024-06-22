@@ -10,6 +10,7 @@ using UnityEngine;
 [DefaultExecutionOrder(-98)]
 public class PlayerFrame : MonoBehaviour
 {
+    [field: SerializeField] public ChampionStats ChampionStats { get; set; }
     private PlayerCombat playerCombat;
     private PlayerHealthNetworked playerHealth;
     private PlayerMovement playerMovement;
