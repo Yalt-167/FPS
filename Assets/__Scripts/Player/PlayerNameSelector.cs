@@ -61,17 +61,17 @@ public class PlayerNameSelector : NetworkBehaviour
         labelStyle = new(GUI.skin.label)
         {
             fontSize = 20,
-            alignment = TextAnchor.MiddleCenter
+            alignment = TextAnchor.MiddleCenter,
         };
 
         buttonStyle = new(GUI.skin.button)
         {
-            fontSize = 20
+            fontSize = 20,
         };
 
         textFieldStyle = new(GUI.skin.textField)
         {
-            fontSize = 20
+            fontSize = 20,
         };
 
         if (!IsOwner)

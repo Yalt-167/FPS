@@ -10,7 +10,7 @@ using Random = UnityEngine.Random;
 using UnityEditor;
 
 [DefaultExecutionOrder(-99)]
-public sealed class Game : NetworkBehaviour
+public sealed class Game : NetworkManager
 {
     public static Game Manager;
 
@@ -59,15 +59,15 @@ public sealed class Game : NetworkBehaviour
     {
         return whichComponentID switch
         {
-            NetworkedComponent.NetworkObject => players.First(each => ((NetworkObject)each).NetworkObjectId == componentID),
+            NetworkedComponent.NetworkObject => players.First(each => each.NetworkObject.NetworkObjectId == componentID),
 
-            NetworkedComponent.ClientNetworkTransform => players.First(each => ((ClientNetworkTransform)each).NetworkObjectId == componentID),
+            NetworkedComponent.ClientNetworkTransform => players.First(each => each.ClientNetworkTransform.NetworkObjectId == componentID),
 
-            NetworkedComponent.HandlePlayerNetworkBehaviour => players.First(each => ((HandlePlayerNetworkBehaviour)each).NetworkObjectId == componentID),
+            NetworkedComponent.HandlePlayerNetworkBehaviour => players.First(each => each.BehaviourHandler.NetworkObjectId == componentID),
 
-            NetworkedComponent.WeaponHandler => players.First(each => ((WeaponHandler)each).NetworkObjectId == componentID),
+            NetworkedComponent.WeaponHandler => players.First(each => each.WeaponHandler.NetworkObjectId == componentID),
 
-            NetworkedComponent.PlayerHealthNetworked => players.First(each => ((PlayerHealthNetworked)each).NetworkObjectId == componentID),
+            NetworkedComponent.PlayerHealthNetworked => players.First(each => each.Health.NetworkObjectId == componentID),
 
             _ => throw new Exception("This component provided does not match anything"),
         };
@@ -225,12 +225,6 @@ public sealed class Game : NetworkBehaviour
         Application.targetFrameRate = 60;
     }
 
-    
-    public void NextLevel()
-    {
-        SceneManager.LoadScene(++CurrentSceneID);
-    }
-
     private void OnDrawGizmos()
     {
         if (debugBottomPlane)
@@ -266,8 +260,8 @@ public struct NetworkedPlayer
 {
     public string Name;
     public ushort TeamID;
-    public NetworkObject Object;
-    public ClientNetworkTransform Transform;
+    public NetworkObject NetworkObject;
+    public ClientNetworkTransform ClientNetworkTransform;
     public HandlePlayerNetworkBehaviour BehaviourHandler;
     public WeaponHandler WeaponHandler;
     public PlayerHealthNetworked Health;
@@ -284,34 +278,17 @@ public struct NetworkedPlayer
     {
         Name = name;
         TeamID = teamID;
-        Object = object_;
-        Transform = transform_;
+        NetworkObject = object_;
+        ClientNetworkTransform = transform_;
         BehaviourHandler = behaviourHandler;
         WeaponHandler = weaponHandler;
         Health = health;
     }
 
-    public string GetInfos()
+    public readonly string GetInfos()
     {
         return $"Player: {Name} / Team: {TeamID}";
     }
-
-
-    #region QoL
-
-    #region Practical Getters
-
-    public static explicit operator string(NetworkedPlayer relevantPlayer) => relevantPlayer.Name;
-    public static explicit operator ushort(NetworkedPlayer relevantPlayer) => relevantPlayer.TeamID;
-    public static explicit operator NetworkObject(NetworkedPlayer relevantPlayer) => relevantPlayer.Object;
-    public static explicit operator ClientNetworkTransform(NetworkedPlayer relevantPlayer) => relevantPlayer.Transform;
-    public static explicit operator HandlePlayerNetworkBehaviour(NetworkedPlayer relevantPlayer) => relevantPlayer.BehaviourHandler;
-    public static explicit operator WeaponHandler(NetworkedPlayer relevantPlayer) => relevantPlayer.WeaponHandler;
-    public static explicit operator PlayerHealthNetworked(NetworkedPlayer relevantPlayer) => relevantPlayer.Health; 
-
-    #endregion
-
-    #endregion
 }
 
 [Serializable]
