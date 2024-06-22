@@ -103,10 +103,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     #region Jump Setup
 
     [Header("Jump")]
-    [SerializeField] private Vector3 jumpForce;
-    private float timeLeftGround;
     [SerializeField] private float initialJumpSpeedBoost;
     [SerializeField] private float slideIntoJumpVelocityBoost;
+    private float JumpForce => PlayerFrame?.ChampionStats.MovementStats.JumpStats.JumpForce ?? 1280f;
+    private float timeLeftGround;
 
     [SerializeField] private float terminalVelocity = -75f;
 
@@ -446,7 +446,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             initialJumpSpeedBoost *
             transform.TransformDirection(new Vector3(MyInput.GetAxis(inputQuery.Left, inputQuery.Right), 0f, MyInput.GetAxis(inputQuery.Back, inputQuery.Forward))).normalized;
 
-        Rigidbody.AddForce(fullJump ? jumpForce : jumpForce / 2, ForceMode.Impulse);
+        Rigidbody.AddForce((fullJump ? JumpForce : JumpForce / 2) * Vector3.up, ForceMode.Impulse);
 
         isBhopping = afterSlide;
 
