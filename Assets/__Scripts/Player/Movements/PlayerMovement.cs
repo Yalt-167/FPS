@@ -5,7 +5,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 [DefaultExecutionOrder(-7)]
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 {
     public VelocityDebug GlobalVelocityDebug;
     public VelocityDebug LocalVelocityDebug;
@@ -273,6 +273,18 @@ public class PlayerMovement : MonoBehaviour
     }
 
     #endregion
+
+    #region PlayerFrameHandling
+
+    public PlayerFrame PlayerFrame { get; set; }
+
+    public void InitPlayerFrame(PlayerFrame playerFrame)
+    {
+        PlayerFrame = playerFrame;
+    }
+
+    #endregion
+
 
     #region Updates
 

@@ -6,10 +6,15 @@ using UnityEngine;
 
 [DefaultExecutionOrder(-97)]
 [Serializable]
-public class HandlePlayerNetworkBehaviour : NetworkBehaviour
+public class HandlePlayerNetworkBehaviour : NetworkBehaviour, IPlayerFrameMember
 {
 
-    private PlayerFrame playerFrame;
+    public PlayerFrame PlayerFrame { get; set; }
+
+    public void InitPlayerFrame(PlayerFrame playerFrame)
+    {
+        PlayerFrame = playerFrame;
+    }
 
     [Header("ToKillOnForeign")]
     [SerializeField] private List<Component> componentsToKillOnForeignPlayers;

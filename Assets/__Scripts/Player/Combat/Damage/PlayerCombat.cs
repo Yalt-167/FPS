@@ -4,9 +4,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [DefaultExecutionOrder(-6)]
-public class PlayerCombat : MonoBehaviour
+public class PlayerCombat : MonoBehaviour, IPlayerFrameMember
 {
-    private PlayerFrame playerFrame;
+
+    public PlayerFrame PlayerFrame { get; set; }
+
+    public void InitPlayerFrame(PlayerFrame playerFrame)
+    {
+        PlayerFrame = playerFrame;
+    }
+
 
     [SerializeField] private int allowedWeaponsCount = 3;
     [SerializeField] private CombatInputQuery inputQuery;

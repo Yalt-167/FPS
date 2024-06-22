@@ -8,7 +8,7 @@ using Unity.VisualScripting;
 
 [DefaultExecutionOrder(-4)]
 [Serializable]
-public class PlayerHealthNetworked : NetworkBehaviour
+public class PlayerHealthNetworked : NetworkBehaviour, IPlayerFrameMember
 {
     [field: SerializeField] public PlayerHealthData HealthData { get; private set; }
 
@@ -22,6 +22,14 @@ public class PlayerHealthNetworked : NetworkBehaviour
     public bool Alive => CurrentHealth > 0;
 
     public ushort TeamID;
+
+    public PlayerFrame PlayerFrame { get; set; }
+
+    public void InitPlayerFrame(PlayerFrame playerFrame)
+    {
+        PlayerFrame = playerFrame;
+    }
+
 
     private void Awake()
     {

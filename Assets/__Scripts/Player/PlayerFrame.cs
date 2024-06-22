@@ -30,8 +30,15 @@ public class PlayerFrame : MonoBehaviour
     private void Awake()
     {
         playerCombat = GetComponent<PlayerCombat>();
+        playerCombat.InitPlayerFrame(this);
+
         playerHealth = GetComponent<PlayerHealthNetworked>();
+        playerHealth.InitPlayerFrame(this);
+
         playerMovement = GetComponent<PlayerMovement>();
+        playerMovement.InitPlayerFrame(this);
+
         handlePlayerNetworkBehaviour = GetComponent<HandlePlayerNetworkBehaviour>();
+        handlePlayerNetworkBehaviour.InitPlayerFrame(this);
     }
 }
