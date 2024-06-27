@@ -54,7 +54,6 @@ public class PlayerCombat : MonoBehaviour, IPlayerFrameMember
     {
         //cameraTransform = transform.GetChild(0).GetChild(0);
         weaponHandler = GetComponent<WeaponHandler>();
-        playerFrame = GetComponent<PlayerFrame>();
         inputQuery.Init();
         UpdateWeapon();
     }
