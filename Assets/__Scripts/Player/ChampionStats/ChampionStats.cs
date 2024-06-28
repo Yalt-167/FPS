@@ -43,6 +43,7 @@ public struct ChampionDashStats
     public bool HasDash;
     public float DashVelocity;
     public float DashDuration;
+    public float DashCooldown;
 }
 
 

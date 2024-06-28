@@ -124,16 +124,16 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     #region Dash Setup
 
     [Header("Dash")]
-    [SerializeField] private float dashVelocity;
-    [SerializeField] private float dashDuration = .1f;
-    [SerializeField] private float dashCooldown = 1f;
-    private bool dashOnCooldown;
     [SerializeField] private float dashIntoJumpVelocityBoost;
     [SerializeField] private float afterDashVelocityBoostWindowDuration;
-    private bool InDashVelocityBoostWindow => timeDashTriggered + dashDuration + afterDashVelocityBoostWindowDuration > Time.time;
+    private float DashVelocity => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashVelocity ?? 90f;
+    private float DashDuration => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashDuration ?? .1f;
+    private float DashCooldown => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashCooldown ?? 1f;
+    private bool dashOnCooldown;
+    private bool InDashVelocityBoostWindow => timeDashTriggered + DashDuration + afterDashVelocityBoostWindowDuration > Time.time;
 
     private bool dashReady;
-    private bool DashUsable => dashReady && !dashOnCooldown;
+    private bool DashUsable => dashReady && !dashOnCooldown && (PlayerFrame?.ChampionStats.MovementStats.DashStats.HasDash ?? false);
     private float timeDashTriggered = float.NegativeInfinity;
     private bool ShouldReplenishDash => isCollidingDown || isCollidingLeft || isCollidingRight;
 
@@ -720,7 +720,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             () =>
                 {
                     //Rigidbody.velocity = dashVelocity * cameraTransform.forward; // perhaps do sth less brutal with gradual velocity loss
-                    Rigidbody.velocity = dashVelocity * dir; // perhaps do sth less brutal with gradual velocity loss
+                    Rigidbody.velocity = DashVelocity * dir; // perhaps do sth less brutal with gradual velocity loss
 
                     if (inputQuery.InitiateCrouch && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
                     {
@@ -737,7 +737,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                         return true;
                     }
 
-                    return timeDashTriggered + dashDuration < Time.time;
+                    return timeDashTriggered + DashDuration < Time.time;
                 }
         );
 
@@ -767,7 +767,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         dashOnCooldown = true;
 
-        yield return new WaitForSeconds(dashCooldown);
+        yield return new WaitForSeconds(DashCooldown);
 
         dashOnCooldown = false;
     }

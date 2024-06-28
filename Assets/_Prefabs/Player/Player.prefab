@@ -297,6 +297,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76b8400fd8a83f64988129bb2e605760, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <ChampionStats>k__BackingField: {fileID: 11400000, guid: bf6485afb90a6d040a4e890132e56a37,
+    type: 2}
   PlayerID: 0
 --- !u!136 &2189134874924269601
 CapsuleCollider:
@@ -360,7 +362,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3013796309
+  GlobalObjectIdHash: 870966366
   InScenePlacedSourceGlobalObjectIdHash: 870966366
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -494,10 +496,6 @@ MonoBehaviour:
       holdForSeconds: 0
   currentMovementMode: 0
   targetSpeed: 0
-  sprintSpeed: 17
-  strafeSpeed: 15
-  backwardSpeed: 13
-  wallRunSpeed: 19
   acceleration: 180000
   stopDecceleration: 0
   baseDecceleration: 0
@@ -519,13 +517,9 @@ MonoBehaviour:
   rightCheck: {fileID: 7365264222304117882}
   upperLedgeClimbCheck: {fileID: 4523781870532104376}
   lowerLedgeClimbCheck: {fileID: 5845699291598176001}
-  jumpForce: {x: 0, y: 1280, z: 0}
   initialJumpSpeedBoost: 60
   slideIntoJumpVelocityBoost: 1.3
   terminalVelocity: -75
-  dashVelocity: 90
-  dashDuration: 0.1
-  dashCooldown: 0.5
   dashIntoJumpVelocityBoost: 5
   afterDashVelocityBoostWindowDuration: 0.1
   slideDecelerationRate: 0.995
