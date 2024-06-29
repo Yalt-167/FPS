@@ -2713,10 +2713,20 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3585224139081462434, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
     - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
         type: 3}
       propertyPath: m_Name
       value: Ground (34)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3338,7 +3348,7 @@ PrefabInstance:
     - target: {fileID: 723289750944885562, guid: b0dc9c6db818cb24abd593caf7f527ef,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 499.99997
+      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 723289750944885562, guid: b0dc9c6db818cb24abd593caf7f527ef,
         type: 3}
@@ -3400,12 +3410,18 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3585224139081462434, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
     - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
         type: 3}
       propertyPath: m_Name
       value: Ground (30)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 0}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -3665,6 +3681,11 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3585224139081462434, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
     - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
         type: 3}
       propertyPath: m_Name
@@ -3932,6 +3953,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6295365012853949036, guid: 57d51a3db93007440a678d59332fc979,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 40932.99
+      objectReference: {fileID: 0}
+    - target: {fileID: 6295365012853949036, guid: 57d51a3db93007440a678d59332fc979,
+        type: 3}
       propertyPath: m_LocalPosition.x
       value: -88.3
       objectReference: {fileID: 0}
@@ -3984,6 +4010,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: plane
+      objectReference: {fileID: 0}
+    - target: {fileID: 7162903644666737497, guid: 57d51a3db93007440a678d59332fc979,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

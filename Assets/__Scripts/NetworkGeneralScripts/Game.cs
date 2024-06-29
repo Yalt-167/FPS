@@ -220,10 +220,10 @@ public sealed class Game : NetworkManager
     }
 
 
-    private void Start()
-    {
-        Application.targetFrameRate = 60;
-    }
+    //private void Start()
+    //{
+    //    Application.targetFrameRate = 60;
+    //}
 
     private void OnDrawGizmos()
     {

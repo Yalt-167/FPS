@@ -6,7 +6,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 [Serializable]
-public class WeaponHandler : NetworkBehaviour
+public class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
 {
     #warning PlaceHolderValue to remove here
     private ushort _____placeHolderTeamID = 0;
@@ -107,7 +107,15 @@ public class WeaponHandler : NetworkBehaviour
         }
     }
 
+
     #endregion
+
+    public PlayerFrame PlayerFrame { get; set; }
+
+    public void InitPlayerFrame(PlayerFrame playerFrame)
+    {
+        PlayerFrame = playerFrame;
+    }
 
     #region Charge Setup
 

@@ -132,4 +132,9 @@ public class PlayerNameSelector : NetworkBehaviour
         teamSelectorComponent.PlayerName = playerName;
         Destroy(this);
     }
+
+    public IEnumerator ChooseNickname()
+    {
+
+    }
 }
