@@ -33,6 +33,11 @@ public class PlayerFrame : NetworkBehaviour
         PlayerID = playerID;
     }
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        GetComponent<HandlePlayerNetworkBehaviour>().ManageFiles();
+    }
 
     public void InitPlayerFrame(string playerName)
     {
@@ -50,7 +55,8 @@ public class PlayerFrame : NetworkBehaviour
 
         handlePlayerNetworkBehaviour = GetComponent<HandlePlayerNetworkBehaviour>();
         handlePlayerNetworkBehaviour.InitPlayerFrame(this);
-        handlePlayerNetworkBehaviour.ManageFiles();
+        //handlePlayerNetworkBehaviour.ManageSelfFiles();
+        handlePlayerNetworkBehaviour.ToggleCursor(false);
 
         Game.Manager.RegisterPlayerServerRpc(
             new(playerName, GetComponent<NetworkObject>().NetworkObjectId)

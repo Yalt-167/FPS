@@ -38,18 +38,58 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour, IPlayerFrameMember
         {
             Destroy(gameObj);
         }
-
-        Game.Manager.AddNetworkedWeaponHandler(GetComponent<WeaponHandler>());
     }
 
-    #region Networking & Tears
-    #endregion
+    public void ManageFiles(bool isOwner)
+    {
+        _ = isOwner ? ManageSelfFiles() : ManageForeignFiles();
+    }
 
+    public object ManageSelfFiles()
+    {
+        foreach (var component in componentsToKillOnLocalPlayers)
+        {
+            Destroy(component);
+        }
+
+        foreach (var gameObj in gameObjectsToKillOnLocalPlayers)
+        {
+            Destroy(gameObj);
+        }
+
+        Game.Manager.AddNetworkedWeaponHandler(GetComponent<WeaponHandler>());
+
+        return null;
+    }
+
+    public object ManageForeignFiles()
+    {
+        foreach (var component in componentsToKillOnForeignPlayers)
+        {
+            Destroy(component);
+        }
+
+        foreach (var gameObj in gameObjectsToKillOnForeignPlayers)
+        {
+            Destroy(gameObj);
+        }
+
+        Game.Manager.AddNetworkedWeaponHandler(GetComponent<WeaponHandler>());
+
+        return null;
+    }
 
     public void ToggleGameControls(bool towardOn)
     {
         transform.GetChild(0).GetComponent<FollowRotationCamera>().enabled = towardOn;
         GetComponent<PlayerCombat>().enabled = towardOn;
         GetComponent<PlayerMovement>().enabled = towardOn;
+    }
+
+    public void ToggleCursor(bool towardOn)
+    {
+        Cursor.lockState = towardOn ? CursorLockMode.None : CursorLockMode.Locked; //
+        Cursor.visible = !towardOn;
+        // those two may cause issues when destroying the script on remote players // chekc when loggin concurrently
     }
 }

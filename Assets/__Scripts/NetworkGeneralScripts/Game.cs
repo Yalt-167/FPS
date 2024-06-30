@@ -188,6 +188,27 @@ public sealed class Game : NetworkManager
         Instantiate(networkObjectPrefab, position, orientation).GetComponent<NetworkObject>().Spawn();
     }
 
+    [MenuItem("Developer/DebugNetworkObjects")]
+    public static void DebugNetworkObjects()
+    {
+        foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
+        {
+            print($"NetworkObjectId: {element.Key} | Obj: {element.Value.name}");
+        }
+    }
+
+    [MenuItem("Developer/DebugNetworkBehaviours")]
+    public static void DebugNetworkBehaviours()
+    {
+        foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
+        {
+            print($"NetworkObjectId: {element.Key} | Obj: {element.Value.name}");
+            foreach (NetworkBehaviour networkBehaviour in element.Value.GetComponents<NetworkBehaviour>())
+            {
+                print($"Behaviour: {networkBehaviour.GetType()} | NetworkBehaviourId: {networkBehaviour.NetworkBehaviourId}");
+            }
+        }
+    }
 
     #endregion
 

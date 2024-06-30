@@ -10,6 +10,7 @@ public class PlayerNameSelector : NetworkBehaviour
     private string playerName = "";
     private string message = "";
     private bool wasInitialized = false;
+    private bool active = true;
 
     private static GUIStyle labelStyle;
     private static GUIStyle buttonStyle;
@@ -55,6 +56,12 @@ public class PlayerNameSelector : NetworkBehaviour
     #endregion
 
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        transform.GetChild(0).gameObject.SetActive(IsOwner);
+    }
+
     private void Init()
     {
         wasInitialized = true;
@@ -78,7 +85,7 @@ public class PlayerNameSelector : NetworkBehaviour
         if (!IsOwner)
         {
             print("Destroyed parasite Awake");
-            Destroy(this);
+            active = false;
         }
     }
 
@@ -89,17 +96,14 @@ public class PlayerNameSelector : NetworkBehaviour
             Init();
         }
 
+        if(!active) { return; }
+
         GUI.Label(labelRect, label, labelStyle);
 
         playerName = GUI.TextField(inputFieldRect, playerName, textFieldStyle);
 
         if (GUI.Button(loginButtonRect, loginButtonText, buttonStyle))
         {
-
-// hehehe 
-//#line 16707565 "compiler.txt"
-//            throw new System.NullReferenceException();
-
             if (!string.IsNullOrEmpty(playerName))
             {
                 CheckWetherNameAvailableServerRpc();
@@ -110,16 +114,13 @@ public class PlayerNameSelector : NetworkBehaviour
             }
         }
 
-        GUI.Label(
-            messageRect,
-            message,
-            labelStyle
-            );
+        GUI.Label(messageRect, message, labelStyle);
     }
 
     [Rpc(SendTo.Server)]
     private void CheckWetherNameAvailableServerRpc()
     {
+        print("happened");
         if (Game.Manager.PlayerWithNameExist(playerName))
         {
             message = $"Name {playerName} is already in use!";
@@ -133,6 +134,7 @@ public class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.Server)]
     private void RequestSpawnPlayerServerRpc()
     {
+        print("happened too");
         SpawnPlayerClientRpc();
     }
 
@@ -141,10 +143,14 @@ public class PlayerNameSelector : NetworkBehaviour
     {
         print("Tried spawning player on this client");
 
+        // try getting that up there somehow
         var playerGameObject = Instantiate(playerPrefab, Vector3.up * 5f, Quaternion.identity);
         playerGameObject.GetComponent<NetworkObject>().Spawn();
         playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
 
-        Destroy(gameObject); // may cause issues when there are several clients (when spawning a new player)
+        //GetComponent<NetworkObject>().Despawn();
+        //Destroy(gameObject);
+        transform.GetChild(0).gameObject.SetActive(active = false);
+        // may cause issues when there are several clients (when spawning a new player)
     }
 }
