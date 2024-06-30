@@ -389,7 +389,7 @@ PrefabInstance:
     - target: {fileID: 723289750944885562, guid: b0dc9c6db818cb24abd593caf7f527ef,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.55
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 723289750944885562, guid: b0dc9c6db818cb24abd593caf7f527ef,
         type: 3}
@@ -550,7 +550,7 @@ PrefabInstance:
     - target: {fileID: 723289750944885562, guid: b0dc9c6db818cb24abd593caf7f527ef,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.05
       objectReference: {fileID: 0}
     - target: {fileID: 723289750944885562, guid: b0dc9c6db818cb24abd593caf7f527ef,
         type: 3}
@@ -595,7 +595,7 @@ PrefabInstance:
     - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
         type: 3}
       propertyPath: m_Name
-      value: Ground
+      value: Floor
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
