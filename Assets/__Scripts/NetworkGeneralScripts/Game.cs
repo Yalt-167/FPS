@@ -166,9 +166,36 @@ public sealed class Game : NetworkManager
 
     #endregion
 
-    #region Respawn Logic
+    #region Network Object Spawning
 
-    private Dictionary<ushort, List<SpawnPoint>> spawnPoints = new Dictionary<ushort, List<SpawnPoint>>();
+    [Rpc(SendTo.Server)]
+    public void RequestSpawnServerRpc(GameObject networkObjectPrefab, Vector3 position, Quaternion orientation)
+    {
+        if (networkObjectPrefab.TryGetComponent<NetworkObject>(out var _))
+        {
+            SpawnNetworkObjectClientRpc(networkObjectPrefab, position, orientation);
+        }
+        else
+        {
+            Debug.LogError("NetworkPrefab is missing a NetworkObject component.");
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void SpawnNetworkObjectClientRpc(GameObject networkObjectPrefab, Vector3 position, Quaternion orientation)
+    {
+        // Legitiomately spawn the obj on the network
+        Instantiate(networkObjectPrefab, position, orientation).GetComponent<NetworkObject>().Spawn();
+    }
+
+
+
+#endregion
+
+
+#region Respawn Logic
+
+private Dictionary<ushort, List<SpawnPoint>> spawnPoints = new Dictionary<ushort, List<SpawnPoint>>();
 
 
     public void AddRespawnPoint(SpawnPoint spawnPoint)

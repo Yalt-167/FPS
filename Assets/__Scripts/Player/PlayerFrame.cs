@@ -58,9 +58,11 @@ public class PlayerFrame : NetworkBehaviour
 
     private IEnumerator SelectNickname()
     {
-        var name = gameObject.AddComponent<PlayerNameSelector>();
+        var playerNameSelector = gameObject.AddComponent<PlayerNameSelector>();
+        yield break;
+        //playerNameSelector.
 
-        yield return new WaitUntil(() => nameSelected);
+        //yield return new WaitUntil(() => nameSelected);
     }
 
     public void NicknameSelected()

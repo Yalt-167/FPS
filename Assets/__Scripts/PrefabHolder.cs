@@ -9,4 +9,9 @@ public class PrefabHolder : MonoBehaviour
     {
         Instantiate(prefab, spawnPosition, spawnRotation);
     }
+
+    public void SpawnNetworkPrefab(Vector3 spawnPosition, Quaternion spawnRotation)
+    {
+        Game.Manager.RequestSpawnServerRpc(prefab, spawnPosition, spawnRotation);
+    }
 }

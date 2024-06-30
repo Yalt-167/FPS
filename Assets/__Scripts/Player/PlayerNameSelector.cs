@@ -121,20 +121,18 @@ public class PlayerNameSelector : NetworkBehaviour
         }
         else
         {
-            ContinueOntoTeamSelector();
+            SpawnPlayer();
         }
     }
 
-    private void ContinueOntoTeamSelector()
+    private void SpawnPlayer()
     {
-        print("been there");
-        var teamSelectorComponent = gameObject.AddComponent<TeamSelector>();
-        teamSelectorComponent.PlayerName = playerName;
+        print("tried spawning player");
+
+        GetComponent<PrefabHolder>().SpawnNetworkPrefab(Vector3.up * 15f, Quaternion.identity);
+
+        //var teamSelectorComponent = gameObject.AddComponent<TeamSelector>();
+        //teamSelectorComponent.PlayerName = playerName;
         Destroy(this);
-    }
-
-    public IEnumerator ChooseNickname()
-    {
-
     }
 }

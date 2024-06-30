@@ -207,7 +207,6 @@ GameObject:
   - component: {fileID: 8620312614544550616}
   - component: {fileID: 7879344369763397016}
   - component: {fileID: 8471839803964524711}
-  - component: {fileID: 8115924278459489588}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -785,18 +784,6 @@ MonoBehaviour:
   <HealthData>k__BackingField: {fileID: 11400000, guid: 31b3be51212c77744b1e8161efdb4a23,
     type: 2}
   TeamID: 0
---- !u!114 &8115924278459489588
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 615695314538812458}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6853627262153d34ba7f63743756ed92, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &888805865160700714
 GameObject:
   m_ObjectHideFlags: 0
