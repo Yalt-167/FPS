@@ -127,12 +127,10 @@ public class PlayerNameSelector : NetworkBehaviour
 
     private void SpawnPlayer()
     {
-        print("tried spawning player");
+        print("Tried spawning player");
 
         GetComponent<PrefabHolder>().SpawnNetworkPrefab(Vector3.up * 15f, Quaternion.identity);
 
-        //var teamSelectorComponent = gameObject.AddComponent<TeamSelector>();
-        //teamSelectorComponent.PlayerName = playerName;
-        Destroy(this);
+        Destroy(gameObject);
     }
 }

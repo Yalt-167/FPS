@@ -12,6 +12,6 @@ public class PrefabHolder : MonoBehaviour
 
     public void SpawnNetworkPrefab(Vector3 spawnPosition, Quaternion spawnRotation)
     {
-        Game.Manager.RequestSpawnServerRpc(prefab, spawnPosition, spawnRotation);
+        Game.Manager.RequestNetworkObjectClientSpawnServerRpc(prefab, spawnPosition, spawnRotation);
     }
 }

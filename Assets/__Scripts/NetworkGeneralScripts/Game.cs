@@ -169,7 +169,7 @@ public sealed class Game : NetworkManager
     #region Network Object Spawning
 
     [Rpc(SendTo.Server)]
-    public void RequestSpawnServerRpc(GameObject networkObjectPrefab, Vector3 position, Quaternion orientation)
+    public void RequestNetworkObjectClientSpawnServerRpc(GameObject networkObjectPrefab, Vector3 position, Quaternion orientation)
     {
         if (networkObjectPrefab.TryGetComponent<NetworkObject>(out var _))
         {
@@ -195,7 +195,7 @@ public sealed class Game : NetworkManager
 
 #region Respawn Logic
 
-private Dictionary<ushort, List<SpawnPoint>> spawnPoints = new Dictionary<ushort, List<SpawnPoint>>();
+    private Dictionary<ushort, List<SpawnPoint>> spawnPoints = new Dictionary<ushort, List<SpawnPoint>>();
 
 
     public void AddRespawnPoint(SpawnPoint spawnPoint)

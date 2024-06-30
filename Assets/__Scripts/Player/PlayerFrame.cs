@@ -11,7 +11,6 @@ using Unity.Netcode;
 [DefaultExecutionOrder(-98)]
 public class PlayerFrame : NetworkBehaviour
 {
-    private bool nameSelected = false;
     [field: SerializeField] public ChampionStats ChampionStats { get; set; }
 
     private PlayerCombat playerCombat;
@@ -53,20 +52,5 @@ public class PlayerFrame : NetworkBehaviour
         handlePlayerNetworkBehaviour.InitPlayerFrame(this);
         handlePlayerNetworkBehaviour.ManageFiles();
 
-        StartCoroutine(SelectNickname());
-    }
-
-    private IEnumerator SelectNickname()
-    {
-        var playerNameSelector = gameObject.AddComponent<PlayerNameSelector>();
-        yield break;
-        //playerNameSelector.
-
-        //yield return new WaitUntil(() => nameSelected);
-    }
-
-    public void NicknameSelected()
-    {
-        nameSelected = true;
     }
 }
