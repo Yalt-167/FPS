@@ -34,7 +34,7 @@ public class PlayerFrame : NetworkBehaviour
     }
 
 
-    public override void OnNetworkSpawn()
+    public void InitPlayerFrame(string playerName)
     {
         playerCombat = GetComponent<PlayerCombat>();
         playerCombat.InitPlayerFrame(this);
@@ -52,5 +52,8 @@ public class PlayerFrame : NetworkBehaviour
         handlePlayerNetworkBehaviour.InitPlayerFrame(this);
         handlePlayerNetworkBehaviour.ManageFiles();
 
+        Game.Manager.RegisterPlayerServerRpc(
+            new(playerName, GetComponent<NetworkObject>().NetworkObjectId)
+            );
     }
 }

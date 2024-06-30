@@ -2,17 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-using UnityEngine.UI;
 
 public class PlayerNameSelector : NetworkBehaviour
 {
+    [SerializeField] private GameObject playerPrefab;
+
     private string playerName = "";
     private string message = "";
     private bool wasInitialized = false;
 
-    GUIStyle labelStyle;
-    GUIStyle buttonStyle;
-    GUIStyle textFieldStyle;
+    private static GUIStyle labelStyle;
+    private static GUIStyle buttonStyle;
+    private static GUIStyle textFieldStyle;
 
     private static readonly int screenWidth = Screen.width;
     private static readonly int screenHeight = Screen.height;
@@ -83,7 +84,6 @@ public class PlayerNameSelector : NetworkBehaviour
 
     private void OnGUI()
     {
-
         if (!wasInitialized)
         {
             Init();
@@ -95,6 +95,11 @@ public class PlayerNameSelector : NetworkBehaviour
 
         if (GUI.Button(loginButtonRect, loginButtonText, buttonStyle))
         {
+
+// hehehe 
+//#line 16707565 "compiler.txt"
+//            throw new System.NullReferenceException();
+
             if (!string.IsNullOrEmpty(playerName))
             {
                 CheckWetherNameAvailableServerRpc();
@@ -121,16 +126,25 @@ public class PlayerNameSelector : NetworkBehaviour
         }
         else
         {
-            SpawnPlayer();
+            RequestSpawnPlayerServerRpc();
         }
     }
 
-    private void SpawnPlayer()
+    [Rpc(SendTo.Server)]
+    private void RequestSpawnPlayerServerRpc()
     {
-        print("Tried spawning player");
+        SpawnPlayerClientRpc();
+    }
 
-        GetComponent<PrefabHolder>().SpawnNetworkPrefab(Vector3.up * 15f, Quaternion.identity);
+    [Rpc(SendTo.ClientsAndHost)]
+    private void SpawnPlayerClientRpc()
+    {
+        print("Tried spawning player on this client");
 
-        Destroy(gameObject);
+        var playerGameObject = Instantiate(playerPrefab, Vector3.up * 5f, Quaternion.identity);
+        playerGameObject.GetComponent<NetworkObject>().Spawn();
+        playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
+
+        Destroy(gameObject); // may cause issues when there are several clients (when spawning a new player)
     }
 }

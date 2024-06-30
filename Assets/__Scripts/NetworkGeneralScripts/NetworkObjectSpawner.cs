@@ -9,15 +9,8 @@ public class NetworkObjectSpawner : NetworkBehaviour
     [SerializeField]
     private GameObject networkObjectPrefab;
 
-    public override void OnNetworkSpawn()
-    {
-        if (IsServer)
-        {
-            SpawnNetworkObject();
-        }
-    }
 
-    private void SpawnNetworkObject()
+    public void SpawnNetworkObject()
     {
         // Ensure the prefab is registered with the NetworkManager
         if (networkObjectPrefab != null && networkObjectPrefab.GetComponent<NetworkObject>() != null)

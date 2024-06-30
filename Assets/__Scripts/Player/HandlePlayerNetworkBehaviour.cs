@@ -43,29 +43,13 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour, IPlayerFrameMember
     }
 
     #region Networking & Tears
-
-    public override void OnNetworkSpawn()
-    {
-        transform.position = new(transform.position.x, 2, transform.position.z);
+    #endregion
 
 
-        ToggleControls(false);
-        ManageFiles();
-    }
-
-
-    public override void OnNetworkDespawn()
-    {
-
-    }
-
-
-    public void ToggleControls(bool towardOn)
+    public void ToggleGameControls(bool towardOn)
     {
         transform.GetChild(0).GetComponent<FollowRotationCamera>().enabled = towardOn;
         GetComponent<PlayerCombat>().enabled = towardOn;
         GetComponent<PlayerMovement>().enabled = towardOn;
     }
-
-    #endregion
 }

@@ -116,7 +116,7 @@ public sealed class Game : NetworkManager
 
     }
 
-    [MenuItem("Developper/DebugPlayerList")]
+    [MenuItem("Developer/DebugPlayerList")]
     public static void DebugPlayerList()
     {
         foreach (var player in Manager.players)
@@ -184,18 +184,17 @@ public sealed class Game : NetworkManager
     [Rpc(SendTo.ClientsAndHost)]
     private void SpawnNetworkObjectClientRpc(GameObject networkObjectPrefab, Vector3 position, Quaternion orientation)
     {
-        // Legitiomately spawn the obj on the network
+        // Legitimately spawn the obj on the network
         Instantiate(networkObjectPrefab, position, orientation).GetComponent<NetworkObject>().Spawn();
     }
 
 
+    #endregion
 
-#endregion
 
+    #region Respawn Logic
 
-#region Respawn Logic
-
-    private Dictionary<ushort, List<SpawnPoint>> spawnPoints = new Dictionary<ushort, List<SpawnPoint>>();
+    private readonly Dictionary<ushort, List<SpawnPoint>> spawnPoints = new();
 
 
     public void AddRespawnPoint(SpawnPoint spawnPoint)
@@ -322,20 +321,17 @@ public struct NetworkedPlayer
 public struct NetworkedPlayerPrimitive : INetworkSerializable
 {
     public string Name;
-    public ushort TeamID;
     public ulong ObjectNetworkID;
 
-    public NetworkedPlayerPrimitive(string name, ushort teamID, ulong objectNetworkID)
+    public NetworkedPlayerPrimitive(string name, ulong objectNetworkID)
     {
         Name = name;
-        TeamID = teamID;
         ObjectNetworkID = objectNetworkID;
     }
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref Name);
-        serializer.SerializeValue(ref TeamID);
         serializer.SerializeValue(ref ObjectNetworkID);
     }
 
@@ -344,7 +340,7 @@ public struct NetworkedPlayerPrimitive : INetworkSerializable
         NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(ObjectNetworkID, out var networkObject);
         return new NetworkedPlayer(
                 Name,
-                TeamID,
+                0,
                 networkObject,
                 networkObject.GetComponent<ClientNetworkTransform>(),
                 networkObject.GetComponent<HandlePlayerNetworkBehaviour>(),
