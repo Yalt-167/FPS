@@ -25,6 +25,35 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour, IPlayerFrameMember
     [SerializeField] private List<Component> componentsToKillOnLocalPlayers;
     [SerializeField] private List<GameObject> gameObjectsToKillOnLocalPlayers;
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        ManageFiles();
+    }
+
+
+    [Rpc(SendTo.Server)]
+    public void ManageFilesAllServerRpc()
+    {
+        ManageFilesAllClientRpc();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void ManageFilesAllClientRpc()
+    {
+        var (componentsToKill, gameObjectsToKill) = IsOwner ? (componentsToKillOnLocalPlayers, gameObjectsToKillOnLocalPlayers) : (componentsToKillOnForeignPlayers, gameObjectsToKillOnForeignPlayers);
+
+        foreach (var component in componentsToKill)
+        {
+            Destroy(component);
+        }
+
+        foreach (var gameObj in gameObjectsToKill)
+        {
+            Destroy(gameObj);
+        }
+    }
+
     public void ManageFiles()
     {
         var (componentsToKill, gameObjectsToKill) = IsOwner ? (componentsToKillOnLocalPlayers, gameObjectsToKillOnLocalPlayers) : (componentsToKillOnForeignPlayers, gameObjectsToKillOnForeignPlayers);

@@ -6,6 +6,7 @@ using Unity.Netcode;
 public class PlayerNameSelector : NetworkBehaviour
 {
     [SerializeField] private GameObject playerPrefab;
+    private GameObject playerGameObject;
 
     private string playerName = "";
     private string message = "";
@@ -54,6 +55,7 @@ public class PlayerNameSelector : NetworkBehaviour
     private static readonly string noNameEnteredMessage = "Please enter a name.";
 
     #endregion
+
 
 
     public override void OnNetworkSpawn()
@@ -120,7 +122,6 @@ public class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.Server)]
     private void CheckWetherNameAvailableServerRpc()
     {
-        print("happened");
         if (Game.Manager.PlayerWithNameExist(playerName))
         {
             message = $"Name {playerName} is already in use!";
@@ -131,26 +132,44 @@ public class PlayerNameSelector : NetworkBehaviour
         }
     }
 
-    [Rpc(SendTo.Server)]
-    private void RequestSpawnPlayerServerRpc()
-    {
-        print("happened too");
-        SpawnPlayerClientRpc();
-    }
+    //[Rpc(SendTo.Server)]
+    //private void RequestSpawnPlayerServerRpc(int paramToAvoidCallingThisOne)
+    //{
+    //    playerGameObject = Instantiate(playerPrefab, Vector3.up * 5f, Quaternion.identity);
+    //    var networkObjectComponent = playerGameObject.GetComponent<NetworkObject>();
+    //    networkObjectComponent.SpawnAsPlayerObject(networkObjectComponent.OwnerClientId);
+    //    playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
+    //    transform.GetChild(0).gameObject.SetActive(active = false); // deactivate camera
+    //    // may cause issues when there are several clients (when spawning a new player) ? idk what I was thinking about but may be true tho
+        
+    //    //InitSpawnedPlayerClientRpc();
+    //}
 
-    [Rpc(SendTo.ClientsAndHost)]
-    private void SpawnPlayerClientRpc()
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestSpawnPlayerServerRpc(ServerRpcParams rpcParams = default)
     {
-        print("Tried spawning player on this client");
+        ulong clientId = rpcParams.Receive.SenderClientId;
 
-        // try getting that up there somehow
-        var playerGameObject = Instantiate(playerPrefab, Vector3.up * 5f, Quaternion.identity);
-        playerGameObject.GetComponent<NetworkObject>().Spawn();
+        playerGameObject = Instantiate(playerPrefab, Vector3.up * 5f, Quaternion.identity);
+
+        playerGameObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
+
+        // Initialize the player frame (assuming InitPlayerFrame handles setting up the player name, etc.)
         playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
 
-        //GetComponent<NetworkObject>().Despawn();
-        //Destroy(gameObject);
-        transform.GetChild(0).gameObject.SetActive(active = false);
-        // may cause issues when there are several clients (when spawning a new player)
+        active = false;
+        transform.GetChild(0).gameObject.SetActive(false);
+    }
+
+        [Rpc(SendTo.ClientsAndHost)]
+    private void InitSpawnedPlayerClientRpc()
+    {
+        print("Tried spawning player on this client");
+        StartCoroutine(InitPlayerFrame());
+    }
+
+    private IEnumerator InitPlayerFrame()
+    {
+        yield return new WaitUntil(() => playerGameObject != null);
     }
 }
