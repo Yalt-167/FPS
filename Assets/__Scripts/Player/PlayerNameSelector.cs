@@ -11,7 +11,7 @@ public class PlayerNameSelector : NetworkBehaviour
     private string playerName = "";
     private string message = "";
     private bool wasInitialized = false;
-    private bool active = true;
+    private bool promptActive = true;
 
     private static GUIStyle labelStyle;
     private static GUIStyle buttonStyle;
@@ -84,7 +84,7 @@ public class PlayerNameSelector : NetworkBehaviour
             fontSize = 20,
         };
 
-        active = IsOwner;
+        promptActive = IsOwner;
     }
 
     private void OnGUI()
@@ -94,7 +94,7 @@ public class PlayerNameSelector : NetworkBehaviour
             Init();
         }
 
-        if(!active) { return; }
+        if(!promptActive) { return; }
 
         GUI.Label(labelRect, label, labelStyle);
 
@@ -148,22 +148,15 @@ public class PlayerNameSelector : NetworkBehaviour
 
         playerGameObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(senderClientID);
 
-        // Initialize the player frame (assuming InitPlayerFrame handles setting up the player name, etc.)
         playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
 
-        active = false;
+        DeactivatePromptClientRpc();
         transform.GetChild(0).gameObject.SetActive(false);
     }
 
-        [Rpc(SendTo.ClientsAndHost)]
-    private void InitSpawnedPlayerClientRpc()
+    [Rpc(SendTo.ClientsAndHost)]
+    private void DeactivatePromptClientRpc()
     {
-        print("Tried spawning player on this client");
-        StartCoroutine(InitPlayerFrame());
-    }
-
-    private IEnumerator InitPlayerFrame()
-    {
-        yield return new WaitUntil(() => playerGameObject != null);
+        promptActive = false;
     }
 }
