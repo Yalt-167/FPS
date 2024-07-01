@@ -84,11 +84,7 @@ public class PlayerNameSelector : NetworkBehaviour
             fontSize = 20,
         };
 
-        if (!IsOwner)
-        {
-            print("Destroyed parasite Awake");
-            active = false;
-        }
+        active = IsOwner;
     }
 
     private void OnGUI()
@@ -119,8 +115,8 @@ public class PlayerNameSelector : NetworkBehaviour
         GUI.Label(messageRect, message, labelStyle);
     }
 
-    [Rpc(SendTo.Server)]
-    private void CheckWetherNameAvailableServerRpc()
+    [ServerRpc]
+    private void CheckWetherNameAvailableServerRpc(ServerRpcParams rpcParams = default)
     {
         if (Game.Manager.PlayerWithNameExist(playerName))
         {
@@ -128,7 +124,7 @@ public class PlayerNameSelector : NetworkBehaviour
         }
         else
         {
-            RequestSpawnPlayerServerRpc();
+            RequestSpawnPlayerServerRpc(rpcParams.Receive.SenderClientId);
         }
     }
 
@@ -146,13 +142,11 @@ public class PlayerNameSelector : NetworkBehaviour
     //}
 
     [ServerRpc(RequireOwnership = false)]
-    private void RequestSpawnPlayerServerRpc(ServerRpcParams rpcParams = default)
+    private void RequestSpawnPlayerServerRpc(ulong senderClientID)
     {
-        ulong clientId = rpcParams.Receive.SenderClientId;
-
         playerGameObject = Instantiate(playerPrefab, Vector3.up * 5f, Quaternion.identity);
 
-        playerGameObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
+        playerGameObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(senderClientID);
 
         // Initialize the player frame (assuming InitPlayerFrame handles setting up the player name, etc.)
         playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
