@@ -141,7 +141,7 @@ public class PlayerNameSelector : NetworkBehaviour
     //    //InitSpawnedPlayerClientRpc();
     //}
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server)]
     private void RequestSpawnPlayerServerRpc(ulong senderClientID)
     {
         playerGameObject = Instantiate(playerPrefab, Vector3.up * 5f, Quaternion.identity);
