@@ -49,13 +49,13 @@ public class PlayerFrame : NetworkBehaviour
 
         handlePlayerNetworkBehaviour = GetComponent<HandlePlayerNetworkBehaviour>();
         handlePlayerNetworkBehaviour.InitPlayerFrame(this);
-        //handlePlayerNetworkBehaviour.ManageSelfFiles();
-        //handlePlayerNetworkBehaviour.ManageFiles();
         handlePlayerNetworkBehaviour.ToggleCursor(false);
 
         Game.Manager.RegisterPlayerServerRpc(
             new(playerName, GetComponent<NetworkObject>().NetworkObjectId)
             );
+
+        Game.Manager.UpdatePlayerListServerRpc();
 
         //handlePlayerNetworkBehaviour.ManageFilesAllServerRpc();
     }

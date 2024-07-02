@@ -24,7 +24,7 @@ public sealed class Game : NetworkManager
     #region Player List
 
     private readonly NetworkedPlayer NO_PLAYER = new();
-    public readonly List<NetworkedPlayer> players = new();
+    public readonly new List<NetworkedPlayer> players = new();
 
     /// <summary>
     ///  returns ur absolute ID (fancy word for index in playerList)<br/>
@@ -41,7 +41,7 @@ public sealed class Game : NetworkManager
     [Rpc(SendTo.ClientsAndHost)]
     private void RegisterPlayerInternalClientRpc(NetworkedPlayerPrimitive player)
     {
-        players.Add(player.ToNetworkedPlayer());
+        players.Add(player.AsNetworkedPlayer());
     }
 
 
@@ -221,10 +221,51 @@ public sealed class Game : NetworkManager
 
     #endregion
 
+    [ServerRpc]
+    public void UpdatePlayerListServerRpc(ServerRpcParams rpcParams = default)
+    {
+        UpdatePlayerListClientRpc(
+            GetPlayersAsPrimitives()
+            //,
+            //new ClientRpcParams
+            //{
+            //    Send = new ClientRpcSendParams
+            //    {
+            //        TargetClientIds = new ulong[] { rpcParams.Receive.SenderClientId }
+            //    }
+            //}
+        );
+    }
 
-    #region Respawn Logic
+    private NetworkedPlayerPrimitive[] GetPlayersAsPrimitives()
+    {
+        NetworkedPlayerPrimitive[] asPrimitives = new NetworkedPlayerPrimitive[players.Count];
+        
+        for (int i = 0; i < asPrimitives.Length; i++)
+        {
+            asPrimitives[i] = players[i].AsNetworkedPlayerPrimitive();
+        }
 
-    private readonly Dictionary<ushort, List<SpawnPoint>> spawnPoints = new();
+        return asPrimitives;
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void UpdatePlayerListClientRpc(NetworkedPlayerPrimitive[] playerPrimitives/*, ClientRpcParams rpcParams*/)
+    {
+        if (IsServer) { return; }
+
+        players.Clear();
+        for (int i = 0;i < playerPrimitives.Length;i++)
+        {
+            players[i] = playerPrimitives[i].AsNetworkedPlayer();
+        }
+        print("was called here");
+    }
+
+
+#region Respawn Logic
+
+private readonly Dictionary<ushort, List<SpawnPoint>> spawnPoints = new();
 
 
     public void AddRespawnPoint(SpawnPoint spawnPoint)
@@ -345,6 +386,11 @@ public struct NetworkedPlayer
     {
         return $"{{Player: {Name} | Team: {TeamID}}}";
     }
+
+    public readonly NetworkedPlayerPrimitive AsNetworkedPlayerPrimitive()
+    {
+        return new NetworkedPlayerPrimitive(Name, NetworkObject.NetworkObjectId);
+    }
 }
 
 [Serializable]
@@ -365,7 +411,7 @@ public struct NetworkedPlayerPrimitive : INetworkSerializable
         serializer.SerializeValue(ref ObjectNetworkID);
     }
 
-    public readonly NetworkedPlayer ToNetworkedPlayer()
+    public readonly NetworkedPlayer AsNetworkedPlayer()
     {
         NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(ObjectNetworkID, out var networkObject);
         return new NetworkedPlayer(

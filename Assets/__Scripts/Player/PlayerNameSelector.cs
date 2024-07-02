@@ -164,17 +164,22 @@ public class PlayerNameSelector : NetworkBehaviour
 
         playerGameObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(senderClientID);
 
-        print(playerName);
         playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
 
-        DeactivatePromptClientRpc();
-        transform.GetChild(0).gameObject.SetActive(false);
+        DeactivateLoginPromptClientRpc();
+        DeactivateLoginCameraClientRpc();
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void DeactivatePromptClientRpc()
+    private void DeactivateLoginPromptClientRpc()
     {
         promptActive = false;
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void DeactivateLoginCameraClientRpc()
+    {
+        transform.GetChild(0).gameObject.SetActive(false);
     }
 }
 
