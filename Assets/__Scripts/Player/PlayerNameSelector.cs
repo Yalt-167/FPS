@@ -8,8 +8,13 @@ public class PlayerNameSelector : NetworkBehaviour
     [SerializeField] private GameObject playerPrefab;
     private GameObject playerGameObject;
 
-    private string playerName = "";
-    private string message = "";
+    //private string playerName = "";
+    private NetworkSerializableString netPlayerName = new();
+    //private readonly NetworkVariable<NetworkSerializableString> netPlayerName = new NetworkVariable<NetworkSerializableString>();
+
+    //private string message = "";
+    //public readonly NetworkVariable<NetworkSerializableString> netErrorMessage = new NetworkVariable<NetworkSerializableString>();
+    public NetworkSerializableString netErrorMessage = new();
     private bool wasInitialized = false;
     private bool promptActive = true;
 
@@ -85,7 +90,7 @@ public class PlayerNameSelector : NetworkBehaviour
         };
 
         promptActive = IsOwner;
-    }
+}
 
     private void OnGUI()
     {
@@ -98,29 +103,40 @@ public class PlayerNameSelector : NetworkBehaviour
 
         GUI.Label(labelRect, label, labelStyle);
 
-        playerName = GUI.TextField(inputFieldRect, playerName, textFieldStyle);
+        //playerName = GUI.TextField(inputFieldRect, playerName, textFieldStyle);
+        netPlayerName.Value = GUI.TextField(inputFieldRect, netPlayerName, textFieldStyle);
 
         if (GUI.Button(loginButtonRect, loginButtonText, buttonStyle))
         {
-            if (!string.IsNullOrEmpty(playerName))
+            if (!string.IsNullOrEmpty(netPlayerName))
             {
-                CheckWetherNameAvailableServerRpc(playerName);
+                CheckWetherNameAvailableServerRpc(netPlayerName);
             }
             else
             {
-                message = noNameEnteredMessage;
+                //message = noNameEnteredMessage;
+                netErrorMessage.Value = noNameEnteredMessage;
+                //SetErrorMessageServerRpc(noNameEnteredMessage);
             }
         }
 
-        GUI.Label(messageRect, message, labelStyle);
+        //GUI.Label(messageRect, message, labelStyle);
+        //GUI.Label(messageRect, netErrorMessage.Value, labelStyle);
+    }
+
+    [Rpc(SendTo.Server)]
+    private void SetErrorMessageServerRpc()
+    {
+        //netErrorMessage.Value = new(message);
     }
 
     [ServerRpc]
-    private void CheckWetherNameAvailableServerRpc(string playerName, ServerRpcParams rpcParams = default)
+    private void CheckWetherNameAvailableServerRpc(NetworkSerializableString playerName, ServerRpcParams rpcParams = default)
     {
         if (Game.Manager.PlayerWithNameExist(playerName))
         {
-            message = $"Name {playerName} is already in use!";
+            netErrorMessage.Value = $"Name {playerName} is already in use!";
+            //SetErrorMessageServerRpc($"Name {playerName} is already in use!");
         }
         else
         {
@@ -142,7 +158,7 @@ public class PlayerNameSelector : NetworkBehaviour
     //}
 
     [Rpc(SendTo.Server)]
-    private void RequestSpawnPlayerServerRpc(string playerName, ulong senderClientID)
+    private void RequestSpawnPlayerServerRpc(NetworkSerializableString playerName, ulong senderClientID)
     {
         playerGameObject = Instantiate(playerPrefab, Vector3.up * 5f, Quaternion.identity);
 
@@ -161,3 +177,34 @@ public class PlayerNameSelector : NetworkBehaviour
         promptActive = false;
     }
 }
+
+
+public struct NetworkSerializableString : INetworkSerializable
+{
+    public string Value;
+    public NetworkSerializableString(string value) { Value = value; }
+    public static implicit operator string(NetworkSerializableString value) { return value.Value; }
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Value);
+    }
+    public override string ToString()
+    {
+        return Value;
+    }
+}
+
+//public struct NetworkSerializableData<T> : INetworkSerializable 
+//{
+//    public T Data;
+//    public NetworkSerializableData(T value) { Data = value; }
+//    public static implicit operator T(NetworkSerializableData<T> value) { return value.Data; }
+//    public void NetworkSerialize<Type>(BufferSerializer<Type> serializer) where Type : IReaderWriter
+//    {
+//        serializer.SerializeValue(ref Data);
+//    }
+//    public override string ToString()
+//    {
+//        return Data.ToString();
+//    }
+//}
