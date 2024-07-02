@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using System.Linq;
 using Random = UnityEngine.Random;
 using UnityEditor;
+using System.Text;
 
 [DefaultExecutionOrder(-99)]
 public sealed class Game : NetworkManager
@@ -119,10 +120,18 @@ public sealed class Game : NetworkManager
     [MenuItem("Developer/DebugPlayerList")]
     public static void DebugPlayerList()
     {
+        var stringBuilder = new StringBuilder();
+
+        stringBuilder.Append("[ ");
+        var isFirst = true;
         foreach (var player in Manager.players)
         {
-            Debug.Log(player.GetInfos());
+            stringBuilder.Append(isFirst ? $"{player.GetInfos()}" : $", {player.GetInfos()}");
+            isFirst = false;
         }
+        stringBuilder.Append(" ]");
+
+        Debug.Log(stringBuilder.ToString());
     }
 
 
@@ -334,7 +343,7 @@ public struct NetworkedPlayer
 
     public readonly string GetInfos()
     {
-        return $"Player: {Name} / Team: {TeamID}";
+        return $"{{Player: {Name} | Team: {TeamID}}}";
     }
 }
 

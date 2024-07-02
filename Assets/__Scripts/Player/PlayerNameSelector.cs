@@ -104,7 +104,7 @@ public class PlayerNameSelector : NetworkBehaviour
         {
             if (!string.IsNullOrEmpty(playerName))
             {
-                CheckWetherNameAvailableServerRpc();
+                CheckWetherNameAvailableServerRpc(playerName);
             }
             else
             {
@@ -116,7 +116,7 @@ public class PlayerNameSelector : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void CheckWetherNameAvailableServerRpc(ServerRpcParams rpcParams = default)
+    private void CheckWetherNameAvailableServerRpc(string playerName, ServerRpcParams rpcParams = default)
     {
         if (Game.Manager.PlayerWithNameExist(playerName))
         {
@@ -124,7 +124,7 @@ public class PlayerNameSelector : NetworkBehaviour
         }
         else
         {
-            RequestSpawnPlayerServerRpc(rpcParams.Receive.SenderClientId);
+            RequestSpawnPlayerServerRpc(playerName, rpcParams.Receive.SenderClientId);
         }
     }
 
@@ -142,12 +142,13 @@ public class PlayerNameSelector : NetworkBehaviour
     //}
 
     [Rpc(SendTo.Server)]
-    private void RequestSpawnPlayerServerRpc(ulong senderClientID)
+    private void RequestSpawnPlayerServerRpc(string playerName, ulong senderClientID)
     {
         playerGameObject = Instantiate(playerPrefab, Vector3.up * 5f, Quaternion.identity);
 
         playerGameObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(senderClientID);
 
+        print(playerName);
         playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
 
         DeactivatePromptClientRpc();
