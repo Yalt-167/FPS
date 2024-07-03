@@ -124,10 +124,10 @@ public class PlayerNameSelector : NetworkBehaviour
         //GUI.Label(messageRect, netErrorMessage.Value, labelStyle);
     }
 
-    [Rpc(SendTo.Server)]
-    private void SetErrorMessageServerRpc()
+    [Rpc(SendTo.ClientsAndHost)]
+    private void SetErrorMessageClientRpc(NetworkSerializableString message)
     {
-        //netErrorMessage.Value = new(message);
+        netErrorMessage.Value = message;
     }
 
     [ServerRpc]
@@ -135,8 +135,7 @@ public class PlayerNameSelector : NetworkBehaviour
     {
         if (Game.Manager.PlayerWithNameExist(playerName))
         {
-            netErrorMessage.Value = $"Name {playerName} is already in use!";
-            //SetErrorMessageServerRpc($"Name {playerName} is already in use!");
+            SetErrorMessageClientRpc(new($"Name {playerName} is already in use!"));
         }
         else
         {
