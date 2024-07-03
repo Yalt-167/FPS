@@ -8,12 +8,8 @@ public class PlayerNameSelector : NetworkBehaviour
     [SerializeField] private GameObject playerPrefab;
     private GameObject playerGameObject;
 
-    //private string playerName = "";
     private NetworkSerializableString netPlayerName = new();
-    //private readonly NetworkVariable<NetworkSerializableString> netPlayerName = new NetworkVariable<NetworkSerializableString>();
 
-    //private string message = "";
-    //public readonly NetworkVariable<NetworkSerializableString> netErrorMessage = new NetworkVariable<NetworkSerializableString>();
     public NetworkSerializableString netErrorMessage = new();
     private bool wasInitialized = false;
     private bool promptActive = true;
@@ -114,14 +110,11 @@ public class PlayerNameSelector : NetworkBehaviour
             }
             else
             {
-                //message = noNameEnteredMessage;
                 netErrorMessage.Value = noNameEnteredMessage;
-                //SetErrorMessageServerRpc(noNameEnteredMessage);
             }
         }
 
-        //GUI.Label(messageRect, message, labelStyle);
-        //GUI.Label(messageRect, netErrorMessage.Value, labelStyle);
+        GUI.Label(messageRect, netErrorMessage.Value, labelStyle);
     }
 
     [Rpc(SendTo.ClientsAndHost)]
