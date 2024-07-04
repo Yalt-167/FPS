@@ -224,17 +224,9 @@ public sealed class Game : NetworkManager
     [ServerRpc]
     public void UpdatePlayerListServerRpc(ServerRpcParams rpcParams = default)
     {
-        UpdatePlayerListClientRpc(
-            GetPlayersAsPrimitives()
-            //,
-            //new ClientRpcParams
-            //{
-            //    Send = new ClientRpcSendParams
-            //    {
-            //        TargetClientIds = new ulong[] { rpcParams.Receive.SenderClientId }
-            //    }
-            //}
-        );
+        print("UpdatePlayerListServerRpc");
+
+        UpdatePlayerListClientRpc(GetPlayersAsPrimitives());
     }
 
     private NetworkedPlayerPrimitive[] GetPlayersAsPrimitives()
@@ -249,18 +241,19 @@ public sealed class Game : NetworkManager
         return asPrimitives;
     }
 
-    [Rpc(SendTo.ClientsAndHost)]
-    private void UpdatePlayerListClientRpc(NetworkedPlayerPrimitive[] playerPrimitives/*, ClientRpcParams rpcParams*/)
+    [ClientRpc]
+    private void UpdatePlayerListClientRpc(NetworkedPlayerPrimitive[] playerPrimitives)
     {
-        if (IsServer) { return; }
+        print("UpdatePlayerListClientRpc");
 
         players.Clear();
         for (int i = 0;i < playerPrimitives.Length;i++)
         {
-            players[i] = playerPrimitives[i].AsNetworkedPlayer();
+            players.Add(playerPrimitives[i].AsNetworkedPlayer());
         }
-        print("was called here");
     }
+
+
 
 
 #region Respawn Logic

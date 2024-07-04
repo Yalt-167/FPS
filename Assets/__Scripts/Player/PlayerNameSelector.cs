@@ -99,7 +99,6 @@ public class PlayerNameSelector : NetworkBehaviour
 
         GUI.Label(labelRect, label, labelStyle);
 
-        //playerName = GUI.TextField(inputFieldRect, playerName, textFieldStyle);
         netPlayerName.Value = GUI.TextField(inputFieldRect, netPlayerName, textFieldStyle);
 
         if (GUI.Button(loginButtonRect, loginButtonText, buttonStyle))
@@ -205,3 +204,6 @@ public struct NetworkSerializableString : INetworkSerializable
 //        return Data.ToString();
 //    }
 //}
+
+
+// make the player prefab a child of the login instead and use its NetworkObject
