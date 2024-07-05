@@ -145,7 +145,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private float slideDecelerationRate;
     [SerializeField] private float slideCancelThreshold;
     [SerializeField] private float initialSlideBoost = 3f;
-    [SerializeField] private float initialSlideDownBoost = 10f;
+    //[SerializeField] private float initialSlideDownBoost = 10f;
     [SerializeField] private float slideJumpBoostWindow;
     [SerializeField] private float slideSlowdownForce;
     [SerializeField] private float slideDownwardForce = 1000f;
@@ -1086,3 +1086,5 @@ public struct CollisionDebug
 
 #endregion
 
+// remove boosts and make it a more manageable controller
+// still dynamic with slide/dash etc but no more velocity boost for chaining moves

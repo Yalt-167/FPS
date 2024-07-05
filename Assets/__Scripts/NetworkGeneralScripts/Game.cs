@@ -24,7 +24,7 @@ public sealed class Game : NetworkManager
     #region Player List
 
     private readonly NetworkedPlayer NO_PLAYER = new();
-    public readonly new List<NetworkedPlayer> players = new();
+    public readonly List<NetworkedPlayer> players = new();
 
     /// <summary>
     ///  returns ur absolute ID (fancy word for index in playerList)<br/>
