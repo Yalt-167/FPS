@@ -197,7 +197,7 @@ public class PlayerNameSelector : NetworkBehaviour
 
         GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
 
-        for (int childTransformIndex = 0; childTransformIndex < 4; childTransformIndex++)
+        for (int childTransformIndex = 0; childTransformIndex < 5; childTransformIndex++)
         {
             transform.GetChild(childTransformIndex).gameObject.SetActive(true); // every subGameObject of the player
         }
