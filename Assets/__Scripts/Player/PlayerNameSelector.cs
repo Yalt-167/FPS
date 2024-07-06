@@ -1,7 +1,11 @@
+#define PLAYER_PACK_ARCHITECTURE
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
+
 
 public class PlayerNameSelector : NetworkBehaviour
 {
@@ -131,18 +135,22 @@ public class PlayerNameSelector : NetworkBehaviour
         }
         else
         {
-            //RequestSpawnPlayerServerRpc(playerName, rpcParams.Receive.SenderClientId);
+
+# if PLAYER_PACK_ARCHITECTURE
             EnablePlayerServerRpc(playerName);
+#else
+            //RequestSpawnPlayerServerRpc(playerName, rpcParams.Receive.SenderClientId);
+#endif
         }
     }
 
     [Rpc(SendTo.Server)]
     private void EnablePlayerServerRpc(NetworkSerializableString playerName)
     {
-        ActivatePlayer_ClientRpc(playerName);
+        ActivatePlayerPackArchitectureClientRpc(playerName);
 
-        DeactivateLoginPromptClientRpc();
-        DeactivateLoginCameraClientRpc();
+        //DeactivateLoginPromptClientRpc();
+        //DeactivateLoginCameraClientRpc();
     }
 
     //[Rpc(SendTo.Server)]
@@ -163,7 +171,7 @@ public class PlayerNameSelector : NetworkBehaviour
     {
         SpawnPlayerClientRpc();
         playerGameObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(senderClientID);
-        ActivatePlayerClientRpc(playerName);
+        //ActivatePlayerPackArchitectureClientRpc(playerName);
         //playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
 
         DeactivateLoginPromptClientRpc();
@@ -178,15 +186,27 @@ public class PlayerNameSelector : NetworkBehaviour
     
     
     [Rpc(SendTo.ClientsAndHost)]
-    private void ActivatePlayer_ClientRpc(NetworkSerializableString playerName)
+    private void ActivatePlayerPackArchitectureClientRpc(NetworkSerializableString playerName)
     {
-        playerGameObject = transform.GetChild(1).gameObject;
-        playerGameObject.SetActive(true);
-        playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
+        GetComponent<PlayerMovement>().enabled = true;
+        GetComponent<PlayerCombat>().enabled = true;
+        GetComponent<ClientNetworkTransform>().enabled = true;
+        GetComponent<PlayerHealthDisplay>().enabled = true;
+        GetComponent<WeaponHandler>().enabled = true;
+        GetComponent<PlayerHealthNetworked>().enabled = true;
+
+        GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
+
+        for (int childTransformIndex = 0; childTransformIndex < 4; childTransformIndex++)
+        {
+            transform.GetChild(childTransformIndex).gameObject.SetActive(true); // every subGameObject of the player
+        }
+        transform.GetChild(5).gameObject.SetActive(false); // Main Camera
+        enabled = false;
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void ActivatePlayerClientRpc(NetworkSerializableString playerName)
+    private void ActivatePlayerPlayerLoginArchitectureClientRpc(NetworkSerializableString playerName)
     {
         playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
     }
