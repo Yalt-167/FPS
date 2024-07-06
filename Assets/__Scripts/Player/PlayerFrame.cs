@@ -51,6 +51,8 @@ public class PlayerFrame : NetworkBehaviour
         handlePlayerNetworkBehaviour.InitPlayerFrame(this);
         handlePlayerNetworkBehaviour.ToggleCursor(false);
 
+        var hasNetworkObject = GetComponent<NetworkObject>() ?? throw new System.Exception("Does not have");
+
         Game.Manager.RegisterPlayerServerRpc(
             new(playerName, GetComponent<NetworkObject>().NetworkObjectId)
             );

@@ -9,6 +9,7 @@ using System.Linq;
 using Random = UnityEngine.Random;
 using UnityEditor;
 using System.Text;
+using System.Runtime.CompilerServices;
 
 [DefaultExecutionOrder(-99)]
 public sealed class Game : NetworkManager
@@ -41,7 +42,9 @@ public sealed class Game : NetworkManager
     [Rpc(SendTo.ClientsAndHost)]
     private void RegisterPlayerInternalClientRpc(NetworkedPlayerPrimitive player)
     {
+        print("crashed here");
         players.Add(player.AsNetworkedPlayer());
+        print("did not crashed here");
     }
 
 
@@ -406,7 +409,11 @@ public struct NetworkedPlayerPrimitive : INetworkSerializable
 
     public readonly NetworkedPlayer AsNetworkedPlayer()
     {
-        NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(ObjectNetworkID, out var networkObject);
+        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(ObjectNetworkID, out var networkObject))
+        {
+            throw new System.Exception("This player was not properly spawned");
+        }
+
         return new NetworkedPlayer(
                 Name,
                 0,

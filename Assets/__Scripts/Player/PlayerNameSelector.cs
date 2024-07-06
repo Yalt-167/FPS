@@ -131,8 +131,18 @@ public class PlayerNameSelector : NetworkBehaviour
         }
         else
         {
-            RequestSpawnPlayerServerRpc(playerName, rpcParams.Receive.SenderClientId);
+            //RequestSpawnPlayerServerRpc(playerName, rpcParams.Receive.SenderClientId);
+            EnablePlayerServerRpc(playerName);
         }
+    }
+
+    [Rpc(SendTo.Server)]
+    private void EnablePlayerServerRpc(NetworkSerializableString playerName)
+    {
+        ActivatePlayer_ClientRpc(playerName);
+
+        DeactivateLoginPromptClientRpc();
+        DeactivateLoginCameraClientRpc();
     }
 
     //[Rpc(SendTo.Server)]
@@ -144,22 +154,43 @@ public class PlayerNameSelector : NetworkBehaviour
     //    playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
     //    transform.GetChild(0).gameObject.SetActive(active = false); // deactivate camera
     //    // may cause issues when there are several clients (when spawning a new player) ? idk what I was thinking about but may be true tho
-        
+
     //    //InitSpawnedPlayerClientRpc();
     //}
 
     [Rpc(SendTo.Server)]
     private void RequestSpawnPlayerServerRpc(NetworkSerializableString playerName, ulong senderClientID)
     {
-        playerGameObject = Instantiate(playerPrefab, Vector3.up * 5f, Quaternion.identity);
-
+        SpawnPlayerClientRpc();
         playerGameObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(senderClientID);
-
-        playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
+        ActivatePlayerClientRpc(playerName);
+        //playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
 
         DeactivateLoginPromptClientRpc();
         DeactivateLoginCameraClientRpc();
     }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void SpawnPlayerClientRpc()
+    {
+        playerGameObject = Instantiate(playerPrefab, Vector3.up * 5f, Quaternion.identity);
+    }
+    
+    
+    [Rpc(SendTo.ClientsAndHost)]
+    private void ActivatePlayer_ClientRpc(NetworkSerializableString playerName)
+    {
+        playerGameObject = transform.GetChild(1).gameObject;
+        playerGameObject.SetActive(true);
+        playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void ActivatePlayerClientRpc(NetworkSerializableString playerName)
+    {
+        playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
+    }
+
 
     [Rpc(SendTo.ClientsAndHost)]
     private void DeactivateLoginPromptClientRpc()

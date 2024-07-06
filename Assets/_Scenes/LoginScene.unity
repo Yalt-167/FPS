@@ -241,84 +241,6 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
---- !u!1001 &398057269
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 2239167805086639640, guid: 93e987b2c64553c43b4f0be611e512b0,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2239167805086639640, guid: 93e987b2c64553c43b4f0be611e512b0,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2239167805086639640, guid: 93e987b2c64553c43b4f0be611e512b0,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2239167805086639640, guid: 93e987b2c64553c43b4f0be611e512b0,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2239167805086639640, guid: 93e987b2c64553c43b4f0be611e512b0,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2239167805086639640, guid: 93e987b2c64553c43b4f0be611e512b0,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2239167805086639640, guid: 93e987b2c64553c43b4f0be611e512b0,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2239167805086639640, guid: 93e987b2c64553c43b4f0be611e512b0,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2239167805086639640, guid: 93e987b2c64553c43b4f0be611e512b0,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2239167805086639640, guid: 93e987b2c64553c43b4f0be611e512b0,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2515968098823721945, guid: 93e987b2c64553c43b4f0be611e512b0,
-        type: 3}
-      propertyPath: GlobalObjectIdHash
-      value: 418980900
-      objectReference: {fileID: 0}
-    - target: {fileID: 3966391915613094633, guid: 93e987b2c64553c43b4f0be611e512b0,
-        type: 3}
-      propertyPath: m_Name
-      value: PlayerLogin
-      objectReference: {fileID: 0}
-    - target: {fileID: 3966391915613094633, guid: 93e987b2c64553c43b4f0be611e512b0,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 93e987b2c64553c43b4f0be611e512b0, type: 3}
 --- !u!1 &567216992
 GameObject:
   m_ObjectHideFlags: 0
@@ -449,6 +371,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2741000013444039455, guid: b378211f2dd648b45a09e6208c6e12e3,
+        type: 3}
+      propertyPath: NetworkConfig.PlayerPrefab
+      value: 
+      objectReference: {fileID: 3966391915613094633, guid: 97fd470c5acd60448b6c7fc43ba2b672,
+        type: 3}
     - target: {fileID: 2978146470187400772, guid: b378211f2dd648b45a09e6208c6e12e3,
         type: 3}
       propertyPath: m_IsActive
@@ -615,4 +543,3 @@ SceneRoots:
   - {fileID: 1568317669}
   - {fileID: 137306479}
   - {fileID: 567216993}
-  - {fileID: 398057269}
