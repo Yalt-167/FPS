@@ -198,9 +198,18 @@ public class PlayerNameSelector : NetworkBehaviour
     {
         GetComponent<PlayerMovement>().enabled = true;
         GetComponent<PlayerCombat>().enabled = true;
-        //GetComponent<PlayerHealthDisplay>().enabled = true;
-        //GetComponent<WeaponHandler>().enabled = true;
-        //GetComponent<PlayerHealthNetworked>().enabled = true;
+
+        var headTransform = transform.GetChild(0);
+        headTransform.GetComponent<FollowRotationCamera>().enabled = true;
+        headTransform.GetComponent<ViewBobbing>().enabled = true;
+
+        var cameraTransform = headTransform.GetChild(0).GetChild(0);
+        cameraTransform.GetComponent<Camera>().enabled = true;
+        cameraTransform.GetComponent<AudioListener>().enabled = true;
+
+        GetComponent<PlayerHealthDisplay>().enabled = true;
+        GetComponent<WeaponHandler>().enabled = true;
+        GetComponent<PlayerHealthNetworked>().enabled = true;
 
         GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
 
@@ -208,7 +217,7 @@ public class PlayerNameSelector : NetworkBehaviour
         //{
         //    transform.GetChild(childTransformIndex).gameObject.SetActive(true); // every subGameObject of the player
         //}
-        //transform.GetChild(5).gameObject.SetActive(false); // Main Camera
+        transform.GetChild(5).gameObject.SetActive(false); // Main Camera
         enabled = false;
     }
 
@@ -244,6 +253,7 @@ public class PlayerNameSelector : NetworkBehaviour
     }
 
     [SerializeField] private BehaviourGatherer handleOnRemotePlayer;
+
     [Space(20)]
     [SerializeField] private BehaviourGatherer handleOnLocalPlayer;
 
@@ -289,7 +299,7 @@ public class PlayerNameSelector : NetworkBehaviour
 
     public void ManageFiles(bool isOwner)
     {
-        print("was called");
+        print($"was called: {isOwner}");
         _ = isOwner ? ManageSelfFiles() : ManageForeignFiles();
     }
 
