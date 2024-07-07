@@ -74,7 +74,7 @@ public class PlayerNameSelector : NetworkBehaviour
                 0
             #endif
             ).gameObject.SetActive(IsOwner);
-        ManageFiles();
+        //ManageFiles();
     }
 
     private void Init()
@@ -212,13 +212,10 @@ public class PlayerNameSelector : NetworkBehaviour
         GetComponent<PlayerHealthNetworked>().enabled = true;
 
         GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
-
-        //for (int childTransformIndex = 0; childTransformIndex < 5; childTransformIndex++)
-        //{
-        //    transform.GetChild(childTransformIndex).gameObject.SetActive(true); // every subGameObject of the player
-        //}
         transform.GetChild(5).gameObject.SetActive(false); // Main Camera
         enabled = false;
+
+        ManageFiles();
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -300,58 +297,65 @@ public class PlayerNameSelector : NetworkBehaviour
     public void ManageFiles(bool isOwner)
     {
         print($"was called: {isOwner}");
-        _ = isOwner ? ManageSelfFiles() : ManageForeignFiles();
+        _ = isOwner ? ManageLocalPlayerFiles() : ManageRemotePlayerFiles();
     }
 
-    public object ManageSelfFiles()
+    public object ManageLocalPlayerFiles()
     {
         foreach (var component in handleOnLocalPlayer.componentsToKill)
         {
+            //print($"Destroyed {component.name}");
             Destroy(component);
         }
 
         foreach (var gameObj in handleOnLocalPlayer.gameObjectsToKill)
         {
+            //print($"Destroyed {gameObj.name}");
             Destroy(gameObj);
         }
 
         foreach (var component in handleOnLocalPlayer.componentsToDisable)
         {
-            if (component.TryGetComponent<MonoBehaviour>(out var comp))
+            print($"Tried deactivating {component.name}");
+            if (component is Behaviour behaviour)
             {
-                comp.enabled = false;
+                print("managed to");
+                behaviour.enabled = false;
             }
         }
 
         foreach (var gameObj in handleOnLocalPlayer.gameObjectsToDisable)
         {
+            //print($"Deactivated {gameObj.name}");
             gameObj.SetActive(false);
         }
 
         return null;
     }
 
-    public object ManageForeignFiles()
+    public object ManageRemotePlayerFiles()
     {
-        foreach (var component in handleOnLocalPlayer.componentsToKill)
+        foreach (var component in handleOnRemotePlayer.componentsToKill)
         {
             Destroy(component);
         }
 
-        foreach (var gameObj in handleOnLocalPlayer.gameObjectsToKill)
+        foreach (var gameObj in handleOnRemotePlayer.gameObjectsToKill)
         {
             Destroy(gameObj);
         }
 
-        foreach (var component in handleOnLocalPlayer.componentsToDisable)
+        foreach (var component in handleOnRemotePlayer.componentsToDisable)
         {
-            if (component.TryGetComponent<MonoBehaviour>(out var comp))
+            print($"Tried deactivating {component.name}");
+            if (component is Behaviour behaviour)
             {
-                comp.enabled = false;
+                print("managed to");
+                behaviour.enabled = false;
             }
         }
 
-        foreach (var gameObj in handleOnLocalPlayer.gameObjectsToDisable)
+        foreach (var gameObj in handleOnRemotePlayer.gameObjectsToDisable)
         {
             gameObj.SetActive(false);
         }
