@@ -10,6 +10,7 @@ using Random = UnityEngine.Random;
 using UnityEditor;
 using System.Text;
 using System.Runtime.CompilerServices;
+using Unity.VisualScripting.FullSerializer;
 
 [DefaultExecutionOrder(-99)]
 public sealed class Game : NetworkManager
@@ -225,25 +226,26 @@ public sealed class Game : NetworkManager
     [ServerRpc]
     public void UpdatePlayerListServerRpc(ServerRpcParams rpcParams = default)
     {
-        print("[ServerRpc] UpdatePlayerList");
-
         UpdatePlayerListClientRpc(GetPlayersAsPrimitives());
     }
 
     private NetworkedPlayerPrimitive[] GetPlayersAsPrimitives()
     {
         NetworkedPlayerPrimitive[] asPrimitives = new NetworkedPlayerPrimitive[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count];
-        print(NetworkManager.Singleton.SpawnManager.SpawnedObjects);
+        
+        var stringBuilder = new StringBuilder();
+        stringBuilder.Append("[ ");
         var idx = 0;
         foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
         {
-            print(element.Key);
+            stringBuilder.Append($"{{{element.Key}, {element.Value}}} ");
             if (element.Value.TryGetComponent<PlayerFrame>(out var playerFrameComponent))
             {
                 asPrimitives[idx++] = playerFrameComponent.AsPrimitive();
             }
         }
-
+        stringBuilder.Append("]");
+        print(stringBuilder.ToString());
         return asPrimitives;
     }
 
@@ -251,10 +253,11 @@ public sealed class Game : NetworkManager
     private void UpdatePlayerListClientRpc(NetworkedPlayerPrimitive[] playerPrimitives)
     {
         print("[ClientRpc] UpdatePlayerList");
-
+        playerPrimitives = GetPlayersAsPrimitives();
         players.Clear();
         for (int i = 0; i < playerPrimitives.Length; i++)
         {
+            print(playerPrimitives[i].ObjectNetworkID);
             players.Add(playerPrimitives[i].AsNetworkedPlayer());
         }
     }
@@ -402,6 +405,7 @@ public struct NetworkedPlayerPrimitive : INetworkSerializable
     {
         Name = name;
         ObjectNetworkID = objectNetworkID;
+        Debug.Log($"Name: {Name} | objectNetworkID: {ObjectNetworkID}");
     }
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -412,6 +416,7 @@ public struct NetworkedPlayerPrimitive : INetworkSerializable
 
     public readonly NetworkedPlayer AsNetworkedPlayer() // findAnchor
     {
+        Debug.Log($"Name: {Name} | objectNetworkID: {ObjectNetworkID}");
         if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(ObjectNetworkID, out var networkObject))
         {
             throw new System.Exception($"This player (ObjectNetworkID: {ObjectNetworkID}) was not properly spawned");

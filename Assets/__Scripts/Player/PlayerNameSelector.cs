@@ -219,7 +219,7 @@ public class PlayerNameSelector : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void ActivatePlayerPlayerLoginArchitectureClientRpc(NetworkSerializableString playerName)
+    private void ActivatePlayerLoginArchitectureClientRpc(NetworkSerializableString playerName)
     {
         playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
     }

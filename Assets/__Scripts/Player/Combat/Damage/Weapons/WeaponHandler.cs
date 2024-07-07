@@ -1292,7 +1292,6 @@ public class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
 
     private IEnumerator ToggleAimFOV(bool shouldBeAiming)
     {
-        //print($"called with value: {}");
         var startingPoint = camera.fieldOfView;
         var elapsedTime = 0f;
         var (target, targetDuration) = shouldBeAiming ?
