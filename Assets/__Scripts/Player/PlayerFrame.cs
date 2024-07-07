@@ -35,6 +35,7 @@ public class PlayerFrame : NetworkBehaviour
 
     public void InitPlayerFrame(string playerName)
     {
+        print("Init Frame");
         playerCombat = GetComponent<PlayerCombat>();
         playerCombat.InitPlayerFrame(this);
 

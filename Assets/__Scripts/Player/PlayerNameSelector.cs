@@ -66,7 +66,14 @@ public class PlayerNameSelector : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        transform.GetChild(0).gameObject.SetActive(IsOwner);
+        transform.GetChild(
+            #if PLAYER_PACK_ARCHITECTURE
+            5
+            #else
+                0
+            #endif
+            ).gameObject.SetActive(IsOwner);
+        ManageFiles();
     }
 
     private void Init()
@@ -136,7 +143,7 @@ public class PlayerNameSelector : NetworkBehaviour
         else
         {
 
-# if PLAYER_PACK_ARCHITECTURE
+#if PLAYER_PACK_ARCHITECTURE
             EnablePlayerServerRpc(playerName);
 #else
             //RequestSpawnPlayerServerRpc(playerName, rpcParams.Receive.SenderClientId);
@@ -223,6 +230,132 @@ public class PlayerNameSelector : NetworkBehaviour
     {
         transform.GetChild(0).gameObject.SetActive(false);
     }
+
+
+    #region Handle Files
+
+    [Header("Handle On Remote Player")]
+    [SerializeField] private List<Component> componentsToKillOnRemotePlayers;
+    [SerializeField] private List<GameObject> gameObjectsToKillOnRemotePlayers;
+    [SerializeField] private List<Component> componentsToDisableOnRemotePlayers;
+    [SerializeField] private List<GameObject> gameObjectsToDisableOnRemotePlayers;
+
+    [Space(20)]
+    [Header("Handle On Local Player")]
+    [SerializeField] private List<Component> componentsToKillOnLocalPlayer;
+    [SerializeField] private List<GameObject> gameObjectsToKillOnLocalPlayer;
+    [SerializeField] private List<Component> componentsToDisableOnLocalPlayer;
+    [SerializeField] private List<GameObject> gameObjectsToDisableOnLocalPlayer;
+
+
+    [Rpc(SendTo.Server)]
+    public void ManageFilesAllServerRpc()
+    {
+        ManageFilesAllClientRpc();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void ManageFilesAllClientRpc()
+    {
+        var (componentsToKill, gameObjectsToKill, componentsToDisable, gameObjectsToDisable) =
+            IsOwner ?
+                (componentsToKillOnLocalPlayer, gameObjectsToKillOnLocalPlayer,componentsToDisableOnLocalPlayer,gameObjectsToDisableOnLocalPlayer)
+                :
+                (componentsToKillOnRemotePlayers, gameObjectsToKillOnRemotePlayers, componentsToDisableOnRemotePlayers, gameObjectsToDisableOnRemotePlayers);
+
+        foreach (var component in componentsToKill)
+        {
+            Destroy(component);
+        }
+
+        foreach (var gameObj in gameObjectsToKill)
+        {
+            Destroy(gameObj);
+        }
+
+        foreach (var component in componentsToDisable)
+        {
+            if (component.TryGetComponent<MonoBehaviour>(out var comp))
+            {
+                comp.enabled = false;
+            }
+        }
+
+        foreach (var gameObj in gameObjectsToDisable)
+        {
+            gameObj.SetActive(false);
+        }
+    }
+
+    public void ManageFiles()
+    {
+        ManageFiles(IsOwner);
+    }
+
+    public void ManageFiles(bool isOwner)
+    {
+        _ = isOwner ? ManageSelfFiles() : ManageForeignFiles();
+    }
+
+    public object ManageSelfFiles()
+    {
+        foreach (var component in componentsToKillOnLocalPlayer)
+        {
+            Destroy(component);
+        }
+
+        foreach (var gameObj in gameObjectsToKillOnLocalPlayer)
+        {
+            Destroy(gameObj);
+        }
+
+        foreach (var component in componentsToDisableOnLocalPlayer)
+        {
+            if (component.TryGetComponent<MonoBehaviour>(out var comp))
+            {
+                comp.enabled = false;
+            }
+        }
+
+        foreach (var gameObj in gameObjectsToDisableOnLocalPlayer)
+        {
+            gameObj.SetActive(false);
+        }
+
+        return null;
+    }
+
+    public object ManageForeignFiles()
+    {
+        foreach (var component in componentsToKillOnRemotePlayers)
+        {
+            Destroy(component);
+        }
+
+        foreach (var gameObj in gameObjectsToKillOnRemotePlayers)
+        {
+            Destroy(gameObj);
+        }
+
+        foreach (var component in componentsToDisableOnRemotePlayers)
+        {
+            if (component.TryGetComponent<MonoBehaviour>(out var comp))
+            {
+                comp.enabled = false;
+            }
+        }
+
+        foreach (var gameObj in gameObjectsToDisableOnRemotePlayers)
+        {
+            gameObj.SetActive(false);
+        }
+
+        return null;
+    }
+
+    #endregion
+
+
 }
 
 
