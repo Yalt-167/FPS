@@ -20,7 +20,7 @@ public class PlayerFrame : NetworkBehaviour
 
     private PlayerMovement playerMovement;
 
-    private HandlePlayerNetworkBehaviour handlePlayerNetworkBehaviour;
+    //private HandlePlayerNetworkBehaviour handlePlayerNetworkBehaviour;
 
 
     public ushort PlayerID;
@@ -48,9 +48,10 @@ public class PlayerFrame : NetworkBehaviour
         playerMovement = GetComponent<PlayerMovement>();
         playerMovement.InitPlayerFrame(this);
 
-        handlePlayerNetworkBehaviour = GetComponent<HandlePlayerNetworkBehaviour>();
-        handlePlayerNetworkBehaviour.InitPlayerFrame(this);
-        handlePlayerNetworkBehaviour.ToggleCursor(false);
+        //handlePlayerNetworkBehaviour = GetComponent<HandlePlayerNetworkBehaviour>();
+        //handlePlayerNetworkBehaviour.InitPlayerFrame(this);
+        //handlePlayerNetworkBehaviour.ToggleCursor(false);
+        ToggleCursor(false);
 
         var hasNetworkObject = GetComponent<NetworkObject>() ?? throw new System.Exception("Does not have");
 
@@ -62,4 +63,29 @@ public class PlayerFrame : NetworkBehaviour
 
         //handlePlayerNetworkBehaviour.ManageFilesAllServerRpc();
     }
+
+    public void ToggleGameControls(bool towardOn)
+    {
+        ToggleCameraInputs(towardOn);
+        ToggleActionInputs(towardOn);
+    }
+
+    public void ToggleCameraInputs(bool towardOn)
+    {
+        transform.GetChild(0).GetComponent<FollowRotationCamera>().enabled = towardOn;
+    }
+
+    public void ToggleActionInputs(bool towardOn)
+    {
+        GetComponent<PlayerCombat>().enabled = towardOn;
+        GetComponent<PlayerMovement>().enabled = towardOn;
+    }
+
+    public void ToggleCursor(bool towardOn)
+    {
+        Cursor.lockState = towardOn ? CursorLockMode.None : CursorLockMode.Locked; //
+        Cursor.visible = !towardOn;
+        // those two may cause issues when destroying the script on remote players // chekc when loggin concurrently
+    }
+
 }

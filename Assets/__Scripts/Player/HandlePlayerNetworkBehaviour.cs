@@ -28,7 +28,7 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour, IPlayerFrameMember
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        ManageFiles();
+        //ManageFiles();
     }
 
 

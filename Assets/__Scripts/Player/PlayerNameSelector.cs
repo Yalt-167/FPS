@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
+using System;
 
 
 public class PlayerNameSelector : NetworkBehaviour
@@ -197,18 +198,17 @@ public class PlayerNameSelector : NetworkBehaviour
     {
         GetComponent<PlayerMovement>().enabled = true;
         GetComponent<PlayerCombat>().enabled = true;
-        GetComponent<ClientNetworkTransform>().enabled = true;
-        GetComponent<PlayerHealthDisplay>().enabled = true;
-        GetComponent<WeaponHandler>().enabled = true;
-        GetComponent<PlayerHealthNetworked>().enabled = true;
+        //GetComponent<PlayerHealthDisplay>().enabled = true;
+        //GetComponent<WeaponHandler>().enabled = true;
+        //GetComponent<PlayerHealthNetworked>().enabled = true;
 
         GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
 
-        for (int childTransformIndex = 0; childTransformIndex < 5; childTransformIndex++)
-        {
-            transform.GetChild(childTransformIndex).gameObject.SetActive(true); // every subGameObject of the player
-        }
-        transform.GetChild(5).gameObject.SetActive(false); // Main Camera
+        //for (int childTransformIndex = 0; childTransformIndex < 5; childTransformIndex++)
+        //{
+        //    transform.GetChild(childTransformIndex).gameObject.SetActive(true); // every subGameObject of the player
+        //}
+        //transform.GetChild(5).gameObject.SetActive(false); // Main Camera
         enabled = false;
     }
 
@@ -234,19 +234,18 @@ public class PlayerNameSelector : NetworkBehaviour
 
     #region Handle Files
 
-    [Header("Handle On Remote Player")]
-    [SerializeField] private List<Component> componentsToKillOnRemotePlayers;
-    [SerializeField] private List<GameObject> gameObjectsToKillOnRemotePlayers;
-    [SerializeField] private List<Component> componentsToDisableOnRemotePlayers;
-    [SerializeField] private List<GameObject> gameObjectsToDisableOnRemotePlayers;
+    [Serializable]
+    public struct BehaviourGatherer
+    {
+        public List<Component> componentsToKill;
+        public List<GameObject> gameObjectsToKill;
+        public List<Component> componentsToDisable;
+        public List<GameObject> gameObjectsToDisable;
+    }
 
+    [SerializeField] private BehaviourGatherer handleOnRemotePlayer;
     [Space(20)]
-    [Header("Handle On Local Player")]
-    [SerializeField] private List<Component> componentsToKillOnLocalPlayer;
-    [SerializeField] private List<GameObject> gameObjectsToKillOnLocalPlayer;
-    [SerializeField] private List<Component> componentsToDisableOnLocalPlayer;
-    [SerializeField] private List<GameObject> gameObjectsToDisableOnLocalPlayer;
-
+    [SerializeField] private BehaviourGatherer handleOnLocalPlayer;
 
     [Rpc(SendTo.Server)]
     public void ManageFilesAllServerRpc()
@@ -257,23 +256,19 @@ public class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     public void ManageFilesAllClientRpc()
     {
-        var (componentsToKill, gameObjectsToKill, componentsToDisable, gameObjectsToDisable) =
-            IsOwner ?
-                (componentsToKillOnLocalPlayer, gameObjectsToKillOnLocalPlayer,componentsToDisableOnLocalPlayer,gameObjectsToDisableOnLocalPlayer)
-                :
-                (componentsToKillOnRemotePlayers, gameObjectsToKillOnRemotePlayers, componentsToDisableOnRemotePlayers, gameObjectsToDisableOnRemotePlayers);
+        var relevantStruct = IsOwner ? handleOnRemotePlayer : handleOnLocalPlayer;
 
-        foreach (var component in componentsToKill)
+        foreach (var component in relevantStruct.componentsToKill)
         {
             Destroy(component);
         }
 
-        foreach (var gameObj in gameObjectsToKill)
+        foreach (var gameObj in relevantStruct.gameObjectsToKill)
         {
             Destroy(gameObj);
         }
 
-        foreach (var component in componentsToDisable)
+        foreach (var component in relevantStruct.componentsToDisable)
         {
             if (component.TryGetComponent<MonoBehaviour>(out var comp))
             {
@@ -281,7 +276,7 @@ public class PlayerNameSelector : NetworkBehaviour
             }
         }
 
-        foreach (var gameObj in gameObjectsToDisable)
+        foreach (var gameObj in relevantStruct.gameObjectsToDisable)
         {
             gameObj.SetActive(false);
         }
@@ -294,22 +289,23 @@ public class PlayerNameSelector : NetworkBehaviour
 
     public void ManageFiles(bool isOwner)
     {
+        print("was called");
         _ = isOwner ? ManageSelfFiles() : ManageForeignFiles();
     }
 
     public object ManageSelfFiles()
     {
-        foreach (var component in componentsToKillOnLocalPlayer)
+        foreach (var component in handleOnLocalPlayer.componentsToKill)
         {
             Destroy(component);
         }
 
-        foreach (var gameObj in gameObjectsToKillOnLocalPlayer)
+        foreach (var gameObj in handleOnLocalPlayer.gameObjectsToKill)
         {
             Destroy(gameObj);
         }
 
-        foreach (var component in componentsToDisableOnLocalPlayer)
+        foreach (var component in handleOnLocalPlayer.componentsToDisable)
         {
             if (component.TryGetComponent<MonoBehaviour>(out var comp))
             {
@@ -317,7 +313,7 @@ public class PlayerNameSelector : NetworkBehaviour
             }
         }
 
-        foreach (var gameObj in gameObjectsToDisableOnLocalPlayer)
+        foreach (var gameObj in handleOnLocalPlayer.gameObjectsToDisable)
         {
             gameObj.SetActive(false);
         }
@@ -327,17 +323,17 @@ public class PlayerNameSelector : NetworkBehaviour
 
     public object ManageForeignFiles()
     {
-        foreach (var component in componentsToKillOnRemotePlayers)
+        foreach (var component in handleOnLocalPlayer.componentsToKill)
         {
             Destroy(component);
         }
 
-        foreach (var gameObj in gameObjectsToKillOnRemotePlayers)
+        foreach (var gameObj in handleOnLocalPlayer.gameObjectsToKill)
         {
             Destroy(gameObj);
         }
 
-        foreach (var component in componentsToDisableOnRemotePlayers)
+        foreach (var component in handleOnLocalPlayer.componentsToDisable)
         {
             if (component.TryGetComponent<MonoBehaviour>(out var comp))
             {
@@ -345,7 +341,7 @@ public class PlayerNameSelector : NetworkBehaviour
             }
         }
 
-        foreach (var gameObj in gameObjectsToDisableOnRemotePlayers)
+        foreach (var gameObj in handleOnLocalPlayer.gameObjectsToDisable)
         {
             gameObj.SetActive(false);
         }
@@ -354,8 +350,6 @@ public class PlayerNameSelector : NetworkBehaviour
     }
 
     #endregion
-
-
 }
 
 

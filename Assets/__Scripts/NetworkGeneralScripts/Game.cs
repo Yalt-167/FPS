@@ -67,7 +67,7 @@ public sealed class Game : NetworkManager
 
             NetworkedComponent.ClientNetworkTransform => players.First(each => each.ClientNetworkTransform.NetworkObjectId == componentID),
 
-            NetworkedComponent.HandlePlayerNetworkBehaviour => players.First(each => each.BehaviourHandler.NetworkObjectId == componentID),
+            //NetworkedComponent.HandlePlayerNetworkBehaviour => players.First(each => each.BehaviourHandler.NetworkObjectId == componentID),
 
             NetworkedComponent.WeaponHandler => players.First(each => each.WeaponHandler.NetworkObjectId == componentID),
 
@@ -355,7 +355,7 @@ public struct NetworkedPlayer
     public ushort TeamID;
     public NetworkObject NetworkObject;
     public ClientNetworkTransform ClientNetworkTransform;
-    public HandlePlayerNetworkBehaviour BehaviourHandler;
+    //public HandlePlayerNetworkBehaviour BehaviourHandler;
     public WeaponHandler WeaponHandler;
     public PlayerHealthNetworked Health;
 
@@ -364,7 +364,7 @@ public struct NetworkedPlayer
         ushort teamID,
         NetworkObject object_,
         ClientNetworkTransform transform_,
-        HandlePlayerNetworkBehaviour behaviourHandler,
+        //HandlePlayerNetworkBehaviour behaviourHandler,
         WeaponHandler weaponHandler,
         PlayerHealthNetworked health
     )
@@ -373,7 +373,7 @@ public struct NetworkedPlayer
         TeamID = teamID;
         NetworkObject = object_;
         ClientNetworkTransform = transform_;
-        BehaviourHandler = behaviourHandler;
+        //BehaviourHandler = behaviourHandler;
         WeaponHandler = weaponHandler;
         Health = health;
     }
@@ -419,7 +419,7 @@ public struct NetworkedPlayerPrimitive : INetworkSerializable
                 0,
                 networkObject,
                 networkObject.GetComponent<ClientNetworkTransform>(),
-                networkObject.GetComponent<HandlePlayerNetworkBehaviour>(),
+                //networkObject.GetComponent<HandlePlayerNetworkBehaviour>(),
                 networkObject.GetComponent<WeaponHandler>(),
                 networkObject.GetComponent<PlayerHealthNetworked>()
             );
@@ -431,7 +431,7 @@ public enum NetworkedComponent : byte
 {
     NetworkObject,
     ClientNetworkTransform,
-    HandlePlayerNetworkBehaviour,
+    //HandlePlayerNetworkBehaviour,
     WeaponHandler,
     PlayerHealthNetworked
 }

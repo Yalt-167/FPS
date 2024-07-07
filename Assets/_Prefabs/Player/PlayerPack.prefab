@@ -1236,7 +1236,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5141735692475205435}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 91b2d715ae7cffc419e1b6b7ee9b9e65, type: 3}
   m_Name: 
@@ -1276,7 +1276,6 @@ GameObject:
   - component: {fileID: 669408356608229932}
   - component: {fileID: 51039222329652402}
   - component: {fileID: 2646494379582407812}
-  - component: {fileID: 8724483357092158295}
   - component: {fileID: 7053344651727101131}
   - component: {fileID: 5284269051849885546}
   - component: {fileID: 6958501662965233336}
@@ -1623,7 +1622,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5705630700605972737}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ed6a4b13445a27a449abf043fefdaed0, type: 3}
   m_Name: 
@@ -1778,34 +1777,6 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &8724483357092158295
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5705630700605972737}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 199a36a9e862ccf4883daeb2eb038720, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  componentsToKillOnForeignPlayers:
-  - {fileID: 8534307621890972782}
-  - {fileID: 51039222329652402}
-  - {fileID: 5516743904902779326}
-  - {fileID: 3391045545914725488}
-  - {fileID: 543361970138017989}
-  - {fileID: 1212207979648881112}
-  - {fileID: 2297063594925009126}
-  - {fileID: 292191549483302698}
-  - {fileID: 7053344651727101131}
-  - {fileID: 669408356608229932}
-  - {fileID: 9081819830090978957}
-  gameObjectsToKillOnForeignPlayers:
-  - {fileID: 4338599983721542394}
-  componentsToKillOnLocalPlayers: []
-  gameObjectsToKillOnLocalPlayers: []
 --- !u!114 &7053344651727101131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1828,7 +1799,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5705630700605972737}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 70e386591dc753842807b0c94cf01a7b, type: 3}
   m_Name: 
@@ -1872,27 +1843,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 615695314538812458, guid: 42044f9ed8a25c642adad8baa561dbb6,
     type: 3}
-  componentsToKillOnRemotePlayers:
-  - {fileID: 3391045545914725488}
-  - {fileID: 543361970138017989}
-  - {fileID: 669408356608229932}
-  - {fileID: 8534307621890972782}
-  - {fileID: 51039222329652402}
-  - {fileID: 7053344651727101131}
-  - {fileID: 5516743904902779326}
-  - {fileID: 9081819830090978957}
-  gameObjectsToKillOnRemotePlayers:
-  - {fileID: 3467822551731792150}
-  - {fileID: 4356166339693058417}
-  - {fileID: 4338599983721542394}
-  componentsToDisableOnRemotePlayers:
-  - {fileID: 2297063594925009126}
-  - {fileID: 292191549483302698}
-  gameObjectsToDisableOnRemotePlayers: []
-  componentsToKillOnLocalPlayer: []
-  gameObjectsToKillOnLocalPlayer: []
-  componentsToDisableOnLocalPlayer: []
-  gameObjectsToDisableOnLocalPlayer: []
+  handleOnRemotePlayer:
+    componentsToKill:
+    - {fileID: 3391045545914725488}
+    - {fileID: 543361970138017989}
+    - {fileID: 669408356608229932}
+    - {fileID: 8534307621890972782}
+    - {fileID: 51039222329652402}
+    - {fileID: 7053344651727101131}
+    - {fileID: 5516743904902779326}
+    - {fileID: 9081819830090978957}
+    gameObjectsToKill:
+    - {fileID: 3467822551731792150}
+    - {fileID: 4356166339693058417}
+    - {fileID: 4338599983721542394}
+    componentsToDisable:
+    - {fileID: 2297063594925009126}
+    - {fileID: 292191549483302698}
+    - {fileID: 1212207979648881112}
+    gameObjectsToDisable: []
+  handleOnLocalPlayer:
+    componentsToKill: []
+    gameObjectsToKill: []
+    componentsToDisable: []
+    gameObjectsToDisable: []
 --- !u!1 &5814794369634734712
 GameObject:
   m_ObjectHideFlags: 0
