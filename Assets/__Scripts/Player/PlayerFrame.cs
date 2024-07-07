@@ -22,6 +22,9 @@ public class PlayerFrame : NetworkBehaviour
 
     //private HandlePlayerNetworkBehaviour handlePlayerNetworkBehaviour;
 
+    private string playerName;
+    private NetworkedPlayerPrimitive asPrimitive;
+
 
     public ushort PlayerID;
     public ushort TeamID => playerHealth.TeamID;
@@ -33,7 +36,7 @@ public class PlayerFrame : NetworkBehaviour
         PlayerID = playerID;
     }
 
-    public void InitPlayerFrame(string playerName)
+    public void InitPlayerFrame(string playerName_)
     {
         print("Init Frame");
         playerCombat = GetComponent<PlayerCombat>();
@@ -53,15 +56,22 @@ public class PlayerFrame : NetworkBehaviour
         //handlePlayerNetworkBehaviour.ToggleCursor(false);
         ToggleCursor(false);
 
-        var hasNetworkObject = GetComponent<NetworkObject>() ?? throw new System.Exception("Does not have");
+        playerName = playerName_;
 
-        Game.Manager.RegisterPlayerServerRpc(
-            new(playerName, GetComponent<NetworkObject>().NetworkObjectId)
-            );
+        var hasNetworkObject = GetComponent<NetworkObject>() ?? throw new System.Exception("Does not have");
+        print($"NetworkObjectId: {NetworkObjectId}");
+        print($"NetworkObject.NetworkObjectId: {NetworkObject.NetworkObjectId}");
+        asPrimitive = new(playerName, NetworkObjectId);
+        Game.Manager.RegisterPlayerServerRpc(asPrimitive);
 
         Game.Manager.UpdatePlayerListServerRpc();
 
         //handlePlayerNetworkBehaviour.ManageFilesAllServerRpc();
+    }
+
+    public NetworkedPlayerPrimitive AsPrimitive()
+    {
+        return asPrimitive;
     }
 
     public void ToggleGameControls(bool towardOn)

@@ -296,7 +296,6 @@ public class PlayerNameSelector : NetworkBehaviour
 
     public void ManageFiles(bool isOwner)
     {
-        print($"was called: {isOwner}");
         _ = isOwner ? ManageLocalPlayerFiles() : ManageRemotePlayerFiles();
     }
 
@@ -316,10 +315,10 @@ public class PlayerNameSelector : NetworkBehaviour
 
         foreach (var component in handleOnLocalPlayer.componentsToDisable)
         {
-            print($"Tried deactivating {component.name}");
+            //print($"Tried deactivating {component.name}");
             if (component is Behaviour behaviour)
             {
-                print("managed to");
+                //print("managed to");
                 behaviour.enabled = false;
             }
         }
@@ -347,10 +346,10 @@ public class PlayerNameSelector : NetworkBehaviour
 
         foreach (var component in handleOnRemotePlayer.componentsToDisable)
         {
-            print($"Tried deactivating {component.name}");
+            //print($"Tried deactivating {component.name}");
             if (component is Behaviour behaviour)
             {
-                print("managed to");
+                //print("managed to");
                 behaviour.enabled = false;
             }
         }

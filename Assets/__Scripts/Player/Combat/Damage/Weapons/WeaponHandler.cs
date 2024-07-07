@@ -1539,3 +1539,6 @@ public struct WeaponInfos
         ActionOnHitWall = weaponStats.HitscanBulletSettings.ActionOnHitWall;
     }
 }
+
+
+// create a weapon abstract clas instead? with OnAttackDown OnAttackUp OnReload OnAimDown OnAimUp etc bc that could be more flexible

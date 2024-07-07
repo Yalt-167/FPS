@@ -42,9 +42,7 @@ public sealed class Game : NetworkManager
     [Rpc(SendTo.ClientsAndHost)]
     private void RegisterPlayerInternalClientRpc(NetworkedPlayerPrimitive player)
     {
-        print("crashed here");
         players.Add(player.AsNetworkedPlayer());
-        print("did not crashed here");
     }
 
 
@@ -73,7 +71,7 @@ public sealed class Game : NetworkManager
 
             NetworkedComponent.PlayerHealthNetworked => players.First(each => each.Health.NetworkObjectId == componentID),
 
-            _ => throw new Exception("This component provided does not match anything"),
+            _ => throw new Exception($"This component provided ({whichComponentID}) does not match anything"),
         };
         
     }
@@ -227,18 +225,23 @@ public sealed class Game : NetworkManager
     [ServerRpc]
     public void UpdatePlayerListServerRpc(ServerRpcParams rpcParams = default)
     {
-        print("UpdatePlayerListServerRpc");
+        print("[ServerRpc] UpdatePlayerList");
 
         UpdatePlayerListClientRpc(GetPlayersAsPrimitives());
     }
 
     private NetworkedPlayerPrimitive[] GetPlayersAsPrimitives()
     {
-        NetworkedPlayerPrimitive[] asPrimitives = new NetworkedPlayerPrimitive[players.Count];
-        
-        for (int i = 0; i < asPrimitives.Length; i++)
+        NetworkedPlayerPrimitive[] asPrimitives = new NetworkedPlayerPrimitive[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count];
+        print(NetworkManager.Singleton.SpawnManager.SpawnedObjects);
+        var idx = 0;
+        foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
         {
-            asPrimitives[i] = players[i].AsNetworkedPlayerPrimitive();
+            print(element.Key);
+            if (element.Value.TryGetComponent<PlayerFrame>(out var playerFrameComponent))
+            {
+                asPrimitives[idx++] = playerFrameComponent.AsPrimitive();
+            }
         }
 
         return asPrimitives;
@@ -247,10 +250,10 @@ public sealed class Game : NetworkManager
     [ClientRpc]
     private void UpdatePlayerListClientRpc(NetworkedPlayerPrimitive[] playerPrimitives)
     {
-        print("UpdatePlayerListClientRpc");
+        print("[ClientRpc] UpdatePlayerList");
 
         players.Clear();
-        for (int i = 0;i < playerPrimitives.Length;i++)
+        for (int i = 0; i < playerPrimitives.Length; i++)
         {
             players.Add(playerPrimitives[i].AsNetworkedPlayer());
         }
@@ -407,11 +410,11 @@ public struct NetworkedPlayerPrimitive : INetworkSerializable
         serializer.SerializeValue(ref ObjectNetworkID);
     }
 
-    public readonly NetworkedPlayer AsNetworkedPlayer()
+    public readonly NetworkedPlayer AsNetworkedPlayer() // findAnchor
     {
         if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(ObjectNetworkID, out var networkObject))
         {
-            throw new System.Exception("This player was not properly spawned");
+            throw new System.Exception($"This player (ObjectNetworkID: {ObjectNetworkID}) was not properly spawned");
         }
 
         return new NetworkedPlayer(
