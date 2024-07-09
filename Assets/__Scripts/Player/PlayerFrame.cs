@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System.Diagnostics;
+using UnityEditor.PackageManager;
+using System;
 
 
 
@@ -22,7 +25,9 @@ public class PlayerFrame : NetworkBehaviour
 
     //private HandlePlayerNetworkBehaviour handlePlayerNetworkBehaviour;
 
+    private bool WasInitiated => string.IsNullOrEmpty(playerName);
     private string playerName;
+
 
 
     public ushort PlayerID;
@@ -35,7 +40,7 @@ public class PlayerFrame : NetworkBehaviour
         PlayerID = playerID;
     }
 
-    public void InitPlayerFrame(string playerName_)
+    public void InitPlayerFrameLocal(string playerName_)
     {
         playerCombat = GetComponent<PlayerCombat>();
         playerCombat.InitPlayerFrame(this);
@@ -65,8 +70,31 @@ public class PlayerFrame : NetworkBehaviour
         //handlePlayerNetworkBehaviour.ManageFilesAllServerRpc();
     }
 
-    public NetworkedPlayerPrimitive AsPrimitive()
+
+    public void InitPlayerFrameRemote()
     {
+        playerCombat = GetComponent<PlayerCombat>();
+        playerCombat.InitPlayerFrame(this);
+
+        weaponHandler = GetComponent<WeaponHandler>();
+        weaponHandler.InitPlayerFrame(this);
+
+        playerHealth = GetComponent<PlayerHealthNetworked>();
+        playerHealth.InitPlayerFrame(this);
+
+        playerMovement = GetComponent<PlayerMovement>();
+        playerMovement.InitPlayerFrame(this);
+
+        //playerName = playerName_;
+    }
+
+    public NetworkedPlayerPrimitive AsPrimitive(ulong requestingClientID)
+    {
+        if (!WasInitiated)
+        {
+            RequestPlayerNameServerRpc(NetworkManager.Singleton.LocalClientId, requestingClientID);
+        }
+
         return new(playerName, NetworkObjectId);
     }
 
@@ -94,4 +122,63 @@ public class PlayerFrame : NetworkBehaviour
         // those two may cause issues when destroying the script on remote players // chekc when loggin concurrently
     }
 
+    //[ServerRpc]
+    //private void RequestPlayersDataServerRpc(ulong requestingClientID)
+    //{
+    //    foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+    //    {
+    //        if (client.ClientId != requestingClientID)
+    //        {
+
+    //            SendPlayerDataClientRpc(new(playerName, requestingClientID);
+    //        }
+    //    }
+    //}
+
+    [ServerRpc]
+    private void RequestPlayerNameServerRpc(ulong targetID, ulong requestingID)
+    {
+        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            if (client.ClientId == targetID)
+            {
+                SendPlayerNameClientRpc(new NetworkSerializableString(playerName), requestingID);
+            }
+        }
+    }
+
+    private void SendPlayerNameClientRpc(NetworkSerializableString playerName_, ulong targetClientID)
+    {
+        if (NetworkManager.Singleton.LocalClientId == targetClientID)
+        {
+            playerName = playerName_;
+        }
+    }
+
+    //[ClientRpc]
+    //private void SendPlayerDataClientRpc(PlayerData data, ulong targetClientID)
+    //{
+    //    if (NetworkManager.Singleton.LocalClientId == targetClientID)
+    //    {
+
+    //    }
+    //}
+}
+
+public struct PlayerData : INetworkSerializable
+{
+    public string PlayerName;
+    public ulong ClientID;
+
+    public PlayerData(string playerName, ulong clientID)
+    {
+        PlayerName = playerName;
+        ClientID = clientID;
+    }
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref PlayerName);
+        serializer.SerializeValue(ref ClientID);
+    }
 }

@@ -177,7 +177,7 @@ public sealed class Game : NetworkManager
 
     #endregion
 
-    #region Network Object Spawning
+    #region Network Objects Spawning
 
     [Rpc(SendTo.Server)]
     public void RequestNetworkObjectClientSpawnServerRpc(GameObject networkObjectPrefab, Vector3 position, Quaternion orientation)
@@ -198,6 +198,10 @@ public sealed class Game : NetworkManager
         // Legitimately spawn the obj on the network
         Instantiate(networkObjectPrefab, position, orientation).GetComponent<NetworkObject>().Spawn();
     }
+
+    #endregion
+
+    #region Network Objects Monitoring
 
     [MenuItem("Developer/DebugNetworkObjects")]
     public static void DebugNetworkObjects()
@@ -226,10 +230,10 @@ public sealed class Game : NetworkManager
     [ServerRpc]
     public void UpdatePlayerListServerRpc(ServerRpcParams rpcParams = default)
     {
-        UpdatePlayerListClientRpc(GetPlayersAsPrimitives());
+        UpdatePlayerListClientRpc(GetPlayersAsPrimitives(rpcParams.Receive.SenderClientId));
     }
 
-    private NetworkedPlayerPrimitive[] GetPlayersAsPrimitives()
+    private NetworkedPlayerPrimitive[] GetPlayersAsPrimitives(ulong requestingClientID)
     {
         NetworkedPlayerPrimitive[] asPrimitives = new NetworkedPlayerPrimitive[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count];
         
@@ -241,7 +245,7 @@ public sealed class Game : NetworkManager
             stringBuilder.Append($"{{{element.Key}, {element.Value}}} ");
             if (element.Value.TryGetComponent<PlayerFrame>(out var playerFrameComponent))
             {
-                asPrimitives[idx++] = playerFrameComponent.AsPrimitive();
+                asPrimitives[idx++] = playerFrameComponent.AsPrimitive(requestingClientID);
             }
         }
         stringBuilder.Append("]");
@@ -265,9 +269,9 @@ public sealed class Game : NetworkManager
 
 
 
-#region Respawn Logic
+    #region Respawn Logic
 
-private readonly Dictionary<ushort, List<SpawnPoint>> spawnPoints = new();
+    private readonly Dictionary<ushort, List<SpawnPoint>> spawnPoints = new();
 
 
     public void AddRespawnPoint(SpawnPoint spawnPoint)

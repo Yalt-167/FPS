@@ -211,7 +211,7 @@ public class PlayerNameSelector : NetworkBehaviour
         GetComponent<WeaponHandler>().enabled = true;
         GetComponent<PlayerHealthNetworked>().enabled = true;
 
-        GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
+        GetComponent<PlayerFrame>().InitPlayerFrameLocal(playerName);
         transform.GetChild(5).gameObject.SetActive(false); // Main Camera
         enabled = false;
 
@@ -221,7 +221,7 @@ public class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void ActivatePlayerLoginArchitectureClientRpc(NetworkSerializableString playerName)
     {
-        playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
+        playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrameLocal(playerName);
     }
 
 
