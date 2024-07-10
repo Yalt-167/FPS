@@ -14,6 +14,7 @@ using System;
 [DefaultExecutionOrder(-98)]
 public class PlayerFrame : NetworkBehaviour
 {
+    //private NetworkLi
     [field: SerializeField] public ChampionStats ChampionStats { get; set; }
 
     private PlayerCombat playerCombat;

@@ -16,12 +16,6 @@ public sealed class Game : NetworkManager
 {
     public static Game Manager;
 
-    #region Debug
-
-    [SerializeField] private bool debugBottomPlane;
-
-    #endregion
-
     #region Player List
 
     private readonly NetworkedPlayer NO_PLAYER = new();
@@ -278,7 +272,7 @@ public sealed class Game : NetworkManager
         players.Clear();
         for (int i = 0; i < playerPrimitives.Length; i++)
         {
-            print(playerPrimitives[i].ObjectNetworkID);
+            //print(playerPrimitives[i].ObjectNetworkID);
             players.Add(playerPrimitives[i].AsNetworkedPlayer());
         }
     }
@@ -367,9 +361,32 @@ public sealed class Game : NetworkManager
 
     private void Awake()
     {
-        if (Manager != null) {  return; }
+        //if (IsServer)
+        //{
+            Manager = this;
+        //}
+        //else
+        //{
+        //    UpdateGameManagerServerRpc();
+        //}
 
-        Manager = this;
+        //if (Manager != null) { print("Already had a manager"); return; }
+
+    }
+
+
+    [ServerRpc]
+    private void UpdateGameManagerServerRpc()
+    {
+        print("ServerRpc");
+        UpdateGameManagerClientRpc(Manager);
+    }
+
+    [ClientRpc]
+    private void UpdateGameManagerClientRpc(Game manager)
+    {
+        print("ClientRpc");
+        Manager = manager;
     }
 
 
@@ -378,26 +395,33 @@ public sealed class Game : NetworkManager
     //    Application.targetFrameRate = 60;
     //}
 
-    private void OnDrawGizmos()
-    {
-        if (debugBottomPlane)
-        {
-            Gizmos.color = Color.red;
-            var origin = new Vector3(transform.position.x, -30, transform.position.z);
-            var debugDist = 100f; // how far the plane with be rendered
+    #region Debug
 
-            var sideward = Vector3.right * debugDist;
-            var forward = Vector3.forward * debugDist;
-            for (int offset = -100; offset <= 100; offset += 10)
-            {
-                var forwardOffsetVec = new Vector3(0, 0, offset);
-                Gizmos.DrawLine(origin - sideward + forwardOffsetVec, origin + sideward + forwardOffsetVec);
+    //[SerializeField] private bool debugBottomPlane;
 
-                var sidewardOffsetVec = new Vector3(offset, 0, 0);
-                Gizmos.DrawLine(origin - forward + sidewardOffsetVec, origin + forward + sidewardOffsetVec);
-            }
-        }
-    }
+    //private void OnDrawGizmos()
+    //{
+    //    if (debugBottomPlane)
+    //    {
+    //        Gizmos.color = Color.red;
+    //        var origin = new Vector3(transform.position.x, -30, transform.position.z);
+    //        var debugDist = 100f; // how far the plane with be rendered
+
+    //        var sideward = Vector3.right * debugDist;
+    //        var forward = Vector3.forward * debugDist;
+    //        for (int offset = -100; offset <= 100; offset += 10)
+    //        {
+    //            var forwardOffsetVec = new Vector3(0, 0, offset);
+    //            Gizmos.DrawLine(origin - sideward + forwardOffsetVec, origin + sideward + forwardOffsetVec);
+
+    //            var sidewardOffsetVec = new Vector3(offset, 0, 0);
+    //            Gizmos.DrawLine(origin - forward + sidewardOffsetVec, origin + forward + sidewardOffsetVec);
+    //        }
+    //    }
+    //}
+
+    #endregion
+
 }
 
 [Serializable]
