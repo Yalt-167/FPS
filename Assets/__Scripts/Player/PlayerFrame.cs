@@ -62,10 +62,10 @@ public class PlayerFrame : NetworkBehaviour
         playerName = playerName_;
 
         var hasNetworkObject = GetComponent<NetworkObject>() ?? throw new System.Exception("Does not have");
-        print($"NetworkObjectId: {NetworkObjectId}");
+        
         Game.Manager.RegisterPlayerServerRpc(new(playerName, NetworkObjectId));
 
-        Game.Manager.UpdatePlayerListServerRpc();
+        //Game.Manager.UpdatePlayerListServerRpc();
 
         //handlePlayerNetworkBehaviour.ManageFilesAllServerRpc();
     }
@@ -88,12 +88,12 @@ public class PlayerFrame : NetworkBehaviour
         //playerName = playerName_;
     }
 
-    public NetworkedPlayerPrimitive AsPrimitive(ulong requestingClientID)
+    public NetworkedPlayerPrimitive AsPrimitive(/*ulong requestingClientID*/)
     {
-        if (!WasInitiated)
-        {
-            RequestPlayerNameServerRpc(NetworkManager.Singleton.LocalClientId, requestingClientID);
-        }
+        //if (!WasInitiated)
+        //{
+        //    RequestPlayerNameServerRpc(NetworkManager.Singleton.LocalClientId, requestingClientID);
+        //}
 
         return new(playerName, NetworkObjectId);
     }
@@ -147,6 +147,7 @@ public class PlayerFrame : NetworkBehaviour
         }
     }
 
+    [ClientRpc]
     private void SendPlayerNameClientRpc(NetworkSerializableString playerName_, ulong targetClientID)
     {
         if (NetworkManager.Singleton.LocalClientId == targetClientID)

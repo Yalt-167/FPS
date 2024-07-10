@@ -9,8 +9,7 @@ using System.Linq;
 using Random = UnityEngine.Random;
 using UnityEditor;
 using System.Text;
-using System.Runtime.CompilerServices;
-using Unity.VisualScripting.FullSerializer;
+
 
 [DefaultExecutionOrder(-99)]
 public sealed class Game : NetworkManager
@@ -26,7 +25,7 @@ public sealed class Game : NetworkManager
     #region Player List
 
     private readonly NetworkedPlayer NO_PLAYER = new();
-    public readonly List<NetworkedPlayer> players = new();
+    public List<NetworkedPlayer> players = new();
 
     /// <summary>
     ///  returns ur absolute ID (fancy word for index in playerList)<br/>
@@ -43,6 +42,7 @@ public sealed class Game : NetworkManager
     [Rpc(SendTo.ClientsAndHost)]
     private void RegisterPlayerInternalClientRpc(NetworkedPlayerPrimitive player)
     {
+        print("Added a player");
         players.Add(player.AsNetworkedPlayer());
     }
 
@@ -122,6 +122,7 @@ public sealed class Game : NetworkManager
     [MenuItem("Developer/DebugPlayerList")]
     public static void DebugPlayerList()
     {
+        //PrintIterable(Manager.players);
         var stringBuilder = new StringBuilder();
 
         stringBuilder.Append("[ ");
@@ -129,6 +130,22 @@ public sealed class Game : NetworkManager
         foreach (var player in Manager.players)
         {
             stringBuilder.Append(isFirst ? $"{player.GetInfos()}" : $", {player.GetInfos()}");
+            isFirst = false;
+        }
+        stringBuilder.Append(" ]");
+
+        Debug.Log(stringBuilder.ToString());
+    }
+
+    public static void PrintIterable(IEnumerable iterable)
+    {
+        var stringBuilder = new StringBuilder();
+
+        stringBuilder.Append("[ ");
+        var isFirst = true;
+        foreach (var item in iterable)
+        {
+            stringBuilder.Append(isFirst ? $"{item.ToString()}" : $", {item.ToString()}");
             isFirst = false;
         }
         stringBuilder.Append(" ]");
@@ -230,10 +247,10 @@ public sealed class Game : NetworkManager
     [ServerRpc]
     public void UpdatePlayerListServerRpc(ServerRpcParams rpcParams = default)
     {
-        UpdatePlayerListClientRpc(GetPlayersAsPrimitives(rpcParams.Receive.SenderClientId));
+        UpdatePlayerListClientRpc(GetPlayersAsPrimitives(/*rpcParams.Receive.SenderClientId*/));
     }
 
-    private NetworkedPlayerPrimitive[] GetPlayersAsPrimitives(ulong requestingClientID)
+    private NetworkedPlayerPrimitive[] GetPlayersAsPrimitives(/*ulong requestingClientID*/)
     {
         NetworkedPlayerPrimitive[] asPrimitives = new NetworkedPlayerPrimitive[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count];
         
@@ -245,7 +262,7 @@ public sealed class Game : NetworkManager
             stringBuilder.Append($"{{{element.Key}, {element.Value}}} ");
             if (element.Value.TryGetComponent<PlayerFrame>(out var playerFrameComponent))
             {
-                asPrimitives[idx++] = playerFrameComponent.AsPrimitive(requestingClientID);
+                asPrimitives[idx++] = playerFrameComponent.AsPrimitive(/*requestingClientID*/);
             }
         }
         stringBuilder.Append("]");
@@ -264,6 +281,37 @@ public sealed class Game : NetworkManager
             print(playerPrimitives[i].ObjectNetworkID);
             players.Add(playerPrimitives[i].AsNetworkedPlayer());
         }
+    }
+
+    //private IEnumerator UpdatePlayerList()
+    //{
+    //    players.Clear();
+    //    foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+    //    {
+    //        Req
+    //    }
+    //}
+
+    //[Rpc(SendTo.SpecifiedInParams)]
+    //private void RequestPlayerNameClientRpc(RpcSendParams rpcParam)
+    //{
+    //    NetworkManager.Singleton.
+    //}
+
+    [ServerRpc]
+    public void RetrieveExistingPlayerListServerRpc()
+    {
+        if (!IsServer) { return; }
+
+        print($"list was taken from here {IsServer}");
+        SetPlayerListClientRpc(players);
+    }
+
+    [ClientRpc]
+    private void SetPlayerListClientRpc(List<NetworkedPlayer> players_)
+    {
+        print("Updated Existing List");
+        players = players_;
     }
 
 
@@ -319,6 +367,8 @@ public sealed class Game : NetworkManager
 
     private void Awake()
     {
+        if (Manager != null) {  return; }
+
         Manager = this;
     }
 
@@ -391,6 +441,11 @@ public struct NetworkedPlayer
     public readonly string GetInfos()
     {
         return $"{{Player: {Name} | Team: {TeamID}}}";
+    }
+
+    public new readonly string ToString()
+    {
+        return GetInfos();
     }
 
     public readonly NetworkedPlayerPrimitive AsNetworkedPlayerPrimitive()

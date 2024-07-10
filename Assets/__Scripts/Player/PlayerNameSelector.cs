@@ -62,8 +62,6 @@ public class PlayerNameSelector : NetworkBehaviour
 
     #endregion
 
-
-
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -74,7 +72,6 @@ public class PlayerNameSelector : NetworkBehaviour
                 0
             #endif
             ).gameObject.SetActive(IsOwner);
-        //ManageFiles();
     }
 
     private void Init()
@@ -98,7 +95,12 @@ public class PlayerNameSelector : NetworkBehaviour
         };
 
         promptActive = IsOwner;
-}
+
+        if (IsOwner)
+        {
+            Game.Manager.RetrieveExistingPlayerListServerRpc();
+        }
+    }
 
     private void OnGUI()
     {
