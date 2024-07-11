@@ -1,5 +1,7 @@
-using UnityEngine;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEditor;
 
 [ExecuteInEditMode]
@@ -14,7 +16,11 @@ public class TextureResize : MonoBehaviour
         UpdateTextureTiling();
     }
 
-    
+    private void OnValidate()
+    {
+        UpdateTextureTiling();
+    }
+
     private void Update()
     {
         if (transform.hasChanged)
@@ -36,7 +42,7 @@ public class TextureResizeEditorButton : Editor
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        if (GUILayout.Button("UpdateTexture"))
+        if (GUILayout.Button("Update Texture"))
         {
             TextureResize targetScript = (TextureResize)target;
             targetScript.UpdateTextureTiling();
