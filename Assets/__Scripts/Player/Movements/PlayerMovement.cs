@@ -20,11 +20,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private FollowRotationCamera followRotationCamera;
     public Vector3 Position => transform.position;
     public float CurrentSpeed => new Vector3(Rigidbody.velocity.x, 0f, Rigidbody.velocity.z).magnitude;
-    public bool IsSliding { get; private set; }
-    public bool IsDashing { get; private set; } = false;
-    public bool IsWallRunning { get; private set; } = false;
     public bool IsJumping { get; private set; } = false;
-    public bool IsGrappling { get; private set; } = false;
     public bool IsGrounded => isCollidingDown;
 
 
@@ -117,7 +113,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private float lastJumpPressed = -.2f;
     private bool CanUseCoyote => coyoteUsable && !isCollidingDown && timeLeftGround + coyoteTimeThreshold > Time.time;
     private bool HasBufferedJump => isCollidingDown && lastJumpPressed + jumpBuffer > Time.time;
-    private bool isBhopping;
 
     #endregion
 
@@ -206,6 +201,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private readonly float cameraTransformBaseHeight = .6f;
     private readonly float cameraTransformSlidingHeight = .3f;
 
+    private Action currentCameraHandlingMethod;
 
     #endregion
 
@@ -315,8 +311,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         _ = inputQuery.HoldRightForTime;
         _ = inputQuery.QuickReset;
 
-        //RunCollisionChecks();
         currentMovementMethod();
+        currentCameraHandlingMethod();
         TryReplenishDash();
         if (inputQuery.SwitchCameraPosition) SwitchCameraPosition();
 
@@ -366,31 +362,37 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             case MovementMode.RUN:
                 currentGravityForce = baseGravity;
                 currentMovementMethod = HandleRun;
+                currentCameraHandlingMethod = () => { };
                 break;
 
             case MovementMode.SLIDE:
                 currentGravityForce = baseGravity;
                 currentMovementMethod = HandleSlide;
+                currentCameraHandlingMethod = () => { };
                 break;
 
             case MovementMode.WALLRUN:
                 currentGravityForce = noGravity;
                 currentMovementMethod = HandleWallrun;
+                currentCameraHandlingMethod = () => { };
                 break;
 
             case MovementMode.DASH:
                 currentGravityForce = noGravity;
                 currentMovementMethod = HandleDash;
+                currentCameraHandlingMethod = () => { };
                 break;
 
             case MovementMode.LEDGE_CLIMB:
                 currentGravityForce = noGravity;
                 currentMovementMethod = HandleLedgeClimb;
+                currentCameraHandlingMethod = () => { };
                 break;
 
             case MovementMode.GRAPPLING:
                 currentGravityForce = noGravity;
                 currentMovementMethod = HandleGrappling;
+                currentCameraHandlingMethod = () => { };
                 break;
         }
     }
@@ -432,8 +434,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private void CommonJumpStart()
     {
         coyoteUsable = false;
-        IsSliding = false;
-        IsWallRunning = false;
         IsJumping = true;
 
         ResetYVelocity();
@@ -450,8 +450,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             transform.TransformDirection(new Vector3(MyInput.GetAxis(inputQuery.Left, inputQuery.Right), 0f, MyInput.GetAxis(inputQuery.Back, inputQuery.Forward))).normalized;
 
         Rigidbody.AddForce((fullJump ? JumpForce : JumpForce / 2) * Vector3.up, ForceMode.Impulse);
-
-        isBhopping = afterSlide;
 
         StartCoroutine(ResetJumping());
     }
@@ -484,15 +482,13 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void HandleRun()
     {
-        if (isCollidingDown)
-        {
-            Run(true);
-        }
-        else
+        if (!isCollidingDown)
         {
             ApplyGravity();
-            Run(isBhopping);
         }
+        
+        Run(isCollidingDown);
+        
 
         if (HandleJump(true, InSlideJumpBoostWindow, InDashVelocityBoostWindow))
         {
@@ -603,7 +599,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         //capsuleCollider.height = slidingColliderHeight;
         transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
         transform.position = transform.position - Vector3.up * .5f;
-        IsSliding = true;
         //cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, .25f, 1f);
 
 
@@ -656,11 +651,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private void CommonSlideExit(MovementMode newMovementMode)
     {
         //cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, 2f, 1f);
-        IsSliding = false;
         transform.localScale = transform.localScale.Mask(1f, 2f, 1f);
         transform.position = transform.position - Vector3.up * .5f;
-        //CapsuleCollider.height *= 2;
-        //capsuleCollider.height = initialColliderHeight;
         timeStoppedSlide = Time.time;
         SetMovementMode(newMovementMode);
     }
@@ -688,7 +680,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private IEnumerator Dash()
     {
-        IsDashing = true;
         SetMovementMode(MovementMode.DASH);
         dashReady = false;
         ResetVelocityBoost();
@@ -743,7 +734,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private void CommonDashExit(MovementMode newMovementMode)
     {
         followRotationCamera.enabled = true;
-        IsDashing = false;
         SetMovementMode(newMovementMode);
         StartCoroutine(StartDashCooldown());
     }
@@ -845,7 +835,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         SetMovementMode(MovementMode.WALLRUN);
 
         onRight = side > 0;
-        IsWallRunning = true;
         var forceDirection = onRight ? transform.right : -transform.right;
 
         timeStartedWallRunning = Time.time;
@@ -914,7 +903,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         timeStartedWallRunning = float.PositiveInfinity;
         StartCoroutine(SetCameraTilt(onRight, true));
-        IsWallRunning = false;
         SetMovementMode(newMovementMode);
     }
 
