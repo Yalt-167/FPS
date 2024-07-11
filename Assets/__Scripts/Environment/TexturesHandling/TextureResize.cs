@@ -32,7 +32,7 @@ public class TextureResize : MonoBehaviour
 
     public void UpdateTextureTiling()
     {
-        GetComponent<Renderer>().material.mainTextureScale = new Vector2(transform.localScale.x / scaleFactor, transform.localScale.z / scaleFactor);
+        GetComponent<Renderer>().sharedMaterial.mainTextureScale = new Vector2(transform.localScale.x / scaleFactor, transform.localScale.z / scaleFactor);
     }
 }
 

@@ -299,6 +299,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         cameraTransform = transform.GetChild(0).GetComponent<Transform>();
         followRotationCamera = transform.GetChild(0).GetComponent<FollowRotationCamera>();
         cameraTransform = transform.GetChild(0);
+        cameraOriginalPosition = cameraTransform.localPosition;
 
         cameraTransform.localPosition = cameraTransformPositions[0];
         SetMovementMode(MovementMode.RUN);
@@ -596,19 +597,20 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         if (!inputQuery.HoldSlide) { yield break; } // if changed his mind
         
         SetMovementMode(MovementMode.SLIDE);
-        //capsuleCollider.height = slidingColliderHeight;
         transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
         transform.position = transform.position - Vector3.up * .5f;
         //cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, .25f, 1f);
 
 
-
+        if (chainedFromDash)
+        {
         //var dir = new Vector3(MyInput.GetAxis(inputQuery.Left, inputQuery.Right), 0f, MyInput.GetAxis(inputQuery.Back, inputQuery.Forward));
         //horizontalVelocityBoost +=
         //    (chainedFromDash ? dashIntoSlideVelocityBoost : 1f) * initialSlideBoost * (dir == Vector3.zero ?
         //        Rigidbody.velocity.Mask(1f, 0, 1f).normalized
         //        :
         //        transform.TransformDirection(dir)).normalized;
+        }
 
 
         var dashed = false;
@@ -623,13 +625,14 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                     }
 
                     /* -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized -> gets the opposite of the velocity while ignoring verticality */
-                    //Rigidbody.AddForce(slideSlowdownForce * Time.deltaTime * -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Force);
+                    Rigidbody.AddForce(slideSlowdownForce * Time.deltaTime * -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Force);
 
                     if (DashUsable && inputQuery.Dash)
                     {
                         CommonSlideExit(MovementMode.DASH);
                         StartCoroutine(Dash());
-                        return dashed = true;
+                        dashed = true;
+                        return true;
                     }
 
                     jumped = HandleJump(true, true, InDashVelocityBoostWindow);
@@ -661,8 +664,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         var startingPoint = cameraTransform.localPosition.y;
         var goal = isReset ? cameraTransformBaseHeight : cameraTransformSlidingHeight;
-        var upperBound = Mathf.Max(startingPoint, goal);
-        var lowerBound = Mathf.Min(startingPoint, goal);
+        var (lowerBound, upperBound) = startingPoint < goal ? (startingPoint, goal) : (goal, startingPoint);
         var elapsedTime = 0f;
         while (elapsedTime < slideCameraHeightAdjustmentDuration)
         {
@@ -970,7 +972,42 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         currentExternalVelocityBoost += force;
     }
 
+    #region Camera Handling
 
+    [Header("Bobbing Settings")]
+    [SerializeField] private float bobbingSpeed = 0.1f; // Speed of the bobbing motion
+    [SerializeField] private float bobbingAmount = 0.1f; // Amount of bobbing motion
+    private Vector3 cameraOriginalPosition; // Original camera position
+
+    private float BobbingSpeed => 0f;
+    //PlayerMovement.Instance.IsGrounded ?
+    //    PlayerMovement.Instance.IsSliding || PlayerMovement.Instance.IsDashing ?
+    //        0f
+    //        :
+    //        PlayerMovement.Instance.CurrentSpeed > 5f ?
+    //            10f
+    //            : 1f
+    //    :
+    //0f;
+
+
+    private IEnumerator Bob()
+    {
+        var timer = 0f;
+
+        for (; ; )
+        {
+            var verticalOffset = Mathf.Sin(timer) * bobbingAmount;
+
+            cameraTransform.localPosition = cameraOriginalPosition + new Vector3(0f, verticalOffset, 0f);
+
+            timer += BobbingSpeed * Time.deltaTime;
+
+            yield return null;
+        }
+    }
+
+    #endregion
     private void OnDrawGizmosSelected()
     {
 

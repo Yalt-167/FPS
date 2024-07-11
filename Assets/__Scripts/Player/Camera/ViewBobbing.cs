@@ -8,7 +8,7 @@ public class ViewBobbing : MonoBehaviour
     [SerializeField] private float bobbingSpeed = 0.1f; // Speed of the bobbing motion
     [SerializeField] private float bobbingAmount = 0.1f; // Amount of bobbing motion
     [SerializeField] private Transform cameraTransform; // Reference to the camera transform
-    private Vector3 originalPosition; // Original position of the camera
+    private Vector3 originalPosition; // Original camera position
 
     private float BobbingSpeed => 0f;
         //PlayerMovement.Instance.IsGrounded ?
@@ -28,18 +28,6 @@ public class ViewBobbing : MonoBehaviour
         // Store the original position of the camera
         originalPosition = cameraTransform.localPosition;
     }
-
-    //private void OnEnable()
-    //{
-    //    // Start the view bobbing coroutine
-    //    if (Game.Manager.GameSettings.viewBobbing) bobbingCoroutine = StartCoroutine(Bob());
-    //}
-
-    //private void OnDisable()
-    //{
-    //    StopCoroutine(bobbingCoroutine);
-    //}
-
 
     private IEnumerator Bob()
     {
