@@ -728,7 +728,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -1530,11 +1530,11 @@ MonoBehaviour:
       RelevantKey: 32
       howToActivate: 1
       holdForSeconds: 0
-    InitiateCrouch:
+    InitiateSlide:
       RelevantKey: 304
       howToActivate: 0
       holdForSeconds: 0
-    HoldCrouch:
+    HoldSlide:
       RelevantKey: 304
       howToActivate: 2
       holdForSeconds: 0
@@ -2147,7 +2147,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -2260,7 +2260,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3

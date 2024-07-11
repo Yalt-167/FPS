@@ -72,7 +72,7 @@ public class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlashable
     }
 
     /// <summary>
-    /// This method aims to assert wether several hitboxes belong to a singular target<br> for instance a shotgun should nt log each and every pellet that land and rather log a total -> verifiy that each hit lands on the same target and add them all
+    /// This method aims to assert wether several hitboxes belong to a singular target<br> for instance a shotgun should nt log each and every pellet that lands and rather log a total -> verifiy that each hit lands on the same target and add them all
     /// </summary>
     /// <returns></returns>
     public bool BelongToSamePlayer(List<IDamageable> components)
@@ -91,8 +91,10 @@ public class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlashable
         return true;
     }
 
+    // method that returns the ID of the player ot belongs too
+
 }
-   
+  
 
 public enum BodyParts : byte
 {

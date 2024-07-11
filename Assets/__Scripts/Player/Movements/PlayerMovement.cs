@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     [SerializeField] private MovementInputQuery inputQuery;
     private Rigidbody Rigidbody;
-    private CapsuleCollider CapsuleCollider;
+    private CapsuleCollider capsuleCollider;
     private FollowRotationCamera followRotationCamera;
     public Vector3 Position => transform.position;
     public float CurrentSpeed => new Vector3(Rigidbody.velocity.x, 0f, Rigidbody.velocity.z).magnitude;
@@ -155,6 +155,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private bool InSlideJumpBoostWindow => timeFinishedSliding + slideJumpBoostWindow > Time.time;
 
     [SerializeField] private float slideCameraHeightAdjustmentDuration = .3f;
+
+    private readonly float initialColliderHeight = 2f;
+    private readonly float slidingColliderHeight = .5f;
 
     #endregion
 
@@ -296,7 +299,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         inputQuery.Init();
 
         Rigidbody = GetComponent<Rigidbody>();
-        CapsuleCollider = GetComponent<CapsuleCollider>();
+        capsuleCollider = GetComponent<CapsuleCollider>();
         cameraTransform = transform.GetChild(0).GetComponent<Transform>();
         followRotationCamera = transform.GetChild(0).GetComponent<FollowRotationCamera>();
         cameraTransform = transform.GetChild(0);
@@ -501,7 +504,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             StartCoroutine(Dash());
             return;
         }
-        else if (inputQuery.InitiateCrouch && !(Rigidbody.velocity == Vector3.zero))
+        else if (inputQuery.InitiateSlide && !(Rigidbody.velocity == Vector3.zero))
         {
             StartCoroutine(Slide(InDashVelocityBoostWindow));
             return;
@@ -562,27 +565,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         horizontalVelocityBoost = transform.TransformDirection(localVelocityBoost);
 
-
-        //if (wantedMoveVec.x == 0f)
-        //{
-        //    Rigidbody.velocity = transform.TransformDirection(transform.InverseTransformDirection(Rigidbody.velocity).Mask(sidewayInertiaControlFactor, 0, 1));
-        //}
-        //else if (Mathf.Sign(wantedMoveVec.x) != Mathf.Sign(transform.InverseTransformDirection(Rigidbody.velocity).x))
-        //{
-        //    Rigidbody.velocity = transform.TransformDirection(transform.InverseTransformDirection(Rigidbody.velocity).Mask(0, 0, 1));
-        //}
-
-        //if (Mathf.Sign(wantedMoveVec.y) != Mathf.Sign(transform.InverseTransformDirection(Rigidbody.velocity).z))
-        //{
-        //    Rigidbody.velocity = transform.TransformDirection(transform.InverseTransformDirection(Rigidbody.velocity).Mask(1, 0, 0));
-        //}
-
         // dumb shit
         //{
-
-        //float xVelocityComponent = wantedMoveVec.x == 0f ? sidewayInertiaControlFactor : (Mathf.Sign(wantedMoveVec.x) != Mathf.Sign(transform.InverseTransformDirection(Rigidbody.velocity).x)) ? 0f : 1f;
-        //float zVelocityComponent = Mathf.Sign(wantedMoveVec.y) != Mathf.Sign(transform.InverseTransformDirection(Rigidbody.velocity).z) ? 0f : 1f;
-
         //Rigidbody.velocity = transform.TransformDirection(transform.InverseTransformDirection(Rigidbody.velocity).Mask(wantedMoveVec.x == 0f ? sidewayInertiaControlFactor : (Mathf.Sign(wantedMoveVec.x) != Mathf.Sign(transform.InverseTransformDirection(Rigidbody.velocity).x)) ? 0f : 1f, 0f, Mathf.Sign(wantedMoveVec.y) != Mathf.Sign(transform.InverseTransformDirection(Rigidbody.velocity).z) ? 0f : 1f));
         //}
 
@@ -611,28 +595,26 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private IEnumerator Slide(bool chainedFromDash)
     {
+        yield return new WaitUntil(() => isCollidingDown || !inputQuery.HoldSlide); // await the landing to initiate the slide
+
+        if (!inputQuery.HoldSlide) { yield break; } // if changed his mind
+        
         SetMovementMode(MovementMode.SLIDE);
-        CapsuleCollider.height *= .5f;
+        //capsuleCollider.height = slidingColliderHeight;
+        transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
+        transform.position = transform.position - Vector3.up * .5f;
         IsSliding = true;
+        //cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, .25f, 1f);
 
 
-        yield return new WaitUntil(() => isCollidingDown || !inputQuery.HoldCrouch);
 
+        //var dir = new Vector3(MyInput.GetAxis(inputQuery.Left, inputQuery.Right), 0f, MyInput.GetAxis(inputQuery.Back, inputQuery.Forward));
+        //horizontalVelocityBoost +=
+        //    (chainedFromDash ? dashIntoSlideVelocityBoost : 1f) * initialSlideBoost * (dir == Vector3.zero ?
+        //        Rigidbody.velocity.Mask(1f, 0, 1f).normalized
+        //        :
+        //        transform.TransformDirection(dir)).normalized;
 
-        if (!inputQuery.HoldCrouch)
-        {
-            CommonSlideExit(MovementMode.RUN);
-            yield break;
-        }
-
-        var dir = new Vector3(MyInput.GetAxis(inputQuery.Left, inputQuery.Right), 0f, MyInput.GetAxis(inputQuery.Back, inputQuery.Forward));
-        horizontalVelocityBoost +=
-            (chainedFromDash ? dashIntoSlideVelocityBoost : 1f) * initialSlideBoost * (dir == Vector3.zero ?
-                Rigidbody.velocity.Mask(1f, 0, 1f).normalized
-                :
-                transform.TransformDirection(dir)).normalized;
-
-        cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, .5f, 1f);
 
         var dashed = false;
         var jumped = false;
@@ -646,7 +628,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                     }
 
                     /* -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized -> gets the opposite of the velocity while ignoring verticality */
-                    Rigidbody.AddForce(slideSlowdownForce * Time.deltaTime * -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Force);
+                    //Rigidbody.AddForce(slideSlowdownForce * Time.deltaTime * -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Force);
 
                     if (DashUsable && inputQuery.Dash)
                     {
@@ -659,7 +641,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
                     return
                         Rigidbody.velocity.magnitude < slideCancelThreshold ||
-                        !inputQuery.HoldCrouch ||
+                        !inputQuery.HoldSlide ||
                         jumped
                         ;
                 }
@@ -673,9 +655,12 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void CommonSlideExit(MovementMode newMovementMode)
     {
-        cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, 2f, 1f);
+        //cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, 2f, 1f);
         IsSliding = false;
-        CapsuleCollider.height *= 2;
+        transform.localScale = transform.localScale.Mask(1f, 2f, 1f);
+        transform.position = transform.position - Vector3.up * .5f;
+        //CapsuleCollider.height *= 2;
+        //capsuleCollider.height = initialColliderHeight;
         timeStoppedSlide = Time.time;
         SetMovementMode(newMovementMode);
     }
@@ -722,7 +707,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                     //Rigidbody.velocity = dashVelocity * cameraTransform.forward; // perhaps do sth less brutal with gradual velocity loss
                     Rigidbody.velocity = DashVelocity * dir; // perhaps do sth less brutal with gradual velocity loss
 
-                    if (inputQuery.InitiateCrouch && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
+                    if (inputQuery.InitiateSlide && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
                     {
                         slid = true;
                         CommonDashExit(MovementMode.SLIDE);
@@ -903,7 +888,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                     return leftEarly = true;
                 }
 
-                if (inputQuery.InitiateCrouch)
+                if (inputQuery.InitiateSlide)
                 {
                     CommonWallRunExit(MovementMode.SLIDE, onRight);
                     StartCoroutine(Slide(false));

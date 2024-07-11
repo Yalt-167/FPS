@@ -26,8 +26,8 @@ public class MovementInputQuery : InputQuery
     public FixedKeybind HoldJump = new(KeyCode.Space, PlayerActionActivationType.OnKeyHeld);
     public FixedKeybind InterruptJump = new(KeyCode.Space, PlayerActionActivationType.OnKeyUp);
 
-    public FixedKeybind InitiateCrouch = new(KeyCode.Space, PlayerActionActivationType.OnKeyDown);
-    public FixedKeybind HoldCrouch = new(KeyCode.Space, PlayerActionActivationType.OnKeyHeld);
+    public FixedKeybind InitiateSlide = new(KeyCode.Space, PlayerActionActivationType.OnKeyDown);
+    public FixedKeybind HoldSlide = new(KeyCode.Space, PlayerActionActivationType.OnKeyHeld);
 
     public FixedKeybind Dash = new(KeyCode.Alpha9, PlayerActionActivationType.OnKeyDown);
 
@@ -62,8 +62,8 @@ public class MovementInputQuery : InputQuery
         InterruptJump.Init();
 
 
-        InitiateCrouch.Init();
-        HoldCrouch.Init();
+        InitiateSlide.Init();
+        HoldSlide.Init();
         Dash.Init();
 
 
