@@ -1026,23 +1026,23 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private void OnDrawGizmosSelected()
     {
 
-        //Gizmos.color = isCollidingDown ? Color.red : Color.green;
-        //Gizmos.DrawWireSphere(
-        //    transform.position + ceilingCheckOffset,
-        //    groundCeilingCheckRadius
-        //    );
+        Gizmos.color = isCollidingDown ? Color.red : Color.green;
+        Gizmos.DrawWireSphere(
+            transform.position + ceilingCheckOffset,
+            groundCeilingCheckRadius
+            );
 
-        //Gizmos.color = isCollidingUp ? Color.red : Color.green;
-        //Gizmos.DrawWireSphere(
-        //    transform.position + groundCheckOffset,
-        //    groundCeilingCheckRadius
-        //    );
+        Gizmos.color = isCollidingUp ? Color.red : Color.green;
+        Gizmos.DrawWireSphere(
+            transform.position + groundCheckOffset,
+            groundCeilingCheckRadius
+            );
 
-        //Gizmos.color = isCollidingOnAnySide ? Color.red : Color.green;
-        //Gizmos.DrawWireCube(
-        //    transform.position,
-        //    bodyCheckSize
-        //    );
+        Gizmos.color = isCollidingOnAnySide ? Color.red : Color.green;
+        Gizmos.DrawWireCube(
+            transform.position,
+            bodyCheckSize
+            );
     }
 }
 
