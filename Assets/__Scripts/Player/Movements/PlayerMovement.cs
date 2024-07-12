@@ -975,39 +975,54 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     #region Camera Handling
 
     [Header("Bobbing Settings")]
-    [SerializeField] private float bobbingSpeed = 0.1f; // Speed of the bobbing motion
-    [SerializeField] private float bobbingAmount = 0.1f; // Amount of bobbing motion
+    [SerializeField] private float maxViewBobbingSpeed = 0.1f; // Speed of the bobbing motion
+    [SerializeField] private float maxViewBobbingDepth = 0.1f; // Amount of bobbing motion
     private Vector3 cameraOriginalPosition; // Original camera position
 
-    private float BobbingSpeed => 0f;
-    //PlayerMovement.Instance.IsGrounded ?
-    //    PlayerMovement.Instance.IsSliding || PlayerMovement.Instance.IsDashing ?
-    //        0f
-    //        :
-    //        PlayerMovement.Instance.CurrentSpeed > 5f ?
-    //            10f
-    //            : 1f
-    //    :
-    //0f;
+    [SerializeField] private float speedThresholdToTriggerViewBobbing;
+    [SerializeField] private float timeToRegulateBobbingOffset;
 
+    [SerializeField] private float speedThresholdToReachMaxViewBobbingIntensity;
+    private float RelevantParamForBobbingIntensity => Mathf.Min(CurrentSpeed, speedThresholdToReachMaxViewBobbingIntensity);
+    private float BobbingSpeed => Mathf.Lerp(0f, maxViewBobbingSpeed, RelevantParamForBobbingIntensity / speedThresholdToReachMaxViewBobbingIntensity);
+    private float BobbingDepth => Mathf.Lerp(0f, maxViewBobbingDepth, RelevantParamForBobbingIntensity / speedThresholdToReachMaxViewBobbingIntensity);
+    private bool isBobbing;
 
     private IEnumerator Bob()
     {
-        var timer = 0f;
+        var viewBobbingProgress = 0f; // this name kinda sucks but idk what to name it
 
-        for (; ; )
+        isBobbing = true;
+        for (; isCollidingDown && currentMovementMode == MovementMode.RUN && CurrentSpeed > speedThresholdToTriggerViewBobbing;) // the geneva convention is not safe
         {
-            var verticalOffset = Mathf.Sin(timer) * bobbingAmount;
+            var verticalOffset = Mathf.Sin(viewBobbingProgress) * BobbingDepth;
 
             cameraTransform.localPosition = cameraOriginalPosition + new Vector3(0f, verticalOffset, 0f);
 
-            timer += BobbingSpeed * Time.deltaTime;
+            viewBobbingProgress += BobbingSpeed * Time.deltaTime;
+
+            yield return null;
+        }
+        
+        StartCoroutine(ResetBobbingOffset());
+    }
+
+    private IEnumerator ResetBobbingOffset()
+    {
+        isBobbing = false;
+        var elapsed = 0f;
+        var startingPoint = cameraTransform.localPosition;
+        for (; elapsed < timeToRegulateBobbingOffset && !isBobbing;)
+        {
+            elapsed += Time.deltaTime;
+            cameraTransform.localPosition = Vector3.Lerp(startingPoint, cameraOriginalPosition, elapsed / timeToRegulateBobbingOffset);
 
             yield return null;
         }
     }
 
     #endregion
+
     private void OnDrawGizmosSelected()
     {
 
