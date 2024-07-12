@@ -988,7 +988,18 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private float BobbingDepth => Mathf.Lerp(0f, maxViewBobbingDepth, RelevantParamForBobbingIntensity / speedThresholdToReachMaxViewBobbingIntensity);
     private bool isBobbing;
 
-    private IEnumerator Bob()
+    private void HandleRunCamera()
+    {
+        if (!isBobbing)
+        {
+            StartCoroutine(TriggerViewBobbing());
+        }
+
+
+
+    }
+
+    private IEnumerator TriggerViewBobbing()
     {
         var viewBobbingProgress = 0f; // this name kinda sucks but idk what to name it
 
@@ -1112,4 +1123,4 @@ public struct CollisionDebug
 #endregion
 
 // remove boosts and make it a more manageable controller
-// still dynamic with slide/dash etc but no more velocity boost for chaining moves
+// still dynamic with slide/dash etc but no more velocity boost for chaining moves (except for dash -> slide | slide -> jump
