@@ -1205,7 +1205,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3897177104569148242}
   - component: {fileID: 3391045545914725488}
-  - component: {fileID: 543361970138017989}
   m_Layer: 0
   m_Name: Head
   m_TagString: Untagged
@@ -1242,21 +1241,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sensitivity: 4
---- !u!114 &543361970138017989
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5141735692475205435}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a7c98dcc73f8b141ab2190910f7ecf3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bobbingSpeed: 1
-  bobbingAmount: 0.15
-  cameraTransform: {fileID: 1195907894058845421}
 --- !u!1 &5705630700605972737
 GameObject:
   m_ObjectHideFlags: 0
@@ -1370,7 +1354,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2957232829
+  GlobalObjectIdHash: 169908227
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1570,8 +1554,6 @@ MonoBehaviour:
   currentMovementMode: 0
   targetSpeed: 0
   acceleration: 180000
-  stopDecceleration: 0
-  baseDecceleration: 0
   sidewayInertiaControlFactor: 0
   horizontalVelocityBoostDecayRate: 0.95
   minHorizontalVelocityBoostThreshold: 0
@@ -1620,10 +1602,11 @@ MonoBehaviour:
   speedThresholdToTriggerViewBobbing: 6
   timeToRegulateBobbingOffset: 0.3
   speedThresholdToReachMaxViewBobbingIntensity: 6
-  maxRunCameraTiltAngle: 50
-  maxRunCameraTiltSpeed: 5000
+  maxRunCameraTiltAngle: 3
+  maxRunCameraTiltSpeed: 1
+  runCameraTiltLeniencyToExtent: 0.1
   runCameraTiltSnappiness: 0
-  runCameraTiltRegulationSpeed: 0
+  runCameraTiltRegulationSpeed: 5
 --- !u!114 &669408356608229932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1855,7 +1838,7 @@ MonoBehaviour:
   handleOnRemotePlayer:
     componentsToKill:
     - {fileID: 3391045545914725488}
-    - {fileID: 543361970138017989}
+    - {fileID: 0}
     - {fileID: 669408356608229932}
     - {fileID: 8534307621890972782}
     - {fileID: 51039222329652402}

@@ -203,7 +203,6 @@ public class PlayerNameSelector : NetworkBehaviour
 
         var headTransform = transform.GetChild(0);
         headTransform.GetComponent<FollowRotationCamera>().enabled = true;
-        headTransform.GetComponent<ViewBobbing>().enabled = true;
 
         var cameraTransform = headTransform.GetChild(0).GetChild(0);
         cameraTransform.GetComponent<Camera>().enabled = true;

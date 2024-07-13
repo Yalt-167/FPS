@@ -21,11 +21,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private FollowRotationCamera followRotationCamera;
     public Vector3 Position => transform.position;
     public float CurrentSpeed => new Vector3(Rigidbody.velocity.x, 0f, Rigidbody.velocity.z).magnitude;
-    public float ForwardSpeed => Vector3.Dot(Rigidbody.velocity, transform.forward);
+    public float CurrentForwardSpeed => Vector3.Dot(Rigidbody.velocity, transform.forward);
+    public float CurrentStrafeSpeed => Mathf.Abs(Vector3.Dot(Rigidbody.velocity, transform.right));
+    public float CurrentVerticalSpeed => Rigidbody.velocity.y;
     public bool IsJumping { get; private set; } = false;
-    public bool IsGrounded => isCollidingDown;
-
-
 
     [Space(10)]
     [SerializeField] private MovementMode currentMovementMode;
@@ -43,8 +42,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private float WallRunSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.WallRunningSpeed ?? 9f;
 
     [SerializeField] private float acceleration;
-    [SerializeField] private float stopDecceleration; // deceleration when no key held
-    [SerializeField] private float baseDecceleration; // decceleration when speed above limit
     [SerializeField] private float sidewayInertiaControlFactor; // when the direction changes apply it to control inertia and prevent the player from going sideway (former forward)
 
     private Action currentMovementMethod;
@@ -977,12 +974,12 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     #region Camera Handling
 
     [Header("Bobbing Settings")]
-    [SerializeField] private float maxViewBobbingSpeed = 0.1f; // Speed of the bobbing motion
-    [SerializeField] private float maxViewBobbingDepth = 0.1f; // Amount of bobbing motion
+    [SerializeField] private float maxViewBobbingSpeed; // Speed of the bobbing motion
+    [SerializeField] private float maxViewBobbingDepth; // Amount of bobbing motion
     private Vector3 cameraOriginalPosition; // Original camera position
 
     [SerializeField] private float speedThresholdToTriggerViewBobbing;
-    private float SpeedThresholdToTriggerViewBobbing => RunningSpeed - RunningSpeed / 3;
+    private float SpeedThresholdToTriggerViewBobbing => RunningSpeed - RunningSpeed / 3; // completely & purely arbitrary
     [SerializeField] private float timeToRegulateBobbingOffset;
 
     [SerializeField] private float speedThresholdToReachMaxViewBobbingIntensity;
@@ -995,9 +992,12 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [Header("Run Camera Tilt")]
     [SerializeField] private float maxRunCameraTiltAngle;
     [SerializeField] private float maxRunCameraTiltSpeed;
-    private float leniencyToRunCameraTiltAngleExtent;
+    [SerializeField] private float runCameraTiltLeniencyToExtent;
+    // this name sucks but basically
+    // the leniency to the clamp (maxCameraTilt / noCameraTilt) so the lerp doesn t run forever and at some point
+    // (when the difference currentCameraTilt -> extent < leniency) the value snaps to the extent
     private float currentRunCameraTiltAngle;
-    private float CurrentRunCameraTiltAngle
+    public float CurrentRunCameraTiltAngle
     {
         get
         {
@@ -1005,28 +1005,33 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
         set
         {
-            if (Mathf.Abs(value - maxRunCameraTiltAngle) < leniencyToRunCameraTiltAngleExtent)
+            if (Mathf.Abs(value - maxRunCameraTiltAngle) < runCameraTiltLeniencyToExtent && TargetRunCameraTiltAngle != 0)
             {
-                currentRunCameraTiltAngle = value;
+                currentRunCameraTiltAngle = maxRunCameraTiltAngle * Mathf.Sign(value);
+                print($"Set value {currentRunCameraTiltAngle}");
                 return;
             }
 
-            if (Mathf.Abs(value) < leniencyToRunCameraTiltAngleExtent)
+            if (Mathf.Abs(value) < runCameraTiltLeniencyToExtent && TargetRunCameraTiltAngle == 0)
             {
                 currentRunCameraTiltAngle = 0;
+                print($"Set value {currentRunCameraTiltAngle}");
+                return;
             }
+
+            currentRunCameraTiltAngle = value;
+            print($"Set value {currentRunCameraTiltAngle}");
         }
     }
 
-    [SerializeField] private float runCameraTiltSnappiness;
+    private float TargetRunCameraTiltAngle => MyInput.GetAxis(inputQuery.Right, inputQuery.Left) * maxRunCameraTiltAngle;
+    // as dir in {-1, 0, 1} dir * maxRunCameraTiltAngle in {-maxRunCameraTiltAngle, 0 (regulateCameraTilt), maxRunCameraTiltAngle}
 
     [SerializeField] private float runCameraTiltRegulationSpeed;
 
 
     private void HandleRunCamera()
     {
-        print(ForwardSpeed);
-
         if (!isBobbing)
         {
             StartCoroutine(TriggerViewBobbing());
@@ -1037,14 +1042,14 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void HandleRunCameraTilt()
     {
-        var tiltDirection = MyInput.GetAxis(inputQuery.Left, inputQuery.Right);
-        HandleRunCameraTiltInternal(tiltDirection * maxRunCameraTiltAngle); // as dir in {-1, 0, 1} dir * maxRunCameraTiltAngle in {-maxRunCameraTiltAngle, 0 (regulateCameraTilt), maxRunCameraTiltAngle}
+        HandleRunCameraTiltInternal(TargetRunCameraTiltAngle); 
     }
 
     private void HandleRunCameraTiltInternal(float targetAngle)
     {
-        CurrentRunCameraTiltAngle = Mathf.Lerp(CurrentRunCameraTiltAngle, targetAngle, maxRunCameraTiltSpeed * Time.deltaTime);
-        ApplyRunCameraTilt();
+        print(CurrentRunCameraTiltAngle);
+        CurrentRunCameraTiltAngle = Mathf.Lerp(CurrentRunCameraTiltAngle, targetAngle, (targetAngle == 0 ? runCameraTiltRegulationSpeed : maxRunCameraTiltSpeed) * Time.deltaTime);
+        //ApplyRunCameraTilt();
     }
 
     private void ApplyRunCameraTilt()
