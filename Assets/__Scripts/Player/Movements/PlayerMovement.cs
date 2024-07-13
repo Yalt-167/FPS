@@ -188,7 +188,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [Header("Camera")]
     [SerializeField] private float maxWallRunCameraTilt = 45f;
     [SerializeField] private float wallRunCameraTiltDuration = .2f;
-    [field: SerializeField] public float CurrentWallRunCameraTilt { get; private set; } = 0f;
+    public float CurrentWallRunCameraTilt { get; private set; } = 0f;
     [SerializeField] private float timeOnWallBeforeTiltingCamera;
     private float timeStartedWallRunning;
     private bool ShouldStartTiltingCamera => timeStartedWallRunning + timeOnWallBeforeTiltingCamera < Time.time;
@@ -201,6 +201,17 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private readonly float cameraTransformSlidingHeight = .3f;
 
     private Action currentCameraHandlingMethod;
+
+    public float RelevantCameraTiltAngle => currentMovementMode switch
+        {
+            MovementMode.RUN => CurrentRunCameraTiltAngle,
+            MovementMode.SLIDE => 0f,
+            MovementMode.WALLRUN => CurrentWallRunCameraTilt,
+            MovementMode.DASH => 0f,
+            MovementMode.LEDGE_CLIMB => 0f,
+            MovementMode.GRAPPLING => 0f,
+            _ => 0f
+        };
 
     #endregion
 
@@ -1008,19 +1019,16 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             if (Mathf.Abs(value - maxRunCameraTiltAngle) < runCameraTiltLeniencyToExtent && TargetRunCameraTiltAngle != 0)
             {
                 currentRunCameraTiltAngle = maxRunCameraTiltAngle * Mathf.Sign(value);
-                print($"Set value {currentRunCameraTiltAngle}");
                 return;
             }
 
             if (Mathf.Abs(value) < runCameraTiltLeniencyToExtent && TargetRunCameraTiltAngle == 0)
             {
                 currentRunCameraTiltAngle = 0;
-                print($"Set value {currentRunCameraTiltAngle}");
                 return;
             }
 
             currentRunCameraTiltAngle = value;
-            print($"Set value {currentRunCameraTiltAngle}");
         }
     }
 
@@ -1047,7 +1055,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void HandleRunCameraTiltInternal(float targetAngle)
     {
-        print(CurrentRunCameraTiltAngle);
         CurrentRunCameraTiltAngle = Mathf.Lerp(CurrentRunCameraTiltAngle, targetAngle, (targetAngle == 0 ? runCameraTiltRegulationSpeed : maxRunCameraTiltSpeed) * Time.deltaTime);
         //ApplyRunCameraTilt();
     }

@@ -26,8 +26,9 @@ public class FollowRotationCamera : MonoBehaviour
         // around x-axis(and z with the cameraTilt thingy)
         xRotation -= Input.GetAxis(MouseYAxis) * sensitivity;
         xRotation = Mathf.Clamp(xRotation, -89f, 89f); // Clamp in order to avoid doing a flip when looking up/down too intensely
-        transform.localRotation = Quaternion.Euler(xRotation, 0f, playerMovement.CurrentWallRunCameraTilt);
-        transform.localRotation = Quaternion.Euler(xRotation, 0f, playerMovement.CurrentRunCameraTiltAngle);
+        //transform.localRotation = Quaternion.Euler(xRotation, 0f, playerMovement.CurrentWallRunCameraTilt);
+        //transform.localRotation = Quaternion.Euler(xRotation, 0f, playerMovement.CurrentRunCameraTiltAngle);
+        transform.localRotation = Quaternion.Euler(xRotation, 0f, playerMovement.RelevantCameraTiltAngle);
 
         // around y-axis
         yRotation += Input.GetAxis(MouseXAxis) * sensitivity;
