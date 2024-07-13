@@ -1,3 +1,5 @@
+//#define DEBUG_MULTIPLAYER
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -267,7 +269,9 @@ public sealed class Game : NetworkManager
     [ClientRpc]
     private void UpdatePlayerListClientRpc(NetworkedPlayerPrimitive[] playerPrimitives)
     {
+#if DEBUG_MULTIPLAYER
         print("[ClientRpc] UpdatePlayerList");
+#endif
         playerPrimitives = GetPlayersAsPrimitives();
         players.Clear();
         for (int i = 0; i < playerPrimitives.Length; i++)
@@ -297,14 +301,19 @@ public sealed class Game : NetworkManager
     {
         if (!IsServer) { return; }
 
+#if DEBUG_MULTIPLAYER
         print($"list was taken from here {IsServer}");
+#endif
         SetPlayerListClientRpc(players);
     }
 
     [ClientRpc]
     private void SetPlayerListClientRpc(List<NetworkedPlayer> players_)
     {
+#if DEBUG_MULTIPLAYER
         print("Updated Existing List");
+#endif
+        
         players = players_;
     }
 
@@ -378,14 +387,19 @@ public sealed class Game : NetworkManager
     [ServerRpc]
     private void UpdateGameManagerServerRpc()
     {
+#if DEBUG_MULTIPLAYER
         print("ServerRpc");
+#endif
         UpdateGameManagerClientRpc(Manager);
     }
 
     [ClientRpc]
     private void UpdateGameManagerClientRpc(Game manager)
     {
+#if DEBUG_MULTIPLAYER
         print("ClientRpc");
+#endif
+
         Manager = manager;
     }
 
@@ -488,7 +502,9 @@ public struct NetworkedPlayerPrimitive : INetworkSerializable
     {
         Name = name;
         ObjectNetworkID = objectNetworkID;
+#if DEBUG_MULTIPLAYER
         Debug.Log($"Name: {Name} | objectNetworkID: {ObjectNetworkID}");
+#endif
     }
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -499,7 +515,9 @@ public struct NetworkedPlayerPrimitive : INetworkSerializable
 
     public readonly NetworkedPlayer AsNetworkedPlayer() // findAnchor
     {
+#if DEBUG_MULTIPLAYER
         Debug.Log($"Name: {Name} | objectNetworkID: {ObjectNetworkID}");
+#endif
         if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(ObjectNetworkID, out var networkObject))
         {
             throw new System.Exception($"This player (ObjectNetworkID: {ObjectNetworkID}) was not properly spawned");

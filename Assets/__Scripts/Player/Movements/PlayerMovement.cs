@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -20,6 +21,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private FollowRotationCamera followRotationCamera;
     public Vector3 Position => transform.position;
     public float CurrentSpeed => new Vector3(Rigidbody.velocity.x, 0f, Rigidbody.velocity.z).magnitude;
+    public float ForwardSpeed => Vector3.Dot(Rigidbody.velocity, transform.forward);
     public bool IsJumping { get; private set; } = false;
     public bool IsGrounded => isCollidingDown;
 
@@ -363,7 +365,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             case MovementMode.RUN:
                 currentGravityForce = baseGravity;
                 currentMovementMethod = HandleRun;
-                currentCameraHandlingMethod = () => { };
+                currentCameraHandlingMethod = HandleRunCamera;
                 break;
 
             case MovementMode.SLIDE:
@@ -980,6 +982,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private Vector3 cameraOriginalPosition; // Original camera position
 
     [SerializeField] private float speedThresholdToTriggerViewBobbing;
+    private float SpeedThresholdToTriggerViewBobbing => RunningSpeed - RunningSpeed / 3;
     [SerializeField] private float timeToRegulateBobbingOffset;
 
     [SerializeField] private float speedThresholdToReachMaxViewBobbingIntensity;
@@ -988,15 +991,70 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private float BobbingDepth => Mathf.Lerp(0f, maxViewBobbingDepth, RelevantParamForBobbingIntensity / speedThresholdToReachMaxViewBobbingIntensity);
     private bool isBobbing;
 
+
+    [Header("Run Camera Tilt")]
+    [SerializeField] private float maxRunCameraTiltAngle;
+    [SerializeField] private float maxRunCameraTiltSpeed;
+    private float leniencyToRunCameraTiltAngleExtent;
+    private float currentRunCameraTiltAngle;
+    private float CurrentRunCameraTiltAngle
+    {
+        get
+        {
+            return currentRunCameraTiltAngle;
+        }
+        set
+        {
+            if (Mathf.Abs(value - maxRunCameraTiltAngle) < leniencyToRunCameraTiltAngleExtent)
+            {
+                currentRunCameraTiltAngle = value;
+                return;
+            }
+
+            if (Mathf.Abs(value) < leniencyToRunCameraTiltAngleExtent)
+            {
+                currentRunCameraTiltAngle = 0;
+            }
+        }
+    }
+
+    [SerializeField] private float runCameraTiltSnappiness;
+
+    [SerializeField] private float runCameraTiltRegulationSpeed;
+
+
     private void HandleRunCamera()
     {
+        print(ForwardSpeed);
+
         if (!isBobbing)
         {
             StartCoroutine(TriggerViewBobbing());
         }
 
+        HandleRunCameraTilt();
+    }
 
+    private void HandleRunCameraTilt()
+    {
+        var tiltDirection = MyInput.GetAxis(inputQuery.Left, inputQuery.Right);
+        HandleRunCameraTiltInternal(tiltDirection * maxRunCameraTiltAngle); // as dir in {-1, 0, 1} dir * maxRunCameraTiltAngle in {-maxRunCameraTiltAngle, 0 (regulateCameraTilt), maxRunCameraTiltAngle}
+    }
 
+    private void HandleRunCameraTiltInternal(float targetAngle)
+    {
+        CurrentRunCameraTiltAngle = Mathf.Lerp(CurrentRunCameraTiltAngle, targetAngle, maxRunCameraTiltSpeed * Time.deltaTime);
+        ApplyRunCameraTilt();
+    }
+
+    private void ApplyRunCameraTilt()
+    {
+        //targetRecoilHandlerRotation = Vector3.Lerp(targetRecoilHandlerRotation, Vector3.zero, RecoilRegulationSpeed * Time.deltaTime);
+        //currentRecoilHandlerRotation = Vector3.Slerp(currentRecoilHandlerRotation, targetRecoilHandlerRotation, recoilMovementSnappiness * Time.deltaTime);
+        //recoilHandlerTransform.localRotation = Quaternion.Euler(currentRecoilHandlerRotation);
+        var curCameraTransformRotation = cameraTransform.transform.localRotation.eulerAngles;
+        curCameraTransformRotation.z = CurrentRunCameraTiltAngle;
+        cameraTransform.transform.localRotation = Quaternion.Euler(curCameraTransformRotation);
     }
 
     private IEnumerator TriggerViewBobbing()
