@@ -14,7 +14,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
-  m_LightmapFlags: 2
+  m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -42,13 +42,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _DissovleScale: 75
+    - _DissovleScale: 35
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
     - _DissolveSpeed: {r: -0.5, g: 0, b: 0, a: 0}
     - _FirstColor: {r: 1, g: 0, b: 0, a: 0}
-    - _MainTextureSpeed: {r: -0.5, g: 0, b: 0, a: 0}
+    - _MainTextureSpeed: {r: -0.1, g: 0, b: 0, a: 0}
     - _secondColor: {r: 0, g: 0.1750474, b: 1, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &6312046154592881517

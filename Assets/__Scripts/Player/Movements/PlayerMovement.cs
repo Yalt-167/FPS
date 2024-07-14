@@ -205,7 +205,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     public float RelevantCameraTiltAngle => currentMovementMode switch
         {
             MovementMode.RUN => CurrentRunCameraTiltAngle,
-            MovementMode.SLIDE => 0f,
+            MovementMode.SLIDE => CurrentSlideCameraTiltAngle,
             MovementMode.WALLRUN => CurrentWallRunCameraTilt,
             MovementMode.DASH => 0f,
             MovementMode.LEDGE_CLIMB => 0f,
@@ -332,8 +332,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         CollisionDebug = new(isCollidingUp, isCollidingDown, isCollidingRight, isCollidingLeft, isCollidingOnAnySide);
         HorizontalVelocityBoostDebug = new(horizontalVelocityBoost);
 
-        if (Physics.Raycast(transform.position, Vector3.down, 2f * 0.5f + 0.2f, limits)) transform.position = Vector3.up * 100;
         // do a layer per level instead with a scriptable object LevelInfo holding all relevant y
+        if (transform.position.y < -50)
+        {
+            transform.position = Vector3.up * 100;
+        }
     }
 
     private void FixedUpdate()
@@ -379,7 +382,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             case MovementMode.SLIDE:
                 currentGravityForce = baseGravity;
                 currentMovementMethod = HandleSlide;
-                currentCameraHandlingMethod = () => { };
+                currentCameraHandlingMethod = HandleSlideCamera;
                 break;
 
             case MovementMode.WALLRUN:
@@ -482,8 +485,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private IEnumerator ResetJumping()
     {
         yield return new WaitUntil(
-                () => Rigidbody.velocity.y < 0f/* || (int) currentMovementMode > 1*/
+                () => Rigidbody.velocity.y < 0f || currentMovementMode != MovementMode.RUN
             );
+
         IsJumping = false;
     }
 
@@ -984,6 +988,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     #region Camera Handling
 
+    #region View Bobbing
+
     [Header("Bobbing Settings")]
     [SerializeField] private float maxViewBobbingSpeed; // Speed of the bobbing motion
     [SerializeField] private float maxViewBobbingDepth; // Amount of bobbing motion
@@ -999,6 +1005,42 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private float BobbingDepth => Mathf.Lerp(0f, maxViewBobbingDepth, RelevantParamForBobbingIntensity / speedThresholdToReachMaxViewBobbingIntensity);
     private bool isBobbing;
 
+    private IEnumerator TriggerViewBobbing()
+    {
+        var viewBobbingProgress = 0f; // this name kinda sucks but idk what to name it
+
+        isBobbing = true;
+        for (; isCollidingDown && currentMovementMode == MovementMode.RUN && CurrentSpeed > speedThresholdToTriggerViewBobbing;) // the geneva convention is not safe
+        {
+            var verticalOffset = Mathf.Sin(viewBobbingProgress) * BobbingDepth;
+
+            cameraTransform.localPosition = cameraOriginalPosition + new Vector3(0f, verticalOffset, 0f);
+
+            viewBobbingProgress += BobbingSpeed * Time.deltaTime;
+
+            yield return null;
+        }
+
+        StartCoroutine(ResetBobbingOffset());
+    }
+
+    private IEnumerator ResetBobbingOffset()
+    {
+        isBobbing = false;
+        var elapsed = 0f;
+        var startingPoint = cameraTransform.localPosition;
+        for (; elapsed < timeToRegulateBobbingOffset && !isBobbing;)
+        {
+            elapsed += Time.deltaTime;
+            cameraTransform.localPosition = Vector3.Lerp(startingPoint, cameraOriginalPosition, elapsed / timeToRegulateBobbingOffset);
+
+            yield return null;
+        }
+    }
+
+    #endregion
+
+    #region Run Camera Tilt
 
     [Header("Run Camera Tilt")]
     [SerializeField] private float maxRunCameraTiltAngle;
@@ -1056,51 +1098,67 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private void HandleRunCameraTiltInternal(float targetAngle)
     {
         CurrentRunCameraTiltAngle = Mathf.Lerp(CurrentRunCameraTiltAngle, targetAngle, (targetAngle == 0 ? runCameraTiltRegulationSpeed : maxRunCameraTiltSpeed) * Time.deltaTime);
-        //ApplyRunCameraTilt();
     }
 
-    private void ApplyRunCameraTilt()
-    {
-        //targetRecoilHandlerRotation = Vector3.Lerp(targetRecoilHandlerRotation, Vector3.zero, RecoilRegulationSpeed * Time.deltaTime);
-        //currentRecoilHandlerRotation = Vector3.Slerp(currentRecoilHandlerRotation, targetRecoilHandlerRotation, recoilMovementSnappiness * Time.deltaTime);
-        //recoilHandlerTransform.localRotation = Quaternion.Euler(currentRecoilHandlerRotation);
-        var curCameraTransformRotation = cameraTransform.transform.localRotation.eulerAngles;
-        curCameraTransformRotation.z = CurrentRunCameraTiltAngle;
-        cameraTransform.transform.localRotation = Quaternion.Euler(curCameraTransformRotation);
-    }
+    #endregion
 
-    private IEnumerator TriggerViewBobbing()
-    {
-        var viewBobbingProgress = 0f; // this name kinda sucks but idk what to name it
+    #region Slide Camera Tilt
 
-        isBobbing = true;
-        for (; isCollidingDown && currentMovementMode == MovementMode.RUN && CurrentSpeed > speedThresholdToTriggerViewBobbing;) // the geneva convention is not safe
+    [Header("Slide Camera Tilt")]
+    [SerializeField] private bool slideTiltOnRight;
+    [SerializeField] private float maxSlideCameraTiltAngle;
+    [SerializeField] private float slideCameraTiltSpeed;
+    [SerializeField] private float slideCameraTiltLeniencyToExtent;
+    // this name sucks but basically
+    // the leniency to the clamp (maxCameraTilt / noCameraTilt) so the lerp doesn t run forever and at some point
+    // (when the difference currentCameraTilt -> extent < leniency) the value snaps to the extent
+    private float currentSlideCameraTiltAngle;
+    public float CurrentSlideCameraTiltAngle
+    {
+        get
         {
-            var verticalOffset = Mathf.Sin(viewBobbingProgress) * BobbingDepth;
-
-            cameraTransform.localPosition = cameraOriginalPosition + new Vector3(0f, verticalOffset, 0f);
-
-            viewBobbingProgress += BobbingSpeed * Time.deltaTime;
-
-            yield return null;
+            return currentSlideCameraTiltAngle;
         }
-        
-        StartCoroutine(ResetBobbingOffset());
-    }
-
-    private IEnumerator ResetBobbingOffset()
-    {
-        isBobbing = false;
-        var elapsed = 0f;
-        var startingPoint = cameraTransform.localPosition;
-        for (; elapsed < timeToRegulateBobbingOffset && !isBobbing;)
+        set
         {
-            elapsed += Time.deltaTime;
-            cameraTransform.localPosition = Vector3.Lerp(startingPoint, cameraOriginalPosition, elapsed / timeToRegulateBobbingOffset);
+            if (Mathf.Abs(value - maxSlideCameraTiltAngle) < slideCameraTiltLeniencyToExtent && TargetSlideCameraTiltAngle != 0)
+            {
+                currentSlideCameraTiltAngle = maxSlideCameraTiltAngle * Mathf.Sign(value);
+                return;
+            }
 
-            yield return null;
+            if (Mathf.Abs(value) < slideCameraTiltLeniencyToExtent && TargetSlideCameraTiltAngle == 0)
+            {
+                currentSlideCameraTiltAngle = 0;
+                return;
+            }
+
+            currentSlideCameraTiltAngle = value;
         }
     }
+
+    private float TargetSlideCameraTiltAngle => maxSlideCameraTiltAngle * (slideTiltOnRight ? -1f : 1f);
+    // as dir in {-1, 0, 1} dir * maxRunCameraTiltAngle in {-maxRunCameraTiltAngle, 0 (regulateCameraTilt), maxRunCameraTiltAngle}
+
+    [SerializeField] private float slideCameraTiltRegulationSpeed;
+
+
+    private void HandleSlideCamera()
+    {
+        HandleSlideCameraTilt();
+    }
+
+    private void HandleSlideCameraTilt()
+    {
+        HandleSlideCameraTiltInternal(TargetSlideCameraTiltAngle);
+    }
+
+    private void HandleSlideCameraTiltInternal(float targetAngle)
+    {
+        CurrentSlideCameraTiltAngle = Mathf.Lerp(CurrentSlideCameraTiltAngle, targetAngle, (targetAngle == 0 ? slideCameraTiltRegulationSpeed : slideCameraTiltSpeed) * Time.deltaTime);
+    }
+
+    #endregion
 
     #endregion
 
