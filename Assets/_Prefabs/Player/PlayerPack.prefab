@@ -1354,7 +1354,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 169908227
+  GlobalObjectIdHash: 2957232829
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1595,7 +1595,6 @@ MonoBehaviour:
   timeAfterSlidingCanLedgeClimbAgain: 0.2
   maxWallRunCameraTilt: 15
   wallRunCameraTiltDuration: 0.15
-  <CurrentWallRunCameraTilt>k__BackingField: 0
   timeOnWallBeforeTiltingCamera: 0.1
   maxViewBobbingSpeed: 13
   maxViewBobbingDepth: 0.05
@@ -1605,7 +1604,6 @@ MonoBehaviour:
   maxRunCameraTiltAngle: 3
   maxRunCameraTiltSpeed: 1
   runCameraTiltLeniencyToExtent: 0.1
-  runCameraTiltSnappiness: 0
   runCameraTiltRegulationSpeed: 5
 --- !u!114 &669408356608229932
 MonoBehaviour:
