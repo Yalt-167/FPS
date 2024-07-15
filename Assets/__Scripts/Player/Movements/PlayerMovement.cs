@@ -34,14 +34,14 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     #region Movements Setup
 
     [Header("Movements")]
-    [SerializeField] private float targetSpeed;
+    [SerializeField] private float acceleration;
+    private float targetSpeed;
     // in m/s
     private float RunningSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.RunningSpeed ?? 8f;
     private float StrafingSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeed ?? 7f;
     private float BackwardSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.BackwardSpeed ?? 5f;
     private float WallRunSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.WallRunningSpeed ?? 9f;
 
-    [SerializeField] private float acceleration;
     [SerializeField] private float sidewayInertiaControlFactor; // when the direction changes apply it to control inertia and prevent the player from going sideway (former forward)
 
     private Action currentMovementMethod;
