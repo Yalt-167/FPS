@@ -1552,7 +1552,6 @@ MonoBehaviour:
       howToActivate: 0
       holdForSeconds: 0
   currentMovementMode: 0
-  targetSpeed: 0
   acceleration: 180000
   sidewayInertiaControlFactor: 0
   horizontalVelocityBoostDecayRate: 0.95
@@ -1577,11 +1576,10 @@ MonoBehaviour:
   terminalVelocity: -75
   dashIntoJumpVelocityBoost: 5
   afterDashVelocityBoostWindowDuration: 0.1
-  slideDecelerationRate: 0.995
   slideCancelThreshold: 0.3
   initialSlideBoost: 180
   slideJumpBoostWindow: 0.2
-  slideSlowdownForce: 36000
+  slideSlowdownForce: 20000
   slideDownwardForce: 120000
   dashIntoSlideVelocityBoost: 1.3
   slideCameraHeightAdjustmentDuration: 0.3
