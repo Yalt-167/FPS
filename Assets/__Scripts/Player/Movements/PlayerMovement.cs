@@ -55,6 +55,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private Vector3 horizontalVelocityBoostCoefficient;
     [SerializeField] private float velocityBoostCancelThreshold;
 
+
+    [SerializeField][Range(0, 90)] private float maxScalableAngle;
+
+
     #endregion
 
     #region Gravity Setup

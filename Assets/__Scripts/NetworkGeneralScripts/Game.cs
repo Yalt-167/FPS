@@ -341,8 +341,10 @@ public sealed class Game : NetworkManager
         spawnPoints[spawnPoint.TeamID].Remove(spawnPoint);
     }
 
-    public Vector3 GetSpawnPosition(ushort teamID)
+    public Vector3 GetSpawnPosition(ushort teamID) // make this method safe to call in case there s no spawnpoint available
     {
+        if (!spawnPoints.ContainsKey(teamID)) { return Vector3.zero; }
+
         var relevantSpawnPoints = spawnPoints[teamID];
         var relevantSpawnPointsCount = relevantSpawnPoints.Count;
 

@@ -76,16 +76,23 @@ public class PlayerCombat : MonoBehaviour, IPlayerFrameMember
 
     private void HandleWeaponSwitch()
     {
-        if (inputQuery.FirstGun || inputQuery.SecondGun || inputQuery.ThirdGun)
+        if (inputQuery.FirstGun)
         {
-            if (inputQuery.FirstGun) currentWeaponIndex = 0;
-            else if (inputQuery.SecondGun) currentWeaponIndex = 1;
-            else if (inputQuery.ThirdGun) currentWeaponIndex = 2;
-
-            UpdateWeapon();
-
+            UpdateWeaponWithIndex(0);
             return;
         }
+        else if (inputQuery.SecondGun)
+        {
+            UpdateWeaponWithIndex(1);
+            return;
+        }
+        else if (inputQuery.ThirdGun)
+        {
+            UpdateWeaponWithIndex(2);
+            return;
+        }
+
+        
 
         var scrollWheelInput = Input.GetAxis(ScrollWheelAxis);
         if (scrollWheelInput != 0f)
@@ -95,6 +102,11 @@ public class PlayerCombat : MonoBehaviour, IPlayerFrameMember
         }
     }
 
+
+    private void UpdateWeaponWithIndex(int index)
+    {
+        weaponHandler.SetWeapon(weapons[currentWeaponIndex = index]);
+    }
 
     private void UpdateWeapon()
     {
