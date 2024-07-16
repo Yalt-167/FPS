@@ -17,7 +17,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     [SerializeField] private MovementInputQuery inputQuery;
     private Rigidbody Rigidbody;
-    private CapsuleCollider capsuleCollider;
     private FollowRotationCamera followRotationCamera;
     public Vector3 Position => transform.position;
     public float CurrentSpeed => new Vector3(Rigidbody.velocity.x, 0f, Rigidbody.velocity.z).magnitude;
@@ -56,6 +55,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private float velocityBoostCancelThreshold;
 
 
+    [SerializeField] private float maxStepHeight;
     [SerializeField][Range(0, 90)] private float maxScalableAngle;
 
 
@@ -92,10 +92,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private bool isCollidingLeft = false;
     private bool isCollidingOnAnySide = false;
 
-    [SerializeField] private BoxCaster leftCheck;
-    [SerializeField] private BoxCaster rightCheck;
-    [SerializeField] private BoxCaster upperLedgeClimbCheck;
-    [SerializeField] private BoxCaster lowerLedgeClimbCheck;
+    private BoxCaster leftCheck;
+    private BoxCaster rightCheck;
+    private BoxCaster upperLedgeClimbCheck;
+    private BoxCaster lowerLedgeClimbCheck;
+    private BoxCaster stepCheck;
 
     #endregion
 
@@ -307,11 +308,17 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         inputQuery.Init();
 
         Rigidbody = GetComponent<Rigidbody>();
-        capsuleCollider = GetComponent<CapsuleCollider>();
-        cameraTransform = transform.GetChild(0).GetComponent<Transform>();
+        cameraTransform = transform.GetChild(0).transform;
         followRotationCamera = transform.GetChild(0).GetComponent<FollowRotationCamera>();
         cameraTransform = transform.GetChild(0);
         cameraOriginalPosition = cameraTransform.localPosition;
+
+        rightCheck = transform.GetChild(1).GetChild(0).GetComponent<BoxCaster>();
+        leftCheck = transform.GetChild(1).GetChild(1).GetComponent<BoxCaster>();
+        upperLedgeClimbCheck = transform.GetChild(1).GetChild(2).GetComponent<BoxCaster>();
+        lowerLedgeClimbCheck = transform.GetChild(1).GetChild(3).GetComponent<BoxCaster>();
+        stepCheck = transform.GetChild(1).GetChild(4).GetComponent<BoxCaster>();
+
 
         cameraTransform.localPosition = cameraTransformPositions[0];
         SetMovementMode(MovementMode.RUN);
