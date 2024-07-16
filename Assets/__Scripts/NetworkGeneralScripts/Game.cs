@@ -11,6 +11,7 @@ using System.Linq;
 using Random = UnityEngine.Random;
 using UnityEditor;
 using System.Text;
+using System.Runtime.CompilerServices;
 
 
 [DefaultExecutionOrder(-99)]
@@ -58,15 +59,15 @@ public sealed class Game : NetworkManager
     {
         return whichComponentID switch
         {
-            NetworkedComponent.NetworkObject => players.First(each => each.NetworkObject.NetworkObjectId == componentID),
+            NetworkedComponent.NetworkObject => players.First(predicate: (each) => each.NetworkObject.NetworkObjectId == componentID),
 
-            NetworkedComponent.ClientNetworkTransform => players.First(each => each.ClientNetworkTransform.NetworkObjectId == componentID),
+            NetworkedComponent.ClientNetworkTransform => players.First(predicate: (each) => each.ClientNetworkTransform.NetworkObjectId == componentID),
 
             //NetworkedComponent.HandlePlayerNetworkBehaviour => players.First(each => each.BehaviourHandler.NetworkObjectId == componentID),
 
-            NetworkedComponent.WeaponHandler => players.First(each => each.WeaponHandler.NetworkObjectId == componentID),
+            NetworkedComponent.WeaponHandler => players.First(predicate: (each) => each.WeaponHandler.NetworkObjectId == componentID),
 
-            NetworkedComponent.PlayerHealthNetworked => players.First(each => each.Health.NetworkObjectId == componentID),
+            NetworkedComponent.PlayerHealthNetworked => players.First(predicate: (each) => each.Health.NetworkObjectId == componentID),
 
             _ => throw new Exception($"This component provided ({whichComponentID}) does not match anything"),
         };
@@ -324,7 +325,6 @@ public sealed class Game : NetworkManager
 
     private readonly Dictionary<ushort, List<SpawnPoint>> spawnPoints = new();
 
-
     public void AddRespawnPoint(SpawnPoint spawnPoint)
     {
         if (!spawnPoints.ContainsKey(spawnPoint.TeamID))
@@ -341,27 +341,24 @@ public sealed class Game : NetworkManager
         spawnPoints[spawnPoint.TeamID].Remove(spawnPoint);
     }
 
-    public Vector3 GetSpawnPosition(ushort teamID) // make this method safe to call in case there s no spawnpoint available
+    public Vector3 GetSpawnPosition(ushort teamID)
     {
-        if (!spawnPoints.ContainsKey(teamID)) { return Vector3.zero; }
+        var spawnPointExists = spawnPoints.TryGetValue(teamID, out var relevantSpawnPoints);
 
-        var relevantSpawnPoints = spawnPoints[teamID];
-        var relevantSpawnPointsCount = relevantSpawnPoints.Count;
+        if (!spawnPointExists) { return NoSpawnpointAvailableForThisTeam(teamID); }
 
         // filtering the active ones
-        var activeRelevantSpawnPoints = new List<SpawnPoint>();
-        for (int i = 0; i < relevantSpawnPointsCount; i++)
-        {
-            if (relevantSpawnPoints[i].Active)
-            {
-                activeRelevantSpawnPoints.Add(relevantSpawnPoints[i]);
-            }
-        }
+        var activeRelevantSpawnPoints = (List<SpawnPoint>)relevantSpawnPoints.Where(predicate: (spawnPoint) => spawnPoint.Active);
 
-        var activeRelevantSpawnPointsCount = activeRelevantSpawnPoints.Count;
-        if (activeRelevantSpawnPointsCount == 0) { throw new Exception($"There s no checkpoint available for this player with team ID: {teamID}"); }
+        if (activeRelevantSpawnPoints.Count == 0) { return NoSpawnpointAvailableForThisTeam(teamID); }
 
-        return activeRelevantSpawnPoints[Random.Range(0, activeRelevantSpawnPointsCount - 1)].SpawnPosition;
+        return activeRelevantSpawnPoints[Random.Range(0, activeRelevantSpawnPoints.Count - 1)].SpawnPosition;
+    }
+
+    private Vector3 NoSpawnpointAvailableForThisTeam(ushort teamID)
+    {
+        print($"There s no checkpoint available for this player with team ID: {teamID}");
+        return Vector3.zero;
     }
 
     #endregion
