@@ -35,6 +35,24 @@ public class BoxCaster : MonoBehaviour
         return colliders.Length > 0;
     }
 
+    public bool AddCast(LayerMask layers, ref List<Collider> colliders)
+    {
+        var tempColliders  = Physics.OverlapBox(
+            transform.position,
+            Size * .5f,
+            transform.rotation,
+            layers,
+            QueryTriggerInteraction.Ignore
+            );
+
+        foreach (var collider in tempColliders)
+        {
+            colliders.Add(collider);
+        }
+
+        return tempColliders.Length > 0;
+    }
+
     private void OnDrawGizmosSelected()
     {
         if (!debugBox) { return; }

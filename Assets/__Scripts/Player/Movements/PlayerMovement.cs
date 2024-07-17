@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using Unity.Netcode;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering.Universal.Internal;
 
 [DefaultExecutionOrder(-7)]
 public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
@@ -16,9 +16,12 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     #region References
 
     [SerializeField] private MovementInputQuery inputQuery;
+    private int ForwardAxisInput => MyInput.GetAxis(inputQuery.Back, inputQuery.Forward);
+    private int SidewayAxisInput => MyInput.GetAxis(inputQuery.Left, inputQuery.Right);
     private Rigidbody Rigidbody;
     private FollowRotationCamera followRotationCamera;
     public Vector3 Position => transform.position;
+    public Vector3 FeetPosition => transform.position - Vector3.down;
     public float CurrentSpeed => new Vector3(Rigidbody.velocity.x, 0f, Rigidbody.velocity.z).magnitude;
     public float CurrentForwardSpeed => Vector3.Dot(Rigidbody.velocity, transform.forward);
     public float CurrentStrafeSpeed => Mathf.Abs(Vector3.Dot(Rigidbody.velocity, transform.right));
@@ -96,7 +99,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private BoxCaster rightCheck;
     private BoxCaster upperLedgeClimbCheck;
     private BoxCaster lowerLedgeClimbCheck;
-    private BoxCaster stepCheck;
+    private BoxCaster frontStepCheck;
+    private BoxCaster backStepCheck;
+    private BoxCaster rightStepCheck;
+    private BoxCaster leftStepCheck;
 
     #endregion
 
@@ -308,16 +314,19 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         inputQuery.Init();
 
         Rigidbody = GetComponent<Rigidbody>();
-        cameraTransform = transform.GetChild(0).transform;
-        followRotationCamera = transform.GetChild(0).GetComponent<FollowRotationCamera>();
         cameraTransform = transform.GetChild(0);
+        followRotationCamera = cameraTransform.GetComponent<FollowRotationCamera>();
         cameraOriginalPosition = cameraTransform.localPosition;
 
-        rightCheck = transform.GetChild(1).GetChild(0).GetComponent<BoxCaster>();
-        leftCheck = transform.GetChild(1).GetChild(1).GetComponent<BoxCaster>();
-        upperLedgeClimbCheck = transform.GetChild(1).GetChild(2).GetComponent<BoxCaster>();
-        lowerLedgeClimbCheck = transform.GetChild(1).GetChild(3).GetComponent<BoxCaster>();
-        stepCheck = transform.GetChild(1).GetChild(4).GetComponent<BoxCaster>();
+        var secondChildTransform = transform.GetChild(1);
+        rightCheck = secondChildTransform.GetChild(0).GetComponent<BoxCaster>();
+        leftCheck = secondChildTransform.GetChild(1).GetComponent<BoxCaster>();
+        upperLedgeClimbCheck = secondChildTransform.GetChild(2).GetComponent<BoxCaster>();
+        lowerLedgeClimbCheck = secondChildTransform.GetChild(3).GetComponent<BoxCaster>();
+        frontStepCheck = secondChildTransform.GetChild(4).GetComponent<BoxCaster>();
+        backStepCheck = secondChildTransform.GetChild(5).GetComponent<BoxCaster>();
+        rightStepCheck = secondChildTransform.GetChild(6).GetComponent<BoxCaster>();
+        leftStepCheck = secondChildTransform.GetChild(7).GetComponent<BoxCaster>();
 
 
         cameraTransform.localPosition = cameraTransformPositions[0];
@@ -470,7 +479,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             (afterSlide ? slideIntoJumpVelocityBoost : 1f) *
             (afterDash ? dashIntoJumpVelocityBoost : 1f) *
             initialJumpSpeedBoost *
-            transform.TransformDirection(new Vector3(MyInput.GetAxis(inputQuery.Left, inputQuery.Right), 0f, MyInput.GetAxis(inputQuery.Back, inputQuery.Forward))).normalized;
+            transform.TransformDirection(new Vector3(SidewayAxisInput, 0f, ForwardAxisInput)).normalized;
 
         Rigidbody.AddForce((fullJump ? JumpForce : JumpForce / 2) * Vector3.up, ForceMode.Impulse);
 
@@ -548,7 +557,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void Run(bool grounded)
     {
-        var wantedMoveVec = new Vector2(MyInput.GetAxis(inputQuery.Left, inputQuery.Right), MyInput.GetAxis(inputQuery.Back, inputQuery.Forward)).normalized;
+        var wantedMoveVec = new Vector2(SidewayAxisInput, ForwardAxisInput).normalized;
 
         var targetSpeed = CalculateTargetSpeed(wantedMoveVec) - (grounded ? 0f : .5f);
 
@@ -606,16 +615,71 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void CheckStep()
     {
-        var hasSthInFront = stepCheck.ReturnCast(groundLayers, out var colliders);
+        var currentDirection = DirectionUtility.GetDirectionFromAxises(ForwardAxisInput, SidewayAxisInput);
 
-        if (!hasSthInFront) {  return; }
-
-        var currentDirection = 
-
-        if ()
+        var hasSthToStepOn = false;
+        var colliders = new List<Collider>();
+        switch (currentDirection)
         {
+            case Direction.Forward:
+                hasSthToStepOn = frontStepCheck.AddCast(groundLayers, ref colliders);
+                break;
 
+            case Direction.ForwardRight:
+                hasSthToStepOn = frontStepCheck.AddCast(groundLayers, ref colliders);
+                hasSthToStepOn |= rightStepCheck.AddCast(groundLayers, ref colliders);
+                break;
+
+            case Direction.Right:
+                hasSthToStepOn = rightStepCheck.AddCast(groundLayers, ref colliders);
+                break;
+
+            case Direction.BackwardRight:
+                hasSthToStepOn = backStepCheck.AddCast(groundLayers, ref colliders);
+                hasSthToStepOn |= rightStepCheck.AddCast(groundLayers, ref colliders);
+                break;
+
+            case Direction.Backward:
+                hasSthToStepOn = backStepCheck.AddCast(groundLayers, ref colliders);
+                break;
+
+            case Direction.BackwardLeft:
+                hasSthToStepOn = backStepCheck.AddCast(groundLayers, ref colliders);
+                hasSthToStepOn |= leftStepCheck.AddCast(groundLayers, ref colliders);
+                break;
+
+            case Direction.Left:
+                hasSthToStepOn = leftStepCheck.AddCast(groundLayers, ref colliders);
+                break;
+
+            case Direction.ForwardLeft:
+                hasSthToStepOn = frontStepCheck.AddCast(groundLayers, ref colliders);
+                hasSthToStepOn |= leftStepCheck.AddCast(groundLayers, ref colliders);
+                break;
+
+            case Direction.None:
+                break;
+
+            default:
+                break;
         }
+
+        if (!hasSthToStepOn) { return; }
+        
+        colliders.Where(predicate: (collider) => GetHighestPointOffCollider(collider).y < FeetPosition.y + maxStepHeight);
+
+        var stepToTake = colliders.Max();
+        var relevantXZ = stepToTake.ClosestPoint(transform.position).Mask(1f, 0f, 1f);
+        transform.position = relevantXZ + Vector3.up * GetHighestPointOffCollider(stepToTake).y;
+    }
+
+    private Vector3 GetHighestPointOffCollider(Collider collider) // update this for it to work with slanted ground too
+    {
+        // raycasts from above can
+        // can determine the slope
+        // assume it s flat
+        var transform_ = collider.transform;
+        return transform_.position + .5f * transform_.lossyScale.y * Vector3.up;
     }
 
     #endregion
@@ -641,7 +705,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         if (chainedFromDash)
         {
-        //var dir = new Vector3(MyInput.GetAxis(inputQuery.Left, inputQuery.Right), 0f, MyInput.GetAxis(inputQuery.Back, inputQuery.Forward));
+        //var dir = new Vector3(SidewayAxisInput, 0f, ForwardAxisInput);
         //horizontalVelocityBoost +=
         //    (chainedFromDash ? dashIntoSlideVelocityBoost : 1f) * initialSlideBoost * (dir == Vector3.zero ?
         //        Rigidbody.velocity.Mask(1f, 0, 1f).normalized
@@ -727,7 +791,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         var jumped = false;
         timeDashTriggered = Time.time;
         followRotationCamera.enabled = false;
-        var dir = cameraTransform.TransformDirection(new(MyInput.GetAxis(inputQuery.Left, inputQuery.Right), 0f, MyInput.GetAxis(inputQuery.Back, inputQuery.Forward)));
+        var dir = cameraTransform.TransformDirection(SidewayAxisInput, 0f, ForwardAxisInput);
 
         dir = dir == Vector3.zero ? cameraTransform.forward : dir;
         
@@ -820,10 +884,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         StartCoroutine(ClimbLedge(CalculateLedgePosition(ledges)));
     }
 
-    private IEnumerator ClimbLedge(Vector3 ledgePosition)
+    private IEnumerator ClimbLedge(Vector3 ledgePosition) // on slanted ground the lower ledge climb check can collide and not the upper so fix that (test buffing the upper cast width)
     {
         SetMovementMode(MovementMode.LEDGE_CLIMB);
-
         Rigidbody.velocity = Vector3.zero;
         ResetVelocityBoost();
 
@@ -846,11 +909,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         Collider relevantCollider = null;
         foreach (var collider in colliders)
         {
-            var halfColSize = collider.transform.lossyScale.y * .5f;
-            var curPos = collider.transform.position.y + halfColSize;
-            if (ledgeY < curPos) // get the highest scalable surface's height
+            var highestPointOfCollider = GetHighestPointOffCollider(collider).y;
+            if (ledgeY < highestPointOfCollider) // get the highest scalable surface's height
             {
-                ledgeY = curPos; 
+                ledgeY = highestPointOfCollider; 
                 relevantCollider = collider;
             }
         }
