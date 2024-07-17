@@ -604,6 +604,20 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         return wantedMoveVec.x == 0f ? wantedMoveVec.y == 0f ? 0f : wantedMoveVec.y < 0f ? BackwardSpeed : RunningSpeed : wantedMoveVec.y < 0f ? BackwardSpeed : StrafingSpeed;
     }
 
+    private void CheckStep()
+    {
+        var hasSthInFront = stepCheck.ReturnCast(groundLayers, out var colliders);
+
+        if (!hasSthInFront) {  return; }
+
+        var currentDirection = 
+
+        if ()
+        {
+
+        }
+    }
+
     #endregion
 
     #region Slide
