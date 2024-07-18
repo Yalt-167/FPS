@@ -548,6 +548,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             }
         }
 
+        CheckStep();
         
         if (CheckLedgeClimb(out var ledges))
         {
@@ -666,11 +667,12 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         if (!hasSthToStepOn) { return; }
         
-        colliders.Where(predicate: (collider) => GetHighestPointOffCollider(collider).y < FeetPosition.y + maxStepHeight);
-
-        var stepToTake = colliders.Max();
-        var relevantXZ = stepToTake.ClosestPoint(transform.position).Mask(1f, 0f, 1f);
-        transform.position = relevantXZ + Vector3.up * GetHighestPointOffCollider(stepToTake).y;
+        var stepToTake = colliders.Where(predicate: (collider) => GetHighestPointOffCollider(collider).y < FeetPosition.y + maxStepHeight).Max();
+        if (stepToTake != null)
+        {
+            var relevantXZ = stepToTake.ClosestPoint(transform.position).Mask(1f, 0f, 1f);
+            transform.position = relevantXZ + Vector3.up * GetHighestPointOffCollider(stepToTake).y;
+        }
     }
 
     private Vector3 GetHighestPointOffCollider(Collider collider) // update this for it to work with slanted ground too

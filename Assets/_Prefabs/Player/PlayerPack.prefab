@@ -239,7 +239,7 @@ Transform:
   m_GameObject: {fileID: 796870078216925707}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.55, y: -0.8, z: 0}
+  m_LocalPosition: {x: 0.55, y: -0.79, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -257,7 +257,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e6e6ef8c81efe445bff5d96c9bed05c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugBox: 0
+  debugBox: 1
   <Size>k__BackingField: {x: 0.1, y: 0.4, z: 1}
 --- !u!1 &1010797326032856726
 GameObject:
@@ -422,7 +422,7 @@ Transform:
   m_GameObject: {fileID: 1266733754730029727}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.55, y: -0.8, z: 0}
+  m_LocalPosition: {x: -0.55, y: -0.79, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -440,7 +440,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e6e6ef8c81efe445bff5d96c9bed05c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugBox: 0
+  debugBox: 1
   <Size>k__BackingField: {x: 0.1, y: 0.4, z: 1}
 --- !u!1 &1490273979010500152
 GameObject:
@@ -545,7 +545,7 @@ Transform:
   m_GameObject: {fileID: 2058158964589800911}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.8, z: -0.55}
+  m_LocalPosition: {x: 0, y: -0.79, z: -0.55}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -563,7 +563,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e6e6ef8c81efe445bff5d96c9bed05c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugBox: 0
+  debugBox: 1
   <Size>k__BackingField: {x: 1, y: 0.4, z: 0.1}
 --- !u!1 &2114718002127449859
 GameObject:
@@ -809,7 +809,7 @@ Transform:
   m_GameObject: {fileID: 3377490646107749542}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.8, z: 0.55}
+  m_LocalPosition: {x: 0, y: -0.79, z: 0.55}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -827,7 +827,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e6e6ef8c81efe445bff5d96c9bed05c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugBox: 0
+  debugBox: 1
   <Size>k__BackingField: {x: 1, y: 0.4, z: 0.1}
 --- !u!1 &3467822551731792150
 GameObject:
