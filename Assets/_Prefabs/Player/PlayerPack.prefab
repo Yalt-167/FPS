@@ -1542,7 +1542,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 169908227
+  GlobalObjectIdHash: 2957232829
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1746,7 +1746,7 @@ MonoBehaviour:
   velocityBoostCoefficient: 0.1
   horizontalVelocityBoostCoefficient: {x: 0.5, y: 0.1, z: 0.5}
   velocityBoostCancelThreshold: 1
-  maxStepHeight: 0
+  maxStepHeight: 0.5
   maxScalableAngle: 0
   baseGravity: 120000
   groundLayers:
@@ -1761,7 +1761,6 @@ MonoBehaviour:
   dashIntoJumpVelocityBoost: 5
   afterDashVelocityBoostWindowDuration: 0.1
   slideCancelThreshold: 0.3
-  initialSlideBoost: 180
   slideJumpBoostWindow: 0.2
   slideSlowdownForce: 20000
   slideDownwardForce: 120000

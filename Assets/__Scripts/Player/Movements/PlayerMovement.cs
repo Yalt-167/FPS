@@ -21,7 +21,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private Rigidbody Rigidbody;
     private FollowRotationCamera followRotationCamera;
     public Vector3 Position => transform.position;
-    public Vector3 FeetPosition => transform.position - Vector3.down;
+    public Vector3 FeetPosition => transform.position + Vector3.down;
     public float CurrentSpeed => new Vector3(Rigidbody.velocity.x, 0f, Rigidbody.velocity.z).magnitude;
     public float CurrentForwardSpeed => Vector3.Dot(Rigidbody.velocity, transform.forward);
     public float CurrentStrafeSpeed => Mathf.Abs(Vector3.Dot(Rigidbody.velocity, transform.right));
@@ -685,7 +685,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         var relevantXZ = stepToTake.ClosestPoint(transform.position).Mask(1f, 0f, 1f);
         transform.position = relevantXZ + Vector3.up * (GetHighestPointOffCollider(stepToTake).y + 1);
-        print("stepped");
     }
 
     private Vector3 GetHighestPointOffCollider(Collider collider) // update this for it to work with slanted ground too
