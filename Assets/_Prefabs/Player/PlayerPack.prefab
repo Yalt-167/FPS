@@ -1782,7 +1782,7 @@ MonoBehaviour:
   speedThresholdToTriggerViewBobbing: 6
   timeToRegulateBobbingOffset: 0.3
   speedThresholdToReachMaxViewBobbingIntensity: 6
-  maxRunCameraTiltAngle: 3
+  maxRunCameraTiltAngle: 1
   maxRunCameraTiltSpeed: 1
   runCameraTiltLeniencyToExtent: 0.1
   runCameraTiltRegulationSpeed: 5
