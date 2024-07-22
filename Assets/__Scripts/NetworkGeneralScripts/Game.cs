@@ -6,12 +6,10 @@ using System.Collections.Generic;
 using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.Linq;
 using Random = UnityEngine.Random;
 using UnityEditor;
 using System.Text;
-using System.Runtime.CompilerServices;
 
 
 [DefaultExecutionOrder(-99)]
@@ -39,7 +37,9 @@ public sealed class Game : NetworkManager
     [Rpc(SendTo.ClientsAndHost)]
     private void RegisterPlayerInternalClientRpc(NetworkedPlayerPrimitive player)
     {
+#if DEBUG_MULTIPLAYER
         print("Added a player");
+#endif
         players.Add(player.AsNetworkedPlayer());
     }
 
@@ -107,7 +107,7 @@ public sealed class Game : NetworkManager
     {
         try
         {
-            return players.First(each => each.Name == name);
+            return players.First(predicate: (each) => each.Name == name);
         }
         catch
         {
@@ -151,7 +151,7 @@ public sealed class Game : NetworkManager
     }
 
 
-    #endregion
+#endregion
 
     #region Player Combat List
 
@@ -169,11 +169,11 @@ public sealed class Game : NetworkManager
 
     public WeaponHandler GetNetworkedWeaponHandlerFromNetworkObjectID(ulong playerObjectID) // ? make it so they are sorted ? -> slower upon adding it but faster to select it still
     {
-        foreach (var networkHandler in networkedWeaponHandlers)
+        foreach (var networkedWeaponHandler in networkedWeaponHandlers)
         {
-            if (networkHandler.NetworkObjectId == playerObjectID)
+            if (networkedWeaponHandler.NetworkObjectId == playerObjectID)
             {
-                return networkHandler;
+                return networkedWeaponHandler;
             }
         }
 
@@ -250,20 +250,30 @@ public sealed class Game : NetworkManager
     private NetworkedPlayerPrimitive[] GetPlayersAsPrimitives(/*ulong requestingClientID*/)
     {
         NetworkedPlayerPrimitive[] asPrimitives = new NetworkedPlayerPrimitive[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count];
-        
+
+#if DEBUG_MULTIPLAYER
         var stringBuilder = new StringBuilder();
         stringBuilder.Append("[ ");
+#endif
         var idx = 0;
         foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
         {
+#if DEBUG_MULTIPLAYER
             stringBuilder.Append($"{{{element.Key}, {element.Value}}} ");
+#endif
             if (element.Value.TryGetComponent<PlayerFrame>(out var playerFrameComponent))
             {
-                asPrimitives[idx++] = playerFrameComponent.AsPrimitive(/*requestingClientID*/);
+                asPrimitives[idx
+#if DEBUG_MULTIPLAYER
+                    ++
+#endif
+                    ] = playerFrameComponent.AsPrimitive(/*requestingClientID*/);
             }
         }
+#if DEBUG_MULTIPLAYER
         stringBuilder.Append("]");
         print(stringBuilder.ToString());
+#endif
         return asPrimitives;
     }
 
@@ -282,25 +292,11 @@ public sealed class Game : NetworkManager
         }
     }
 
-    //private IEnumerator UpdatePlayerList()
-    //{
-    //    players.Clear();
-    //    foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
-    //    {
-    //        Req
-    //    }
-    //}
-
-    //[Rpc(SendTo.SpecifiedInParams)]
-    //private void RequestPlayerNameClientRpc(RpcSendParams rpcParam)
-    //{
-    //    NetworkManager.Singleton.
-    //}
 
     [ServerRpc]
     public void RetrieveExistingPlayerListServerRpc()
     {
-        if (!IsServer) { return; }
+        //if (!IsServer) { return; }
 
 #if DEBUG_MULTIPLAYER
         print($"list was taken from here {IsServer}");
@@ -365,21 +361,9 @@ public sealed class Game : NetworkManager
 
     [field: SerializeField] public Settings GameSettings { get; private set; }
 
-    public int CurrentSceneID { get; private set; } = 1;
-
     private void Awake()
     {
-        //if (IsServer)
-        //{
-            Manager = this;
-        //}
-        //else
-        //{
-        //    UpdateGameManagerServerRpc();
-        //}
-
-        //if (Manager != null) { print("Already had a manager"); return; }
-
+        Manager = this;
     }
 
 

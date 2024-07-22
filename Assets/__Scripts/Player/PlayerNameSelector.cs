@@ -1,4 +1,5 @@
 #define PLAYER_PACK_ARCHITECTURE
+#define LOG_EVENTS
 
 using System.Collections;
 using System.Collections.Generic;

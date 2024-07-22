@@ -689,10 +689,43 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private Vector3 GetHighestPointOffCollider(Collider collider) // update this for it to work with slanted ground too
     {
-        //var vertices = collider.bounds.
+        if (collider.gameObject.TryGetComponent<MeshFilter>(out var meshFilterComponent))
+        {
+            var verticesCount = meshFilterComponent.mesh.vertexCount;
+            var vertices = meshFilterComponent.mesh.vertices;
+
+            
+            var highestPointSoFar = float.NegativeInfinity * Vector3.up;
+
+            for (int vertiexIndex = 0; vertiexIndex < verticesCount; vertiexIndex++)
+            {
+                if (vertices[vertiexIndex].y > highestPointSoFar.y)
+                {
+                    highestPointSoFar = vertices[vertiexIndex];
+                }
+            }
+
+            return highestPointSoFar;
+        }
+        else
+        {
+            // if it s not rendered then it must be some invisible barrier (which I don t plan on having)
+            // anyway: should not be climbed
+            return Vector3.up * float.PositiveInfinity;
+        }       
+    }
+    
+    private Vector3 GetHighestPointOffCollider_(Collider collider) // update this for it to work with slanted ground too
+    {
         // raycasts from above
         // can determine the slope
         // assume it s flat (as in not curved not just not slanted)
+        throw new NotImplementedException();
+
+    }
+
+    private Vector3 GetHighestPointOffNonRotatedCollider(Collider collider)
+    {
         var transform_ = collider.transform;
         return transform_.position + .5f * transform_.lossyScale.y * Vector3.up;
     }
@@ -1352,3 +1385,4 @@ public struct CollisionDebug
 
 // remove boosts and make it a more manageable controller
 // still dynamic with slide/dash etc but no more velocity boost for chaining moves (except for dash -> slide | slide -> jump
+// dash into slide conserve 

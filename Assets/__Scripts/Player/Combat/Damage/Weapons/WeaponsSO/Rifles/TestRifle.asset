@@ -111,6 +111,6 @@ MonoBehaviour:
     Weight: 0
   Model: {fileID: 0}
   Sounds:
-    ShootingSound: {fileID: 8300000, guid: 49aafd84ecb1f2d46917a267797fffec, type: 3}
+    ShootingSound: {fileID: 8300000, guid: 5f69ece9d9ed71644938667e9dfe0bbb, type: 3}
     ReloadSound: {fileID: 0}
     NearEmptyMagazineShootSound: {fileID: 0}

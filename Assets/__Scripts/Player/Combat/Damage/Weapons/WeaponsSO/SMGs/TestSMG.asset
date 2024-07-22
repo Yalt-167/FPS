@@ -13,7 +13,12 @@ MonoBehaviour:
   m_Name: TestSMG
   m_EditorClassIdentifier: 
   Stats:
-    Damage: 2
+    Damage:
+      CriticalDamage: 0
+      HighDamage: 0
+      BaseDamage: 0
+      LowDamage: 0
+      NegatedDamage: 0
     WeaponClass: 0
     IsHitscan: 1
     HitscanBulletSettings:
@@ -59,7 +64,12 @@ MonoBehaviour:
       SpreadAngleAddedPerShot: 0.5
       SpreadRegulationSpeed: 0.001
     ShotgunStats:
-      PelletsDamage: 0
+      PelletsDamage:
+        CriticalDamage: 0
+        HighDamage: 0
+        BaseDamage: 0
+        LowDamage: 0
+        NegatedDamage: 0
       PelletsCount: 0
       PelletsSpreadAngle: 0
       AimingPelletsSpreadAngle: 0
@@ -98,8 +108,9 @@ MonoBehaviour:
       WeaponKickBackRegulationTime: 0.003
     CanBreakThings: 0
     EffectsInflicted: 0
+    Weight: 0
   Model: {fileID: 0}
   Sounds:
-    ShootingSound: {fileID: 8300000, guid: 49aafd84ecb1f2d46917a267797fffec, type: 3}
+    ShootingSound: {fileID: 8300000, guid: 5f69ece9d9ed71644938667e9dfe0bbb, type: 3}
     ReloadSound: {fileID: 0}
     NearEmptyMagazineShootSound: {fileID: 0}
