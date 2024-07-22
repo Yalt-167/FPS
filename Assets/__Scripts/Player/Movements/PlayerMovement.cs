@@ -148,7 +148,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     [Header("Sliding")]
     [SerializeField] private float slideCancelThreshold;
-    [SerializeField] private float initialSlideBoost = 3f;
     [SerializeField] private float slideJumpBoostWindow;
     [SerializeField] private float slideSlowdownForce;
     [SerializeField] private float slideDownwardForce;
@@ -540,10 +539,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
         else
         {
-            var shouldWallrunLeftRight = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
-            if (shouldWallrunLeftRight != 0f && !isCollidingDown)
+            var sideToWallRunOn = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
+            if (sideToWallRunOn != 0f && !isCollidingDown)
             {
-                StartCoroutine(Wallrun(shouldWallrunLeftRight));
+                StartCoroutine(Wallrun(sideToWallRunOn));
                 return;
             }
         }
@@ -667,19 +666,35 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         if (!hasSthToStepOn) { return; }
         
-        var stepToTake = colliders.Where(predicate: (collider) => GetHighestPointOffCollider(collider).y < FeetPosition.y + maxStepHeight).Max();
-        if (stepToTake != null)
+        print(colliders.Count);
+        
+        var relevantColliders = colliders.Where(predicate: (collider) => GetHighestPointOffCollider(collider).y < FeetPosition.y + maxStepHeight).ToList();
+
+        if (relevantColliders.Count == 0) { return; }
+
+        Collider stepToTake = null;
+        var highestPointSoFar = float.NegativeInfinity;
+
+        foreach (var collider in relevantColliders)
         {
-            var relevantXZ = stepToTake.ClosestPoint(transform.position).Mask(1f, 0f, 1f);
-            transform.position = relevantXZ + Vector3.up * GetHighestPointOffCollider(stepToTake).y;
+            var currentHeight = GetHighestPointOffCollider(collider).y;
+            if (currentHeight > highestPointSoFar)
+            {
+                highestPointSoFar = currentHeight;
+                stepToTake = collider;
+            }
         }
+
+        var relevantXZ = stepToTake.ClosestPoint(transform.position).Mask(1f, 0f, 1f);
+        transform.position = relevantXZ + Vector3.up * (GetHighestPointOffCollider(stepToTake).y + 1);
     }
 
     private Vector3 GetHighestPointOffCollider(Collider collider) // update this for it to work with slanted ground too
     {
-        // raycasts from above can
+        //var vertices = collider.bounds.
+        // raycasts from above
         // can determine the slope
-        // assume it s flat
+        // assume it s flat (as in not curved not just not slanted)
         var transform_ = collider.transform;
         return transform_.position + .5f * transform_.lossyScale.y * Vector3.up;
     }
