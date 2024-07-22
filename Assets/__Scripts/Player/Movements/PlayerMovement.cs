@@ -666,8 +666,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         if (!hasSthToStepOn) { return; }
         
-        print(colliders.Count);
-        
         var relevantColliders = colliders.Where(predicate: (collider) => GetHighestPointOffCollider(collider).y < FeetPosition.y + maxStepHeight).ToList();
 
         if (relevantColliders.Count == 0) { return; }
@@ -687,6 +685,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         var relevantXZ = stepToTake.ClosestPoint(transform.position).Mask(1f, 0f, 1f);
         transform.position = relevantXZ + Vector3.up * (GetHighestPointOffCollider(stepToTake).y + 1);
+        print("stepped");
     }
 
     private Vector3 GetHighestPointOffCollider(Collider collider) // update this for it to work with slanted ground too
