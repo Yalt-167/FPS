@@ -34,6 +34,13 @@ public static class DirectionUtility
         return sidewayAxis > 0 ? forwardAxis > 0 ? Direction.ForwardRight : Direction.BackwardRight : forwardAxis > 0 ? Direction.ForwardLeft : Direction.BackwardLeft;
     }
 
+    public static Direction GetSimpleDirectionFromAxis(int axis, bool wantSideway)
+    {
+        if (axis == 0) { return Direction.None; }
+
+        return wantSideway ? (axis > 0 ? Direction.Right : Direction.Left) : (axis > 0 ? Direction.Forward : Direction.Backward);
+    }
+
     public static Direction InvertDirection(Direction direction)
     {
         return direction switch
