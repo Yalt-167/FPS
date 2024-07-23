@@ -327,7 +327,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         rightStepCheck = secondChildTransform.GetChild(6).GetComponent<BoxCaster>();
         leftStepCheck = secondChildTransform.GetChild(7).GetComponent<BoxCaster>();
 
-
         cameraTransform.localPosition = cameraTransformPositions[0];
         SetMovementMode(MovementMode.RUN);
     }
@@ -361,16 +360,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         RunCollisionChecks();
 
         horizontalVelocityBoost = Vector3.Lerp(Vector3.zero, horizontalVelocityBoost, horizontalVelocityBoostDecayRate);
-        if (horizontalVelocityBoost.magnitude < minHorizontalVelocityBoostThreshold)
-        {
-            horizontalVelocityBoost = Vector3.zero;
-        }
+        if (horizontalVelocityBoost.magnitude < minHorizontalVelocityBoostThreshold) { horizontalVelocityBoost = Vector3.zero; }
 
         currentExternalVelocityBoost = Vector3.Lerp(Vector3.zero, currentExternalVelocityBoost, externalVelocityBoostDecayRate);
-        if (currentExternalVelocityBoost.magnitude < minHorizontalVelocityBoostThreshold)
-        {
-            currentExternalVelocityBoost = Vector3.zero;
-        }
+        if (currentExternalVelocityBoost.magnitude < minHorizontalVelocityBoostThreshold) { currentExternalVelocityBoost = Vector3.zero; }
     }
 
     #endregion
@@ -428,6 +421,13 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
     }
 
+
+    private void ApplySlowdown(float slowdownForce)
+    {
+        /* -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized -> gets the opposite of the velocity while ignoring verticality */
+        Rigidbody.AddForce(slideSlowdownForce * Time.deltaTime * -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Force);
+    }
+
     #endregion
 
     #region Jump
@@ -474,11 +474,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         print("jumped");
         CommonJumpStart();
-        horizontalVelocityBoost +=
-            (afterSlide ? slideIntoJumpVelocityBoost : 1f) *
-            (afterDash ? dashIntoJumpVelocityBoost : 1f) *
-            initialJumpSpeedBoost *
-            transform.TransformDirection(new Vector3(SidewayAxisInput, 0f, ForwardAxisInput)).normalized;
+        //horizontalVelocityBoost +=
+        //    (afterSlide ? slideIntoJumpVelocityBoost : 1f) *
+        //    (afterDash ? dashIntoJumpVelocityBoost : 1f) *
+        //    initialJumpSpeedBoost *
+        //    transform.TransformDirection(new Vector3(SidewayAxisInput, 0f, ForwardAxisInput)).normalized;
 
         Rigidbody.AddForce((fullJump ? JumpForce : JumpForce / 2) * Vector3.up, ForceMode.Impulse);
 
@@ -489,9 +489,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         CommonJumpStart();
 
-        horizontalVelocityBoost += initialJumpSpeedBoost * Rigidbody.velocity.normalized;
+        //horizontalVelocityBoost += initialJumpSpeedBoost * Rigidbody.velocity.normalized;
         horizontalVelocityBoost += (towardRight ? transform.right : -transform.right) * (awayFromWall ? sideWallJumpForceAwayFromWall : sideWallJumpForce);
-            
+
         horizontalVelocityBoost.y = 0f; // just in case (bc of that: Rigidbody.velocity.normalized) (even though it s reset in CommonJumpStart() I had issues with it so better safe than sorry
 
         Rigidbody.AddForce(awayFromWall ? upwardWallJumpForceAwayFromWall : upwardWallJumpForce, ForceMode.Impulse);
@@ -770,11 +770,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                 {
                     if (isCollidingDown)
                     {
+                        // like some extra gravity so the player can slide along steeper slopes
                         Rigidbody.AddForce(slideDownwardForce * Time.deltaTime * -transform.up, ForceMode.Force);
                     }
 
-                    /* -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized -> gets the opposite of the velocity while ignoring verticality */
-                    Rigidbody.AddForce(slideSlowdownForce * Time.deltaTime * -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Force);
+                    ApplySlowdown(slideSlowdownForce);
 
                     if (DashUsable && inputQuery.Dash)
                     {
@@ -1385,4 +1385,5 @@ public struct CollisionDebug
 
 // remove boosts and make it a more manageable controller
 // still dynamic with slide/dash etc but no more velocity boost for chaining moves (except for dash -> slide | slide -> jump
-// dash into slide conserve 
+// dash into slide conserve momentum
+// slide into jump too

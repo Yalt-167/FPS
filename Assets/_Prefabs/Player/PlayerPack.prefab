@@ -1542,7 +1542,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2957232829
+  GlobalObjectIdHash: 169908227
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1762,7 +1762,7 @@ MonoBehaviour:
   afterDashVelocityBoostWindowDuration: 0.1
   slideCancelThreshold: 0.3
   slideJumpBoostWindow: 0.2
-  slideSlowdownForce: 20000
+  slideSlowdownForce: 15000
   slideDownwardForce: 120000
   dashIntoSlideVelocityBoost: 1.3
   slideCameraHeightAdjustmentDuration: 0.3
