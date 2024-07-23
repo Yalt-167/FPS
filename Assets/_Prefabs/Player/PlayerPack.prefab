@@ -1787,7 +1787,7 @@ MonoBehaviour:
   runCameraTiltLeniencyToExtent: 0.1
   runCameraTiltRegulationSpeed: 5
   slideTiltOnRight: 1
-  maxSlideCameraTiltAngle: 25
+  maxSlideCameraTiltAngle: 10
   slideCameraTiltSpeed: 1
   slideCameraTiltLeniencyToExtent: 0.1
   slideCameraTiltRegulationSpeed: 5
