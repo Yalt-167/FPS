@@ -221,6 +221,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             _ => 0f
         };
 
+
+    private bool slideCameraHandlingCoroutineActive;
+
     #endregion
 
     // actual code 
@@ -1278,17 +1281,42 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void HandleSlideCamera()
     {
-        HandleSlideCameraTilt();
+        if (!slideCameraHandlingCoroutineActive)
+        {
+            var localVelocity = transform.InverseTransformDirection(Rigidbody.velocity);
+            StartCoroutine(
+                HandleSlideCameraCoroutine(
+                    localVelocity.x == 0f ? 
+                    TargetSlideCameraTiltAngle : // going forward -> choose side according to settings
+                    maxSlideCameraTiltAngle * (localVelocity.x < 0f ? -1f : 1f) // at least slightly sideway choose side according to that
+                )
+            );
+        }
     }
 
-    private void HandleSlideCameraTilt()
-    {
-        HandleSlideCameraTiltInternal(TargetSlideCameraTiltAngle);
-    }
 
-    private void HandleSlideCameraTiltInternal(float targetAngle)
+    private IEnumerator HandleSlideCameraCoroutine(float targetAngle)
     {
-        CurrentSlideCameraTiltAngle = Mathf.Lerp(CurrentSlideCameraTiltAngle, targetAngle, (targetAngle == 0 ? slideCameraTiltRegulationSpeed : slideCameraTiltSpeed) * Time.deltaTime);
+        slideCameraHandlingCoroutineActive = true;
+
+        while (currentMovementMode == MovementMode.SLIDE)
+        {
+            HandleSlideCameraTilt(targetAngle);
+            yield return null;
+        }
+
+        slideCameraHandlingCoroutineActive = false;
+
+        while(slideCameraHandlingCoroutineActive == false)
+        {
+            HandleSlideCameraTilt(0f); // regulate until the player slides again
+            yield return null;
+        }
+
+    }
+    private void HandleSlideCameraTilt(float targetAngle)
+    {
+        CurrentSlideCameraTiltAngle = Mathf.Lerp(CurrentSlideCameraTiltAngle, targetAngle, (targetAngle == 0f ? slideCameraTiltRegulationSpeed : slideCameraTiltSpeed) * Time.deltaTime);
     }
 
     #endregion
