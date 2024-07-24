@@ -15,9 +15,9 @@ MonoBehaviour:
   MovementStats:
     SpeedStats:
       RunningSpeed: 13
-      StrafingSpeed: 9
+      StrafingSpeedCoefficient: 0.75
       BackwardSpeed: 5
-      WallRunningSpeed: 9
+      WallRunningSpeed: 13
     JumpStats:
       JumpForce: 1280
       SideWallJumpForce: 0
