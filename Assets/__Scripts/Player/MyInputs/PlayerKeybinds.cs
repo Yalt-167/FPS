@@ -67,6 +67,7 @@ public class MovementInputQuery : InputQuery
         InitiateSlide.Init();
         HoldSlide.Init();
         Dash.Init();
+        HoldSprint.Init();
 
 
         InitiateGrapplingHook.Init();

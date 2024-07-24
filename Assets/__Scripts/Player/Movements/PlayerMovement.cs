@@ -39,7 +39,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private float acceleration;
     private float targetSpeed;
     // in m/s
-    private float WalkingSpeed => RunningSpeed / 2;
+    private float WalkingSpeed => RunningSpeed * .75f;
     private float RunningSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.RunningSpeed ?? 8f;
     //private float StrafingSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeed ?? 7f;
     private float StrafingSpeedCoefficient => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeedCoefficient ?? .75f;
@@ -163,6 +163,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private readonly float initialColliderHeight = 2f;
     private readonly float slidingColliderHeight = .5f;
 
+
+    private bool crouched;
     #endregion
 
     #region Wallrun && WallJump Setup
@@ -342,6 +344,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         _ = inputQuery.HoldLeftForTime;
         _ = inputQuery.HoldRightForTime;
         _ = inputQuery.QuickReset;
+        _ = inputQuery.HoldSlide;
+        _ = inputQuery.HoldSprint;
 
         currentMovementMethod();
         currentCameraHandlingMethod();
@@ -523,9 +527,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             ApplyGravity();
         }
         
-        Run();
-        Crouch(inputQuery.HoldSlide);
-        
+        Run();        
+        if (!inputQuery.HoldSlide)
+        {
+            UnCrouch();
+        }
 
         if (HandleJump(true, InSlideJumpBoostWindow, InDashVelocityBoostWindow))
         {
@@ -542,7 +548,12 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             // this
             if (inputQuery.HoldSprint && !(Rigidbody.velocity == Vector3.zero))
             {
-                StartCoroutine(Slide(InDashVelocityBoostWindow));
+                StartCoroutine(Slide(InDashVelocityBoostWindow)); // add some kind of coyote threshold where the velocity is conserved even tho the player walked a bit
+                return;
+            }
+            else
+            {
+                Crouch();
                 return;
             }
         }
@@ -636,6 +647,27 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
         //return wantedMoveVec.x == 0f ? wantedMoveVec.y == 0f ? 0f : wantedMoveVec.y < 0f ? BackwardSpeed : RunningSpeed : wantedMoveVec.y < 0f ? BackwardSpeed : StrafingSpeed;
     }
+
+    private void Crouch()
+    {
+        if (crouched) { return; }
+
+        print("Crouch");
+        crouched = true;
+        transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
+        transform.position -= Vector3.up * .5f;
+    }
+
+    private void UnCrouch()
+    {
+        if (!crouched) { return; }
+
+        print("Uncrouch");
+        crouched = false;
+        transform.position += Vector3.up * .5f;
+        transform.localScale = transform.localScale.Mask(1f, 2f, 1f);
+    }
+
 
     private void CheckStep()
     {
@@ -770,8 +802,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         if (!inputQuery.HoldSlide) { yield break; } // if changed his mind
         
         SetMovementMode(MovementMode.SLIDE);
+        print("slide");
         transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
-        transform.position = transform.position - Vector3.up * .5f;
+        transform.position -= Vector3.up * .5f;
         //cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, .25f, 1f);
 
 
