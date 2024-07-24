@@ -26,17 +26,19 @@ public class MovementInputQuery : InputQuery
     public FixedKeybind HoldJump = new(KeyCode.Space, PlayerActionActivationType.OnKeyHeld);
     public FixedKeybind InterruptJump = new(KeyCode.Space, PlayerActionActivationType.OnKeyUp);
 
-    public FixedKeybind InitiateSlide = new(KeyCode.Space, PlayerActionActivationType.OnKeyDown);
-    public FixedKeybind HoldSlide = new(KeyCode.Space, PlayerActionActivationType.OnKeyHeld);
+    public FixedKeybind InitiateSlide = new(KeyCode.LeftShift, PlayerActionActivationType.OnKeyDown);
+    public FixedKeybind HoldSlide = new(KeyCode.LeftShift, PlayerActionActivationType.OnKeyHeld);
 
     public FixedKeybind Dash = new(KeyCode.Alpha9, PlayerActionActivationType.OnKeyDown);
+
+    public VariableKeybind HoldSprint = new(KeyCode.A, new List<PlayerActionActivationType>() { PlayerActionActivationType.OnKeyHeld, PlayerActionActivationType.Toggle });
 
     public FixedKeybind InitiateGrapplingHook = new(KeyCode.X, PlayerActionActivationType.OnKeyDown);
     public FixedKeybind HoldGrapplingHook = new(KeyCode.X, PlayerActionActivationType.OnKeyHeld);
     public FixedKeybind ReleaseGrapplingHook = new(KeyCode.X, PlayerActionActivationType.OnKeyUp);
 
     public FixedKeybind SwitchCameraPosition = new(KeyCode.W, PlayerActionActivationType.OnKeyDown);
-    public VariableKeybind QuickReset = new(KeyCode.Alpha9, new List<PlayerActionActivationType>() { PlayerActionActivationType.OnKeyDown, PlayerActionActivationType.OnHeldForTime }, .5f);
+    public VariableKeybind QuickReset = new(KeyCode.X, new List<PlayerActionActivationType>() { PlayerActionActivationType.OnKeyDown, PlayerActionActivationType.OnHeldForTime }, .5f);
 
     public FixedKeybind Pause = new(KeyCode.Escape, PlayerActionActivationType.OnKeyDown);
 

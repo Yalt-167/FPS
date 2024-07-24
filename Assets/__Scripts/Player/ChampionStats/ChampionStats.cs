@@ -23,7 +23,7 @@ public struct ChampionMovementStats
 public struct ChampionSpeedStats
 {
     public float RunningSpeed;
-    public float StrafingSpeed;
+    public float StrafingSpeedCoefficient;
     public float BackwardSpeed;
     public float WallRunningSpeed;
 }

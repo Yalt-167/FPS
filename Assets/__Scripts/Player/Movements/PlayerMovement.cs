@@ -39,8 +39,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private float acceleration;
     private float targetSpeed;
     // in m/s
+    private float WalkingSpeed => RunningSpeed / 2;
     private float RunningSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.RunningSpeed ?? 8f;
-    private float StrafingSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeed ?? 7f;
+    //private float StrafingSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeed ?? 7f;
+    private float StrafingSpeedCoefficient => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeedCoefficient ?? .75f;
     private float BackwardSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.BackwardSpeed ?? 5f;
     private float WallRunSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.WallRunningSpeed ?? 9f;
 
@@ -424,11 +426,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
     }
 
-
     private void ApplySlowdown(float slowdownForce)
     {
         /* -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized -> gets the opposite of the velocity while ignoring verticality */
-        Rigidbody.AddForce(slideSlowdownForce * Time.deltaTime * -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Force);
+        Rigidbody.AddForce(slowdownForce * Time.deltaTime * -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Force);
     }
 
     #endregion
@@ -522,7 +523,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             ApplyGravity();
         }
         
-        Run(isCollidingDown);
+        Run();
+        Crouch(inputQuery.HoldSlide);
         
 
         if (HandleJump(true, InSlideJumpBoostWindow, InDashVelocityBoostWindow))
@@ -535,10 +537,14 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             StartCoroutine(Dash());
             return;
         }
-        else if (inputQuery.InitiateSlide && !(Rigidbody.velocity == Vector3.zero))
+        else if (inputQuery.HoldSlide)
         {
-            StartCoroutine(Slide(InDashVelocityBoostWindow));
-            return;
+            // this
+            if (inputQuery.HoldSprint && !(Rigidbody.velocity == Vector3.zero))
+            {
+                StartCoroutine(Slide(InDashVelocityBoostWindow));
+                return;
+            }
         }
         else
         {
@@ -558,11 +564,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
     }
 
-    private void Run(bool grounded)
+    private void Run()
     {
         var wantedMoveVec = new Vector2(SidewayAxisInput, ForwardAxisInput).normalized;
 
-        var targetSpeed = CalculateTargetSpeed(wantedMoveVec) - (grounded ? 0f : .5f);
+        var targetSpeed = CalculateTargetSpeed(wantedMoveVec) - (isCollidingDown ? 0f : .5f);
 
         var velocityY = Rigidbody.velocity.y;
         var localVelocity = transform.InverseTransformDirection(Rigidbody.velocity);
@@ -597,7 +603,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         horizontalVelocityBoost = transform.TransformDirection(localVelocityBoost);
 
-        // dumb shit
+        // DumbShit()
         //{
         //Rigidbody.velocity = transform.TransformDirection(transform.InverseTransformDirection(Rigidbody.velocity).Mask(wantedMoveVec.x == 0f ? sidewayInertiaControlFactor : (Mathf.Sign(wantedMoveVec.x) != Mathf.Sign(transform.InverseTransformDirection(Rigidbody.velocity).x)) ? 0f : 1f, 0f, Mathf.Sign(wantedMoveVec.y) != Mathf.Sign(transform.InverseTransformDirection(Rigidbody.velocity).z) ? 0f : 1f));
         //}
@@ -608,12 +614,27 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         ResetYVelocity(Mathf.Clamp(velocityY, terminalVelocity, 13f));
 
-        Rigidbody.AddForce((horizontalVelocityBoost + currentExternalVelocityBoost), ForceMode.Impulse); // 120 * Time.deltaTime * 
+        Rigidbody.AddForce(horizontalVelocityBoost + currentExternalVelocityBoost, ForceMode.Impulse);
     }
 
     private float CalculateTargetSpeed(Vector2 wantedMoveVec)
     {
-        return wantedMoveVec.x == 0f ? wantedMoveVec.y == 0f ? 0f : wantedMoveVec.y < 0f ? BackwardSpeed : RunningSpeed : wantedMoveVec.y < 0f ? BackwardSpeed : StrafingSpeed;
+        if (wantedMoveVec.x == 0f)
+        {
+            if (wantedMoveVec.y == 0f)
+            {
+                return 0;
+            }
+            else
+            {
+                return wantedMoveVec.y < 0f ? BackwardSpeed : inputQuery.HoldSprint ? RunningSpeed : WalkingSpeed;
+            }
+        }
+        else
+        {
+            return StrafingSpeedCoefficient * (wantedMoveVec.y < 0f ? BackwardSpeed : inputQuery.HoldSprint ? RunningSpeed : WalkingSpeed);
+        }
+        //return wantedMoveVec.x == 0f ? wantedMoveVec.y == 0f ? 0f : wantedMoveVec.y < 0f ? BackwardSpeed : RunningSpeed : wantedMoveVec.y < 0f ? BackwardSpeed : StrafingSpeed;
     }
 
     private void CheckStep()
@@ -1415,3 +1436,13 @@ public struct CollisionDebug
 // still dynamic with slide/dash etc but no more velocity boost for chaining moves (except for dash -> slide | slide -> jump
 // dash into slide conserve momentum
 // slide into jump too
+
+//public enum MovementMode
+//{
+//    RUN -> instantly corrects your speed to its max (if grounded)
+//    SLIDE -> lets you stay over the threshold but gradually reduce your speed
+//    WALLRUN -> instantly corrects your speed to its max
+//    DASH -> instantly sets your velocity to dash velocity
+//    LEDGE_CLIMB -> kills momentum
+//    GRAPPLING -> let you gather speed the further you are from the target you are at the beginning of tyhe grapple action
+//}
