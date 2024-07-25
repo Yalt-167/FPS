@@ -296,7 +296,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             coyoteUsable = true; // just landed
         }
 
-        // The rest
+        // the rest
         isCollidingDown = grounded;
         isCollidingRight = WallCheckRight();
         isCollidingLeft = WallCheckLeft();
@@ -543,7 +543,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             ApplyGravity();
         }
         
-        Run();       
+        Run();
         if (!inputQuery.HoldSlide)
         {
             UnCrouch();
@@ -584,7 +584,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
 
         CheckStep();
-        
+
         if (CheckLedgeClimb(out var ledges))
         {
             LedgeClimb(ledges);
