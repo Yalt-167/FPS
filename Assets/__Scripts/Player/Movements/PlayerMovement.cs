@@ -40,7 +40,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     public bool IsJumping { get; private set; } = false;
     private bool IsRunning => currentMovementMode == MovementMode.Run;
-    private bool IsSprinting => inputQuery.HoldSprint && !IsCrouching && CurrentForwardSpeed < RunningSpeed / 2;
+    private bool IsSprinting => inputQuery.HoldSprint && !IsCrouching && CurrentForwardSpeed > RunningSpeed / 2;
 
     private bool IsCrouching { get; set; }
     private bool IsSliding => currentMovementMode == MovementMode.Slide;
