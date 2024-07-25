@@ -1542,7 +1542,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 169908227
+  GlobalObjectIdHash: 2957232829
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1712,6 +1712,11 @@ MonoBehaviour:
       RelevantKey: 57
       howToActivate: 0
       holdForSeconds: 0
+    HoldSprint:
+      RelevantKey: 97
+      howToActivate: 3
+      holdForSeconds: 0
+      allowedActivationTypes: 0300000002000000
     InitiateGrapplingHook:
       RelevantKey: 120
       howToActivate: 0
@@ -1764,7 +1769,6 @@ MonoBehaviour:
   slideJumpBoostWindow: 0.2
   slideSlowdownForce: 15000
   slideDownwardForce: 120000
-  dashIntoSlideVelocityBoost: 1.3
   slideCameraHeightAdjustmentDuration: 0.3
   sideWallJumpForce: 100
   upwardWallJumpForce: {x: 0, y: 1200, z: 0}

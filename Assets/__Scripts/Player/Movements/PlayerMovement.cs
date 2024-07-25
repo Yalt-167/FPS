@@ -14,6 +14,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     public VelocityDebug HorizontalVelocityBoostDebug;
     public CollisionDebug CollisionDebug;
 
+    [SerializeField] private bool doDebugCollidingDown;
+    [SerializeField] private bool doDebugCollidingUp;
+    [SerializeField] private bool doDebugCollidinAnySide;
+
+
     #region References
 
     [SerializeField] private MovementInputQuery inputQuery;
@@ -35,7 +40,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     public bool IsJumping { get; private set; } = false;
     private bool IsRunning => currentMovementMode == MovementMode.Run;
-    private bool IsSprinting => inputQuery.HoldSprint;
+    private bool IsSprinting => inputQuery.HoldSprint && !IsCrouching && CurrentForwardSpeed < RunningSpeed / 2;
+
+    private bool IsCrouching { get; set; }
     private bool IsSliding => currentMovementMode == MovementMode.Slide;
     private bool IsDashing => currentMovementMode == MovementMode.Dash;
     private bool IsWallrunning => currentMovementMode == MovementMode.Wallrun;
@@ -48,15 +55,13 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     #endregion
 
 
-
-
     #region Movements Setup
 
     [Header("Movements")]
     [SerializeField] private float acceleration;
     private float targetSpeed;
     // in m/s
-    private float WalkingSpeed => RunningSpeed * .75f;
+    private float WalkingSpeed => RunningSpeed * (IsCrouching ? .25f : .5f);
     private float RunningSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.RunningSpeed ?? 8f;
     //private float StrafingSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeed ?? 7f;
     private float StrafingSpeedCoefficient => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeedCoefficient ?? .75f;
@@ -66,20 +71,17 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private float sidewayInertiaControlFactor; // when the direction changes apply it to control inertia and prevent the player from going sideway (former forward)
 
     private Action currentMovementMethod;
+
     private Vector3 horizontalVelocityBoost;
     [SerializeField] private float horizontalVelocityBoostDecayRate;
-    [SerializeField] private float minHorizontalVelocityBoostThreshold;
 
     private Vector3 currentExternalVelocityBoost;
     [SerializeField] private float externalVelocityBoostDecayRate;
-    [SerializeField] private float velocityBoostCoefficient;
-    [SerializeField] private Vector3 horizontalVelocityBoostCoefficient;
-    [SerializeField] private float velocityBoostCancelThreshold;
 
+    [SerializeField] private float minHorizontalVelocityBoostThreshold;
 
     [SerializeField] private float maxStepHeight;
     [SerializeField][Range(0, 90)] private float maxScalableAngle;
-
 
     #endregion
 
@@ -179,8 +181,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private readonly float initialColliderHeight = 2f;
     private readonly float slidingColliderHeight = .5f;
 
-
-    private bool crouched;
     #endregion
 
     #region Wallrun && WallJump Setup
@@ -544,9 +544,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
         
         Run();
-        if (!inputQuery.HoldSlide)
+        if (HandleCrouchActionFromRun())
         {
-            UnCrouch();
+            return;
         }
 
         if (HandleJump(true, InSlideJumpBoostWindow, InDashVelocityBoostWindow))
@@ -559,20 +559,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             StartCoroutine(Dash());
             return;
         }
-        else if (inputQuery.HoldSlide)
-        {
-            // this
-            if (inputQuery.HoldSprint && !(Rigidbody.velocity == Vector3.zero) && !IsSliding)
-            {
-                StartCoroutine(Slide(InDashVelocityBoostWindow)); // add some kind of coyote threshold where the velocity is conserved even tho the player walked a bit (which should kill his momentum)
-                return;
-            }
-            else
-            {
-                Crouch();
-                return;
-            }
-        }
+        
         else
         {
             var sideToWallRunOn = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
@@ -664,22 +651,48 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         //return wantedMoveVec.x == 0f ? wantedMoveVec.y == 0f ? 0f : wantedMoveVec.y < 0f ? BackwardSpeed : RunningSpeed : wantedMoveVec.y < 0f ? BackwardSpeed : StrafingSpeed;
     }
 
+    /// <summary>
+    /// Returns wether the HandleRun() method should return too
+    /// </summary>
+    /// <returns></returns>
+    private bool HandleCrouchActionFromRun()
+    {
+        if (inputQuery.HoldSlide && isCollidingDown)
+        {
+            if (IsSprinting)
+            {
+                StartCoroutine(Slide()); // add some kind of coyote threshold where the velocity is conserved even tho the player walked a bit (which should kill his momentum)
+                return true;
+            }
+            else
+            {
+                Crouch();
+                return false;
+            }
+        }
+        else
+        {
+            UnCrouch();
+            return false;
+        }
+    }
+
     private void Crouch()
     {
-        if (crouched) { return; }
+        if (IsCrouching) { return; }
 
         print("Crouch");
-        crouched = true;
+        IsCrouching = true;
         transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
         transform.position -= Vector3.up * .5f;
     }
 
     private void UnCrouch()
     {
-        if (!crouched) { return; }
+        if (!IsCrouching) { return; }
 
         print("Uncrouch");
-        crouched = false;
+        IsCrouching = false;
         transform.position += Vector3.up * .5f;
         transform.localScale = transform.localScale.Mask(1f, 2f, 1f);
     }
@@ -811,7 +824,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         ApplyGravity();
     }
 
-    private IEnumerator Slide(bool chainedFromDash)
+    private IEnumerator Slide(/*bool chainedFromDash*/)
     {
        
         yield return new WaitUntil(() => isCollidingDown || !inputQuery.HoldSlide); // await the landing to initiate the slide
@@ -824,15 +837,15 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         //cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, .25f, 1f);
 
 
-        if (chainedFromDash)
-        {
-        //var dir = new Vector3(SidewayAxisInput, 0f, ForwardAxisInput);
-        //horizontalVelocityBoost +=
-        //    (chainedFromDash ? dashIntoSlideVelocityBoost : 1f) * initialSlideBoost * (dir == Vector3.zero ?
-        //        Rigidbody.velocity.Mask(1f, 0, 1f).normalized
-        //        :
-        //        transform.TransformDirection(dir)).normalized;
-        }
+        //if (chainedFromDash)
+        //{
+        //  var dir = new Vector3(SidewayAxisInput, 0f, ForwardAxisInput);
+        //  horizontalVelocityBoost +=
+        //      (chainedFromDash ? dashIntoSlideVelocityBoost : 1f) * initialSlideBoost * (dir == Vector3.zero ?
+        //          Rigidbody.velocity.Mask(1f, 0, 1f).normalized
+        //          :
+        //          transform.TransformDirection(dir)).normalized;
+        //}
 
 
         var dashed = false;
@@ -926,7 +939,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                     {
                         slid = true;
                         CommonDashExit(MovementMode.Slide);
-                        StartCoroutine(Slide(true));    
+                        StartCoroutine(Slide(/*true*/));    
                         return true;
                     }
 
@@ -1102,7 +1115,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                 if (inputQuery.InitiateSlide)
                 {
                     CommonWallRunExit(MovementMode.Slide, onRight);
-                    StartCoroutine(Slide(false));
+                    StartCoroutine(Slide(/*false*/));
                     return leftEarly = true;
                 }
 
@@ -1395,24 +1408,34 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void OnDrawGizmosSelected()
     {
+        if (doDebugCollidingDown)
+        {   
+            Gizmos.color = isCollidingDown ? Color.red : Color.green;
+            Gizmos.DrawWireSphere(
+                transform.position + ceilingCheckOffset,
+                groundCeilingCheckRadius
+                );
 
-        Gizmos.color = isCollidingDown ? Color.red : Color.green;
-        Gizmos.DrawWireSphere(
-            transform.position + ceilingCheckOffset,
-            groundCeilingCheckRadius
-            );
+        }
+        
+        if(doDebugCollidingUp)
+        {
+            Gizmos.color = isCollidingUp ? Color.red : Color.green;
+            Gizmos.DrawWireSphere(
+                transform.position + groundCheckOffset,
+                groundCeilingCheckRadius
+                );
+        }
 
-        Gizmos.color = isCollidingUp ? Color.red : Color.green;
-        Gizmos.DrawWireSphere(
-            transform.position + groundCheckOffset,
-            groundCeilingCheckRadius
-            );
-
-        Gizmos.color = isCollidingOnAnySide ? Color.red : Color.green;
-        Gizmos.DrawWireCube(
-            transform.position,
-            bodyCheckSize
-            );
+        
+        if (doDebugCollidinAnySide)
+        {
+            Gizmos.color = isCollidingOnAnySide ? Color.red : Color.green;
+            Gizmos.DrawWireCube(
+                transform.position,
+                bodyCheckSize
+                );
+        }
     }
 }
 
@@ -1495,3 +1518,7 @@ public struct CollisionDebug
 //    LEDGE_CLIMB -> kills momentum
 //    GRAPPLING -> let you gather speed the further you are from the target you are at the beginning of tyhe grapple action
 //}
+
+// crouch slide shenanigans:
+// if crouched then sprint -> should cancel crouch and start sprinting
+// if sprint then crouch -> slide
