@@ -1647,6 +1647,9 @@ MonoBehaviour:
     Right: 0
     Left: 0
     Side: 0
+  doDebugCollidingDown: 0
+  doDebugCollidingUp: 0
+  doDebugCollidinAnySide: 0
   inputQuery:
     InitiateForward:
       RelevantKey: 122
@@ -1746,11 +1749,8 @@ MonoBehaviour:
   acceleration: 180000
   sidewayInertiaControlFactor: 0
   horizontalVelocityBoostDecayRate: 0.95
-  minHorizontalVelocityBoostThreshold: 0
   externalVelocityBoostDecayRate: 0.95
-  velocityBoostCoefficient: 0.1
-  horizontalVelocityBoostCoefficient: {x: 0.5, y: 0.1, z: 0.5}
-  velocityBoostCancelThreshold: 1
+  minHorizontalVelocityBoostThreshold: 0
   maxStepHeight: 0.5
   maxScalableAngle: 0
   baseGravity: 120000
