@@ -22,10 +22,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     #region References
 
     [SerializeField] private MovementInputQuery inputQuery;
-    private int ForwardAxisInput => MyInput.GetAxis(inputQuery.Back, inputQuery.Forward);
-    private int SidewayAxisInput => MyInput.GetAxis(inputQuery.Left, inputQuery.Right);
     private Rigidbody Rigidbody;
     private FollowRotationCamera followRotationCamera;
+    private int ForwardAxisInput => MyInput.GetAxis(inputQuery.Back, inputQuery.Forward);
+    private int SidewayAxisInput => MyInput.GetAxis(inputQuery.Left, inputQuery.Right);
     public Vector3 Position => transform.position;
     public Vector3 FeetPosition => transform.position + Vector3.down;
     public float CurrentSpeed => new Vector3(Rigidbody.velocity.x, 0f, Rigidbody.velocity.z).magnitude;
@@ -40,7 +40,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     public bool IsJumping { get; private set; } = false;
     private bool IsRunning => currentMovementMode == MovementMode.Run;
-    private bool IsSprinting => inputQuery.HoldSprint && !IsCrouching && CurrentForwardSpeed > RunningSpeed / 2;
+    private bool IsSprinting => inputQuery.HoldSprint && !IsCrouching && CurrentSpeed > RunningSpeed / 2;
 
     private bool IsCrouching { get; set; }
     private bool IsSliding => currentMovementMode == MovementMode.Slide;
@@ -61,12 +61,14 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private float acceleration;
     private float targetSpeed;
     // in m/s
-    private float WalkingSpeed => RunningSpeed * (IsCrouching ? .25f : .5f);
+    private float WalkingSpeed => RunningSpeed * .5f;
     private float RunningSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.RunningSpeed ?? 8f;
     //private float StrafingSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeed ?? 7f;
     private float StrafingSpeedCoefficient => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeedCoefficient ?? .75f;
     private float BackwardSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.BackwardSpeed ?? 5f;
     private float WallRunSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.WallRunningSpeed ?? 9f;
+
+    [SerializeField] private float crouhingVelocityCoefficient;
 
     [SerializeField] private float sidewayInertiaControlFactor; // when the direction changes apply it to control inertia and prevent the player from going sideway (former forward)
 
@@ -498,11 +500,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         print("jumped");
         CommonJumpStart();
-        //horizontalVelocityBoost +=
-        //    (afterSlide ? slideIntoJumpVelocityBoost : 1f) *
-        //    (afterDash ? dashIntoJumpVelocityBoost : 1f) *
-        //    initialJumpSpeedBoost *
-        //    transform.TransformDirection(new Vector3(SidewayAxisInput, 0f, ForwardAxisInput)).normalized;
 
         Rigidbody.AddForce((fullJump ? JumpForce : JumpForce / 2) * Vector3.up, ForceMode.Impulse);
 
@@ -526,7 +523,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private IEnumerator ResetJumping()
     {
         yield return new WaitUntil(
-                () => Rigidbody.velocity.y < 0f || currentMovementMode != MovementMode.Run
+                () => Rigidbody.velocity.y <= 0f || currentMovementMode != MovementMode.Run
             );
 
         IsJumping = false;
@@ -542,7 +539,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         {
             ApplyGravity();
         }
-        
+
+        _ = IsSprinting; // just to update it kinda nasty ik
         Run();
         if (HandleCrouchActionFromRun())
         {
@@ -583,6 +581,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         var wantedMoveVec = new Vector2(SidewayAxisInput, ForwardAxisInput).normalized;
 
         var targetSpeed = CalculateTargetSpeed(wantedMoveVec) - (isCollidingDown ? 0f : .5f);
+        print(targetSpeed);
 
         var velocityY = Rigidbody.velocity.y;
         var localVelocity = transform.InverseTransformDirection(Rigidbody.velocity);
@@ -641,12 +640,12 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             }
             else
             {
-                return wantedMoveVec.y < 0f ? BackwardSpeed : inputQuery.HoldSprint ? RunningSpeed : WalkingSpeed;
+                return (wantedMoveVec.y < 0f ? BackwardSpeed : inputQuery.HoldSprint ? RunningSpeed : WalkingSpeed) * (IsCrouching ? crouhingVelocityCoefficient : 1f);
             }
         }
         else
         {
-            return StrafingSpeedCoefficient * (wantedMoveVec.y < 0f ? BackwardSpeed : inputQuery.HoldSprint ? RunningSpeed : WalkingSpeed);
+            return (StrafingSpeedCoefficient * (wantedMoveVec.y < 0f ? BackwardSpeed : inputQuery.HoldSprint ? RunningSpeed : WalkingSpeed)) * (IsCrouching ? crouhingVelocityCoefficient : 1f);
         }
         //return wantedMoveVec.x == 0f ? wantedMoveVec.y == 0f ? 0f : wantedMoveVec.y < 0f ? BackwardSpeed : RunningSpeed : wantedMoveVec.y < 0f ? BackwardSpeed : StrafingSpeed;
     }

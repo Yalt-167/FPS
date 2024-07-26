@@ -227,11 +227,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lockPosition: 0
-  lockPositionRecursively: 0
   lockScale: 1
-  lockScaleRecursively: 1
   lockRotation: 0
-  lockRotationRecursively: 0
 --- !u!1 &796870078216925707
 GameObject:
   m_ObjectHideFlags: 0
@@ -506,11 +503,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lockPosition: 0
-  lockPositionRecursively: 0
   lockScale: 1
-  lockScaleRecursively: 0
   lockRotation: 0
-  lockRotationRecursively: 0
 --- !u!1 &1761437060125563519
 GameObject:
   m_ObjectHideFlags: 0
@@ -835,11 +829,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lockPosition: 0
-  lockPositionRecursively: 0
   lockScale: 1
-  lockScaleRecursively: 0
   lockRotation: 0
-  lockRotationRecursively: 0
 --- !u!1 &3377490646107749542
 GameObject:
   m_ObjectHideFlags: 0
@@ -1137,11 +1128,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lockPosition: 0
-  lockPositionRecursively: 0
   lockScale: 1
-  lockScaleRecursively: 0
   lockRotation: 0
-  lockRotationRecursively: 0
 --- !u!1 &4338599983721542394
 GameObject:
   m_ObjectHideFlags: 0
@@ -1390,11 +1378,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lockPosition: 0
-  lockPositionRecursively: 0
   lockScale: 1
-  lockScaleRecursively: 0
   lockRotation: 0
-  lockRotationRecursively: 0
 --- !u!1 &4801737496559636052
 GameObject:
   m_ObjectHideFlags: 0
@@ -1492,11 +1477,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lockPosition: 0
-  lockPositionRecursively: 0
   lockScale: 1
-  lockScaleRecursively: 0
   lockRotation: 0
-  lockRotationRecursively: 0
 --- !u!1 &5141735692475205435
 GameObject:
   m_ObjectHideFlags: 0
@@ -1861,6 +1843,7 @@ MonoBehaviour:
       holdForSeconds: 0
   currentMovementMode: 0
   acceleration: 180000
+  crouhingVelocityCoefficient: 0.5
   sidewayInertiaControlFactor: 0
   horizontalVelocityBoostDecayRate: 0.95
   externalVelocityBoostDecayRate: 0.95
@@ -2244,11 +2227,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lockPosition: 0
-  lockPositionRecursively: 0
   lockScale: 1
-  lockScaleRecursively: 0
   lockRotation: 0
-  lockRotationRecursively: 0
 --- !u!1 &5974473221775147880
 GameObject:
   m_ObjectHideFlags: 0
@@ -2347,11 +2327,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lockPosition: 0
-  lockPositionRecursively: 0
   lockScale: 1
-  lockScaleRecursively: 0
   lockRotation: 0
-  lockRotationRecursively: 0
 --- !u!1 &6029748860446993793
 GameObject:
   m_ObjectHideFlags: 0
@@ -2908,11 +2885,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lockPosition: 0
-  lockPositionRecursively: 0
   lockScale: 1
-  lockScaleRecursively: 0
   lockRotation: 0
-  lockRotationRecursively: 0
 --- !u!1 &9111725026065835916
 GameObject:
   m_ObjectHideFlags: 0
