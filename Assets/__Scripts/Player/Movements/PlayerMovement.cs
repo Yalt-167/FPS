@@ -369,7 +369,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         TryReplenishDash();
         if (inputQuery.SwitchCameraPosition) SwitchCameraPosition();
 
-        LocalVelocityDebug = new(transform.TransformDirection(Rigidbody.velocity));
+        LocalVelocityDebug = new(transform.InverseTransformDirection(Rigidbody.velocity));
         GlobalVelocityDebug = new(Rigidbody.velocity);
         CollisionDebug = new(isCollidingUp, isCollidingDown, isCollidingRight, isCollidingLeft, isCollidingOnAnySide);
         HorizontalVelocityBoostDebug = new(horizontalVelocityBoost);
@@ -540,7 +540,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             ApplyGravity();
         }
 
-        _ = IsSprinting; // just to update it kinda nasty ik
         Run();
         if (HandleCrouchActionFromRun())
         {
@@ -560,11 +559,14 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         
         else
         {
-            var sideToWallRunOn = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
-            if (sideToWallRunOn != 0f && !isCollidingDown)
+            if (!isCollidingDown)
             {
-                StartCoroutine(Wallrun(sideToWallRunOn));
-                return;
+                var sideToWallRunOn = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
+                if (sideToWallRunOn != 0f)
+                {
+                    StartCoroutine(Wallrun(sideToWallRunOn));
+                    return;
+                }
             }
         }
 
@@ -581,7 +583,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         var wantedMoveVec = new Vector2(SidewayAxisInput, ForwardAxisInput).normalized;
 
         var targetSpeed = CalculateTargetSpeed(wantedMoveVec) - (isCollidingDown ? 0f : .5f);
-        print(targetSpeed);
 
         var velocityY = Rigidbody.velocity.y;
         var localVelocity = transform.InverseTransformDirection(Rigidbody.velocity);
@@ -589,29 +590,29 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         if (wantedMoveVec.x == 0f)
         {
-            localVelocity = localVelocity.Mask(sidewayInertiaControlFactor, 0, 1);
-            localVelocityBoost = localVelocityBoost.Mask(sidewayInertiaControlFactor, 0, 1);
+            localVelocity = localVelocity.Mask(sidewayInertiaControlFactor, 0f, 1f);
+            localVelocityBoost = localVelocityBoost.Mask(sidewayInertiaControlFactor, 0f, 1f);
         }
         else if (Mathf.Sign(wantedMoveVec.x) != Mathf.Sign(localVelocity.x))
         {
-           localVelocity = localVelocity.Mask(0, 0, 1);
+           localVelocity = localVelocity.Mask(0f, 0f, 1f);
         }
 
         if (Mathf.Sign(wantedMoveVec.y) != Mathf.Sign(localVelocity.z))
         {
-            localVelocity = localVelocity.Mask(1, 0, 0);
+            localVelocity = localVelocity.Mask(1f, 0f, 0f);
         }
 
         Rigidbody.velocity = transform.TransformDirection(localVelocity);
 
         if (Mathf.Sign(wantedMoveVec.x) != Mathf.Sign(localVelocityBoost.x))
         {
-            localVelocityBoost = localVelocityBoost.Mask(0, 0, 1);
+            localVelocityBoost = localVelocityBoost.Mask(0f, 0f, 1f);
         }
 
         if (Mathf.Sign(wantedMoveVec.y) != Mathf.Sign(localVelocityBoost.z))
         {
-            localVelocityBoost = localVelocityBoost.Mask(1, 0, 0);
+            localVelocityBoost = localVelocityBoost.Mask(1f, 0f, 0f);
         }
 
         horizontalVelocityBoost = transform.TransformDirection(localVelocityBoost);
@@ -623,7 +624,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
 
         Rigidbody.AddForce(acceleration * Time.deltaTime * (transform.forward * wantedMoveVec.y + transform.right * wantedMoveVec.x), ForceMode.Force);
-        Rigidbody.velocity = Vector3.ClampMagnitude(Rigidbody.velocity.Mask(1f, 0f, 1f), targetSpeed);
+        //if (isCollidingDown)
+        //{
+            Rigidbody.velocity = Vector3.ClampMagnitude(Rigidbody.velocity.Mask(1f, 0f, 1f), targetSpeed);
+        //}
 
         ResetYVelocity(Mathf.Clamp(velocityY, terminalVelocity, 13f));
 
@@ -640,12 +644,28 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             }
             else
             {
-                return (wantedMoveVec.y < 0f ? BackwardSpeed : inputQuery.HoldSprint ? RunningSpeed : WalkingSpeed) * (IsCrouching ? crouhingVelocityCoefficient : 1f);
+                return (
+                        wantedMoveVec.y < 0f ?
+                            BackwardSpeed
+                            :
+                            inputQuery.HoldSprint && !IsCrouching ?
+                                RunningSpeed
+                                :
+                                WalkingSpeed
+                                ) * (IsCrouching ? crouhingVelocityCoefficient : 1f);
             }
         }
         else
         {
-            return (StrafingSpeedCoefficient * (wantedMoveVec.y < 0f ? BackwardSpeed : inputQuery.HoldSprint ? RunningSpeed : WalkingSpeed)) * (IsCrouching ? crouhingVelocityCoefficient : 1f);
+            return StrafingSpeedCoefficient * (
+                wantedMoveVec.y < 0f ?
+                BackwardSpeed
+                :
+                inputQuery.HoldSprint && !IsCrouching ?
+                    RunningSpeed
+                    :
+                    WalkingSpeed
+                    ) * (IsCrouching ? crouhingVelocityCoefficient : 1f);
         }
         //return wantedMoveVec.x == 0f ? wantedMoveVec.y == 0f ? 0f : wantedMoveVec.y < 0f ? BackwardSpeed : RunningSpeed : wantedMoveVec.y < 0f ? BackwardSpeed : StrafingSpeed;
     }
@@ -695,7 +715,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         transform.position += Vector3.up * .5f;
         transform.localScale = transform.localScale.Mask(1f, 2f, 1f);
     }
-
 
     private void CheckStep()
     {
@@ -749,11 +768,15 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
 
         if (!hasSthToStepOn) { return; }
-        
-        var relevantColliders = colliders.Where(predicate: (collider) => GetHighestPointOffCollider(collider).y < FeetPosition.y + maxStepHeight).ToList();
+
+
+        //print(FeetPosition.y);
+
+        var relevantColliders = colliders.Where(predicate: (collider) => GetHighestPointOffCollider(collider).y <= FeetPosition.y + maxStepHeight).ToList();
 
         if (relevantColliders.Count == 0) { return; }
 
+        print("2");
         Collider stepToTake = null;
         var highestPointSoFar = float.NegativeInfinity;
 
@@ -775,26 +798,35 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         if (collider.gameObject.TryGetComponent<MeshFilter>(out var meshFilterComponent))
         {
-            var verticesCount = meshFilterComponent.mesh.vertexCount;
-            var vertices = meshFilterComponent.mesh.vertices;
+            var colliderTransform = collider.transform;
+            var colliderOrigin = colliderTransform.position;
+            var colliderWorldScale = colliderTransform.lossyScale;
 
-            
+            var verticesCount = meshFilterComponent.mesh.vertexCount;
+
+            var vertices = meshFilterComponent.mesh.vertices; // vertices of the mesh in local space
+            var verticesInWorldSpace = vertices.Select(selector: (vertice) => colliderOrigin + vertice.Mask(colliderWorldScale)).ToArray();
+
             var highestPointSoFar = float.NegativeInfinity * Vector3.up;
 
-            for (int vertiexIndex = 0; vertiexIndex < verticesCount; vertiexIndex++)
+            for (int vertex = 0; vertex < verticesCount; vertex++)
             {
-                if (vertices[vertiexIndex].y > highestPointSoFar.y)
+                //print($"Vertex: { vertices[vertex].y}");
+                if (verticesInWorldSpace[vertex].y > highestPointSoFar.y)
                 {
-                    highestPointSoFar = vertices[vertiexIndex];
+                    //print($"Overtook max {highestPointSoFar.y}");
+                    highestPointSoFar = verticesInWorldSpace[vertex];
                 }
             }
 
+            print($"Max: {highestPointSoFar.y}");
             return highestPointSoFar;
         }
         else
         {
             // if it s not rendered then it must be some invisible barrier (which I don t plan on having)
             // anyway: should not be climbed
+            print("it failed");
             return Vector3.up * float.PositiveInfinity;
         }       
     }
@@ -825,7 +857,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private IEnumerator Slide(/*bool chainedFromDash*/)
     {
-       
         yield return new WaitUntil(() => isCollidingDown || !inputQuery.HoldSlide); // await the landing to initiate the slide
 
         if (!inputQuery.HoldSlide) { yield break; } // if changed his mind
@@ -833,7 +864,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         SetMovementMode(MovementMode.Slide);
         transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
         transform.position -= Vector3.up * .5f;
-        //cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, .25f, 1f);
 
 
         //if (chainedFromDash)
@@ -887,8 +917,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void CommonSlideExit(MovementMode newMovementMode)
     {
-        //cameraTransform.localPosition = cameraTransform.localPosition.Mask(1f, 2f, 1f);
-        transform.position = transform.position + Vector3.up * .5f;
+        transform.position += Vector3.up * .5f;
         transform.localScale = transform.localScale.Mask(1f, 2f, 1f);
         timeStoppedSlide = Time.time;
         SetMovementMode(newMovementMode);
@@ -1521,3 +1550,10 @@ public struct CollisionDebug
 // crouch slide shenanigans:
 // if crouched then sprint -> should cancel crouch and start sprinting
 // if sprint then crouch -> slide
+
+
+// no more velocity boost mess
+// only
+// airborne -> airfriction using ApplySlowdown(slowdownForce);
+// grounded -> sliding ? groundfriction using ApplySlowdown(slowdownForce) : instant cap;
+// wallrunning => instant cap;
