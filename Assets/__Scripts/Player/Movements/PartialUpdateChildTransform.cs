@@ -4,14 +4,16 @@ using UnityEngine;
 
 public class PartialUpdateChildTransform : MonoBehaviour
 {
-
     private MyTransform previousData;
+
     [SerializeField] private bool lockPosition;
+
     [SerializeField] private bool lockScale;
+
     [SerializeField] private bool lockRotation;
 
 
-    private void Start()
+    private void Awake()
     {
         previousData = new MyTransform(transform);
     }

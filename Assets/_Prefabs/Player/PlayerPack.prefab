@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 2297063594925009126}
   - component: {fileID: 292191549483302698}
   - component: {fileID: 1212207979648881112}
+  - component: {fileID: 8523406788787802649}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -213,6 +214,24 @@ MonoBehaviour:
     mipBias: 0
     varianceClampScale: 0.9
     contrastAdaptiveSharpening: 0
+--- !u!114 &8523406788787802649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 311958405594091015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b009443d7183d8249a6a38668a1de121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockPosition: 0
+  lockPositionRecursively: 0
+  lockScale: 1
+  lockScaleRecursively: 1
+  lockRotation: 0
+  lockRotationRecursively: 0
 --- !u!1 &796870078216925707
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,6 +470,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4055569346584767719}
+  - component: {fileID: 4946924748623436326}
   m_Layer: 0
   m_Name: BarrelEnd
   m_TagString: Untagged
@@ -473,6 +493,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4507085056709165651}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4946924748623436326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1490273979010500152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b009443d7183d8249a6a38668a1de121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockPosition: 0
+  lockPositionRecursively: 0
+  lockScale: 1
+  lockScaleRecursively: 0
+  lockRotation: 0
+  lockRotationRecursively: 0
 --- !u!1 &1761437060125563519
 GameObject:
   m_ObjectHideFlags: 0
@@ -711,6 +749,7 @@ GameObject:
   - component: {fileID: 3167071195989954767}
   - component: {fileID: 7032831301008198189}
   - component: {fileID: 3711388942927421955}
+  - component: {fileID: 2489946952877142605}
   m_Layer: 0
   m_Name: TriggerRingFront
   m_TagString: Untagged
@@ -783,6 +822,24 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &2489946952877142605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2979411203213262430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b009443d7183d8249a6a38668a1de121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockPosition: 0
+  lockPositionRecursively: 0
+  lockScale: 1
+  lockScaleRecursively: 0
+  lockRotation: 0
+  lockRotationRecursively: 0
 --- !u!1 &3377490646107749542
 GameObject:
   m_ObjectHideFlags: 0
@@ -994,6 +1051,7 @@ GameObject:
   - component: {fileID: 7872283958594724633}
   - component: {fileID: 8037945296923726571}
   - component: {fileID: 3548974580726223625}
+  - component: {fileID: 5498276666006467467}
   m_Layer: 0
   m_Name: Handle
   m_TagString: Untagged
@@ -1066,6 +1124,24 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5498276666006467467
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4128014452941089361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b009443d7183d8249a6a38668a1de121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockPosition: 0
+  lockPositionRecursively: 0
+  lockScale: 1
+  lockScaleRecursively: 0
+  lockRotation: 0
+  lockRotationRecursively: 0
 --- !u!1 &4338599983721542394
 GameObject:
   m_ObjectHideFlags: 0
@@ -1264,6 +1340,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3728256222432838323}
   - component: {fileID: 497167877471356237}
+  - component: {fileID: 2757877960862643568}
   m_Layer: 0
   m_Name: RighCheck
   m_TagString: Untagged
@@ -1300,6 +1377,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debugBox: 0
   <Size>k__BackingField: {x: 0.2, y: 1, z: 0.7}
+--- !u!114 &2757877960862643568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4622927667771209331}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b009443d7183d8249a6a38668a1de121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockPosition: 0
+  lockPositionRecursively: 0
+  lockScale: 1
+  lockScaleRecursively: 0
+  lockRotation: 0
+  lockRotationRecursively: 0
 --- !u!1 &4801737496559636052
 GameObject:
   m_ObjectHideFlags: 0
@@ -1311,6 +1406,7 @@ GameObject:
   - component: {fileID: 4910881287874221694}
   - component: {fileID: 8229603469926003260}
   - component: {fileID: 1779908369908898997}
+  - component: {fileID: 6921331069239496990}
   m_Layer: 0
   m_Name: TriggerRingBottom
   m_TagString: Untagged
@@ -1383,6 +1479,24 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6921331069239496990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4801737496559636052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b009443d7183d8249a6a38668a1de121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockPosition: 0
+  lockPositionRecursively: 0
+  lockScale: 1
+  lockScaleRecursively: 0
+  lockRotation: 0
+  lockRotationRecursively: 0
 --- !u!1 &5141735692475205435
 GameObject:
   m_ObjectHideFlags: 0
@@ -1542,7 +1656,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2957232829
+  GlobalObjectIdHash: 169908227
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -2058,6 +2172,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5320893025777125303}
   - component: {fileID: 4889013781824997616}
+  - component: {fileID: 3103227936286380314}
   m_Layer: 0
   m_Name: Weapon
   m_TagString: Untagged
@@ -2116,6 +2231,24 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 0
   SlerpPosition: 0
+--- !u!114 &3103227936286380314
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5814794369634734712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b009443d7183d8249a6a38668a1de121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockPosition: 0
+  lockPositionRecursively: 0
+  lockScale: 1
+  lockScaleRecursively: 0
+  lockRotation: 0
+  lockRotationRecursively: 0
 --- !u!1 &5974473221775147880
 GameObject:
   m_ObjectHideFlags: 0
@@ -2127,6 +2260,7 @@ GameObject:
   - component: {fileID: 4507085056709165651}
   - component: {fileID: 6869451378594045859}
   - component: {fileID: 6571997832293675418}
+  - component: {fileID: 597308845369205356}
   m_Layer: 0
   m_Name: Barrel
   m_TagString: Untagged
@@ -2200,6 +2334,24 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &597308845369205356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5974473221775147880}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b009443d7183d8249a6a38668a1de121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockPosition: 0
+  lockPositionRecursively: 0
+  lockScale: 1
+  lockScaleRecursively: 0
+  lockRotation: 0
+  lockRotationRecursively: 0
 --- !u!1 &6029748860446993793
 GameObject:
   m_ObjectHideFlags: 0
@@ -2670,6 +2822,7 @@ GameObject:
   - component: {fileID: 2592411902166309902}
   - component: {fileID: 4294936625786440666}
   - component: {fileID: 8907828843878574642}
+  - component: {fileID: 6497412423989508736}
   m_Layer: 0
   m_Name: Magazine
   m_TagString: Untagged
@@ -2742,6 +2895,24 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6497412423989508736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8805003799747122089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b009443d7183d8249a6a38668a1de121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lockPosition: 0
+  lockPositionRecursively: 0
+  lockScale: 1
+  lockScaleRecursively: 0
+  lockRotation: 0
+  lockRotationRecursively: 0
 --- !u!1 &9111725026065835916
 GameObject:
   m_ObjectHideFlags: 0
