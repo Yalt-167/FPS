@@ -19,7 +19,7 @@ MonoBehaviour:
       BackwardSpeed: 5
       WallRunningSpeed: 13
     JumpStats:
-      JumpForce: 1280
+      JumpForce: 180
       SideWallJumpForce: 0
       UpwardWallJumpForce: 0
     DashStats:
