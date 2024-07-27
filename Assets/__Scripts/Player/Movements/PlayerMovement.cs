@@ -58,12 +58,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     #region Movements Setup
 
     [Header("Movements")]
-    [SerializeField] private float acceleration;
-
-    [SerializeField][Tooltip("Basically a lerp of the speed that increases overtime when running (basically some sort of acceleration")] private float currentSpeedRatio;
-    [SerializeField][Tooltip("Instead of having a linear lerp the lerp the lerp value is also lerped")] private float speedRatioLerpRatio;
-    [SerializeField] private float speedRatioLerpRatioIncreaseRate;
-
+    private float currentSpeedRatio; // Basically a lerp of the speed that increases overtime when running (basically some sort of acceleration
     [SerializeField] private float timeToReachMaxSprintSpeed;
     private float targetSpeed;
     [SerializeField] private float airFriction;
@@ -146,7 +141,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [Header("Jump")]
     [SerializeField] private float initialJumpSpeedBoost;
     [SerializeField] private float slideIntoJumpVelocityBoost;
-    private float JumpForce => PlayerFrame?.ChampionStats.MovementStats.JumpStats.JumpForce ?? 1280f;
+    private float JumpForce => PlayerFrame?.ChampionStats.MovementStats.JumpStats.JumpForce ?? 180f;
     private float timeLeftGround;
 
     [SerializeField] private float terminalVelocity = -75f;
@@ -155,7 +150,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private readonly float jumpBuffer = .1f;
     private bool coyoteUsable;
 
-    private float lastJumpPressed = -.2f;
+    private float lastJumpPressed = float.NegativeInfinity;
     private bool CanUseCoyote => coyoteUsable && !isCollidingDown && timeLeftGround + coyoteTimeThreshold > Time.time;
     private bool HasBufferedJump => isCollidingDown && lastJumpPressed + jumpBuffer > Time.time;
 
@@ -165,11 +160,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     [Header("Dash")]
     [SerializeField] private float afterDashMomentumConservationWindowDuration;
+    private bool InDashMomentumConservationWindow => timeDashTriggered + DashDuration + afterDashMomentumConservationWindowDuration > Time.time;
     private float DashVelocity => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashVelocity ?? 90f;
     private float DashDuration => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashDuration ?? .1f;
     private float DashCooldown => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashCooldown ?? 1f;
     private bool dashOnCooldown;
-    private bool InDashMomentumConservationWindow => timeDashTriggered + DashDuration + afterDashMomentumConservationWindowDuration > Time.time;
 
     private bool dashReady;
     private bool DashUsable => dashReady && !dashOnCooldown && (PlayerFrame?.ChampionStats.MovementStats.DashStats.HasDash ?? false);
@@ -658,7 +653,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
 
                 float t = Mathf.Clamp01(timeElapsedSinceStartedSprinting / timeToReachMaxSprintSpeed);
+                print(t);
                 float currentSpeedRatio = Interpolation.ExponentialLerp(t);
+
+                print(currentSpeedRatio);
 
                 Rigidbody.velocity = Vector3.Slerp(direction * WalkingSpeed, targetSpeed * direction, currentSpeedRatio);
             }
@@ -666,22 +664,17 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             {
                 wasSprinting = false;
                 currentSpeedRatio = 0f;
-                Rigidbody.velocity = targetSpeed * direction;
+                Rigidbody.velocity = targetSpeed * direction; // else walking so let him go max "speed"
             }
-            //Rigidbody.AddForce(acceleration * Time.deltaTime * (transform.forward * wantedMoveVec.y + transform.right * wantedMoveVec.x), ForceMode.Force);
         }
         else
         {
             Rigidbody.velocity = Mathf.Lerp(CurrentSpeed, 0, airFriction) * direction;
         }
-        //if (isCollidingDown)
-        //{
-            Rigidbody.velocity = Vector3.ClampMagnitude(Rigidbody.velocity.Mask(1f, 0f, 1f), targetSpeed);
-        //}
 
-        ResetYVelocity(Mathf.Clamp(velocityY, terminalVelocity, 13f));
+        Rigidbody.velocity += transform.up * Mathf.Max(velocityY, terminalVelocity);
 
-        Rigidbody.AddForce(horizontalVelocityBoost + currentExternalVelocityBoost, ForceMode.Impulse);
+        //Rigidbody.AddForce(horizontalVelocityBoost + currentExternalVelocityBoost, ForceMode.Impulse);
     }
 
     private float CalculateTargetSpeed(Vector2 wantedMoveVec)
