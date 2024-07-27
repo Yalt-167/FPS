@@ -59,10 +59,17 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     [Header("Movements")]
     [SerializeField] private float acceleration;
+
+    [SerializeField][Tooltip("Basically a lerp of the speed that increases overtime when running (basically some sort of acceleration")] private float currentSpeedRatio;
+    [SerializeField][Tooltip("Instead of having a linear lerp the lerp the lerp value is also lerped")] private float speedRatioLerpRatio;
+    [SerializeField] private float speedRatioLerpRatioIncreaseRate;
+
+    [SerializeField] private float timeToReachMaxSprintSpeed;
     private float targetSpeed;
-    // in m/s
+    [SerializeField] private float airFriction;
     private float WalkingSpeed => RunningSpeed * .5f;
     private float RunningSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.RunningSpeed ?? 8f;
+    private float SpeedDifferenceBetweenWalkingAndSprinting => RunningSpeed - WalkingSpeed;
     //private float StrafingSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeed ?? 7f;
     private float StrafingSpeedCoefficient => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeedCoefficient ?? .75f;
     private float BackwardSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.BackwardSpeed ?? 5f;
@@ -84,6 +91,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     [SerializeField] private float maxStepHeight;
     [SerializeField][Range(0, 90)] private float maxScalableAngle;
+
+
+
+    private float timeStartedSprinting = float.NegativeInfinity;
+    private bool wasSprinting;
 
     #endregion
 
@@ -152,13 +164,12 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     #region Dash Setup
 
     [Header("Dash")]
-    [SerializeField] private float dashIntoJumpVelocityBoost;
-    [SerializeField] private float afterDashVelocityBoostWindowDuration;
+    [SerializeField] private float afterDashMomentumConservationWindowDuration;
     private float DashVelocity => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashVelocity ?? 90f;
     private float DashDuration => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashDuration ?? .1f;
     private float DashCooldown => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashCooldown ?? 1f;
     private bool dashOnCooldown;
-    private bool InDashVelocityBoostWindow => timeDashTriggered + DashDuration + afterDashVelocityBoostWindowDuration > Time.time;
+    private bool InDashMomentumConservationWindow => timeDashTriggered + DashDuration + afterDashMomentumConservationWindowDuration > Time.time;
 
     private bool dashReady;
     private bool DashUsable => dashReady && !dashOnCooldown && (PlayerFrame?.ChampionStats.MovementStats.DashStats.HasDash ?? false);
@@ -357,7 +368,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void Update()
     {
-        // kinda nasty but these need to be called each frame for them to work as expected (otherwise the CheckKeyHeld() might never be called and the key might just be seen as pressed forever;
+        // kinda nasty but these need to be called each frame for them to work as expected
+        // (otherwise the CheckKeyHeld() might never be called and the key might just be seen as pressed forever;
+        // this is true for each key with an exoected long lasting effects namely:
+        // HoldForTime -> may miss the frame where stopped holding if it was nt checked this frame
+        // Toggle -> may misss the frame where toggled it if it was nt checked this frame
         _ = inputQuery.HoldLeftForTime;
         _ = inputQuery.HoldRightForTime;
         _ = inputQuery.QuickReset;
@@ -367,7 +382,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         currentMovementMethod();
         currentCameraHandlingMethod();
         TryReplenishDash();
-        if (inputQuery.SwitchCameraPosition) SwitchCameraPosition();
+
+        if (inputQuery.SwitchCameraPosition) { SwitchCameraPosition(); }
 
         LocalVelocityDebug = new(transform.InverseTransformDirection(Rigidbody.velocity));
         GlobalVelocityDebug = new(Rigidbody.velocity);
@@ -546,7 +562,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             return;
         }
 
-        if (HandleJump(true, InSlideJumpBoostWindow, InDashVelocityBoostWindow))
+        if (HandleJump(true, InSlideJumpBoostWindow, InDashMomentumConservationWindow))
         {
             return;
         }
@@ -623,7 +639,41 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         //}
 
 
-        Rigidbody.AddForce(acceleration * Time.deltaTime * (transform.forward * wantedMoveVec.y + transform.right * wantedMoveVec.x), ForceMode.Force);
+        var direction = transform.forward * wantedMoveVec.y + transform.right * wantedMoveVec.x;
+        if (isCollidingDown)
+        {
+            if (IsSprinting)
+            {
+                float timeElapsedSinceStartedSprinting;
+                if (!wasSprinting)
+                {
+                    timeStartedSprinting = Time.time;
+                    wasSprinting = true;
+                    timeElapsedSinceStartedSprinting = 0f;
+                }
+                else
+                {
+                    timeElapsedSinceStartedSprinting = Time.time - timeStartedSprinting;
+                }
+
+
+                float t = Mathf.Clamp01(timeElapsedSinceStartedSprinting / timeToReachMaxSprintSpeed);
+                float currentSpeedRatio = Interpolation.ExponentialLerp(t);
+
+                Rigidbody.velocity = Vector3.Slerp(direction * WalkingSpeed, targetSpeed * direction, currentSpeedRatio);
+            }
+            else
+            {
+                wasSprinting = false;
+                currentSpeedRatio = 0f;
+                Rigidbody.velocity = targetSpeed * direction;
+            }
+            //Rigidbody.AddForce(acceleration * Time.deltaTime * (transform.forward * wantedMoveVec.y + transform.right * wantedMoveVec.x), ForceMode.Force);
+        }
+        else
+        {
+            Rigidbody.velocity = Mathf.Lerp(CurrentSpeed, 0, airFriction) * direction;
+        }
         //if (isCollidingDown)
         //{
             Rigidbody.velocity = Vector3.ClampMagnitude(Rigidbody.velocity.Mask(1f, 0f, 1f), targetSpeed);
@@ -770,13 +820,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         if (!hasSthToStepOn) { return; }
 
 
-        //print(FeetPosition.y);
-
         var relevantColliders = colliders.Where(predicate: (collider) => GetHighestPointOffCollider(collider).y <= FeetPosition.y + maxStepHeight).ToList();
 
         if (relevantColliders.Count == 0) { return; }
 
-        print("2");
+
         Collider stepToTake = null;
         var highestPointSoFar = float.NegativeInfinity;
 
@@ -811,22 +859,20 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
             for (int vertex = 0; vertex < verticesCount; vertex++)
             {
-                //print($"Vertex: { vertices[vertex].y}");
                 if (verticesInWorldSpace[vertex].y > highestPointSoFar.y)
                 {
-                    //print($"Overtook max {highestPointSoFar.y}");
                     highestPointSoFar = verticesInWorldSpace[vertex];
                 }
             }
 
-            print($"Max: {highestPointSoFar.y}");
+            //print($"Max: {highestPointSoFar.y}");
             return highestPointSoFar;
         }
         else
         {
             // if it s not rendered then it must be some invisible barrier (which I don t plan on having)
             // anyway: should not be climbed
-            print("it failed");
+            print("It failed");
             return Vector3.up * float.PositiveInfinity;
         }       
     }
@@ -899,7 +945,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                         return true;
                     }
 
-                    jumped = HandleJump(true, true, InDashVelocityBoostWindow);
+                    jumped = HandleJump(true, true, InDashMomentumConservationWindow);
 
                     return
                         Rigidbody.velocity.magnitude < slideCancelThreshold ||
