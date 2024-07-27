@@ -90,8 +90,6 @@ public class CombatInputQuery : InputQuery
     public VariableKeybind Aim;
     public FixedKeybind Reload;
 
-    //public FixedKeybind NextWeapon;
-    //public FixedKeybind PreviousWeapon;
     public FixedKeybind FirstGun;
     public FixedKeybind SecondGun;
     public FixedKeybind ThirdGun;
