@@ -1638,7 +1638,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 169908227
+  GlobalObjectIdHash: 2957232829
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1850,7 +1850,7 @@ MonoBehaviour:
   externalVelocityBoostDecayRate: 0.95
   minHorizontalVelocityBoostThreshold: 0
   maxStepHeight: 0.5
-  maxScalableAngle: 31.4
+  maxScalableAngle: 0
   baseGravity: 120000
   groundLayers:
     serializedVersion: 2
