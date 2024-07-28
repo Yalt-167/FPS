@@ -1,3 +1,5 @@
+#define LOG_MOVEMENTS_EVENTS
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,7 +30,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private int SidewayAxisInput => MyInput.GetAxis(inputQuery.Left, inputQuery.Right);
     public Vector3 Position => transform.position;
     public Vector3 FeetPosition => transform.position + Vector3.down;
-    public float CurrentSpeed => new Vector3(Rigidbody.velocity.x, 0f, Rigidbody.velocity.z).magnitude;
+    public float CurrentSpeed => Rigidbody.velocity.Mask(1f, 0f, 1f).magnitude;
     public float CurrentForwardSpeed => Vector3.Dot(Rigidbody.velocity, transform.forward);
     public float CurrentStrafeSpeed => Mathf.Abs(Vector3.Dot(Rigidbody.velocity, transform.right));
     public float CurrentVerticalSpeed => Rigidbody.velocity.y;
@@ -140,7 +142,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     [Header("Jump")]
     [SerializeField] private float initialJumpSpeedBoost;
-    private float JumpForce => PlayerFrame?.ChampionStats.MovementStats.JumpStats.JumpForce ?? 180f;
+    private float JumpForce => PlayerFrame?.ChampionStats.MovementStats.JumpStats.JumpForce ?? 1080f;
     private float timeLeftGround;
 
     [SerializeField] private float terminalVelocity = -75f;
@@ -492,7 +494,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     /// <param name="afterSlide"></param>
     /// <param name="afterDash"></param>
     /// <returns></returns>
-    private bool HandleJump(bool coyoteThresholdAllowed, bool afterSlide, bool afterDash)
+    private bool HandleJump(bool coyoteThresholdAllowed)
     {
         if (IsJumping) { return false; }
 
@@ -502,13 +504,13 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
             if (CanUseCoyote && coyoteThresholdAllowed || isCollidingDown)
             {
-                Jump(true, afterSlide, afterDash);
+                Jump(true);
                 return true;
             }
         }
         else if (HasBufferedJump)
         {
-            Jump(inputQuery.HoldJump, afterSlide, afterDash);
+            Jump(inputQuery.HoldJump);
             return true;
         }
 
@@ -517,15 +519,23 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void CommonJumpStart()
     {
+#if LOG_MOVEMENTS_EVENTS
+        print("Jumped");
+#endif
+
         coyoteUsable = false;
         IsJumping = true;
 
         ResetYVelocity();
+
+        if (inputQuery.Forward)
+        {
+            Rigidbody.AddForce(initialJumpSpeedBoost * transform.forward, ForceMode.Impulse);
+        }
     }
 
-    private void Jump(bool fullJump, bool afterSlide, bool afterDash)
+    private void Jump(bool fullJump)
     {
-        print("jumped");
         CommonJumpStart();
 
         Rigidbody.AddForce((fullJump ? JumpForce : JumpForce / 2) * Vector3.up, ForceMode.Impulse);
@@ -537,7 +547,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         CommonJumpStart();
 
-        //horizontalVelocityBoost += initialJumpSpeedBoost * Rigidbody.velocity.normalized;
         horizontalVelocityBoost += (towardRight ? transform.right : -transform.right) * (awayFromWall ? sideWallJumpForceAwayFromWall : sideWallJumpForce);
 
         horizontalVelocityBoost.y = 0f; // just in case (bc of that: Rigidbody.velocity.normalized) (even though it s reset in CommonJumpStart() I had issues with it so better safe than sorry
@@ -550,7 +559,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private IEnumerator ResetJumping()
     {
         yield return new WaitUntil(
-                () => Rigidbody.velocity.y <= 0f || currentMovementMode != MovementMode.Run
+                () => Rigidbody.velocity.y < 0f || currentMovementMode != MovementMode.Run
             );
 
         IsJumping = false;
@@ -573,7 +582,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             return;
         }
 
-        if (HandleJump(true, InSlideJumpBoostWindow, InDashMomentumConservationWindow))
+        if (HandleJump(true))
         {
             return;
         }
@@ -612,6 +621,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         var targetSpeed = CalculateTargetSpeed(wantedMoveVec) - (isCollidingDown ? 0f : .5f);
 
         var velocityY = Rigidbody.velocity.y;
+
         var localVelocity = transform.InverseTransformDirection(Rigidbody.velocity);
         var localVelocityBoost = transform.InverseTransformDirection(horizontalVelocityBoost);
 
@@ -668,11 +678,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                 }
 
 
-                float t = Mathf.Clamp01(timeElapsedSinceStartedSprinting / timeToReachMaxSprintSpeed);
-                print(t);
+                float t = Mathf.Clamp01(timeElapsedSinceStartedSprinting / timeToReachMaxSprintSpeed); // if failing timeToReachMaxSprintSpeed probably reset to 0 in th einspector
                 float currentSpeedRatio = Interpolation.ExponentialLerp(t);
-
-                print(currentSpeedRatio);
 
                 Rigidbody.velocity = Vector3.Slerp(direction * WalkingSpeed, targetSpeed * direction, currentSpeedRatio);
             }
@@ -688,7 +695,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             Rigidbody.velocity = Mathf.Lerp(CurrentSpeed, 0, airFriction) * direction;
         }
 
-        Rigidbody.velocity += transform.up * Mathf.Max(velocityY, terminalVelocity);
+        ResetYVelocity(velocityY < terminalVelocity ? terminalVelocity : velocityY);
 
         //Rigidbody.AddForce(horizontalVelocityBoost + currentExternalVelocityBoost, ForceMode.Impulse);
     }
@@ -961,7 +968,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                         return true;
                     }
 
-                    jumped = HandleJump(true, true, InDashMomentumConservationWindow);
+                    jumped = HandleJump(true);
 
                     return
                         Rigidbody.velocity.magnitude < slideCancelThreshold ||
@@ -1033,7 +1040,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                         return true;
                     }
 
-                    if (HandleJump(false, InSlideJumpBoostWindow, true))
+                    if (HandleJump(false))
                     {
                         jumped = true;
                         CommonDashExit(MovementMode.Run);

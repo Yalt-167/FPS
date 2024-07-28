@@ -17,7 +17,6 @@ public class HandleGunAngle : MonoBehaviour
     private void LateUpdate()
     {
         transform.LookAt(GetPointOnCrosshair());
-        print(transform.rotation);
     }
 
     private Vector3 GetPointOnCrosshair()
