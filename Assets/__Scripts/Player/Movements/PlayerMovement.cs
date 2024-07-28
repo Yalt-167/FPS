@@ -140,7 +140,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     [Header("Jump")]
     [SerializeField] private float initialJumpSpeedBoost;
-    [SerializeField] private float slideIntoJumpVelocityBoost;
     private float JumpForce => PlayerFrame?.ChampionStats.MovementStats.JumpStats.JumpForce ?? 180f;
     private float timeLeftGround;
 
@@ -183,6 +182,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private float timeFinishedSliding;
     private bool InSlideJumpBoostWindow => timeFinishedSliding + slideJumpBoostWindow > Time.time;
+    [SerializeField] private float fallIntoSlideVelocityBoost;
 
     [SerializeField] private float slideCameraHeightAdjustmentDuration = .3f;
 
@@ -461,8 +461,24 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void ApplySlowdown(float slowdownForce)
     {
-        /* -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized -> gets the opposite of the velocity while ignoring verticality */
-        Rigidbody.AddForce(slowdownForce * Time.deltaTime * -Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Force);
+        ApplyBoost(-slowdownForce);
+    }
+
+    private void ApplyBoost(float boostForce)
+    {
+        // Rigidbody.velocity.Mask(1f, 0f, 1f).normalized -> gets the velocity while ignoring verticality
+        Rigidbody.AddForce(boostForce * Time.deltaTime * Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Force);
+    }
+
+    private void ApplySlowdownInstant(float slowdownForce)
+    {
+        ApplyBoostInstant(-slowdownForce);
+    }
+
+    private void ApplyBoostInstant(float boostForce)
+    {
+        // Rigidbody.velocity.Mask(1f, 0f, 1f).normalized -> gets the velocity while ignoring verticality
+        Rigidbody.AddForce(boostForce * Time.deltaTime * Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Impulse);
     }
 
     #endregion
@@ -896,9 +912,16 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private IEnumerator Slide(/*bool chainedFromDash*/)
     {
+        var shouldAwardVelocityBoostForFalling = !isCollidingDown;
+
         yield return new WaitUntil(() => isCollidingDown || !inputQuery.HoldSlide); // await the landing to initiate the slide
 
         if (!inputQuery.HoldSlide) { yield break; } // if changed his mind
+
+        if (shouldAwardVelocityBoostForFalling)
+        {
+            ApplyBoost(fallIntoSlideVelocityBoost);
+        }
         
         SetMovementMode(MovementMode.Slide);
         transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
