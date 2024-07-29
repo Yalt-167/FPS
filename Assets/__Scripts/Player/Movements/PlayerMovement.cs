@@ -186,9 +186,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     [Header("Wallrun")]
     [SerializeField] private float sideWallJumpForce;
-    [SerializeField] private Vector3 upwardWallJumpForce;
+    [SerializeField] private float upwardWallJumpForce = 1080f;
     [SerializeField] private float sideWallJumpForceAwayFromWall;
-    [SerializeField] private Vector3 upwardWallJumpForceAwayFromWall;
+    [SerializeField] private float upwardWallJumpForceAwayFromWall = 900f;
     private bool onRight;
     private float timeInterruptedWallrunWithDash = float.NegativeInfinity;
     [SerializeField] private float wallRunForceCoefficient;
@@ -401,6 +401,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     public void SetMovementMode(MovementMode movementMode)
     {
+
         switch (currentMovementMode = movementMode)
         {
             case MovementMode.Run:
@@ -439,6 +440,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                 currentCameraHandlingMethod = () => { };
                 break;
         }
+
+#if LOG_MOVEMENTS_EVENTS
+        print(movementMode);
+#endif
     }
 
     private void ApplySlowdown(float slowdownForce)
@@ -536,12 +541,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         CommonJumpStart();
 
-        // do this with classic Rigidbody.AddForce();
-        //horizontalVelocityBoost += (towardRight ? transform.right : -transform.right) * (awayFromWall ? sideWallJumpForceAwayFromWall : sideWallJumpForce);
-
-        //horizontalVelocityBoost.y = 0f; // just in case (bc of that: Rigidbody.velocity.normalized) (even though it s reset in CommonJumpStart() I had issues with it so better safe than sorry
-
-        Rigidbody.AddForce(awayFromWall ? upwardWallJumpForceAwayFromWall : upwardWallJumpForce, ForceMode.Impulse);
+        var rawForce = transform.right * (awayFromWall ? sideWallJumpForceAwayFromWall : sideWallJumpForce);
+        var forceWithRelevantSide = towardRight ? rawForce : -rawForce;
+        var verticalForce = transform.up * (awayFromWall ? upwardWallJumpForceAwayFromWall : upwardWallJumpForce);
+        Rigidbody.AddForce(forceWithRelevantSide + verticalForce, ForceMode.Impulse);
 
         StartCoroutine(ResetJumping());
     }
@@ -602,7 +605,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             return;
         }
 
-        Crouch(inputQuery.HoldCrouch && isCollidingDown);
+        HandleCrouch(inputQuery.HoldCrouch && isCollidingDown);
     }
 
     private void Run()
@@ -710,38 +713,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         //return wantedMoveVec.x == 0f ? wantedMoveVec.y == 0f ? 0f : wantedMoveVec.y < 0f ? BackwardSpeed : RunningSpeed : wantedMoveVec.y < 0f ? BackwardSpeed : StrafingSpeed;
     }
 
-
-    private void Crouch(bool doIt)
-    {
-        if (doIt)
-        {
-            Crouch();
-        }
-        else
-        {
-            UnCrouch();
-        }
-    }
-
-    private void Crouch()
-    {
-        if (IsCrouching) { return; }
-
-        print("Crouch");
-        IsCrouching = true;
-        transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
-        transform.position -= Vector3.up * .5f;
-    }
-
-    private void UnCrouch()
-    {
-        if (!IsCrouching) { return; }
-
-        print("Uncrouch");
-        IsCrouching = false;
-        transform.position += Vector3.up * .5f;
-        transform.localScale = transform.localScale.Mask(1f, 2f, 1f);
-    }
+    #region Step
 
     private void CheckStep()
     {
@@ -849,9 +821,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             // anyway: should not be climbed
             print("It failed");
             return Vector3.up * float.PositiveInfinity;
-        }       
+        }
     }
-    
+
     private Vector3 GetHighestPointOffCollider_(Collider collider) // update this for it to work with slanted ground too
     {
         // raycasts from above
@@ -869,6 +841,45 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     #endregion
 
+    #region Crouch
+
+    private void HandleCrouch(bool doIt)
+    {
+        if (doIt)
+        {
+            Crouch();
+        }
+        else
+        {
+            UnCrouch();
+        }
+    }
+
+    private void Crouch()
+    {
+        if (IsCrouching) { return; }
+
+        print("Crouch");
+        IsCrouching = true;
+        transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
+        transform.position -= Vector3.up * .5f;
+    }
+
+    private void UnCrouch()
+    {
+        if (!IsCrouching) { return; }
+
+        print("Uncrouch");
+        IsCrouching = false;
+        transform.position += Vector3.up * .5f;
+        transform.localScale = transform.localScale.Mask(1f, 2f, 1f);
+    }
+
+
+    #endregion
+
+    #endregion
+
     #region Slide
 
     private void HandleSlide()
@@ -876,7 +887,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         ApplyGravity();
     }
 
-    private IEnumerator Slide(/*bool chainedFromDash*/)
+    private IEnumerator Slide()
     {
         var shouldAwardVelocityBoostForFalling = !isCollidingDown;
 
@@ -884,26 +895,18 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         if (!inputQuery.HoldSlide) { yield break; } // if changed his mind
 
-        if (shouldAwardVelocityBoostForFalling)
-        {
-            ApplyBoost(fallIntoSlideVelocityBoost);
-        }
+        if (IsSliding) { yield break; } // if somehow the player managed to get there when already sliding
         
+
         SetMovementMode(MovementMode.Slide);
         transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
         transform.position -= Vector3.up * .5f;
 
 
-        //if (chainedFromDash)
-        //{
-        //  var dir = new Vector3(SidewayAxisInput, 0f, ForwardAxisInput);
-        //  horizontalVelocityBoost +=
-        //      (chainedFromDash ? dashIntoSlideVelocityBoost : 1f) * initialSlideBoost * (dir == Vector3.zero ?
-        //          Rigidbody.velocity.Mask(1f, 0, 1f).normalized
-        //          :
-        //          transform.TransformDirection(dir)).normalized;
-        //}
-
+        if (shouldAwardVelocityBoostForFalling)
+        {
+            ApplyBoost(fallIntoSlideVelocityBoost);
+        }
 
         var dashed = false;
         var jumped = false;
