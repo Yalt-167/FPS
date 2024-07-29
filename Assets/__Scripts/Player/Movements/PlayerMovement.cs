@@ -5,12 +5,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.Rendering.Universal.Internal;
 
 [DefaultExecutionOrder(-7)]
 public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 {
+    #region Debug Things
+
     public VelocityDebug GlobalVelocityDebug;
     public VelocityDebug LocalVelocityDebug;
     public VelocityDebug HorizontalVelocityBoostDebug;
@@ -20,6 +20,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private bool doDebugCollidingUp;
     [SerializeField] private bool doDebugCollidinAnySide;
 
+    #endregion
 
     #region References
 
@@ -28,6 +29,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private FollowRotationCamera followRotationCamera;
     private int ForwardAxisInput => MyInput.GetAxis(inputQuery.Back, inputQuery.Forward);
     private int SidewayAxisInput => MyInput.GetAxis(inputQuery.Left, inputQuery.Right);
+    private bool PressingForwardOrStrafeInput => inputQuery.Forward || inputQuery.Left || inputQuery.Right;
     public Vector3 Position => transform.position;
     public Vector3 FeetPosition => transform.position + Vector3.down;
     public float CurrentSpeed => Rigidbody.velocity.Mask(1f, 0f, 1f).magnitude;
@@ -40,10 +42,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     #region State
 
-    public bool IsJumping { get; private set; } = false;
+    private bool IsJumping { get; set; }
     private bool IsRunning => currentMovementMode == MovementMode.Run;
-    private bool IsSprinting => inputQuery.HoldSprint && !IsCrouching && CurrentSpeed > RunningSpeed / 2;
-
+    private bool IsSprinting => !inputQuery.HoldCrouch && PressingForwardOrStrafeInput;
     private bool IsCrouching { get; set; }
     private bool IsSliding => currentMovementMode == MovementMode.Slide;
     private bool IsDashing => currentMovementMode == MovementMode.Dash;
@@ -53,9 +54,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     #endregion
 
-
     #endregion
-
 
     #region Movements Setup
 
@@ -64,15 +63,14 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private float timeToReachMaxSprintSpeed;
     private float targetSpeed;
     [SerializeField] private float airFriction;
-    private float WalkingSpeed => RunningSpeed * .5f;
+    private float CroouchingSpeed => RunningSpeed * .25f;
     private float RunningSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.RunningSpeed ?? 8f;
-    private float SpeedDifferenceBetweenWalkingAndSprinting => RunningSpeed - WalkingSpeed;
+    private float SpeedDifferenceBetweenWalkingAndSprinting => RunningSpeed - CroouchingSpeed;
     //private float StrafingSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeed ?? 7f;
     private float StrafingSpeedCoefficient => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeedCoefficient ?? .75f;
     private float BackwardSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.BackwardSpeed ?? 5f;
     private float WallRunSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.WallRunningSpeed ?? 9f;
 
-    [SerializeField] private float crouhingVelocityCoefficient;
 
     [SerializeField] private float sidewayInertiaControlFactor; // when the direction changes apply it to control inertia and prevent the player from going sideway (former forward)
 
@@ -206,9 +204,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private float cantWallRunAfterDashWindow;
     private bool CanWallRunAfterDash => timeInterruptedWallrunWithDash + cantWallRunAfterDashWindow < Time.time;
 
-    //private void Duration
-
-
     #endregion
 
     #region Ledge Climb Setup
@@ -340,14 +335,14 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void Awake()
     {
-        //Instance = this;
-
         inputQuery.Init();
 
         Rigidbody = GetComponent<Rigidbody>();
         cameraTransform = transform.GetChild(0);
         followRotationCamera = cameraTransform.GetComponent<FollowRotationCamera>();
         cameraOriginalPosition = cameraTransform.localPosition;
+
+        #region Assigning Box Casters
 
         var secondChildTransform = transform.GetChild(1);
         rightCheck = secondChildTransform.GetChild(0).GetComponent<BoxCaster>();
@@ -358,6 +353,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         backStepCheck = secondChildTransform.GetChild(5).GetComponent<BoxCaster>();
         rightStepCheck = secondChildTransform.GetChild(6).GetComponent<BoxCaster>();
         leftStepCheck = secondChildTransform.GetChild(7).GetComponent<BoxCaster>();
+
+        #endregion
 
         cameraTransform.localPosition = cameraTransformPositions[0];
         SetMovementMode(MovementMode.Run);
@@ -374,7 +371,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         _ = inputQuery.HoldRightForTime;
         _ = inputQuery.QuickReset;
         _ = inputQuery.HoldSlide;
-        _ = inputQuery.HoldSprint;
+        _ = inputQuery.HoldCrouch;
 
         currentMovementMethod();
         currentCameraHandlingMethod();
@@ -388,9 +385,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         HorizontalVelocityBoostDebug = new(horizontalVelocityBoost);
 
         // do a layer per level instead with a scriptable object LevelInfo holding all relevant y
-        if (transform.position.y < -50)
+        if (transform.position.y < -50f)
         {
-            transform.position = Vector3.up * 100;
+            transform.position = Vector3.up * 100f;
         }
     }
 
@@ -523,6 +520,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         print("Jumped");
 #endif
 
+        UnCrouch();
         coyoteUsable = false;
         IsJumping = true;
 
@@ -577,47 +575,42 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
 
         Run();
-
-        //if (inputQuery.HoldCrouch)
-        //{
-
-        //}
-
-        if (HandleCrouchActionFromRun())
-        {
-            return;
-        }
+        CheckStep();
 
         if (HandleJump(true))
         {
             return;
         }
-        
+
         if (DashUsable && inputQuery.Dash)
         {
             StartCoroutine(Dash());
             return;
         }
-        
-        else
+
+        if (inputQuery.HoldSlide && CurrentSpeed != 0f) // HoldSlide or InitiateSlide ? -> run some tests
         {
-            if (!isCollidingDown)
+            StartCoroutine(Slide()); // add some kind of coyote threshold where the velocity is conserved even tho the player walked a bit (which should kill his momentum)
+            return;
+        }
+        
+        if (!isCollidingDown)
+        {
+            var sideToWallRunOn = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
+            if (sideToWallRunOn != 0f)
             {
-                var sideToWallRunOn = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
-                if (sideToWallRunOn != 0f)
-                {
-                    StartCoroutine(Wallrun(sideToWallRunOn));
-                    return;
-                }
+                StartCoroutine(Wallrun(sideToWallRunOn));
+                return;
             }
         }
-
-        CheckStep();
 
         if (CheckLedgeClimb(out var ledges))
         {
             LedgeClimb(ledges);
+            return;
         }
+
+        Crouch(inputQuery.HoldCrouch && isCollidingDown);
     }
 
     private void Run()
@@ -687,7 +680,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                 float t = Mathf.Clamp01(timeElapsedSinceStartedSprinting / timeToReachMaxSprintSpeed); // if failing timeToReachMaxSprintSpeed probably reset to 0 in th einspector
                 float currentSpeedRatio = Interpolation.ExponentialLerp(t);
 
-                Rigidbody.velocity = Vector3.Slerp(direction * WalkingSpeed, targetSpeed * direction, currentSpeedRatio);
+                Rigidbody.velocity = Vector3.Slerp(direction * CroouchingSpeed, targetSpeed * direction, currentSpeedRatio);
             }
             else
             {
@@ -716,28 +709,27 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             }
             else
             {
-                return (
+                return 
                         wantedMoveVec.y < 0f ?
                             BackwardSpeed
                             :
-                            inputQuery.HoldSprint && !IsCrouching ?
+                            IsSprinting ?
                                 RunningSpeed
                                 :
-                                WalkingSpeed
-                                ) * (IsCrouching ? crouhingVelocityCoefficient : 1f);
+                                CroouchingSpeed;
             }
         }
         else
         {
             return StrafingSpeedCoefficient * (
                 wantedMoveVec.y < 0f ?
-                BackwardSpeed
-                :
-                inputQuery.HoldSprint && !IsCrouching ?
-                    RunningSpeed
+                    BackwardSpeed
                     :
-                    WalkingSpeed
-                    ) * (IsCrouching ? crouhingVelocityCoefficient : 1f);
+                    IsSprinting ?
+                        RunningSpeed
+                        :
+                        CroouchingSpeed
+                    );
         }
         //return wantedMoveVec.x == 0f ? wantedMoveVec.y == 0f ? 0f : wantedMoveVec.y < 0f ? BackwardSpeed : RunningSpeed : wantedMoveVec.y < 0f ? BackwardSpeed : StrafingSpeed;
     }
@@ -752,7 +744,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         {
             if (IsSprinting)
             {
-                StartCoroutine(Slide()); // add some kind of coyote threshold where the velocity is conserved even tho the player walked a bit (which should kill his momentum)
+                StartCoroutine(Slide());
                 return true;
             }
             else
@@ -765,6 +757,19 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         {
             UnCrouch();
             return false;
+        }
+    }
+
+
+    private void Crouch(bool doIt)
+    {
+        if (doIt)
+        {
+            Crouch();
+        }
+        else
+        {
+            UnCrouch();
         }
     }
 
@@ -1296,16 +1301,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     #endregion
 
-    public void AddExternalForces(Vector3 forceDirection, float force)
-    {
-        currentExternalVelocityBoost += forceDirection * force;
-    }
-
-    public void AddExternalForces(Vector3 force)
-    {
-        currentExternalVelocityBoost += force;
-    }
-
     #region Camera Handling
 
     #region View Bobbing
@@ -1634,3 +1629,6 @@ public struct CollisionDebug
 // airborne -> airfriction using ApplySlowdown(slowdownForce);
 // grounded -> sliding ? groundfriction using ApplySlowdown(slowdownForce) : instant cap;
 // wallrunning => instant cap;
+
+// add a feature where the spread is les significant whe crouching
+// fix the glitch of phasing through floor when spamming slide

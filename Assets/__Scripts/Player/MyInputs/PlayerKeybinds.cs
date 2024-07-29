@@ -28,11 +28,10 @@ public class MovementInputQuery : InputQuery
 
     public FixedKeybind InitiateSlide = new(KeyCode.LeftShift, PlayerActionActivationType.OnKeyDown);
     public FixedKeybind HoldSlide = new(KeyCode.LeftShift, PlayerActionActivationType.OnKeyHeld);
+
     public VariableKeybind HoldCrouch = new(KeyCode.LeftControl, new List<PlayerActionActivationType>() { PlayerActionActivationType.OnKeyHeld, PlayerActionActivationType.Toggle });
 
     public FixedKeybind Dash = new(KeyCode.Alpha9, PlayerActionActivationType.OnKeyDown);
-
-    public VariableKeybind HoldSprint = new(KeyCode.A, new List<PlayerActionActivationType>() { PlayerActionActivationType.OnKeyHeld, PlayerActionActivationType.Toggle });
 
     public FixedKeybind InitiateGrapplingHook = new(KeyCode.X, PlayerActionActivationType.OnKeyDown);
     public FixedKeybind HoldGrapplingHook = new(KeyCode.X, PlayerActionActivationType.OnKeyHeld);
@@ -59,25 +58,20 @@ public class MovementInputQuery : InputQuery
         Left.Init();
         HoldLeftForTime.Init();
 
-
         InitiateJump.Init();
         HoldJump.Init();
         InterruptJump.Init();
 
-
         InitiateSlide.Init();
         HoldSlide.Init();
+        HoldCrouch.Init();
         Dash.Init();
-        HoldSprint.Init();
-
 
         InitiateGrapplingHook.Init();
         HoldGrapplingHook.Init();
         ReleaseGrapplingHook.Init();
 
-
         SwitchCameraPosition.Init();
-
 
         QuickReset.Init();
         Pause.Init();
