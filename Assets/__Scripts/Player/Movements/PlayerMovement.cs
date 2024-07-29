@@ -144,6 +144,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private bool CanUseCoyote => coyoteUsable && !isCollidingDown && timeLeftGround + coyoteTimeThreshold > Time.time;
     private bool HasBufferedJump => isCollidingDown && lastJumpPressed + jumpBuffer > Time.time;
 
+    private bool forceResetJumping;
     #endregion
 
     #region Dash Setup
@@ -519,6 +520,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         UnCrouch();
         coyoteUsable = false;
         IsJumping = true;
+        forceResetJumping = false;
 
         ResetYVelocity();
 
@@ -552,9 +554,12 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private IEnumerator ResetJumping()
     {
         yield return new WaitUntil(
-                () => Rigidbody.velocity.y < 0f || currentMovementMode != MovementMode.Run
+                () => Rigidbody.velocity.y < 0f || forceResetJumping
             );
 
+        print($"Stopped jumping {Rigidbody.velocity.y < 0f} || {forceResetJumping}");
+
+        forceResetJumping = false;
         IsJumping = false;
     }
 
@@ -896,7 +901,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         if (!inputQuery.HoldSlide) { yield break; } // if changed his mind
 
         if (IsSliding) { yield break; } // if somehow the player managed to get there when already sliding
-        
 
         SetMovementMode(MovementMode.Slide);
         transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
@@ -943,7 +947,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         if (dashed) { yield break; }
 
         CommonSlideExit(MovementMode.Run);
-        
     }
 
     private void CommonSlideExit(MovementMode newMovementMode)
@@ -979,6 +982,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         SetMovementMode(MovementMode.Dash);
         dashReady = false;
 
+        forceResetJumping = true;
+
         var slid = false;
         var jumped = false;
         timeDashTriggered = Time.time;
@@ -997,7 +1002,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                     {
                         slid = true;
                         CommonDashExit(MovementMode.Slide);
-                        StartCoroutine(Slide(/*true*/));    
+                        StartCoroutine(Slide());    
                         return true;
                     }
 
@@ -1125,6 +1130,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         if (!inputQuery.Forward || inputQuery.Back || !CanWallRunAfterDash) { yield break; }
 
         SetMovementMode(MovementMode.Wallrun);
+        ResetYVelocity();
 
         onRight = side > 0;
         var forceDirection = onRight ? transform.right : -transform.right;
@@ -1553,4 +1559,4 @@ public struct CollisionDebug
 // wallrunning => instant cap;
 
 // add a feature where the spread is les significant whe crouching
-// fix the glitch of phasing through floor when spamming slide
+// fix the camera when jumping while sliding and still holding the slide key
