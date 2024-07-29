@@ -13,7 +13,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     public VelocityDebug GlobalVelocityDebug;
     public VelocityDebug LocalVelocityDebug;
-    public VelocityDebug HorizontalVelocityBoostDebug;
     public CollisionDebug CollisionDebug;
 
     [SerializeField] private bool doDebugCollidingDown;
@@ -75,14 +74,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private float sidewayInertiaControlFactor; // when the direction changes apply it to control inertia and prevent the player from going sideway (former forward)
 
     private Action currentMovementMethod;
-
-    private Vector3 horizontalVelocityBoost;
-    [SerializeField] private float horizontalVelocityBoostDecayRate;
-
-    private Vector3 currentExternalVelocityBoost;
-    [SerializeField] private float externalVelocityBoostDecayRate;
-
-    [SerializeField] private float minHorizontalVelocityBoostThreshold;
 
     [SerializeField] private float maxStepHeight;
     [SerializeField][Range(0, 90)] private float maxScalableAngle;
@@ -382,7 +373,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         LocalVelocityDebug = new(transform.InverseTransformDirection(Rigidbody.velocity));
         GlobalVelocityDebug = new(Rigidbody.velocity);
         CollisionDebug = new(isCollidingUp, isCollidingDown, isCollidingRight, isCollidingLeft, isCollidingOnAnySide);
-        HorizontalVelocityBoostDebug = new(horizontalVelocityBoost);
 
         // do a layer per level instead with a scriptable object LevelInfo holding all relevant y
         if (transform.position.y < -50f)
@@ -394,13 +384,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private void FixedUpdate()
     {
         RunCollisionChecks();
-
-        // get rid of that eventually
-        horizontalVelocityBoost = Vector3.Lerp(Vector3.zero, horizontalVelocityBoost, horizontalVelocityBoostDecayRate);
-        if (horizontalVelocityBoost.magnitude < minHorizontalVelocityBoostThreshold) { horizontalVelocityBoost = Vector3.zero; }
-
-        currentExternalVelocityBoost = Vector3.Lerp(Vector3.zero, currentExternalVelocityBoost, externalVelocityBoostDecayRate);
-        if (currentExternalVelocityBoost.magnitude < minHorizontalVelocityBoostThreshold) { currentExternalVelocityBoost = Vector3.zero; }
     }
 
     #endregion
@@ -480,6 +463,16 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         Rigidbody.AddForce(boostForce * Time.deltaTime * Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Impulse);
     }
 
+    public void ResetYVelocity()
+    {
+        SetYVelocity(0f);
+    }
+
+    public void SetYVelocity(float newY)
+    {
+        Rigidbody.velocity = new(Rigidbody.velocity.x, newY, Rigidbody.velocity.z);
+    }
+
     #endregion
 
     #region Jump
@@ -488,8 +481,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     /// Returns wether a jump occured
     /// </summary>
     /// <param name="coyoteThresholdAllowed"></param>
-    /// <param name="afterSlide"></param>
-    /// <param name="afterDash"></param>
     /// <returns></returns>
     private bool HandleJump(bool coyoteThresholdAllowed)
     {
@@ -545,9 +536,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         CommonJumpStart();
 
-        horizontalVelocityBoost += (towardRight ? transform.right : -transform.right) * (awayFromWall ? sideWallJumpForceAwayFromWall : sideWallJumpForce);
+        // do this with classic Rigidbody.AddForce();
+        //horizontalVelocityBoost += (towardRight ? transform.right : -transform.right) * (awayFromWall ? sideWallJumpForceAwayFromWall : sideWallJumpForce);
 
-        horizontalVelocityBoost.y = 0f; // just in case (bc of that: Rigidbody.velocity.normalized) (even though it s reset in CommonJumpStart() I had issues with it so better safe than sorry
+        //horizontalVelocityBoost.y = 0f; // just in case (bc of that: Rigidbody.velocity.normalized) (even though it s reset in CommonJumpStart() I had issues with it so better safe than sorry
 
         Rigidbody.AddForce(awayFromWall ? upwardWallJumpForceAwayFromWall : upwardWallJumpForce, ForceMode.Impulse);
 
@@ -622,12 +614,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         var velocityY = Rigidbody.velocity.y;
 
         var localVelocity = transform.InverseTransformDirection(Rigidbody.velocity);
-        var localVelocityBoost = transform.InverseTransformDirection(horizontalVelocityBoost);
 
         if (wantedMoveVec.x == 0f)
         {
             localVelocity = localVelocity.Mask(sidewayInertiaControlFactor, 0f, 1f);
-            localVelocityBoost = localVelocityBoost.Mask(sidewayInertiaControlFactor, 0f, 1f);
         }
         else if (Mathf.Sign(wantedMoveVec.x) != Mathf.Sign(localVelocity.x))
         {
@@ -640,18 +630,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
 
         Rigidbody.velocity = transform.TransformDirection(localVelocity);
-
-        if (Mathf.Sign(wantedMoveVec.x) != Mathf.Sign(localVelocityBoost.x))
-        {
-            localVelocityBoost = localVelocityBoost.Mask(0f, 0f, 1f);
-        }
-
-        if (Mathf.Sign(wantedMoveVec.y) != Mathf.Sign(localVelocityBoost.z))
-        {
-            localVelocityBoost = localVelocityBoost.Mask(1f, 0f, 0f);
-        }
-
-        horizontalVelocityBoost = transform.TransformDirection(localVelocityBoost);
 
         // DumbShit()
         //{
@@ -694,9 +672,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             Rigidbody.velocity = Mathf.Lerp(CurrentSpeed, 0, airFriction) * direction;
         }
 
-        ResetYVelocity(velocityY < terminalVelocity ? terminalVelocity : velocityY);
-
-        //Rigidbody.AddForce(horizontalVelocityBoost + currentExternalVelocityBoost, ForceMode.Impulse);
+        SetYVelocity(velocityY < terminalVelocity ? terminalVelocity : velocityY);
     }
 
     private float CalculateTargetSpeed(Vector2 wantedMoveVec)
@@ -732,32 +708,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                     );
         }
         //return wantedMoveVec.x == 0f ? wantedMoveVec.y == 0f ? 0f : wantedMoveVec.y < 0f ? BackwardSpeed : RunningSpeed : wantedMoveVec.y < 0f ? BackwardSpeed : StrafingSpeed;
-    }
-
-    /// <summary>
-    /// Returns wether the HandleRun() method should return too
-    /// </summary>
-    /// <returns></returns>
-    private bool HandleCrouchActionFromRun()
-    {
-        if (inputQuery.HoldSlide && isCollidingDown)
-        {
-            if (IsSprinting)
-            {
-                StartCoroutine(Slide());
-                return true;
-            }
-            else
-            {
-                Crouch();
-                return false;
-            }
-        }
-        else
-        {
-            UnCrouch();
-            return false;
-        }
     }
 
 
@@ -1025,7 +975,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         SetMovementMode(MovementMode.Dash);
         dashReady = false;
-        ResetVelocityBoost();
 
         var slid = false;
         var jumped = false;
@@ -1128,7 +1077,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         SetMovementMode(MovementMode.LedgeClimb);
         Rigidbody.velocity = Vector3.zero;
-        ResetVelocityBoost();
 
         var elapsedTime = 0f;
         Vector3 startPosition = transform.position;
@@ -1269,35 +1217,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     #region Grapplink Hook
 
     private void HandleGrappling() { }
-
-    #endregion
-
-    #region Velocity
-
-    private void ResetVelocityBoost()
-    {
-        horizontalVelocityBoost = Vector3.zero;
-    }
-
-    public void ResetXVelocity()
-    {
-        Rigidbody.velocity = new(0f, Rigidbody.velocity.y, Rigidbody.velocity.z);
-    }
-
-    public void ResetYVelocity()
-    {
-        Rigidbody.velocity = new(Rigidbody.velocity.x, 0f, Rigidbody.velocity.z);
-    }
-
-    public void ResetYVelocity(float newY)
-    {
-        Rigidbody.velocity = new(Rigidbody.velocity.x, newY, Rigidbody.velocity.z);
-    }
-
-    public void ResetZVelocity()
-    {
-        Rigidbody.velocity = new(Rigidbody.velocity.x, Rigidbody.velocity.y, 0f);
-    }
 
     #endregion
 
