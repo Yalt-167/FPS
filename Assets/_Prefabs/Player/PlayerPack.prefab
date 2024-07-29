@@ -1860,7 +1860,7 @@ MonoBehaviour:
     m_Bits: 64
   initialJumpSpeedBoost: 60
   terminalVelocity: -75
-  afterDashMomentumConservationWindowDuration: 0
+  afterDashMomentumConservationWindowDuration: 0.1
   slideCancelThreshold: 0.3
   slideJumpBoostWindow: 0.2
   slideSlowdownForce: 15000

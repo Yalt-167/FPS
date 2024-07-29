@@ -835,11 +835,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         if (!hasSthToStepOn) { return; }
 
-
         var relevantColliders = colliders.Where(predicate: (collider) => GetHighestPointOffCollider(collider).y <= FeetPosition.y + maxStepHeight).ToList();
 
         if (relevantColliders.Count == 0) { return; }
-
 
         Collider stepToTake = null;
         var highestPointSoFar = float.NegativeInfinity;
@@ -1390,7 +1388,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
     }
 
-    private float TargetRunCameraTiltAngle => MyInput.GetAxis(inputQuery.Right, inputQuery.Left) * maxRunCameraTiltAngle;
+    //private float TargetRunCameraTiltAngle => MyInput.GetAxis(inputQuery.Right, inputQuery.Left) * maxRunCameraTiltAngle;
+    private float TargetRunCameraTiltAngle => MyInput.GetAxis(inputQuery.Right && !isCollidingRight, inputQuery.Left & !isCollidingLeft) * maxRunCameraTiltAngle;
+    //
+    //private float TargetRunCameraTiltAngle => Rigidbody != null ? CurrentStrafeSpeed / Mathf.Abs(CurrentStrafeSpeed) * maxRunCameraTiltAngle : 0f;
     // as dir in {-1, 0, 1} dir * maxRunCameraTiltAngle in {-maxRunCameraTiltAngle, 0 (regulateCameraTilt), maxRunCameraTiltAngle}
 
     [SerializeField] private float runCameraTiltRegulationSpeed;
@@ -1617,6 +1618,7 @@ public struct CollisionDebug
 //}
 
 // crouch slide shenanigans:
+// -> differents keys so no more mess like that and no ned for a sprint key
 // if crouched then sprint -> should cancel crouch and start sprinting
 // if sprint then crouch -> slide
 
