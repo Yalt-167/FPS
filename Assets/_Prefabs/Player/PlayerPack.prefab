@@ -1638,7 +1638,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 169908227
+  GlobalObjectIdHash: 2957232829
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1732,11 +1732,6 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
-  HorizontalVelocityBoostDebug:
-    Overall: 0
-    X: 0
-    Y: 0
-    Z: 0
   CollisionDebug:
     Up: 0
     Down: 0
@@ -1807,15 +1802,15 @@ MonoBehaviour:
       RelevantKey: 304
       howToActivate: 2
       holdForSeconds: 0
+    HoldCrouch:
+      RelevantKey: 306
+      howToActivate: 2
+      holdForSeconds: 0
+      allowedActivationTypes: 0200000003000000
     Dash:
       RelevantKey: 57
       howToActivate: 0
       holdForSeconds: 0
-    HoldSprint:
-      RelevantKey: 97
-      howToActivate: 3
-      holdForSeconds: 0
-      allowedActivationTypes: 0300000002000000
     InitiateGrapplingHook:
       RelevantKey: 120
       howToActivate: 0
@@ -1842,13 +1837,9 @@ MonoBehaviour:
       howToActivate: 0
       holdForSeconds: 0
   currentMovementMode: 0
-  timeToReachMaxSprintSpeed: 3
-  airFriction: 0
-  crouhingVelocityCoefficient: 0.5
+  timeToReachMaxSprintSpeed: 0.5
+  airFriction: 0.1
   sidewayInertiaControlFactor: 0.95
-  horizontalVelocityBoostDecayRate: 0.95
-  externalVelocityBoostDecayRate: 0.95
-  minHorizontalVelocityBoostThreshold: 0
   maxStepHeight: 0.5
   maxScalableAngle: 0
   baseGravity: 120000
@@ -1864,13 +1855,14 @@ MonoBehaviour:
   slideCancelThreshold: 0.3
   slideJumpBoostWindow: 0.2
   slideSlowdownForce: 15000
+  slideSlowdownForceWhenHasDashMomentum: 150000
   slideDownwardForce: 120000
   fallIntoSlideVelocityBoost: 0
   slideCameraHeightAdjustmentDuration: 0.3
   sideWallJumpForce: 100
-  upwardWallJumpForce: {x: 0, y: 1200, z: 0}
+  upwardWallJumpForce: 1080
   sideWallJumpForceAwayFromWall: 13
-  upwardWallJumpForceAwayFromWall: {x: 0, y: 9, z: 0}
+  upwardWallJumpForceAwayFromWall: 900
   wallRunForceCoefficient: 6000
   cantWallRunAfterDashWindow: 0.2
   climbDuration: 0.3

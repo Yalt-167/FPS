@@ -151,7 +151,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     [Header("Dash")]
     [SerializeField] private float afterDashMomentumConservationWindowDuration;
-    private bool InDashMomentumConservationWindow => timeDashTriggered + DashDuration + afterDashMomentumConservationWindowDuration > Time.time;
+    private bool InDashMomentumConservationWindow => timeDashEnded + afterDashMomentumConservationWindowDuration > Time.time;
     private float DashVelocity => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashVelocity ?? 90f;
     private float DashDuration => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashDuration ?? .1f;
     private float DashCooldown => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashCooldown ?? 1f;
@@ -161,6 +161,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private bool DashUsable => dashReady && !dashOnCooldown && (PlayerFrame?.ChampionStats.MovementStats.DashStats.HasDash ?? false);
     private float timeDashTriggered = float.NegativeInfinity;
     private bool ShouldReplenishDash => isCollidingDown || isCollidingLeft || isCollidingRight;
+    private float timeDashEnded = float.NegativeInfinity;
 
     #endregion
 
@@ -170,6 +171,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private float slideCancelThreshold;
     [SerializeField] private float slideJumpBoostWindow;
     [SerializeField] private float slideSlowdownForce;
+    [SerializeField] private float slideSlowdownForceWhenHasDashMomentum;
+
     [SerializeField] private float slideDownwardForce;
 
     private float timeFinishedSliding;
@@ -449,7 +452,12 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void ApplySlowdown(float slowdownForce)
     {
+        var velocity = Rigidbody.velocity.normalized;
         ApplyBoost(-slowdownForce);
+        if (Rigidbody.velocity.normalized != velocity)
+        {
+            Rigidbody.velocity = Rigidbody.velocity.Mask(0f, 1f, 0f);
+        }
     }
 
     private void ApplyBoost(float boostForce)
@@ -466,7 +474,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private void ApplyBoostInstant(float boostForce)
     {
         // Rigidbody.velocity.Mask(1f, 0f, 1f).normalized -> gets the velocity while ignoring verticality
-        Rigidbody.AddForce(boostForce * Time.deltaTime * Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Impulse);
+        Rigidbody.AddForce(boostForce * Rigidbody.velocity.Mask(1f, 0f, 1f).normalized, ForceMode.Impulse);
     }
 
     public void ResetYVelocity()
@@ -663,7 +671,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                 }
 
 
-                float t = Mathf.Clamp01(timeElapsedSinceStartedSprinting / timeToReachMaxSprintSpeed); // if failing timeToReachMaxSprintSpeed probably reset to 0 in th einspector
+                float t = Mathf.Clamp01(timeElapsedSinceStartedSprinting / timeToReachMaxSprintSpeed); // if failing timeToReachMaxSprintSpeed probably reset to 0 in the inspector
                 float currentSpeedRatio = Interpolation.ExponentialLerp(t);
 
                 Rigidbody.velocity = Vector3.Slerp(direction * CroouchingSpeed, targetSpeed * direction, currentSpeedRatio);
@@ -677,7 +685,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
         else
         {
-            Rigidbody.velocity = Mathf.Lerp(CurrentSpeed, 0, airFriction) * direction;
+            float reductionAmount = airFriction * CurrentSpeed * CurrentSpeed * Time.deltaTime;
+            //var lerpedValue = Mathf.Lerp(CurrentSpeed, 0, airFriction * Time.deltaTime);
+            //print(lerpedValue);
+            Rigidbody.velocity = Mathf.Max(CurrentSpeed - reductionAmount, targetSpeed) * direction;
         }
 
         SetYVelocity(velocityY < terminalVelocity ? terminalVelocity : velocityY);
@@ -906,8 +917,14 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
         transform.position -= Vector3.up * .5f;
 
-
-        if (shouldAwardVelocityBoostForFalling)
+        var benefitedFromDashMomentum = InDashMomentumConservationWindow;
+        if (benefitedFromDashMomentum)
+        {
+            print("Got it");
+            var verticalVelocity = Rigidbody.velocity.y;
+            Rigidbody.velocity = DashVelocity * .1f * Rigidbody.velocity.Mask(1f, 0f, 1f).normalized + transform.up * verticalVelocity;
+        }
+        else if (shouldAwardVelocityBoostForFalling)
         {
             ApplyBoost(fallIntoSlideVelocityBoost);
         }
@@ -924,7 +941,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                         Rigidbody.AddForce(slideDownwardForce * Time.deltaTime * -transform.up, ForceMode.Force);
                     }
 
-                    ApplySlowdown(slideSlowdownForce);
+                    ApplySlowdown(benefitedFromDashMomentum && CurrentSpeed > RunningSpeed ? slideSlowdownForceWhenHasDashMomentum : slideSlowdownForce);
 
                     if (DashUsable && inputQuery.Dash)
                     {
@@ -985,7 +1002,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         forceResetJumping = true;
 
         var slid = false;
-        var jumped = false;
         timeDashTriggered = Time.time;
         followRotationCamera.enabled = false;
         var dir = cameraTransform.TransformDirection(SidewayAxisInput, 0f, ForwardAxisInput);
@@ -1006,18 +1022,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                         return true;
                     }
 
-                    if (HandleJump(false))
-                    {
-                        jumped = true;
-                        CommonDashExit(MovementMode.Run);
-                        return true;
-                    }
-
                     return timeDashTriggered + DashDuration < Time.time;
                 }
         );
 
-        if (slid || jumped) { yield break; }
+        if (slid) { yield break; }
         
         var shouldWallrunLeftRight = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
         if (shouldWallrunLeftRight != 0f && !isCollidingDown)
@@ -1034,6 +1043,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private void CommonDashExit(MovementMode newMovementMode)
     {
         followRotationCamera.enabled = true;
+        timeDashEnded = Time.time;
+        ResetYVelocity();
         SetMovementMode(newMovementMode);
         StartCoroutine(StartDashCooldown());
     }
@@ -1560,3 +1571,5 @@ public struct CollisionDebug
 
 // add a feature where the spread is les significant whe crouching
 // fix the camera when jumping while sliding and still holding the slide key
+
+// dash && jump simultaneously -> long jump?
