@@ -596,7 +596,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             return;
         }
 
-        if (inputQuery.HoldSlide && CurrentSpeed != 0f) // HoldSlide or InitiateSlide ? -> run some tests
+        if (inputQuery.InitiateSlide && CurrentSpeed != 0f) // HoldSlide or InitiateSlide ? -> run some tests
         {
             StartCoroutine(Slide(false)); // add some kind of coyote threshold where the velocity is conserved even tho the player walked a bit (which should kill his momentum)
             return;
@@ -905,14 +905,14 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private IEnumerator Slide(bool duringDash)
     {
+        if (IsSliding) { yield break; } // if somehow the player managed to get there when already sliding
+
         print(duringDash);
         var shouldAwardVelocityBoostForFalling = !isCollidingDown;
 
         yield return new WaitUntil(() => isCollidingDown || !inputQuery.HoldSlide); // await the landing to initiate the slide
 
         if (!inputQuery.HoldSlide) { yield break; } // if changed his mind
-
-        if (IsSliding) { yield break; } // if somehow the player managed to get there when already sliding
 
         SetMovementMode(MovementMode.Slide);
         transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
