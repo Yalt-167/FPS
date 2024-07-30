@@ -923,7 +923,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         {
             print("Got it");
             var verticalVelocity = Rigidbody.velocity.y;
-            Rigidbody.velocity = DashVelocity * .1f * Rigidbody.velocity.Mask(1f, 0f, 1f).normalized + transform.up * verticalVelocity;
+            Rigidbody.velocity = DashVelocity * .3f * Rigidbody.velocity.Mask(1f, 0f, 1f).normalized + transform.up * verticalVelocity;
         }
         else if (shouldAwardVelocityBoostForFalling)
         {
