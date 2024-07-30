@@ -598,7 +598,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         if (inputQuery.InitiateSlide && CurrentSpeed != 0f) // HoldSlide or InitiateSlide ? -> run some tests
         {
-            StartCoroutine(Slide(false)); // add some kind of coyote threshold where the velocity is conserved even tho the player walked a bit (which should kill his momentum)
+            StartCoroutine(Slide()); // add some kind of coyote threshold where the velocity is conserved even tho the player walked a bit (which should kill his momentum)
             return;
         }
         
@@ -903,11 +903,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         ApplyGravity();
     }
 
-    private IEnumerator Slide(bool duringDash)
+    private IEnumerator Slide()
     {
         if (IsSliding) { yield break; } // if somehow the player managed to get there when already sliding
 
-        print(duringDash);
         var shouldAwardVelocityBoostForFalling = !isCollidingDown;
 
         yield return new WaitUntil(() => isCollidingDown || !inputQuery.HoldSlide); // await the landing to initiate the slide
@@ -923,7 +922,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         {
             print("Got it");
             var verticalVelocity = Rigidbody.velocity.y;
-            Rigidbody.velocity = DashVelocity * .3f * Rigidbody.velocity.Mask(1f, 0f, 1f).normalized + transform.up * verticalVelocity;
+            Rigidbody.velocity = DashVelocity * .5f * Rigidbody.velocity.Mask(1f, 0f, 1f).normalized + transform.up * verticalVelocity;
         }
         else if (shouldAwardVelocityBoostForFalling)
         {
@@ -1025,19 +1024,22 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                     //Rigidbody.velocity = dashVelocity * cameraTransform.forward; // perhaps do sth less brutal with gradual velocity loss
                     Rigidbody.velocity = DashVelocity * dir; // perhaps do sth less brutal with gradual velocity loss
 
-                    //if (inputQuery.InitiateSlide && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
-                    //{
-                    //    slid = true;
-                    //    CommonDashExit(MovementMode.Slide);
-                    //    StartCoroutine(Slide(true));    
-                    //    return true;
-                    //}
+                    if (inputQuery.InitiateSlide && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
+                    {
+                        slid = true;
+                        return true;
+                    }
 
                     return timeDashTriggered + DashDuration < Time.time;
                 }
         );
 
-        if (slid) { yield break; }
+        if (slid)
+        {
+            CommonDashExit();
+            StartCoroutine(Slide());
+            yield break;
+        }
         
         var shouldWallrunLeftRight = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
         if (shouldWallrunLeftRight != 0f && !isCollidingDown)
@@ -1057,6 +1059,14 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         timeDashEnded = Time.time;
         ResetYVelocity();
         SetMovementMode(newMovementMode);
+        StartCoroutine(StartDashCooldown());
+    }
+
+    private void CommonDashExit()
+    {
+        followRotationCamera.enabled = true;
+        timeDashEnded = Time.time;
+        ResetYVelocity();
         StartCoroutine(StartDashCooldown());
     }
 
@@ -1200,7 +1210,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                 if (inputQuery.InitiateSlide)
                 {
                     CommonWallRunExit(MovementMode.Slide, onRight);
-                    StartCoroutine(Slide(false));
+                    StartCoroutine(Slide());
                     return leftEarly = true;
                 }
 
