@@ -598,7 +598,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         if (inputQuery.HoldSlide && CurrentSpeed != 0f) // HoldSlide or InitiateSlide ? -> run some tests
         {
-            StartCoroutine(Slide()); // add some kind of coyote threshold where the velocity is conserved even tho the player walked a bit (which should kill his momentum)
+            StartCoroutine(Slide(false)); // add some kind of coyote threshold where the velocity is conserved even tho the player walked a bit (which should kill his momentum)
             return;
         }
         
@@ -903,8 +903,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         ApplyGravity();
     }
 
-    private IEnumerator Slide()
+    private IEnumerator Slide(bool duringDash)
     {
+        print(duringDash);
         var shouldAwardVelocityBoostForFalling = !isCollidingDown;
 
         yield return new WaitUntil(() => isCollidingDown || !inputQuery.HoldSlide); // await the landing to initiate the slide
@@ -945,8 +946,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
                     if (DashUsable && inputQuery.Dash)
                     {
-                        CommonSlideExit(MovementMode.Dash);
-                        StartCoroutine(Dash());
                         dashed = true;
                         return true;
                     }
@@ -961,17 +960,27 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                 }
         );
 
-        if (dashed) { yield break; }
+        if (dashed)
+        {
+            CommonSlideExit();
+            StartCoroutine(Dash());
+            yield break;
+        }
 
         CommonSlideExit(MovementMode.Run);
     }
 
     private void CommonSlideExit(MovementMode newMovementMode)
     {
+        CommonSlideExit();
+        SetMovementMode(newMovementMode);
+    }
+
+    private void CommonSlideExit()
+    {
         transform.position += Vector3.up * .5f;
         transform.localScale = transform.localScale.Mask(1f, 2f, 1f);
         timeStoppedSlide = Time.time;
-        SetMovementMode(newMovementMode);
     }
 
     private IEnumerator LerpCameraHeight(bool isReset)
@@ -996,6 +1005,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private IEnumerator Dash()
     {
+        if (IsDashing) { yield break; }
+
         SetMovementMode(MovementMode.Dash);
         dashReady = false;
 
@@ -1014,13 +1025,13 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                     //Rigidbody.velocity = dashVelocity * cameraTransform.forward; // perhaps do sth less brutal with gradual velocity loss
                     Rigidbody.velocity = DashVelocity * dir; // perhaps do sth less brutal with gradual velocity loss
 
-                    if (inputQuery.InitiateSlide && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
-                    {
-                        slid = true;
-                        CommonDashExit(MovementMode.Slide);
-                        StartCoroutine(Slide());    
-                        return true;
-                    }
+                    //if (inputQuery.InitiateSlide && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
+                    //{
+                    //    slid = true;
+                    //    CommonDashExit(MovementMode.Slide);
+                    //    StartCoroutine(Slide(true));    
+                    //    return true;
+                    //}
 
                     return timeDashTriggered + DashDuration < Time.time;
                 }
@@ -1189,7 +1200,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                 if (inputQuery.InitiateSlide)
                 {
                     CommonWallRunExit(MovementMode.Slide, onRight);
-                    StartCoroutine(Slide(/*false*/));
+                    StartCoroutine(Slide(false));
                     return leftEarly = true;
                 }
 
