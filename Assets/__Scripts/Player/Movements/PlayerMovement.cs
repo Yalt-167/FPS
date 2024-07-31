@@ -144,6 +144,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private bool CanUseCoyote => coyoteUsable && !isCollidingDown && timeLeftGround + coyoteTimeThreshold > Time.time;
     private bool HasBufferedJump => isCollidingDown && lastJumpPressed + jumpBuffer > Time.time;
 
+    private bool ShouldLongJump => DashUsable && inputQuery.Dash && inputQuery.Forward;
     private bool forceResetJumping;
     #endregion
 
@@ -378,16 +379,21 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         GlobalVelocityDebug = new(Rigidbody.velocity);
         CollisionDebug = new(isCollidingUp, isCollidingDown, isCollidingRight, isCollidingLeft, isCollidingOnAnySide);
 
-        // do a layer per level instead with a scriptable object LevelInfo holding all relevant y
-        if (transform.position.y < -50f)
-        {
-            transform.position = Vector3.up * 100f;
-        }
+        HandleWhenAtBottomOfMap();
     }
 
     private void FixedUpdate()
     {
         RunCollisionChecks();
+    }
+
+    private void HandleWhenAtBottomOfMap()
+    {
+        // do a layer per level instead with a scriptable object LevelInfo holding all relevant y
+        if (transform.position.y < -50f)
+        {
+            transform.position = Vector3.up * 100f;
+        }
     }
 
     #endregion
@@ -492,13 +498,13 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     #region Jump
 
     /// <summary>
-    /// Returns wether a jump occured
+    /// Returns wether a jump should happen and wether it should be a full one
     /// </summary>
     /// <param name="coyoteThresholdAllowed"></param>
     /// <returns></returns>
-    private bool HandleJump(bool coyoteThresholdAllowed)
+    private (bool, bool) ShouldJump(bool coyoteThresholdAllowed)
     {
-        if (IsJumping) { return false; }
+        if (IsJumping) { return (false, false); }
 
         if (inputQuery.InitiateJump)
         {
@@ -506,17 +512,17 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
             if (CanUseCoyote && coyoteThresholdAllowed || isCollidingDown)
             {
-                Jump(true);
-                return true;
+                //Jump(true);
+                return (true, true);
             }
         }
         else if (HasBufferedJump)
         {
-            Jump(inputQuery.HoldJump);
-            return true;
+            //Jump(inputQuery.HoldJump);
+            return (true, inputQuery.HoldJump);
         }
 
-        return false;
+        return (false, false);
     }
 
     private void CommonJumpStart()
@@ -538,7 +544,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
     }
 
-    private void Jump(bool fullJump)
+    private void Jump(bool fullJump, bool longJump)
     {
         CommonJumpStart();
 
@@ -585,8 +591,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         Run();
         CheckStep();
 
-        if (HandleJump(true))
+        var (shouldJump, shouldBeFullJump) = ShouldJump(true);
+        if (shouldJump)
         {
+            Jump(shouldBeFullJump, ShouldLongJump);
             return;
         }
 
@@ -930,7 +938,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
 
         var dashed = false;
-        var jumped = false;
+        var triedJumping = false;
+        var wouldVeBeenFullJump = false;
 
         yield return new WaitUntil(
             () =>
@@ -949,22 +958,27 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                         return true;
                     }
 
-                    jumped = HandleJump(true);
+                    (triedJumping, wouldVeBeenFullJump) = ShouldJump(true);
 
                     return
                         Rigidbody.velocity.magnitude < slideCancelThreshold ||
                         !inputQuery.HoldSlide ||
-                        jumped
+                        triedJumping
                         ;
                 }
         );
 
-        if (dashed)
+        if (triedJumping)
         {
-            CommonSlideExit();
-            StartCoroutine(Dash());
-            yield break;
+            if (dashed)
+            {
+                CommonSlideExit();
+                StartCoroutine(Dash());
+                yield break;
+            }
+
         }
+
 
         CommonSlideExit(MovementMode.Run);
     }
@@ -1575,7 +1589,7 @@ public struct CollisionDebug
 //    WALLRUN -> instantly corrects your speed to its max
 //    DASH -> instantly sets your velocity to dash velocity
 //    LEDGE_CLIMB -> kills momentum
-//    GRAPPLING -> let you gather speed the further you are from the target you are at the beginning of tyhe grapple action
+//    GRAPPLING -> let you gather speed the further you are from the target you are at the beginning of the grapple action
 //}
 
 // crouch slide shenanigans:
@@ -1593,4 +1607,4 @@ public struct CollisionDebug
 // add a feature where the spread is les significant whe crouching
 // fix the camera when jumping while sliding and still holding the slide key
 
-// dash && jump simultaneously -> long jump?
+// dash && jump simultaneously -> long jump (longer but lower) (only forward)
