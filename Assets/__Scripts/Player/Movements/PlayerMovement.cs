@@ -133,6 +133,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private float initialJumpSpeedBoost;
     private float JumpForce => PlayerFrame?.ChampionStats.MovementStats.JumpStats.JumpForce ?? 1080f;
     private float timeLeftGround;
+    [SerializeField] private Vector3 longJumpForce;
 
     [SerializeField] private float terminalVelocity = -75f;
 
@@ -547,8 +548,16 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private void Jump(bool fullJump, bool longJump)
     {
         CommonJumpStart();
+        
+        if (longJump)
+        {
+            Rigidbody.AddForce(longJumpForce, ForceMode.Impulse);
+        }
+        else
+        {
+            Rigidbody.AddForce((fullJump ? JumpForce : JumpForce / 2) * Vector3.up, ForceMode.Impulse);
+        }
 
-        Rigidbody.AddForce((fullJump ? JumpForce : JumpForce / 2) * Vector3.up, ForceMode.Impulse);
 
         StartCoroutine(ResetJumping());
     }
@@ -1519,7 +1528,15 @@ public enum MovementMode
     Wallrun,
     Dash,
     LedgeClimb,
-    Grappling
+    Grappling,
+}
+
+public enum Actions
+{
+    Jump = 1,
+    Slide = 2,
+    Dash = 4,
+    Grapple = 8,
 }
 
 // run on an angle
@@ -1608,3 +1625,7 @@ public struct CollisionDebug
 // fix the camera when jumping while sliding and still holding the slide key
 
 // dash && jump simultaneously -> long jump (longer but lower) (only forward)
+
+// make the double dash thingy
+
+// make a validatedActionBuffer for keystrokes combo
