@@ -1,4 +1,5 @@
 #define LOG_MOVEMENTS_EVENTS
+#define BUFFER_ACTIONS
 
 using Newtonsoft.Json.Linq;
 using System;
@@ -61,8 +62,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private float validatedActionBufferDuration;
 
     #endregion
-
-
 
     #endregion
 
@@ -468,7 +467,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 #endif
     }
 
-
     #region Action Buffering 
 
     private void BufferAction(MovementAction action, MovementActionParam param)
@@ -504,6 +502,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         return null;
     }
 
+    #region Ended up not using  binary flags
+
     private bool HasOneBit(int number)
     {
         while (number > 0)
@@ -532,6 +532,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     }
 
     #endregion
+
+    #endregion
+
+    #region Velocity Alteration
 
     private void ApplySlowdown(float slowdownForce)
     {
@@ -569,6 +573,8 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         Rigidbody.velocity = new(Rigidbody.velocity.x, newY, Rigidbody.velocity.z);
     }
+
+    #endregion
 
     #endregion
 
@@ -1062,7 +1068,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         if (triedJumping)
         {
-
+            Jump(wouldVeBeenFullJump, dashed && inputQuery.Forward);
+            CommonSlideExit(MovementMode.Run);
+            yield break;
         }
 
         if (dashed)
@@ -1075,9 +1083,9 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         CommonSlideExit(MovementMode.Run);
     }
 
-    private void SlideAction(MovementActionParam _)
+    private void SlideAction(MovementActionParam __)
     {
-        StartCoroutine(Slide());
+        _ = StartCoroutine(Slide());
     }
 
     private void CommonSlideExit(MovementMode newMovementMode)
@@ -1152,21 +1160,22 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             yield break;
         }
         
-        var shouldWallrunLeftRight = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
-        if (shouldWallrunLeftRight != 0f && !isCollidingDown)
+        if (!isCollidingDown)
         {
-            CommonDashExit(MovementMode.Wallrun);
-            StartCoroutine(Wallrun(shouldWallrunLeftRight));
+            var shouldWallrunLeftRight = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
+            if (shouldWallrunLeftRight != 0f)
+            {
+                CommonDashExit(MovementMode.Wallrun);
+                StartCoroutine(Wallrun(shouldWallrunLeftRight));
+            }
         }
-        else
-        {
-            CommonDashExit(MovementMode.Run);
-        }
+
+        CommonDashExit(MovementMode.Run);
     }
 
-    private void DashAction(MovementActionParam _)
+    private void DashAction(MovementActionParam __)
     {
-        StartCoroutine(Dash());
+        _ = StartCoroutine(Dash());
     }
 
     private void CommonDashExit(MovementMode newMovementMode)
@@ -1624,6 +1633,7 @@ public enum MovementMode
     Grappling,
 }
 
+# region Movement Actions
 
 // ACTIONS ANCHORS
 
@@ -1663,10 +1673,7 @@ public struct JumpActionParam : MovementActionParam
 
 //public struct DashActionParam : MovementActionParam { }
 
-
-
-
-
+#endregion
 
 
 // run on an angle
@@ -1759,3 +1766,5 @@ public struct CollisionDebug
 // make the double dash thingy
 
 // make a validatedActionBuffer for keystrokes combo
+
+//  ? make the slide give a boost anyway just wait till totally on ground to give it
