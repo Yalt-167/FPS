@@ -1314,14 +1314,16 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                 {
                     CommonWallRunExit(MovementMode.Run, onRight);
                     WallJump(!onRight, onRight ? inputQuery.Left : inputQuery.Right);
-                    return leftEarly = true;
+                    leftEarly = true;
+                    return  true;
                 }
 
                 if (dashReady && inputQuery.Dash)
                 {   
                     CommonWallRunExit(MovementMode.Dash, onRight);
                     StartCoroutine(Dash());
-                    return leftEarly = true;
+                    leftEarly = true;
+                    return true;
                 }
 
                 
@@ -1329,20 +1331,23 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
                 {
                     CommonWallRunExit(MovementMode.LedgeClimb, onRight);
                     LedgeClimb(ledgesEncountered);
-                    return leftEarly = true;
+                    leftEarly = true;
+                    return true;
                 }
 
                 if (inputQuery.InitiateSlide)
                 {
                     CommonWallRunExit(MovementMode.Slide, onRight);
                     StartCoroutine(Slide());
-                    return leftEarly = true;
+                    leftEarly = true;
+                    return true;
                 }
 
                 if (!isCollidingOnAnySide) { return true; } // out of the final return bc didn t work for reasons that are beyond me
 
                 return
                     inputQuery.Back ||
+                    !inputQuery.Forward ||
                     onRight ? inputQuery.HoldLeftForTime : inputQuery.HoldRightForTime
                     ;
             }
@@ -1768,3 +1773,6 @@ public struct CollisionDebug
 // make a validatedActionBuffer for keystrokes combo
 
 //  ? make the slide give a boost anyway just wait till totally on ground to give it
+
+
+// make a lerping implementation of crouch/slide colllider adjustment
