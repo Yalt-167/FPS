@@ -1,5 +1,6 @@
 #define LOG_MOVEMENTS_EVENTS
 
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -52,6 +53,16 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private bool IsGrappling => currentMovementMode == MovementMode.Grappling;
 
     #endregion
+
+    #region Action Buffering Setup
+
+    private List<MovementActionData> bufferedActions = new();
+
+    [SerializeField] private float validatedActionBufferDuration;
+
+    #endregion
+
+
 
     #endregion
 
@@ -176,10 +187,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private float slideSlowdownForceWhenHasDashMomentum;
 
     [SerializeField] private float slideDownwardForce;
+    [SerializeField] private float fallIntoSlideVelocityBoost;
 
     private float timeFinishedSliding;
     private bool InSlideJumpBoostWindow => timeFinishedSliding + slideJumpBoostWindow > Time.time;
-    [SerializeField] private float fallIntoSlideVelocityBoost;
 
     [SerializeField] private float slideCameraHeightAdjustmentDuration = .3f;
 
@@ -457,6 +468,71 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 #endif
     }
 
+
+    #region Action Buffering 
+
+    private void BufferAction(MovementAction action, MovementActionParam param)
+    {
+        StartCoroutine(TriggerBufferAction(action, param));
+    }
+
+    private IEnumerator TriggerBufferAction(MovementAction action, MovementActionParam param)
+    {
+        var startTime = Time.time;
+
+        bufferedActions.Add(new(action, param));
+
+        yield return new WaitUntil(() => startTime + validatedActionBufferDuration < Time.time || bufferedActions.Count > 1);
+
+        _ = bufferedActions.Select(selector: (actionData) => PerformActions(actionData.Action, actionData.Param));
+
+        bufferedActions.Clear();
+    }
+
+    private object PerformActions(MovementAction action, MovementActionParam param)
+    {
+        Action<MovementActionParam> relevantMethod = action switch
+        {
+            MovementAction.Jump => JumpAction,
+            MovementAction.Slide => SlideAction,
+            MovementAction.Dash => DashAction,
+            _ => (_) => { }
+        };
+
+        relevantMethod(param);
+
+        return null;
+    }
+
+    private bool HasOneBit(int number)
+    {
+        while (number > 0)
+        {
+            if (number % 2 == 1)
+            {
+                return true;
+            }
+            number /= 2;
+        }
+
+        return false;
+    }
+
+    private int CountOneBitsInNumber(int number)
+    {
+        var cnt = 0;
+
+        while (number > 0)
+        {
+            cnt += number % 2;
+            number /= 2;
+        }
+
+        return cnt;
+    }
+
+    #endregion
+
     private void ApplySlowdown(float slowdownForce)
     {
         var velocity = Rigidbody.velocity.normalized;
@@ -560,6 +636,13 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
 
         StartCoroutine(ResetJumping());
+    }
+
+    private void JumpAction(MovementActionParam param)
+    {
+        var jumpActionParam = (JumpActionParam)param;
+
+        Jump(jumpActionParam.FullJump, jumpActionParam.LongJump);
     }
 
     private void WallJump(bool towardRight, bool awayFromWall)
@@ -979,17 +1062,22 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         if (triedJumping)
         {
-            if (dashed)
-            {
-                CommonSlideExit();
-                StartCoroutine(Dash());
-                yield break;
-            }
 
         }
 
+        if (dashed)
+        {
+            CommonSlideExit();
+            StartCoroutine(Dash());
+            yield break;
+        }
 
         CommonSlideExit(MovementMode.Run);
+    }
+
+    private void SlideAction(MovementActionParam _)
+    {
+        StartCoroutine(Slide());
     }
 
     private void CommonSlideExit(MovementMode newMovementMode)
@@ -1074,6 +1162,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         {
             CommonDashExit(MovementMode.Run);
         }
+    }
+
+    private void DashAction(MovementActionParam _)
+    {
+        StartCoroutine(Dash());
     }
 
     private void CommonDashExit(MovementMode newMovementMode)
@@ -1531,13 +1624,50 @@ public enum MovementMode
     Grappling,
 }
 
-public enum Actions
+
+// ACTIONS ANCHORS
+
+public enum MovementAction
 {
-    Jump = 1,
-    Slide = 2,
-    Dash = 4,
-    Grapple = 8,
+    Jump,
+    Slide,
+    Dash,
 }
+
+public struct MovementActionData
+{
+    public MovementAction Action;
+    public MovementActionParam Param;
+
+    public MovementActionData(MovementAction action, MovementActionParam param)
+    {
+        Action = action;
+        Param = param;
+    }
+}
+
+public interface MovementActionParam { }
+
+public struct JumpActionParam : MovementActionParam
+{
+    public bool FullJump;
+    public bool LongJump;
+    public JumpActionParam(bool fullJump, bool longJump)
+    {
+        FullJump = fullJump;
+        LongJump = longJump;
+    }
+}
+
+//public struct SlideActionParam : MovementActionParam { }
+
+//public struct DashActionParam : MovementActionParam { }
+
+
+
+
+
+
 
 // run on an angle
 
