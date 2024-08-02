@@ -33,6 +33,8 @@ public class HandleGunAngle : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        if (!Application.isPlaying) {  return; }
+
         Gizmos.color = Color.red;
         Gizmos.DrawLine(cameraTransform.position, cameraTransform.forward * 1000f);
     }

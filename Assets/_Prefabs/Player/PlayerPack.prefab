@@ -1525,6 +1525,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sensitivity: 4
+  cameraRollLerpCoefficient: 0.5
 --- !u!1 &5705630700605972737
 GameObject:
   m_ObjectHideFlags: 0
@@ -1638,7 +1639,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2957232829
+  GlobalObjectIdHash: 169908227
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1837,6 +1838,7 @@ MonoBehaviour:
       howToActivate: 0
       holdForSeconds: 0
   currentMovementMode: 0
+  validatedActionBufferDuration: 0
   timeToReachMaxSprintSpeed: 0.5
   airFriction: 0.1
   sidewayInertiaControlFactor: 0.95
@@ -1850,6 +1852,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   initialJumpSpeedBoost: 60
+  longJumpForce: {x: 0, y: 0, z: 0}
   terminalVelocity: -75
   afterDashMomentumConservationWindowDuration: 0.1
   slideCancelThreshold: 0.3
@@ -1875,15 +1878,17 @@ MonoBehaviour:
   speedThresholdToTriggerViewBobbing: 6
   timeToRegulateBobbingOffset: 0.3
   speedThresholdToReachMaxViewBobbingIntensity: 6
+  cameraTiltLeniencyToExtent: 0.1
   maxRunCameraTiltAngle: 1
   maxRunCameraTiltSpeed: 1
-  runCameraTiltLeniencyToExtent: 0.1
   runCameraTiltRegulationSpeed: 5
   slideTiltOnRight: 1
   maxSlideCameraTiltAngle: 10
   slideCameraTiltSpeed: 1
-  slideCameraTiltLeniencyToExtent: 0.1
   slideCameraTiltRegulationSpeed: 5
+  maxDashCameraTiltAngle: 50
+  maxDashCameraTiltSpeed: 1
+  dashCameraTiltRegulationSpeed: 5
 --- !u!114 &669408356608229932
 MonoBehaviour:
   m_ObjectHideFlags: 0

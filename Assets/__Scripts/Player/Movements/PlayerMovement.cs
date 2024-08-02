@@ -256,6 +256,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
 
     private bool slideCameraHandlingCoroutineActive;
+    private int dashCameraSideHandlingCoroutineActive; // 0 isn t 1 is tilting -1 is regulating
 
     #endregion
 
@@ -447,7 +448,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             case MovementMode.Dash:
                 currentGravityForce = noGravity;
                 currentMovementMethod = HandleDash;
-                currentCameraHandlingMethod = () => { };
+                currentCameraHandlingMethod = HandleDashCamera;
                 break;
 
             case MovementMode.LedgeClimb:
@@ -1448,12 +1449,16 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     #endregion
 
+    [Header("Camera Tilt")]
+    [SerializeField] private float cameraTiltLeniencyToExtent;
+
+
+
     #region Run Camera Tilt
 
     [Header("Run Camera Tilt")]
     [SerializeField] private float maxRunCameraTiltAngle;
     [SerializeField] private float maxRunCameraTiltSpeed;
-    [SerializeField] private float runCameraTiltLeniencyToExtent;
     // this name sucks but basically
     // the leniency to the clamp (maxCameraTilt / noCameraTilt) so the lerp doesn t run forever and at some point
     // (when the difference currentCameraTilt -> extent < leniency) the value snaps to the extent
@@ -1466,13 +1471,13 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
         set
         {
-            if (Mathf.Abs(value - maxRunCameraTiltAngle) < runCameraTiltLeniencyToExtent && TargetRunCameraTiltAngle != 0)
+            if (Mathf.Abs(value - maxRunCameraTiltAngle) < cameraTiltLeniencyToExtent && TargetRunCameraTiltAngle != 0)
             {
                 currentRunCameraTiltAngle = maxRunCameraTiltAngle * Mathf.Sign(value);
                 return;
             }
 
-            if (Mathf.Abs(value) < runCameraTiltLeniencyToExtent && TargetRunCameraTiltAngle == 0)
+            if (Mathf.Abs(value) < cameraTiltLeniencyToExtent && TargetRunCameraTiltAngle == 0)
             {
                 currentRunCameraTiltAngle = 0;
                 return;
@@ -1515,7 +1520,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [SerializeField] private bool slideTiltOnRight;
     [SerializeField] private float maxSlideCameraTiltAngle;
     [SerializeField] private float slideCameraTiltSpeed;
-    [SerializeField] private float slideCameraTiltLeniencyToExtent;
     // this name sucks but basically
     // the leniency to the clamp (maxCameraTilt / noCameraTilt) so the lerp doesn t run forever and at some point
     // (when the difference currentCameraTilt -> extent < leniency) the value snaps to the extent
@@ -1528,13 +1532,13 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
         set
         {
-            if (Mathf.Abs(value - maxSlideCameraTiltAngle) < slideCameraTiltLeniencyToExtent && TargetSlideCameraTiltAngle != 0)
+            if (Mathf.Abs(value - maxSlideCameraTiltAngle) < cameraTiltLeniencyToExtent && TargetSlideCameraTiltAngle != 0)
             {
                 currentSlideCameraTiltAngle = maxSlideCameraTiltAngle * Mathf.Sign(value);
                 return;
             }
 
-            if (Mathf.Abs(value) < slideCameraTiltLeniencyToExtent && TargetSlideCameraTiltAngle == 0)
+            if (Mathf.Abs(value) < cameraTiltLeniencyToExtent && TargetSlideCameraTiltAngle == 0)
             {
                 currentSlideCameraTiltAngle = 0;
                 return;
@@ -1585,6 +1589,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
 
     }
+
     private void HandleSlideCameraTilt(float targetAngle)
     {
         CurrentSlideCameraTiltAngle = Mathf.Lerp(CurrentSlideCameraTiltAngle, targetAngle, (targetAngle == 0f ? slideCameraTiltRegulationSpeed : slideCameraTiltSpeed) * Time.deltaTime);
@@ -1597,7 +1602,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [Header("Dash Camera Tilt")]
     [SerializeField] private float maxDashCameraTiltAngle;
     [SerializeField] private float maxDashCameraTiltSpeed;
-    [SerializeField] private float dashCameraTiltLeniencyToExtent;
     // this name sucks but basically
     // the leniency to the clamp (maxCameraTilt / noCameraTilt) so the lerp doesn t run forever and at some point
     // (when the difference currentCameraTilt -> extent < leniency) the value snaps to the extent
@@ -1610,13 +1614,13 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
         set
         {
-            if (Mathf.Abs(value - currentDashCameraTiltAngle) < dashCameraTiltLeniencyToExtent && TargetDashCameraTiltAngle != 0)
+            if (Mathf.Abs(value - currentDashCameraTiltAngle) < cameraTiltLeniencyToExtent && TargetDashCameraSideTiltAngle != 0)
             {
                 currentDashCameraTiltAngle = maxRunCameraTiltAngle * Mathf.Sign(value);
                 return;
             }
 
-            if (Mathf.Abs(value) < dashCameraTiltLeniencyToExtent && TargetDashCameraTiltAngle == 0)
+            if (Mathf.Abs(value) < cameraTiltLeniencyToExtent && TargetDashCameraSideTiltAngle == 0)
             {
                 currentDashCameraTiltAngle = 0;
                 return;
@@ -1627,7 +1631,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     }
 
     //private float TargetRunCameraTiltAngle => MyInput.GetAxis(inputQuery.Right, inputQuery.Left) * maxRunCameraTiltAngle;
-    private float TargetDashCameraTiltAngle => IsDashing ? MyInput.GetAxis(inputQuery.Right && !isCollidingRight, inputQuery.Left & !isCollidingLeft) * maxDashCameraTiltAngle : 0f;
+    private float TargetDashCameraSideTiltAngle => IsDashing ? dashSide * maxDashCameraTiltAngle : 0f;
     //
     //private float TargetRunCameraTiltAngle => Rigidbody != null ? CurrentStrafeSpeed / Mathf.Abs(CurrentStrafeSpeed) * maxRunCameraTiltAngle : 0f;
     // as dir in {-1, 0, 1} dir * maxRunCameraTiltAngle in {-maxRunCameraTiltAngle, 0 (regulateCameraTilt), maxRunCameraTiltAngle}
@@ -1637,12 +1641,35 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void HandleDashCamera()
     {
-        HandleDashCameraTilt();
+        if (dashCameraSideHandlingCoroutineActive == 0)
+        {
+            StartCoroutine(HandleDashSideCameraCoroutine(TargetDashCameraSideTiltAngle));
+        }
     }
 
-    private void HandleDashCameraTilt()
+    private IEnumerator HandleDashSideCameraCoroutine(float targetAngle)
     {
-        var targetAngle = TargetDashCameraTiltAngle;
+        dashCameraSideHandlingCoroutineActive = 1;
+
+        while (Mathf.Abs(CurrentDashCameraTiltAngle) != maxDashCameraTiltAngle)
+        {
+            HandleDashCameraTilt(targetAngle);
+            yield return null;
+        }
+
+        dashCameraSideHandlingCoroutineActive = -1;
+
+        while (CurrentDashCameraTiltAngle != 0 && dashCameraSideHandlingCoroutineActive != 1)
+        {
+            HandleDashCameraTilt(0f); // regulate until the player slides again
+            yield return null;
+        }
+
+        dashCameraSideHandlingCoroutineActive = -1;
+    }
+
+    private void HandleDashCameraTilt(float targetAngle)
+    {
         CurrentDashCameraTiltAngle = Mathf.Lerp(CurrentDashCameraTiltAngle, targetAngle, (targetAngle == 0 ? dashCameraTiltRegulationSpeed : maxDashCameraTiltSpeed) * Time.deltaTime);
     }
 
