@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
 public class FollowRotationCamera : MonoBehaviour
@@ -13,6 +14,8 @@ public class FollowRotationCamera : MonoBehaviour
 
     private static readonly string MouseXAxis = "Mouse X";
     private static readonly string MouseYAxis = "Mouse Y";
+    [SerializeField] private float cameraRollLerpCoefficient;
+    private float cameraRollAngle;
    
 
     private void Awake()
@@ -26,14 +29,13 @@ public class FollowRotationCamera : MonoBehaviour
         // around x-axis(and z with the cameraTilt thingy)
         xRotation -= Input.GetAxis(MouseYAxis) * sensitivity;
         xRotation = Mathf.Clamp(xRotation, -89f, 89f); // Clamp in order to avoid doing a flip when looking up/down too intensely
-        //transform.localRotation = Quaternion.Euler(xRotation, 0f, playerMovement.CurrentWallRunCameraTilt);
-        //transform.localRotation = Quaternion.Euler(xRotation, 0f, playerMovement.CurrentRunCameraTiltAngle);
-        transform.localRotation = Quaternion.Euler(xRotation, 0f, playerMovement.RelevantCameraTiltAngle);
+
+        cameraRollAngle = Mathf.Lerp(transform.localRotation.eulerAngles.z, playerMovement.RelevantCameraTiltAngle, cameraRollLerpCoefficient);
+        transform.localRotation = Quaternion.Euler(xRotation, 0f, cameraRollAngle);
 
         // around y-axis
         yRotation += Input.GetAxis(MouseXAxis) * sensitivity;
         playerTransform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
-
     }
 }
 

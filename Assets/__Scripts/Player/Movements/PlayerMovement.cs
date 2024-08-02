@@ -174,6 +174,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     private float timeDashTriggered = float.NegativeInfinity;
     private bool ShouldReplenishDash => isCollidingDown || isCollidingLeft || isCollidingRight;
     private float timeDashEnded = float.NegativeInfinity;
+    private int dashSide; // -1 left 0 not a side 1 right
 
     #endregion
 
@@ -247,7 +248,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
             MovementMode.Run => CurrentRunCameraTiltAngle,
             MovementMode.Slide => CurrentSlideCameraTiltAngle,
             MovementMode.Wallrun => CurrentWallRunCameraTilt,
-            MovementMode.Dash => 0f,
+            MovementMode.Dash => CurrentDashCameraTiltAngle,
             MovementMode.LedgeClimb => 0f,
             MovementMode.Grappling => 0f,
             _ => 0f
@@ -1133,9 +1134,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         var slid = false;
         timeDashTriggered = Time.time;
         followRotationCamera.enabled = false;
-        var dir = cameraTransform.TransformDirection(SidewayAxisInput, 0f, ForwardAxisInput);
+        dashSide = SidewayAxisInput;
+        var dir = cameraTransform.TransformDirection(dashSide, 0f, ForwardAxisInput);
 
         dir = dir == Vector3.zero ? cameraTransform.forward : dir;
+
         
         yield return new WaitUntil(
             () =>
@@ -1500,11 +1503,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void HandleRunCameraTilt()
     {
-        HandleRunCameraTiltInternal(TargetRunCameraTiltAngle); 
-    }
-
-    private void HandleRunCameraTiltInternal(float targetAngle)
-    {
+        var targetAngle = TargetRunCameraTiltAngle;
         CurrentRunCameraTiltAngle = Mathf.Lerp(CurrentRunCameraTiltAngle, targetAngle, (targetAngle == 0 ? runCameraTiltRegulationSpeed : maxRunCameraTiltSpeed) * Time.deltaTime);
     }
 
@@ -1592,6 +1591,63 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     }
 
     #endregion
+
+    #region Dash Camera Handling
+
+    [Header("Dash Camera Tilt")]
+    [SerializeField] private float maxDashCameraTiltAngle;
+    [SerializeField] private float maxDashCameraTiltSpeed;
+    [SerializeField] private float dashCameraTiltLeniencyToExtent;
+    // this name sucks but basically
+    // the leniency to the clamp (maxCameraTilt / noCameraTilt) so the lerp doesn t run forever and at some point
+    // (when the difference currentCameraTilt -> extent < leniency) the value snaps to the extent
+    private float currentDashCameraTiltAngle;
+    public float CurrentDashCameraTiltAngle
+    {
+        get
+        {
+            return currentDashCameraTiltAngle;
+        }
+        set
+        {
+            if (Mathf.Abs(value - currentDashCameraTiltAngle) < dashCameraTiltLeniencyToExtent && TargetDashCameraTiltAngle != 0)
+            {
+                currentDashCameraTiltAngle = maxRunCameraTiltAngle * Mathf.Sign(value);
+                return;
+            }
+
+            if (Mathf.Abs(value) < dashCameraTiltLeniencyToExtent && TargetDashCameraTiltAngle == 0)
+            {
+                currentDashCameraTiltAngle = 0;
+                return;
+            }
+
+            currentDashCameraTiltAngle = value;
+        }
+    }
+
+    //private float TargetRunCameraTiltAngle => MyInput.GetAxis(inputQuery.Right, inputQuery.Left) * maxRunCameraTiltAngle;
+    private float TargetDashCameraTiltAngle => IsDashing ? MyInput.GetAxis(inputQuery.Right && !isCollidingRight, inputQuery.Left & !isCollidingLeft) * maxDashCameraTiltAngle : 0f;
+    //
+    //private float TargetRunCameraTiltAngle => Rigidbody != null ? CurrentStrafeSpeed / Mathf.Abs(CurrentStrafeSpeed) * maxRunCameraTiltAngle : 0f;
+    // as dir in {-1, 0, 1} dir * maxRunCameraTiltAngle in {-maxRunCameraTiltAngle, 0 (regulateCameraTilt), maxRunCameraTiltAngle}
+
+    [SerializeField] private float dashCameraTiltRegulationSpeed;
+
+
+    private void HandleDashCamera()
+    {
+        HandleDashCameraTilt();
+    }
+
+    private void HandleDashCameraTilt()
+    {
+        var targetAngle = TargetDashCameraTiltAngle;
+        CurrentDashCameraTiltAngle = Mathf.Lerp(CurrentDashCameraTiltAngle, targetAngle, (targetAngle == 0 ? dashCameraTiltRegulationSpeed : maxDashCameraTiltSpeed) * Time.deltaTime);
+    }
+
+    #endregion
+
 
     #endregion
 
