@@ -1,4 +1,4 @@
-#define LOG_MOVEMENTS_EVENTS
+//#define LOG_MOVEMENTS_EVENTS
 #define BUFFER_ACTIONS
 
 using Newtonsoft.Json.Linq;
@@ -12,6 +12,11 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 {
     #region Debug Things
+
+    [SerializeField] private bool Tilting;
+    [SerializeField] private bool Regulating;
+    [SerializeField] private bool Idle;
+
 
     public VelocityDebug GlobalVelocityDebug;
     public VelocityDebug LocalVelocityDebug;
@@ -245,7 +250,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     public float RelevantCameraTiltAngle => currentMovementMode switch
         {
-            MovementMode.Run => CurrentRunCameraTiltAngle,
+            MovementMode.Run => CurrentDashCameraTiltAngle == 0 ? CurrentRunCameraTiltAngle : CurrentDashCameraTiltAngle,
             MovementMode.Slide => CurrentSlideCameraTiltAngle,
             MovementMode.Wallrun => CurrentWallRunCameraTilt,
             MovementMode.Dash => CurrentDashCameraTiltAngle,
@@ -1629,7 +1634,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     }
 
     //private float TargetRunCameraTiltAngle => MyInput.GetAxis(inputQuery.Right, inputQuery.Left) * maxRunCameraTiltAngle;
-    private float TargetDashCameraSideTiltAngle => IsDashing ? dashSide * maxDashCameraTiltAngle : 0f;
+    private float TargetDashCameraSideTiltAngle => IsDashing ? -dashSide * maxDashCameraTiltAngle : 0f;
     //
     //private float TargetRunCameraTiltAngle => Rigidbody != null ? CurrentStrafeSpeed / Mathf.Abs(CurrentStrafeSpeed) * maxRunCameraTiltAngle : 0f;
     // as dir in {-1, 0, 1} dir * maxRunCameraTiltAngle in {-maxRunCameraTiltAngle, 0 (regulateCameraTilt), maxRunCameraTiltAngle}
@@ -1639,7 +1644,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void HandleDashCamera()
     {
-        if (dashCameraSideHandlingCoroutineActive <= 0)
+        if (dashCameraSideHandlingCoroutineActive == 0)
         {
             StartCoroutine(HandleDashSideCameraCoroutine(TargetDashCameraSideTiltAngle));
         }
@@ -1647,27 +1652,31 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private IEnumerator HandleDashSideCameraCoroutine(float targetAngle)
     {
+        if (targetAngle == 0) { yield break; }
+
         print($"been here with value: {targetAngle}");
         dashCameraSideHandlingCoroutineActive = 1;
-
-        print("tilting");
+        Idle = false;
+        Tilting = true;
         while (CurrentDashCameraTiltAngle != targetAngle)
         {
             HandleDashCameraTilt(targetAngle);
             yield return null;
         }
 
+        Tilting = false;
         dashCameraSideHandlingCoroutineActive = -1;
 
-        print("regulating");
-        while (CurrentDashCameraTiltAngle != 0 && dashCameraSideHandlingCoroutineActive <= 0)
+        Regulating = true;
+        while (CurrentDashCameraTiltAngle != 0 && dashCameraSideHandlingCoroutineActive == -1)
         {
             HandleDashCameraTilt(0f); // regulate until the player slides again
             yield return null;
         }
 
+        Regulating = false;
         dashCameraSideHandlingCoroutineActive = 0;
-        print("exit");
+        Idle = true;
     }
 
     private void HandleDashCameraTilt(float targetAngle)

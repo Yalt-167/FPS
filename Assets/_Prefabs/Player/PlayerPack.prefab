@@ -1639,7 +1639,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 169908227
+  GlobalObjectIdHash: 2957232829
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1723,6 +1723,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d0411c429844e04797b5b0eccc8a3f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Tilting: 0
+  Regulating: 0
+  Idle: 0
   GlobalVelocityDebug:
     Overall: 0
     X: 0
@@ -1886,9 +1889,9 @@ MonoBehaviour:
   maxSlideCameraTiltAngle: 10
   slideCameraTiltSpeed: 1
   slideCameraTiltRegulationSpeed: 5
-  maxDashCameraTiltAngle: 50
-  maxDashCameraTiltSpeed: 50
-  dashCameraTiltRegulationSpeed: 5
+  maxDashCameraTiltAngle: 4
+  maxDashCameraTiltSpeed: 2
+  dashCameraTiltRegulationSpeed: 3
 --- !u!114 &669408356608229932
 MonoBehaviour:
   m_ObjectHideFlags: 0
