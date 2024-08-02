@@ -1452,8 +1452,6 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     [Header("Camera Tilt")]
     [SerializeField] private float cameraTiltLeniencyToExtent;
 
-
-
     #region Run Camera Tilt
 
     [Header("Run Camera Tilt")]
@@ -1616,7 +1614,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         {
             if (Mathf.Abs(value - currentDashCameraTiltAngle) < cameraTiltLeniencyToExtent && TargetDashCameraSideTiltAngle != 0)
             {
-                currentDashCameraTiltAngle = maxRunCameraTiltAngle * Mathf.Sign(value);
+                currentDashCameraTiltAngle = maxDashCameraTiltAngle * Mathf.Sign(value);
                 return;
             }
 
@@ -1641,7 +1639,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void HandleDashCamera()
     {
-        if (dashCameraSideHandlingCoroutineActive == 0)
+        if (dashCameraSideHandlingCoroutineActive <= 0)
         {
             StartCoroutine(HandleDashSideCameraCoroutine(TargetDashCameraSideTiltAngle));
         }
@@ -1649,9 +1647,11 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private IEnumerator HandleDashSideCameraCoroutine(float targetAngle)
     {
+        print($"been here with value: {targetAngle}");
         dashCameraSideHandlingCoroutineActive = 1;
 
-        while (Mathf.Abs(CurrentDashCameraTiltAngle) != maxDashCameraTiltAngle)
+        print("tilting");
+        while (CurrentDashCameraTiltAngle != targetAngle)
         {
             HandleDashCameraTilt(targetAngle);
             yield return null;
@@ -1659,13 +1659,15 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
         dashCameraSideHandlingCoroutineActive = -1;
 
-        while (CurrentDashCameraTiltAngle != 0 && dashCameraSideHandlingCoroutineActive != 1)
+        print("regulating");
+        while (CurrentDashCameraTiltAngle != 0 && dashCameraSideHandlingCoroutineActive <= 0)
         {
             HandleDashCameraTilt(0f); // regulate until the player slides again
             yield return null;
         }
 
-        dashCameraSideHandlingCoroutineActive = -1;
+        dashCameraSideHandlingCoroutineActive = 0;
+        print("exit");
     }
 
     private void HandleDashCameraTilt(float targetAngle)

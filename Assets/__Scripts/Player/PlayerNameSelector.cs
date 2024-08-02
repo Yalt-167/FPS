@@ -150,7 +150,7 @@ public class PlayerNameSelector : NetworkBehaviour
 #if PLAYER_PACK_ARCHITECTURE
             EnablePlayerServerRpc(playerName);
 #else
-            //RequestSpawnPlayerServerRpc(playerName, rpcParams.Receive.SenderClientId);
+            RequestSpawnPlayerServerRpc(playerName, rpcParams.Receive.SenderClientId);
 #endif
         }
     }

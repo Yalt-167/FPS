@@ -1887,7 +1887,7 @@ MonoBehaviour:
   slideCameraTiltSpeed: 1
   slideCameraTiltRegulationSpeed: 5
   maxDashCameraTiltAngle: 50
-  maxDashCameraTiltSpeed: 1
+  maxDashCameraTiltSpeed: 50
   dashCameraTiltRegulationSpeed: 5
 --- !u!114 &669408356608229932
 MonoBehaviour:
