@@ -1556,6 +1556,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     // as dir in {-1, 0, 1} dir * maxRunCameraTiltAngle in {-maxRunCameraTiltAngle, 0 (regulateCameraTilt), maxRunCameraTiltAngle}
 
     [SerializeField] private float slideCameraTiltRegulationSpeed;
+    [SerializeField] private AnimationCurve dashCameraTiltCurve;
 
 
     private void HandleSlideCamera()
@@ -1605,7 +1606,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     [Header("Dash Camera Tilt")]
     [SerializeField] private float maxDashCameraTiltAngle;
-    [SerializeField] private float maxDashCameraTiltSpeed;
+    [SerializeField] private float dashCameraTiltDuration;
     // this name sucks but basically
     // the leniency to the clamp (maxCameraTilt / noCameraTilt) so the lerp doesn t run forever and at some point
     // (when the difference currentCameraTilt -> extent < leniency) the value snaps to the extent
@@ -1640,7 +1641,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     //private float TargetRunCameraTiltAngle => Rigidbody != null ? CurrentStrafeSpeed / Mathf.Abs(CurrentStrafeSpeed) * maxRunCameraTiltAngle : 0f;
     // as dir in {-1, 0, 1} dir * maxRunCameraTiltAngle in {-maxRunCameraTiltAngle, 0 (regulateCameraTilt), maxRunCameraTiltAngle}
 
-    [SerializeField] private float dashCameraTiltRegulationSpeed;
+    [SerializeField] private float dashCameraTiltRegulationDuration;
 
 
     private void HandleDashCamera()
@@ -1651,11 +1652,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
     }
 
-    private IEnumerator HandleDashSideCameraCoroutine(float targetAngle)
+    private IEnumerator HandleDashSideCameraCoroutine_(float targetAngle)
     {
         if (targetAngle == 0) { yield break; }
 
-        print($"been here with value: {targetAngle}");
         dashCameraSideHandlingCoroutineActive = 1;
         Idle = false;
         Tilting = true;
@@ -1679,10 +1679,48 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         dashCameraSideHandlingCoroutineActive = dashCameraSideHandlingCoroutineActive == 1? 1 : 0;
         Idle = true;
     }
+    
+    private IEnumerator HandleDashSideCameraCoroutine(float targetAngle)
+    {
+        if (targetAngle == 0) { yield break; }
+
+        dashCameraSideHandlingCoroutineActive = 1;
+        Idle = false;
+        Tilting = true;
+        var elapsedTime = 0f;
+        while (elapsedTime < dashCameraTiltDuration)
+        {
+            HandleDashCameraTilt(targetAngle, elapsedTime / dashCameraTiltDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        Tilting = false;
+        dashCameraSideHandlingCoroutineActive = -1;
+
+        Regulating = true;
+        elapsedTime = 0f;
+        while (elapsedTime < dashCameraTiltRegulationDuration && dashCameraSideHandlingCoroutineActive == -1)
+        {
+            HandleDashCameraTilt(0f, elapsedTime / dashCameraTiltRegulationDuration); // regulate until the player slides again
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        Regulating = false;
+        dashCameraSideHandlingCoroutineActive = dashCameraSideHandlingCoroutineActive == 1 ? 1 : 0;
+        Idle = true;
+    }
 
     private void HandleDashCameraTilt(float targetAngle)
     {
-        CurrentDashCameraTiltAngle = Mathf.Lerp(CurrentDashCameraTiltAngle, targetAngle, (targetAngle == 0 ? dashCameraTiltRegulationSpeed : maxDashCameraTiltSpeed) * Time.deltaTime);
+        CurrentDashCameraTiltAngle = Mathf.Lerp(CurrentDashCameraTiltAngle, targetAngle, (targetAngle == 0 ? dashCameraTiltRegulationDuration : dashCameraTiltDuration) * Time.deltaTime);
+    }
+
+    private void HandleDashCameraTilt(float targetAngle, float t)
+    {
+        float easedT = dashCameraTiltCurve.Evaluate(t);
+        CurrentDashCameraTiltAngle = Mathf.Lerp(CurrentDashCameraTiltAngle, targetAngle, easedT);
     }
 
     #endregion
