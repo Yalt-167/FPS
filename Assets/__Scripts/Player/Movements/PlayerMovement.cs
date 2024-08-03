@@ -1645,7 +1645,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
 
     private void HandleDashCamera()
     {
-        if (dashCameraSideHandlingCoroutineActive == 0)
+        if (dashCameraSideHandlingCoroutineActive <= 0)
         {
             StartCoroutine(HandleDashSideCameraCoroutine(TargetDashCameraSideTiltAngle));
         }
@@ -1676,7 +1676,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         }
 
         Regulating = false;
-        dashCameraSideHandlingCoroutineActive = 0;
+        dashCameraSideHandlingCoroutineActive = dashCameraSideHandlingCoroutineActive == 1? 1 : 0;
         Idle = true;
     }
 
