@@ -1132,6 +1132,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         if (IsDashing) { yield break; }
 
+        dashSide = SidewayAxisInput;
         SetMovementMode(MovementMode.Dash);
         dashReady = false;
 
@@ -1140,7 +1141,7 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
         var slid = false;
         timeDashTriggered = Time.time;
         followRotationCamera.enabled = false;
-        dashSide = SidewayAxisInput;
+        //print($"dashSide: {dashSide}");
         var dir = cameraTransform.TransformDirection(dashSide, 0f, ForwardAxisInput);
 
         dir = dir == Vector3.zero ? cameraTransform.forward : dir;

@@ -33,7 +33,7 @@ public class FollowRotationCamera : MonoBehaviour
 
         //cameraRollAngle = Mathf.Lerp(transform.localRotation.eulerAngles.z, playerMovement.RelevantCameraTiltAngle, cameraRollLerpCoefficient);
         //transform.localRotation = Quaternion.Euler(xRotation, 0f, cameraRollAngle);
-        print(playerMovement.RelevantCameraTiltAngle);
+        //print(playerMovement.RelevantCameraTiltAngle);
         transform.localRotation = Quaternion.Euler(xRotation, 0f, playerMovement.RelevantCameraTiltAngle);
 
         // around y-axis
