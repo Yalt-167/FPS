@@ -306,21 +306,25 @@ public sealed class Game : NetworkManager
 #if LOG_METHOD_CALLS
         LogMethodCall();
 #endif
-#if DEBUG_MULTIPLAYER
-        print($"[Debug Multiplayer] list was taken from here {IsServer}");
-#endif
+
         SetPlayerListClientRpc(players);
     }
 
     [ClientRpc]
     private void SetPlayerListClientRpc(List<NetworkedPlayer> players_)
     {
-#if DEBUG_MULTIPLAYER
-        print("Updated Existing List");
+#if LOG_METHOD_CALLS
+        LogMethodCall();
 #endif
         
         players = players_;
 #if DEBUG_MULTIPLAYER
+        print($"[Debug Multiplayer] Count: {players_.Count}");
+        foreach (var player in players_)
+        {
+            print(player.Name);
+        }
+
         foreach (var player in players)
         {
             print(player.Name);

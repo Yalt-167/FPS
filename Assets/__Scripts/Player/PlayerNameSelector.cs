@@ -66,9 +66,6 @@ public class PlayerNameSelector : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-#if LOG_METHOD_CALLS
-        LogMethodCall();
-#endif
         base.OnNetworkSpawn();
         transform.GetChild(
             #if PLAYER_PACK_ARCHITECTURE
@@ -81,9 +78,6 @@ public class PlayerNameSelector : NetworkBehaviour
 
     private void Init()
     {
-#if LOG_METHOD_CALLS
-        LogMethodCall();
-#endif
         wasInitialized = true;
 
         labelStyle = new(GUI.skin.label)
@@ -147,9 +141,6 @@ public class PlayerNameSelector : NetworkBehaviour
     [ServerRpc]
     private void CheckWetherNameAvailableServerRpc(NetworkSerializableString playerName, ServerRpcParams rpcParams = default)
     {
-#if LOG_METHOD_CALLS
-        LogMethodCall();
-#endif
 
         if (Game.Manager.PlayerWithNameExist(playerName))
         {
@@ -169,9 +160,6 @@ public class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.Server)]
     private void EnablePlayerServerRpc(NetworkSerializableString playerName)
     {
-#if LOG_METHOD_CALLS
-        LogMethodCall();
-#endif
         ActivatePlayerPackArchitectureClientRpc(playerName);
 
         //DeactivateLoginPromptClientRpc();
