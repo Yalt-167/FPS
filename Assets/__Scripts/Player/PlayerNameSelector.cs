@@ -1,12 +1,13 @@
 #define PLAYER_PACK_ARCHITECTURE
 #define LOG_EVENTS
+#define LOG_METHOD_CALLS
 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using System;
+using static DebugUtility;
 
 
 public class PlayerNameSelector : NetworkBehaviour
@@ -65,6 +66,9 @@ public class PlayerNameSelector : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+#if LOG_METHOD_CALLS
+        LogMethodCall();
+#endif
         base.OnNetworkSpawn();
         transform.GetChild(
             #if PLAYER_PACK_ARCHITECTURE
@@ -77,6 +81,9 @@ public class PlayerNameSelector : NetworkBehaviour
 
     private void Init()
     {
+#if LOG_METHOD_CALLS
+        LogMethodCall();
+#endif
         wasInitialized = true;
 
         labelStyle = new(GUI.skin.label)
@@ -140,6 +147,10 @@ public class PlayerNameSelector : NetworkBehaviour
     [ServerRpc]
     private void CheckWetherNameAvailableServerRpc(NetworkSerializableString playerName, ServerRpcParams rpcParams = default)
     {
+#if LOG_METHOD_CALLS
+        LogMethodCall();
+#endif
+
         if (Game.Manager.PlayerWithNameExist(playerName))
         {
             SetErrorMessageClientRpc(new($"Name {playerName} is already in use!"));
@@ -158,6 +169,9 @@ public class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.Server)]
     private void EnablePlayerServerRpc(NetworkSerializableString playerName)
     {
+#if LOG_METHOD_CALLS
+        LogMethodCall();
+#endif
         ActivatePlayerPackArchitectureClientRpc(playerName);
 
         //DeactivateLoginPromptClientRpc();
@@ -199,6 +213,9 @@ public class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void ActivatePlayerPackArchitectureClientRpc(NetworkSerializableString playerName)
     {
+#if LOG_METHOD_CALLS
+        LogMethodCall();
+#endif
         GetComponent<PlayerMovement>().enabled = true;
         GetComponent<PlayerCombat>().enabled = true;
 

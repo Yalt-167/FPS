@@ -988,7 +988,10 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         if (IsCrouching) { return; }
 
+#if LOG_MOVEMENTS_EVENTS
         print("Crouch");
+#endif
+
         IsCrouching = true;
         transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
         transform.position -= Vector3.up * .5f;
@@ -998,16 +1001,19 @@ public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         if (!IsCrouching) { return; }
 
+#if LOG_MOVEMENTS_EVENTS
         print("Uncrouch");
+#endif
+
         IsCrouching = false;
         transform.position += Vector3.up * .5f;
         transform.localScale = transform.localScale.Mask(1f, 2f, 1f);
     }
 
 
-    #endregion
+#endregion
 
-    #endregion
+#endregion
 
     #region Slide
 
@@ -1771,7 +1777,7 @@ public enum MovementMode
     Grappling,
 }
 
-# region Movement Actions
+#region Movement Actions
 
 // ACTIONS ANCHORS
 
@@ -1829,7 +1835,7 @@ public struct JumpActionParam : MovementActionParam
 // fix the bug when jumping left/right forever untils it keeps one or the other direction even though I press the
 // other
 
-# region Debug
+#region Debug
 
 [Serializable]
 public struct VelocityDebug

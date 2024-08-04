@@ -1,4 +1,5 @@
-//#define DEBUG_MULTIPLAYER
+#define DEBUG_MULTIPLAYER
+#define LOG_METHOD_CALLS
 
 using System;
 using System.Collections;
@@ -10,6 +11,7 @@ using System.Linq;
 using Random = UnityEngine.Random;
 using UnityEditor;
 using System.Text;
+using static DebugUtility;
 
 
 [DefaultExecutionOrder(-99)]
@@ -31,6 +33,9 @@ public sealed class Game : NetworkManager
     [Rpc(SendTo.Server)]
     public void RegisterPlayerServerRpc(NetworkedPlayerPrimitive player)
     {
+#if LOG_METHOD_CALLS
+        LogMethodCall();
+#endif
         RegisterPlayerInternalClientRpc(player);
     }
 
@@ -38,7 +43,7 @@ public sealed class Game : NetworkManager
     private void RegisterPlayerInternalClientRpc(NetworkedPlayerPrimitive player)
     {
 #if DEBUG_MULTIPLAYER
-        print("Added a player");
+        print("[Debug Multiplayer] Added a player");
 #endif
         players.Add(player.AsNetworkedPlayer());
     }
@@ -296,10 +301,13 @@ public sealed class Game : NetworkManager
     [ServerRpc]
     public void RetrieveExistingPlayerListServerRpc()
     {
-        //if (!IsServer) { return; }
+        if (!IsServer) { return; }
 
+#if LOG_METHOD_CALLS
+        LogMethodCall();
+#endif
 #if DEBUG_MULTIPLAYER
-        print($"list was taken from here {IsServer}");
+        print($"[Debug Multiplayer] list was taken from here {IsServer}");
 #endif
         SetPlayerListClientRpc(players);
     }
@@ -312,6 +320,12 @@ public sealed class Game : NetworkManager
 #endif
         
         players = players_;
+#if DEBUG_MULTIPLAYER
+        foreach (var player in players)
+        {
+            print(player.Name);
+        }
+#endif
     }
 
 

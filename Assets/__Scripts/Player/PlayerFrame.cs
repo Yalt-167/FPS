@@ -62,7 +62,7 @@ public class PlayerFrame : NetworkBehaviour
 
         playerName = playerName_;
 
-        var hasNetworkObject = GetComponent<NetworkObject>() ?? throw new System.Exception("Does not have");
+        _ = GetComponent<NetworkObject>() ?? throw new System.Exception("Does not have a network object");
         
         Game.Manager.RegisterPlayerServerRpc(new(playerName, NetworkObjectId));
 
@@ -86,6 +86,7 @@ public class PlayerFrame : NetworkBehaviour
         playerMovement = GetComponent<PlayerMovement>();
         playerMovement.InitPlayerFrame(this);
 
+
         //playerName = playerName_;
     }
 
@@ -98,6 +99,8 @@ public class PlayerFrame : NetworkBehaviour
 
         return new(playerName, NetworkObjectId);
     }
+
+    #region Toggle Controls
 
     public void ToggleGameControls(bool towardOn)
     {
@@ -123,6 +126,8 @@ public class PlayerFrame : NetworkBehaviour
         // those two may cause issues when destroying the script on remote players // chekc when loggin concurrently
     }
 
+    #endregion
+
     //[ServerRpc]
     //private void RequestPlayersDataServerRpc(ulong requestingClientID)
     //{
@@ -144,6 +149,7 @@ public class PlayerFrame : NetworkBehaviour
             if (client.ClientId == targetID)
             {
                 SendPlayerNameClientRpc(new NetworkSerializableString(playerName), requestingID);
+                return;
             }
         }
     }
