@@ -5,12 +5,19 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 public class LobbyHandler : MonoBehaviour
 {
     public static LobbyHandler DebugInstance;
+
+    public Lobby hostLobby;
+    private readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
+    private float heartbeatTimer; // what pings the lobby for it to stay active when not interacted with (in seconds)
+
     private async void Start()
     {
         DebugInstance = this;
@@ -21,6 +28,24 @@ public class LobbyHandler : MonoBehaviour
 
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
     }
+
+    private void Update()
+    {
+        HandleHeartbeat();
+    }
+
+    private async void HandleHeartbeat()
+    {
+        if (hostLobby != null) {  return; }
+
+        heartbeatTimer += Time.deltaTime;
+        if (heartbeatTimer >= heartbeat)
+        {
+            await LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
+            heartbeatTimer = 0f;
+        }
+    }
+
 
     public static void SignInCallback()
     {
@@ -38,7 +63,7 @@ public class LobbyHandler : MonoBehaviour
 
         try
         {
-            await LobbyService.Instance.CreateLobbyAsync(lobbyName, lobbyCapacity, lobbyOptions);
+            DebugInstance.hostLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, lobbyCapacity, lobbyOptions);
         }
         catch (LobbyServiceException exception)
         {
@@ -46,7 +71,7 @@ public class LobbyHandler : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Successfully created a new lobby named {lobbyName} with {lobbyCapacity} slots");
+        Debug.Log($"Successfully created a new lobby named {DebugInstance.hostLobby.Name} with {DebugInstance.hostLobby.MaxPlayers} slots");
     }
 
     [MenuItem("Developer/Lobby/Edit")]
