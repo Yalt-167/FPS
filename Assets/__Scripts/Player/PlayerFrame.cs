@@ -23,6 +23,7 @@ public class PlayerFrame : NetworkBehaviour
     private PlayerHealthNetworked playerHealth;
 
     private PlayerMovement playerMovement;
+    private NetworkedPlayerPrimitive player;
 
     //private HandlePlayerNetworkBehaviour handlePlayerNetworkBehaviour;
 
@@ -61,10 +62,13 @@ public class PlayerFrame : NetworkBehaviour
         ToggleCursor(false);
 
         playerName = playerName_;
+        player = new(playerName, NetworkObjectId);
 
         _ = GetComponent<NetworkObject>() ?? throw new System.Exception("Does not have a network object");
         
-        Game.Manager.RegisterPlayerServerRpc(new(playerName, NetworkObjectId));
+        Game.Manager.RetrieveExistingPlayerListServerRpc();
+        Game.Manager.RegisterPlayerServerRpc(player);
+
 
         //Game.Manager.UpdatePlayerListServerRpc();
 

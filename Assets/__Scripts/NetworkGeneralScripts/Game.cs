@@ -1,4 +1,4 @@
-#define DEBUG_MULTIPLAYER
+//#define DEBUG_MULTIPLAYER
 #define LOG_METHOD_CALLS
 
 using System;
@@ -21,15 +21,8 @@ public sealed class Game : NetworkManager
 
     #region Player List
 
-    private readonly NetworkedPlayer NO_PLAYER = new();
     public List<NetworkedPlayer> players = new();
 
-    /// <summary>
-    ///  returns ur absolute ID (fancy word for index in playerList)<br/>
-    ///  this ID ensure faster retrieval
-    /// </summary>
-    /// <param name="player"></param>
-    /// <returns></returns>
     [Rpc(SendTo.Server)]
     public void RegisterPlayerServerRpc(NetworkedPlayerPrimitive player)
     {
@@ -42,6 +35,7 @@ public sealed class Game : NetworkManager
     [Rpc(SendTo.ClientsAndHost)]
     private void RegisterPlayerInternalClientRpc(NetworkedPlayerPrimitive player)
     {
+
 #if DEBUG_MULTIPLAYER
         print("[Debug Multiplayer] Added a player");
 #endif
@@ -49,9 +43,11 @@ public sealed class Game : NetworkManager
     }
 
 
-    public void DiscardPlayer(ushort playerID)
+    public void DisconnectPlayer(ushort playerID)
     {
-        players[playerID] = NO_PLAYER;
+        var player = players[playerID];
+        player.Online = false;
+        players[playerID] = player;
     }
 
     /// <summary>
@@ -282,7 +278,7 @@ public sealed class Game : NetworkManager
         return asPrimitives;
     }
 
-    [ClientRpc]
+    [Rpc(SendTo.ClientsAndHost)]
     private void UpdatePlayerListClientRpc(NetworkedPlayerPrimitive[] playerPrimitives)
     {
 #if DEBUG_MULTIPLAYER
@@ -298,7 +294,7 @@ public sealed class Game : NetworkManager
     }
 
 
-    [ServerRpc]
+    [Rpc(SendTo.Server)]
     public void RetrieveExistingPlayerListServerRpc()
     {
         if (!IsServer) { return; }
@@ -376,8 +372,6 @@ public sealed class Game : NetworkManager
     }
 
     #endregion
-
-    [field: SerializeField] public Settings GameSettings { get; private set; }
 
     private void Awake()
     {
@@ -457,6 +451,7 @@ public struct NetworkedPlayer
     //public HandlePlayerNetworkBehaviour BehaviourHandler;
     public WeaponHandler WeaponHandler;
     public PlayerHealthNetworked Health;
+    public bool Online;
 
     public NetworkedPlayer(
         string name,
@@ -475,6 +470,7 @@ public struct NetworkedPlayer
         //BehaviourHandler = behaviourHandler;
         WeaponHandler = weaponHandler;
         Health = health;
+        Online = true;
     }
 
     public readonly string GetInfos()

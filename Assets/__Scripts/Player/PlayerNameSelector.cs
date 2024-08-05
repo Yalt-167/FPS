@@ -74,7 +74,21 @@ public class PlayerNameSelector : NetworkBehaviour
                 0
             #endif
             ).gameObject.SetActive(IsOwner);
+
+        //TestServerRpc();
     }
+
+    //[Rpc(SendTo.Server)]
+    //private void TestServerRpc()
+    //{
+    //    TestClientRpc();
+    //}
+
+    //[Rpc(SendTo.ClientsAndHost)]
+    //private void TestClientRpc()
+    //{
+    //    print("this was called here");
+    //}
 
     private void Init()
     {
@@ -98,10 +112,10 @@ public class PlayerNameSelector : NetworkBehaviour
 
         promptActive = IsOwner;
 
-        if (IsOwner)
-        {
-            Game.Manager.RetrieveExistingPlayerListServerRpc();
-        }
+        //if (IsOwner)
+        //{
+        //    Game.Manager.RetrieveExistingPlayerListServerRpc();
+        //}
     }
 
     private void OnGUI()
@@ -201,9 +215,6 @@ public class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void ActivatePlayerPackArchitectureClientRpc(NetworkSerializableString playerName)
     {
-#if LOG_METHOD_CALLS
-        LogMethodCall();
-#endif
         GetComponent<PlayerMovement>().enabled = true;
         GetComponent<PlayerCombat>().enabled = true;
 
