@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
@@ -87,24 +88,94 @@ public class LobbyHandler : MonoBehaviour
     }
 
     [MenuItem("Developer/Lobby/Join")]
-    public static async void JoinLobby()
+    public static async void JoinLobby()// so far only joinds the first lobby
     {
-        throw new System.NotImplementedException();
+        var lobby = await EnumerateLobbiesAsync();
+
+        if (lobby == null) { return; }
+
+        try
+        {
+            await LobbyService.Instance.JoinLobbyByIdAsync(lobby.Results[0].Id);
+        }
+        catch (LobbyServiceException exception)
+        {
+            Debug.Log(exception.Message);
+        }
+
+        Debug.Log("Succesufully joined lobby");
     }
 
     [MenuItem("Developer/Lobby/List")]
     public static async void ListLobbies()
     {
-        QueryResponse response = await Lobbies.Instance.QueryLobbiesAsync();
-
-        Debug.Log($"Found {response.Results.Count} lobbies matching your criteria, namely:");
-
-        foreach (var lobby in response.Results)
+        try
         {
-            Debug.Log($"{lobby.Name} ({lobby.MaxPlayers})");
+            //QueryLobbiesOptions options = new QueryLobbiesOptions()
+            //{
+            //    Count = 25,
+            //    Filters = new List<QueryFilter>()
+            //    {
+            //        new QueryFilter(QueryFilter.FieldOptions.Name, "testLobby", QueryFilter.OpOptions.EQ),
+            //        new QueryFilter(QueryFilter.FieldOptions.AvailableSlots, "5", QueryFilter.OpOptions.LT),
+            //    },
+            //    Order = new List<QueryOrder>()
+            //    {
+            //        new QueryOrder(true, QueryOrder.FieldOptions.Name),
+            //    }
+
+            //};
+
+            //QueryResponse response = await Lobbies.Instance.QueryLobbiesAsync(options);
+
+            var lobbies = await EnumerateLobbiesAsync();
+
+            if (lobbies == null) { return; }
+
+            Debug.Log($"Found {lobbies.Results.Count} lobbies matching your criteria, namely:");
+
+            foreach (var lobby in lobbies.Results)
+            {
+                Debug.Log($"{lobby.Name} ({lobby.MaxPlayers})");
+            }
+        }
+        catch (LobbyServiceException exception)
+        {
+            Debug.Log(exception.Message);
         }
     }
 
+
+    public static async Task<QueryResponse>? EnumerateLobbiesAsync()
+    {
+        try
+        {
+            QueryLobbiesOptions options = new QueryLobbiesOptions()
+            {
+                Count = 25,
+                Filters = new List<QueryFilter>()
+                {
+                    new QueryFilter(QueryFilter.FieldOptions.Name, "that ll do for now", QueryFilter.OpOptions.EQ),
+                    new QueryFilter(QueryFilter.FieldOptions.AvailableSlots, "5", QueryFilter.OpOptions.LT),
+                },
+                Order = new List<QueryOrder>()
+                {
+                    new QueryOrder(true, QueryOrder.FieldOptions.Name),
+                }
+
+            };
+
+            QueryResponse response = await Lobbies.Instance.QueryLobbiesAsync(options);
+
+            return response;
+        }
+        catch (LobbyServiceException exception)
+        {
+            Debug.Log(exception.Message);
+        }
+
+        return null;
+    }
 #pragma warning enable
 
 
