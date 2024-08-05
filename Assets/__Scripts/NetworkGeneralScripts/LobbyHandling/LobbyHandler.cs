@@ -1,15 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
+using UnityEditor;
 using UnityEngine;
 
 public class LobbyHandler : MonoBehaviour
 {
+    public static LobbyHandler DebugInstance;
     private async void Start()
     {
+        DebugInstance = this;
+
         await UnityServices.InitializeAsync();
 
         AuthenticationService.Instance.SignedIn += SignInCallback;
@@ -17,14 +22,15 @@ public class LobbyHandler : MonoBehaviour
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
     }
 
-    private void SignInCallback()
+    public static void SignInCallback()
     {
         Debug.Log($"Signed in as {AuthenticationService.Instance.PlayerId}");
     }
 
 #pragma warning disable
 
-    private async void CreateLobby()
+    [MenuItem("Developer/Lobby/Create")]
+    public static async void CreateLobby()
     {
         var lobbyName = "that ll do for now";
         var lobbyCapacity = 4;
@@ -43,24 +49,26 @@ public class LobbyHandler : MonoBehaviour
         Debug.Log($"Successfully created a new lobby named {lobbyName} with {lobbyCapacity} slots");
     }
 
-    private async void EditLobby()
+    [MenuItem("Developer/Lobby/Edit")]
+    public static async void EditLobby()
     {
         throw new System.NotImplementedException();
     }
 
-
-    private async void DeleteLobby()
+    [MenuItem("Developer/Lobby/Delete")]
+    public static async void DeleteLobby()
     {
         throw new System.NotImplementedException();
     }
 
-    private async void JoinLobby()
+    [MenuItem("Developer/Lobby/Join")]
+    public static async void JoinLobby()
     {
         throw new System.NotImplementedException();
     }
 
-
-    private async void ListLobbies()
+    [MenuItem("Developer/Lobby/List")]
+    public static async void ListLobbies()
     {
         QueryResponse response = await Lobbies.Instance.QueryLobbiesAsync();
 
