@@ -22,7 +22,7 @@ public class PlayerFrame : NetworkBehaviour
 
     private PlayerHealthNetworked playerHealth;
 
-    private PlayerMovement playerMovement;
+    private Controller.PlayerMovement playerMovement;
     private NetworkedPlayerPrimitive player;
 
     //private HandlePlayerNetworkBehaviour handlePlayerNetworkBehaviour;
@@ -53,7 +53,7 @@ public class PlayerFrame : NetworkBehaviour
         playerHealth = GetComponent<PlayerHealthNetworked>();
         playerHealth.InitPlayerFrame(this);
 
-        playerMovement = GetComponent<PlayerMovement>();
+        playerMovement = GetComponent<Controller.PlayerMovement>();
         playerMovement.InitPlayerFrame(this);
 
         //handlePlayerNetworkBehaviour = GetComponent<HandlePlayerNetworkBehaviour>();
@@ -87,7 +87,7 @@ public class PlayerFrame : NetworkBehaviour
         playerHealth = GetComponent<PlayerHealthNetworked>();
         playerHealth.InitPlayerFrame(this);
 
-        playerMovement = GetComponent<PlayerMovement>();
+        playerMovement = GetComponent<Controller.PlayerMovement>();
         playerMovement.InitPlayerFrame(this);
 
 
@@ -114,13 +114,13 @@ public class PlayerFrame : NetworkBehaviour
 
     public void ToggleCameraInputs(bool towardOn)
     {
-        transform.GetChild(0).GetComponent<FollowRotationCamera>().enabled = towardOn;
+        transform.GetChild(0).GetComponent<Controller.FollowRotationCamera>().enabled = towardOn;
     }
 
     public void ToggleActionInputs(bool towardOn)
     {
         GetComponent<PlayerCombat>().enabled = towardOn;
-        GetComponent<PlayerMovement>().enabled = towardOn;
+        GetComponent<Controller.PlayerMovement>().enabled = towardOn;
     }
 
     public void ToggleCursor(bool towardOn)

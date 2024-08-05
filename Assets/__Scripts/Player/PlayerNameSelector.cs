@@ -215,11 +215,11 @@ public class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void ActivatePlayerPackArchitectureClientRpc(NetworkSerializableString playerName)
     {
-        GetComponent<PlayerMovement>().enabled = true;
+        GetComponent<Controller.PlayerMovement>().enabled = true;
         GetComponent<PlayerCombat>().enabled = true;
 
         var headTransform = transform.GetChild(0);
-        headTransform.GetComponent<FollowRotationCamera>().enabled = true;
+        headTransform.GetComponent<Controller.FollowRotationCamera>().enabled = true;
 
         var cameraTransform = headTransform.GetChild(0).GetChild(0);
         cameraTransform.GetComponent<Camera>().enabled = true;

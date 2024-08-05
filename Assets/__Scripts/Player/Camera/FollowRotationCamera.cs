@@ -3,45 +3,48 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public class FollowRotationCamera : MonoBehaviour
+namespace Controller
 {
-    private Transform playerTransform; // The GameObject whose rotation the camera will follow
-    private PlayerMovement playerMovement;
-    [SerializeField] private float sensitivity = 5f; // Sensitivity of camera rotation
 
-    private float xRotation = 0f; // Current rotation around the x-axis
-    private float yRotation = 0f; // Current rotation around the y-axis
-
-    private static readonly string MouseXAxis = "Mouse X";
-    private static readonly string MouseYAxis = "Mouse Y";
-
-    [SerializeField] private float cameraRollLerpCoefficient;
-    private float cameraRollAngle;
-   
-
-    private void Awake()
+    public class FollowRotationCamera : MonoBehaviour
     {
-        playerTransform = transform.parent;
-        playerMovement = playerTransform.GetComponent<PlayerMovement>();
-    }
+        private Transform playerTransform; // The GameObject whose rotation the camera will follow
+        private PlayerMovement playerMovement;
+        [SerializeField] private float sensitivity = 5f; // Sensitivity of camera rotation
 
-    private void Update()
-    {
-        // around x-axis(and z with the cameraTilt thingy)
-        xRotation -= Input.GetAxis(MouseYAxis) * sensitivity;
-        xRotation = Mathf.Clamp(xRotation, -89f, 89f); // Clamp in order to avoid doing a flip when looking up/down too intensely
+        private float xRotation = 0f; // Current rotation around the x-axis
+        private float yRotation = 0f; // Current rotation around the y-axis
 
-        //cameraRollAngle = Mathf.Lerp(transform.localRotation.eulerAngles.z, playerMovement.RelevantCameraTiltAngle, cameraRollLerpCoefficient);
-        //transform.localRotation = Quaternion.Euler(xRotation, 0f, cameraRollAngle);
-        //print(playerMovement.RelevantCameraTiltAngle);
-        transform.localRotation = Quaternion.Euler(xRotation, 0f, playerMovement.RelevantCameraTiltAngle);
+        private static readonly string MouseXAxis = "Mouse X";
+        private static readonly string MouseYAxis = "Mouse Y";
 
-        // around y-axis
-        yRotation += Input.GetAxis(MouseXAxis) * sensitivity;
-        playerTransform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
+        [SerializeField] private float cameraRollLerpCoefficient;
+        private float cameraRollAngle;
+
+
+        private void Awake()
+        {
+            playerTransform = transform.parent;
+            playerMovement = playerTransform.GetComponent<PlayerMovement>();
+        }
+
+        private void Update()
+        {
+            // around x-axis(and z with the cameraTilt thingy)
+            xRotation -= Input.GetAxis(MouseYAxis) * sensitivity;
+            xRotation = Mathf.Clamp(xRotation, -89f, 89f); // Clamp in order to avoid doing a flip when looking up/down too intensely
+
+            //cameraRollAngle = Mathf.Lerp(transform.localRotation.eulerAngles.z, playerMovement.RelevantCameraTiltAngle, cameraRollLerpCoefficient);
+            //transform.localRotation = Quaternion.Euler(xRotation, 0f, cameraRollAngle);
+            //print(playerMovement.RelevantCameraTiltAngle);
+            transform.localRotation = Quaternion.Euler(xRotation, 0f, playerMovement.RelevantCameraTiltAngle);
+
+            // around y-axis
+            yRotation += Input.GetAxis(MouseXAxis) * sensitivity;
+            playerTransform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
+        }
     }
 }
-
 //using UnityEngine;
 //using System.Collections;
 //using System.Collections.Generic;

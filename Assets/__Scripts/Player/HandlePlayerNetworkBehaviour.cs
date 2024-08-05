@@ -110,9 +110,9 @@ public class HandlePlayerNetworkBehaviour : NetworkBehaviour, IPlayerFrameMember
 
     public void ToggleGameControls(bool towardOn)
     {
-        transform.GetChild(0).GetComponent<FollowRotationCamera>().enabled = towardOn;
+        transform.GetChild(0).GetComponent<Controller.FollowRotationCamera>().enabled = towardOn;
         GetComponent<PlayerCombat>().enabled = towardOn;
-        GetComponent<PlayerMovement>().enabled = towardOn;
+        GetComponent<Controller.PlayerMovement>().enabled = towardOn;
     }
 
     public void ToggleCursor(bool towardOn)
