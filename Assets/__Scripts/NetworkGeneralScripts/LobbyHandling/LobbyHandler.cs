@@ -92,7 +92,21 @@ public class LobbyHandler : MonoBehaviour
     public string DeleteLobbyParamString;
     public async void DeleteLobby()
     {
-        throw new System.NotImplementedException();
+        var lobbies = await EnumerateLobbiesAsync();
+
+        if (lobbies == null) { return; }
+
+        try
+        {
+            await LobbyService.Instance.DeleteLobbyAsync(lobbies.Results[0].Id);
+        }
+        catch (LobbyServiceException exception)
+        {
+            Debug.Log(exception.Message);
+            return;
+        }
+
+        Debug.Log("Lobby was succesfully deleted");
     }
 
 
