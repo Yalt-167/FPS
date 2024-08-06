@@ -12,7 +12,7 @@ public class LobbyHandlerCustomEditor : Editor
 
     public void Awake()
     {
-        LobbyHandler targetScript = (LobbyHandler)target;
+        targetScript = (LobbyHandler)target;
         spaceBetweenButtons = targetScript.SpaceBetweenButtons;
     }
 
@@ -20,7 +20,7 @@ public class LobbyHandlerCustomEditor : Editor
     {
         base.OnInspectorGUI();
 
-        LobbyHandler targetScript = (LobbyHandler)target;
+        targetScript = (LobbyHandler)target;
         spaceBetweenButtons = targetScript.SpaceBetweenButtons;
         GUILayout.Space(spaceBetweenButtons);
         targetScript.CreateLobbyParamString = GUILayout.TextField(targetScript.CreateLobbyParamString);
