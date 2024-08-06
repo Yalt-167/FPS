@@ -2292,7 +2292,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1013962245}
-  - component: {fileID: 1013962244}
+  - component: {fileID: 1013962246}
   m_Layer: 0
   m_Name: LobbyHandler
   m_TagString: Untagged
@@ -2300,18 +2300,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1013962244
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1013962243}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b29669d79b9fbb845936fe39011d2a99, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1013962245
 Transform:
   m_ObjectHideFlags: 0
@@ -2327,6 +2315,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1013962246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1013962243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b29669d79b9fbb845936fe39011d2a99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpaceBetweenButtons: 20
+  CreateLobbyParamString: 
+  EditLobbyParamString: 
+  DeleteLobbyParamString: 
+  JoinLobbyByIDParamString: 
+  JoinLobbyByCodeParamString: 
+  ListLobbiesParamString: 
 --- !u!1 &1053669928
 GameObject:
   m_ObjectHideFlags: 0

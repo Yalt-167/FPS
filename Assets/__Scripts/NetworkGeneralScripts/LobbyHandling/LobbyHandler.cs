@@ -13,16 +13,15 @@ using UnityEngine.PlayerLoop;
 
 public class LobbyHandler : MonoBehaviour
 {
-    public static LobbyHandler DebugInstance;
-
+    public int SpaceBetweenButtons = 20;
     public Lobby hostLobby;
     private readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
     private float heartbeatTimer; // what pings the lobby for it to stay active when not interacted with (in seconds)
 
+    private readonly DataObject.IndexOptions GameModeFilter = DataObject.IndexOptions.S1;
+
     private async void Start()
     {
-        DebugInstance = this;
-
         await UnityServices.InitializeAsync();
 
         AuthenticationService.Instance.SignedIn += SignInCallback;
@@ -47,24 +46,33 @@ public class LobbyHandler : MonoBehaviour
         }
     }
 
-
-    public static void SignInCallback()
+    public void SignInCallback()
     {
         Debug.Log($"Signed in as {AuthenticationService.Instance.PlayerId}");
     }
 
 #pragma warning disable
 
-    [MenuItem("Developer/Lobby/Create")]
-    public static async void CreateLobby()
+    public string CreateLobbyParamString;
+    public async void CreateLobby()
     {
         var lobbyName = "that ll do for now";
         var lobbyCapacity = 4;
-        var lobbyOptions = new CreateLobbyOptions();
+        var lobbyOptions = new CreateLobbyOptions()
+        {
+            IsPrivate = true,
+            Player = GetPlayer(),
+            Data = new Dictionary<string, DataObject>()
+            {
+                {"GameMode",  new DataObject(DataObject.VisibilityOptions.Public, "Deathmatch", GameModeFilter)}, // S1 -> it s now linked to the QueryFilter.FieldOptions.S1
+            }
+
+
+        };
 
         try
         {
-            DebugInstance.hostLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, lobbyCapacity, lobbyOptions);
+            hostLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, lobbyCapacity, lobbyOptions);
         }
         catch (LobbyServiceException exception)
         {
@@ -72,23 +80,24 @@ public class LobbyHandler : MonoBehaviour
             return;
         }
 
-        Debug.Log($"Successfully created a new lobby named {DebugInstance.hostLobby.Name} with {DebugInstance.hostLobby.MaxPlayers} slots");
+        Debug.Log($"Successfully created a new lobby named {hostLobby.Name} with {hostLobby.MaxPlayers} slots");
     }
 
-    [MenuItem("Developer/Lobby/Edit")]
-    public static async void EditLobby()
+    public string EditLobbyParamString;
+    public async void EditLobby()
     {
         throw new System.NotImplementedException();
     }
 
-    [MenuItem("Developer/Lobby/Delete")]
-    public static async void DeleteLobby()
+    public string DeleteLobbyParamString;
+    public async void DeleteLobby()
     {
         throw new System.NotImplementedException();
     }
 
-    [MenuItem("Developer/Lobby/Join")]
-    public static async void JoinLobby()// so far only joinds the first lobby
+
+    public string JoinLobbyByIDParamString;
+    public async void JoinLobbyByID()// so far only joins the first lobby
     {
         var lobby = await EnumerateLobbiesAsync();
 
@@ -106,8 +115,27 @@ public class LobbyHandler : MonoBehaviour
         Debug.Log("Succesufully joined lobby");
     }
 
-    [MenuItem("Developer/Lobby/List")]
-    public static async void ListLobbies()
+    public string JoinLobbyByCodeParamString;
+    public async void JoinLobbyByCode()// so far only joins the first lobby
+    {
+        var lobby = await EnumerateLobbiesAsync();
+
+        if (lobby == null) { return; }
+
+        try
+        {
+            await LobbyService.Instance.JoinLobbyByCodeAsync(lobby.Results[0].LobbyCode);
+        }
+        catch (LobbyServiceException exception)
+        {
+            Debug.Log(exception.Message);
+        }
+
+        Debug.Log("Succesufully joined lobby");
+    }
+
+    public string ListLobbiesParamString;
+    public async void ListLobbies()
     {
         try
         {
@@ -145,8 +173,7 @@ public class LobbyHandler : MonoBehaviour
         }
     }
 
-
-    public static async Task<QueryResponse>? EnumerateLobbiesAsync()
+    public async Task<QueryResponse?> EnumerateLobbiesAsync()
     {
         try
         {
@@ -162,12 +189,11 @@ public class LobbyHandler : MonoBehaviour
                 {
                     new QueryOrder(true, QueryOrder.FieldOptions.Name),
                 }
-
             };
 
             QueryResponse response = await Lobbies.Instance.QueryLobbiesAsync(options);
 
-            return response;
+            return response.Results.Count > 0 ? response : null;
         }
         catch (LobbyServiceException exception)
         {
@@ -176,7 +202,17 @@ public class LobbyHandler : MonoBehaviour
 
         return null;
     }
+
 #pragma warning enable
 
-
+    private Player GetPlayer()
+    {
+        return new Player()
+        {
+            Data = new Dictionary<string, PlayerDataObject>()
+            {
+                {"Name", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "playerName") }
+            }
+        };
+    }
 }
