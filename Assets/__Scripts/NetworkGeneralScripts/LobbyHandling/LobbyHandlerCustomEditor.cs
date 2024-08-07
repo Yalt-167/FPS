@@ -39,31 +39,39 @@ public class LobbyHandlerCustomEditor : Editor
         }
 
         GUILayout.Space(spaceBetweenButtons);
-        targetScript.DeleteLobbyParamString = GUILayout.TextField(targetScript.DeleteLobbyParamString);
         if (GUILayout.Button("Delete lobby"))
         {
             targetScript.DeleteLobby();
         }
 
         GUILayout.Space(spaceBetweenButtons);
-        targetScript.JoinLobbyByIDParamString = GUILayout.TextField(targetScript.JoinLobbyByIDParamString);
         if (GUILayout.Button("Join lobby by id"))
         {
             targetScript.JoinLobbyByID();
         }
 
         GUILayout.Space(spaceBetweenButtons);
-        targetScript.JoinLobbyByCodeParamString = GUILayout.TextField(targetScript.JoinLobbyByCodeParamString);
         if (GUILayout.Button("Join lobby by code"))
         {
             targetScript.JoinLobbyByCode();
         }
 
         GUILayout.Space(spaceBetweenButtons);
-        targetScript.ListLobbiesParamString = GUILayout.TextField(targetScript.ListLobbiesParamString);
         if (GUILayout.Button("List lobbies"))
         {
             targetScript.ListLobbies();
+        }
+        
+        GUILayout.Space(spaceBetweenButtons);
+        if (GUILayout.Button("Copy ID"))
+        {
+            targetScript.CopyLobbyID();
+        }
+        
+        GUILayout.Space(spaceBetweenButtons);
+        if (GUILayout.Button("CopyCode"))
+        {
+            targetScript.CopyLobbyCode();
         }
     }
 }

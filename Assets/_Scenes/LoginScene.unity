@@ -2328,7 +2328,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SpaceBetweenButtons: 20
-  CreateLobbyParamString: 
+  LobbyName: MyLobby
+  LobbyCapacity: 4
+  PrivateLobby: 1
+  Password: 123
+  TargetLobbyCode: 
+  TargetLobbyId: 
   EditLobbyParamString: 
   DeleteLobbyParamString: 
   JoinLobbyByIDParamString: 

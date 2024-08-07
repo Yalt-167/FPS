@@ -161,14 +161,12 @@ public class CreateLobbyOptions
             return;
         }
 
-        Debug.Log($"Successfully created a new lobby named {hostLobby.Name} with {hostLobby.MaxPlayers} slots");
-        Debug.Log($"ID: {hostLobby.Id} (was copied to your clipboard)");
-        GUIUtility.systemCopyBuffer = hostLobby.Id;
-        Debug.Log($"Code: {hostLobby.LobbyCode}");
+        Debug.Log($"Successfully created a new lobby");
+        DisplayHostLobbyData();
+        CopyLobbyID();
 
     }
 
-    public string EditLobbyParamString;
     public async void EditLobby(string lobbyID, string lobbyName, int lobbyCapacity, bool privateLobby, string password)
     {
         var emptyPassword = string.IsNullOrEmpty(password);
@@ -178,7 +176,6 @@ public class CreateLobbyOptions
             return;
         }
 
-        Lobby lobby = null;
         UpdateLobbyOptions updateOptions = new UpdateLobbyOptions()
         {
             Name = lobbyName,
@@ -193,18 +190,18 @@ public class CreateLobbyOptions
         };
         try
         {
-            lobby = await LobbyService.Instance.UpdateLobbyAsync(lobbyID, updateOptions);
+            hostLobby = await LobbyService.Instance.UpdateLobbyAsync(lobbyID, updateOptions);
         }
         catch (LobbyServiceException exception)
         {
-            Debug.Log(exception.Message);
+            Debug.Log($"Couldn t edit lobby: Reason: {exception.Message}");
             return;
         }
 
-        Debug.Log($"Succesfully edited lobby data name: {lobby.Name}, capacity: {lobby.MaxPlayers}, private: {lobby.IsPrivate}, data: {lobby.Data}");
+        Debug.Log($"Succesfully edited lobby data");
+        DisplayHostLobbyData();
     }
 
-    public string DeleteLobbyParamString;
     public async void DeleteLobby()
     {
         var lobbies = await EnumerateLobbiesAsync();
@@ -224,8 +221,6 @@ public class CreateLobbyOptions
         Debug.Log("Lobby was succesfully deleted");
     }
 
-
-    public string JoinLobbyByIDParamString;
     public async void JoinLobbyByID()// so far only joins the first lobby
     {
         var lobby = await EnumerateLobbiesAsync();
@@ -245,7 +240,6 @@ public class CreateLobbyOptions
         Debug.Log("Succesufully joined lobby");
     }
 
-    public string JoinLobbyByCodeParamString;
     public async void JoinLobbyByCode()// so far only joins the first lobby
     {
         var lobby = await EnumerateLobbiesAsync();
@@ -264,7 +258,6 @@ public class CreateLobbyOptions
         Debug.Log("Succesufully joined lobby");
     }
 
-    public string ListLobbiesParamString;
     public async void ListLobbies()
     {
         try
@@ -296,8 +289,8 @@ public class CreateLobbyOptions
                 Count = 25,
                 Filters = new List<QueryFilter>()
                 {
-                    new QueryFilter(QueryFilter.FieldOptions.Name, "that ll do for now", QueryFilter.OpOptions.EQ),
-                    new QueryFilter(QueryFilter.FieldOptions.AvailableSlots, "5", QueryFilter.OpOptions.LT),
+                    //new QueryFilter(QueryFilter.FieldOptions.Name, "that ll do for now", QueryFilter.OpOptions.EQ),
+                    //new QueryFilter(QueryFilter.FieldOptions.AvailableSlots, "5", QueryFilter.OpOptions.LT),
                 },
                 Order = new List<QueryOrder>()
                 {
@@ -318,6 +311,34 @@ public class CreateLobbyOptions
     }
 
 #pragma warning enable
+
+    private void DisplayHostLobbyData()
+    {
+        if (hostLobby == null) { return; }
+
+        Debug.Log($"Name: {hostLobby.Name}");
+        Debug.Log($"Capacity: {hostLobby.MaxPlayers}");
+        Debug.Log($"Private: {hostLobby.IsPrivate}");
+        Debug.Log($"Data: {hostLobby.Data}");
+        Debug.Log($"ID: {hostLobby.Id}");
+        Debug.Log($"Code: {hostLobby.LobbyCode}");
+    }
+
+    public void CopyLobbyID()
+    {
+        if (hostLobby == null) { return; }
+
+        GUIUtility.systemCopyBuffer = hostLobby.Id;
+        Debug.Log("Lobby ID was copied to your clipboard");
+    }
+
+    public void CopyLobbyCode()
+    {
+        if (hostLobby == null) { return; }
+
+        GUIUtility.systemCopyBuffer = hostLobby.LobbyCode;
+        Debug.Log("Lobby code was copied to your clipboard");
+    }
 
     private Player GetPlayer()
     {
