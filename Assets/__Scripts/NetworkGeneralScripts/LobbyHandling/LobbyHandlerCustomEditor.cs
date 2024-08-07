@@ -22,48 +22,48 @@ public class LobbyHandlerCustomEditor : Editor
 
         targetScript = (LobbyHandler)target;
         spaceBetweenButtons = targetScript.SpaceBetweenButtons;
+
+
         GUILayout.Space(spaceBetweenButtons);
-        targetScript.CreateLobbyParamString = GUILayout.TextField(targetScript.CreateLobbyParamString);
-        if (GUILayout.Button("Create lobby"))
+        GUILayout.Label("Create a lobby using the options above");
+        if (GUILayout.Button("Create"))
         {
-            targetScript.CreateLobby();
+            targetScript.CreateLobby(targetScript.LobbyName, targetScript.LobbyCapacity, targetScript.PrivateLobby, targetScript.Password);
         }
 
-        targetScript.EditLobbyParamString = GUILayout.TextField(targetScript.EditLobbyParamString);
         GUILayout.Space(spaceBetweenButtons);
+
         if (GUILayout.Button("Edit lobby"))
         {
             targetScript.EditLobby();
         }
 
-        targetScript.DeleteLobbyParamString = GUILayout.TextField(targetScript.DeleteLobbyParamString);
         GUILayout.Space(spaceBetweenButtons);
+        targetScript.DeleteLobbyParamString = GUILayout.TextField(targetScript.DeleteLobbyParamString);
         if (GUILayout.Button("Delete lobby"))
         {
             targetScript.DeleteLobby();
         }
 
-        targetScript.JoinLobbyByIDParamString = GUILayout.TextField(targetScript.JoinLobbyByIDParamString);
         GUILayout.Space(spaceBetweenButtons);
+        targetScript.JoinLobbyByIDParamString = GUILayout.TextField(targetScript.JoinLobbyByIDParamString);
         if (GUILayout.Button("Join lobby by id"))
         {
             targetScript.JoinLobbyByID();
         }
 
-        targetScript.JoinLobbyByCodeParamString = GUILayout.TextField(targetScript.JoinLobbyByCodeParamString);
         GUILayout.Space(spaceBetweenButtons);
+        targetScript.JoinLobbyByCodeParamString = GUILayout.TextField(targetScript.JoinLobbyByCodeParamString);
         if (GUILayout.Button("Join lobby by code"))
         {
             targetScript.JoinLobbyByCode();
         }
 
-        targetScript.ListLobbiesParamString = GUILayout.TextField(targetScript.ListLobbiesParamString);
         GUILayout.Space(spaceBetweenButtons);
+        targetScript.ListLobbiesParamString = GUILayout.TextField(targetScript.ListLobbiesParamString);
         if (GUILayout.Button("List lobbies"))
         {
             targetScript.ListLobbies();
         }
-
-
     }
 }

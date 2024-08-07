@@ -1,3 +1,5 @@
+using JetBrains.Annotations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -18,16 +20,52 @@ public class LobbyHandler : MonoBehaviour
     private readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
     private float heartbeatTimer; // what pings the lobby for it to stay active when not interacted with (in seconds)
 
-    private readonly DataObject.IndexOptions GameModeFilter = DataObject.IndexOptions.S1;
+    #region Filters Handling
+
+    public FiltersValuesStruct FiltersValues;
+    public FiltersStruct Filters;
+
+    private void InitializeFilters()
+    {
+        FiltersValues = new()
+        {
+            GameModeFilter = DataObject.IndexOptions.S1,
+            HasPassword = DataObject.IndexOptions.S2,
+        };
+
+        Filters = new()
+        {
+            GameModeFilter = QueryFilter.FieldOptions.S1,
+            HasPassword = QueryFilter.FieldOptions.S2,
+        };
+
+    }
+    public struct FiltersValuesStruct
+    {
+        public DataObject.IndexOptions GameModeFilter;
+        public DataObject.IndexOptions HasPassword;
+    }
+
+    public struct FiltersStruct
+    {
+        public QueryFilter.FieldOptions GameModeFilter;
+        public QueryFilter.FieldOptions HasPassword;
+    }
+
+    #endregion
 
     private async void Start()
     {
+        InitializeFilters();
+
         await UnityServices.InitializeAsync();
 
         AuthenticationService.Instance.SignedIn += SignInCallback;
 
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
     }
+
+    
 
     private void Update()
     {
@@ -53,18 +91,55 @@ public class LobbyHandler : MonoBehaviour
 
 #pragma warning disable
 
-    public string CreateLobbyParamString;
-    public async void CreateLobby()
+    public string LobbyName;
+    public int LobbyCapacity;
+
+    public bool PrivateLobby; // Private lobbies are NEVER visible in query results and require the lobby CODE or ID to be manually provided to new players.
+    public string Password;
+
+    public async void CreateLobby(string lobbyName, int lobbyCapacity, bool privateLobby, string password)
     {
-        var lobbyName = "that ll do for now";
-        var lobbyCapacity = 4;
+
+#if false
+
+public class CreateLobbyOptions
+{
+    public bool? IsPrivate { get; set; }
+
+    public string Password { get; set; }
+
+    public bool? IsLocked { get; set; } -> wether people can join so false upon start but lock it when the game begins
+
+    public Player Player { get; set; }
+
+    public Dictionary<string, DataObject> Data { get; set; }
+}
+#endif
+
         var lobbyOptions = new CreateLobbyOptions()
         {
             IsPrivate = true,
             Player = GetPlayer(),
             Data = new Dictionary<string, DataObject>()
             {
-                {"GameMode",  new DataObject(DataObject.VisibilityOptions.Public, "Deathmatch", GameModeFilter)}, // S1 -> it s now linked to the QueryFilter.FieldOptions.S1
+                {
+                    "GameMode", 
+                    new DataObject(
+                        visibility: DataObject.VisibilityOptions.Public,
+                        value: "Deathmatch",
+                        index: FiltersValues.GameModeFilter // GameModeFilter value being S1 -> it s now linked to the QueryFilter.FieldOptions.S1
+                    )
+                },
+
+                {
+                    "HasPassword",
+                    new DataObject(
+                        visibility: DataObject.VisibilityOptions.Public,
+                        value: "Deathmatch",
+                        index: FiltersValues.HasPassword // GameModeFilter value being S1 -> it s now linked to the QueryFilter.FieldOptions.S1
+                    )
+
+                }
             }
 
 
@@ -124,6 +199,7 @@ public class LobbyHandler : MonoBehaviour
         catch (LobbyServiceException exception)
         {
             Debug.Log(exception.Message);
+            return;
         }
 
         Debug.Log("Succesufully joined lobby");
@@ -153,23 +229,6 @@ public class LobbyHandler : MonoBehaviour
     {
         try
         {
-            //QueryLobbiesOptions options = new QueryLobbiesOptions()
-            //{
-            //    Count = 25,
-            //    Filters = new List<QueryFilter>()
-            //    {
-            //        new QueryFilter(QueryFilter.FieldOptions.Name, "testLobby", QueryFilter.OpOptions.EQ),
-            //        new QueryFilter(QueryFilter.FieldOptions.AvailableSlots, "5", QueryFilter.OpOptions.LT),
-            //    },
-            //    Order = new List<QueryOrder>()
-            //    {
-            //        new QueryOrder(true, QueryOrder.FieldOptions.Name),
-            //    }
-
-            //};
-
-            //QueryResponse response = await Lobbies.Instance.QueryLobbiesAsync(options);
-
             var lobbies = await EnumerateLobbiesAsync();
 
             if (lobbies == null) { return; }
@@ -184,6 +243,7 @@ public class LobbyHandler : MonoBehaviour
         catch (LobbyServiceException exception)
         {
             Debug.Log(exception.Message);
+            return;
         }
     }
 
@@ -201,7 +261,7 @@ public class LobbyHandler : MonoBehaviour
                 },
                 Order = new List<QueryOrder>()
                 {
-                    new QueryOrder(true, QueryOrder.FieldOptions.Name),
+                    new QueryOrder(true, QueryOrder.FieldOptions.AvailableSlots),
                 }
             };
 
@@ -221,7 +281,7 @@ public class LobbyHandler : MonoBehaviour
 
     private Player GetPlayer()
     {
-        return new Player()
+        return new Player(id: AuthenticationService.Instance.PlayerId)
         {
             Data = new Dictionary<string, PlayerDataObject>()
             {
