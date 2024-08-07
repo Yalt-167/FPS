@@ -112,6 +112,12 @@ namespace LobbyHandling
             {
                 targetScript.DisplayHostLobbyData();
             }
+
+            GUILayout.Space(spaceBetweenButtons);
+            if (GUILayout.Button("Display lobby data by id"))
+            {
+                targetScript.DisplayLobbyData(targetScript.TargetLobbyId);
+            }
         }
     }
 }

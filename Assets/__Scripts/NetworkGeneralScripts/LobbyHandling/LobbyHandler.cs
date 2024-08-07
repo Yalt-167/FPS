@@ -16,7 +16,7 @@ namespace LobbyHandling
     public sealed class LobbyHandler : MonoBehaviour
     {
         public int SpaceBetweenButtons = 12;
-        public Lobby hostLobby = null;
+        public Lobby hostLobby;
         private static readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
         private float heartbeatTimer; // what pings the lobby for it to stay active when not interacted with (in seconds)
         private static readonly string noPassword = "        ";
@@ -221,6 +221,7 @@ namespace LobbyHandling
 
         public async void JoinLobbyByCode(string lobbyCode)
         {
+            Func<string, JoinLobbyByCodeOptions, Task<Lobby>> method = LobbyService.Instance.JoinLobbyByCodeAsync;
             try
             {
                 hostLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode);
@@ -232,28 +233,6 @@ namespace LobbyHandling
             }
 
             Debug.Log($"Succesfully joined lobby: {hostLobby.Name}");
-        }
-
-        public async void DisplayLobbies()
-        {
-            try
-            {
-                var lobbies = await EnumerateLobbiesAsync();
-
-                if (lobbies == null) { return; }
-
-                Debug.Log($"Found {lobbies.Results.Count} lobb{(lobbies.Results.Count == 1 ? "y" : "ies")} matching your criteria, namely:");
-
-                foreach (var lobby in lobbies.Results)
-                {
-                    DisplayLobbyData(lobby);
-                }
-            }
-            catch (LobbyServiceException exception)
-            {
-                Debug.Log(exception.Message);
-                return;
-            }
         }
 
 #nullable enable
@@ -288,6 +267,29 @@ namespace LobbyHandling
         }
 #nullable disable
 
+        #region Debug
+
+        public async void DisplayLobbies()
+        {
+            try
+            {
+                var lobbies = await EnumerateLobbiesAsync();
+
+                if (lobbies == null) { return; }
+
+                Debug.Log($"Found {lobbies.Results.Count} lobb{(lobbies.Results.Count == 1 ? "y" : "ies")} matching your criteria, namely:");
+
+                foreach (var lobby in lobbies.Results)
+                {
+                    DisplayLobbyData(lobby);
+                }
+            }
+            catch (LobbyServiceException exception)
+            {
+                Debug.Log(exception.Message);
+                return;
+            }
+        }
 
         public void DisplayHostLobbyData()
         {
@@ -307,6 +309,33 @@ namespace LobbyHandling
             }
         }
 
+        public async void DisplayLobbyData(string lobbyID)
+        {
+            Lobby lobby;
+
+            try
+            {
+                lobby = await LobbyService.Instance.GetLobbyAsync(lobbyID);
+            }
+            catch (LobbyServiceException exception)
+            {
+                Debug.Log(exception.Message);
+                return;
+            }
+            
+            Debug.Log($"Name: {lobby.Name} | Capacity: {lobby.MaxPlayers} | Private: {lobby.IsPrivate}");
+            Debug.Log($"ID: {lobby.Id} | Code: {lobby.LobbyCode}");
+
+            foreach (KeyValuePair<string, DataObject> kvp in lobby.Data)
+            {
+                Debug.Log($"{kvp.Key}: {kvp.Value.Value}");
+            }
+        }
+
+        #endregion
+
+        #region Utility
+
         public void CopyLobbyID()
         {
             if (hostLobby == null) { return; }
@@ -323,6 +352,7 @@ namespace LobbyHandling
             Debug.Log("Lobby code was copied to your clipboard");
         }
 
+        #endregion
         private Player GetPlayer()
         {
             return new Player(id: AuthenticationService.Instance.PlayerId)
