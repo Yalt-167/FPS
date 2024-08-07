@@ -2327,18 +2327,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b29669d79b9fbb845936fe39011d2a99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpaceBetweenButtons: 20
+  SpaceBetweenButtons: 4
   LobbyName: MyLobby
   LobbyCapacity: 4
-  PrivateLobby: 1
-  Password: 123
+  PrivateLobby: 0
+  Password: 
   TargetLobbyCode: 
   TargetLobbyId: 
-  EditLobbyParamString: 
-  DeleteLobbyParamString: 
-  JoinLobbyByIDParamString: 
-  JoinLobbyByCodeParamString: 
-  ListLobbiesParamString: 
 --- !u!1 &1053669928
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,67 +1,98 @@
 using System.Collections;
 using System.Collections.Generic;
+
 using UnityEditor;
 using UnityEngine;
 
 namespace LobbyHandling
 {
     [CustomEditor(typeof(LobbyHandler))]
-    public class LobbyHandlerCustomEditor : Editor
+    public sealed class LobbyHandlerCustomEditor : Editor
     {
 
         private LobbyHandler targetScript;
         private int spaceBetweenButtons;
 
-        public void Awake()
+        public void OnEnable()
         {
             targetScript = (LobbyHandler)target;
-            spaceBetweenButtons = targetScript.SpaceBetweenButtons;
         }
 
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
 
-            targetScript = (LobbyHandler)target;
             spaceBetweenButtons = targetScript.SpaceBetweenButtons;
 
 
-            GUILayout.Space(spaceBetweenButtons);
-            GUILayout.Label("Create a lobby using the options above");
+            GUILayout.Space(spaceBetweenButtons * 2);
+            GUILayout.Label("Those will use the options above");
             if (GUILayout.Button("Create"))
             {
                 targetScript.CreateLobby(targetScript.LobbyName, targetScript.LobbyCapacity, targetScript.PrivateLobby, targetScript.Password);
             }
 
             GUILayout.Space(spaceBetweenButtons);
-
-            if (GUILayout.Button("Edit lobby"))
+            if (GUILayout.Button("Edit lobby")) // add check to ensure you are the owner
             {
-                targetScript.EditLobby(targetScript.TargetLobbyId, targetScript.LobbyName, targetScript.LobbyCapacity, targetScript.PrivateLobby, targetScript.Password);
+                if (string.IsNullOrEmpty(targetScript.TargetLobbyId))
+                {
+                    Debug.Log("You must provide the lobby id");
+                }
+                else
+                {
+                    targetScript.EditLobby(targetScript.TargetLobbyId, targetScript.LobbyName, targetScript.LobbyCapacity, targetScript.PrivateLobby, targetScript.Password);
+                }
             }
 
             GUILayout.Space(spaceBetweenButtons);
-            if (GUILayout.Button("Delete lobby"))
+            if (GUILayout.Button("Delete lobby")) // add check to ensure you are the owner
             {
-                targetScript.DeleteLobby();
+                if (string.IsNullOrEmpty(targetScript.TargetLobbyId))
+                {
+                    Debug.Log("You must provide the lobby id");
+                }
+                else
+                {
+                    targetScript.DeleteLobby(targetScript.TargetLobbyId);
+                }
+                
             }
 
             GUILayout.Space(spaceBetweenButtons);
             if (GUILayout.Button("Join lobby by id"))
             {
-                targetScript.JoinLobbyByID();
+                if (string.IsNullOrEmpty(targetScript.TargetLobbyId))
+                {
+                    Debug.Log("You must provide the lobby id");
+                }
+                else
+                {
+                    targetScript.JoinLobbyByID(targetScript.TargetLobbyId);
+                }
+                
             }
 
             GUILayout.Space(spaceBetweenButtons);
             if (GUILayout.Button("Join lobby by code"))
             {
-                targetScript.JoinLobbyByCode();
+
+                if (string.IsNullOrEmpty(targetScript.TargetLobbyCode))
+                {
+                    Debug.Log("You must provide the lobby code");
+                }
+                else
+                {
+                    targetScript.JoinLobbyByCode(targetScript.TargetLobbyCode);
+                }
+                
             }
 
             GUILayout.Space(spaceBetweenButtons);
+            GUILayout.Label("Utility");
             if (GUILayout.Button("List lobbies"))
             {
-                targetScript.ListLobbies();
+                targetScript.DisplayLobbies();
             }
 
             GUILayout.Space(spaceBetweenButtons);
@@ -71,9 +102,15 @@ namespace LobbyHandling
             }
 
             GUILayout.Space(spaceBetweenButtons);
-            if (GUILayout.Button("CopyCode"))
+            if (GUILayout.Button("Copy code"))
             {
                 targetScript.CopyLobbyCode();
+            }
+
+            GUILayout.Space(spaceBetweenButtons);
+            if (GUILayout.Button("Display current lobby data"))
+            {
+                targetScript.DisplayHostLobbyData();
             }
         }
     }

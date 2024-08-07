@@ -7,10 +7,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System;
-using static DebugUtility;
 
 
-public class PlayerNameSelector : NetworkBehaviour
+public sealed class PlayerNameSelector : NetworkBehaviour
 {
     [SerializeField] private GameObject playerPrefab;
     private GameObject playerGameObject;

@@ -2,21 +2,24 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
+using UnityEditor;
+using UnityEngine;
+
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
-using UnityEditor;
-using UnityEngine;
+
 namespace LobbyHandling
 {
-    public class LobbyHandler : MonoBehaviour
+    public sealed class LobbyHandler : MonoBehaviour
     {
         public int SpaceBetweenButtons = 12;
         public Lobby hostLobby = null;
-        private readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
+        private static readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
         private float heartbeatTimer; // what pings the lobby for it to stay active when not interacted with (in seconds)
-        private readonly string noPassword = "        ";
+        private static readonly string noPassword = "        ";
 
         #region Filters Handling
 
@@ -92,14 +95,13 @@ namespace LobbyHandling
             if (heartbeatTimer >= heartbeat)
             {
                 heartbeatTimer = 0f;
+                if (hostLobby == null) { return; }
                 await LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
-                Debug.Log("Heartbeat triggered");
             }
         }
 
         #endregion
 
-#pragma warning disable
 
         public string LobbyName;
         public int LobbyCapacity;
@@ -111,23 +113,6 @@ namespace LobbyHandling
 
         public async void CreateLobby(string lobbyName, int lobbyCapacity, bool privateLobby, string password)
         {
-
-#if false
-
-public class CreateLobbyOptions
-{
-    public bool? IsPrivate { get; set; }
-
-    public string Password { get; set; }
-
-    public bool? IsLocked { get; set; } -> wether people can join so false upon start but lock it when the game begins
-
-    public Player Player { get; set; }
-
-    public Dictionary<string, DataObject> Data { get; set; }
-}
-#endif
-
             var emptyPassword = string.IsNullOrEmpty(password);
             if (!emptyPassword && password.Length < 8)
             {
@@ -141,16 +126,16 @@ public class CreateLobbyOptions
                 Player = GetPlayer(),
                 Password = emptyPassword ? noPassword : password,
                 Data = new Dictionary<string, DataObject>()
-            {
                 {
-                    "GameMode",
-                    new DataObject(
-                        visibility: DataObject.VisibilityOptions.Public,
-                        value: "Deathmatch",
-                        index: FiltersValues.GameMode // GameModeFilter value being S1 -> it s now linked to the QueryFilter.FieldOptions.S1
-                    )
-                },
-            }
+                    {
+                        "GameMode",
+                        new DataObject(
+                            visibility: DataObject.VisibilityOptions.Public,
+                            value: "Deathmatch",
+                            index: FiltersValues.GameMode // GameModeFilter value being S1 -> it s now linked to the QueryFilter.FieldOptions.S1
+                        )
+                    },
+                }
             };
 
             try
@@ -200,19 +185,15 @@ public class CreateLobbyOptions
                 return;
             }
 
-            Debug.Log($"Succesfully edited lobby data");
+            Debug.Log($"Successfully edited lobby data");
             DisplayHostLobbyData();
         }
 
-        public async void DeleteLobby()
+        public async void DeleteLobby(string lobbyID)
         {
-            var lobbies = await EnumerateLobbiesAsync();
-
-            if (lobbies == null) { return; }
-
             try
             {
-                await LobbyService.Instance.DeleteLobbyAsync(lobbies.Results[0].Id);
+                await LobbyService.Instance.DeleteLobbyAsync(lobbyID);
             }
             catch (LobbyServiceException exception)
             {
@@ -220,18 +201,14 @@ public class CreateLobbyOptions
                 return;
             }
 
-            Debug.Log("Lobby was succesfully deleted");
+            Debug.Log("Lobby was successfully deleted");
         }
 
-        public async void JoinLobbyByID()// so far only joins the first lobby
+        public async void JoinLobbyByID(string lobbyID)
         {
-            var lobby = await EnumerateLobbiesAsync();
-
-            if (lobby == null) { return; }
-
             try
             {
-                await LobbyService.Instance.JoinLobbyByIdAsync(lobby.Results[0].Id);
+                hostLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyID);
             }
             catch (LobbyServiceException exception)
             {
@@ -239,28 +216,25 @@ public class CreateLobbyOptions
                 return;
             }
 
-            Debug.Log("Succesufully joined lobby");
+            Debug.Log($"Succesfully joined lobby: {hostLobby.Name}");
         }
 
-        public async void JoinLobbyByCode()// so far only joins the first lobby
+        public async void JoinLobbyByCode(string lobbyCode)
         {
-            var lobby = await EnumerateLobbiesAsync();
-
-            if (lobby == null) { return; }
-
             try
             {
-                await LobbyService.Instance.JoinLobbyByCodeAsync(lobby.Results[0].LobbyCode);
+                hostLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode);
             }
             catch (LobbyServiceException exception)
             {
                 Debug.Log(exception.Message);
+                return;
             }
 
-            Debug.Log("Succesufully joined lobby");
+            Debug.Log($"Succesfully joined lobby: {hostLobby.Name}");
         }
 
-        public async void ListLobbies()
+        public async void DisplayLobbies()
         {
             try
             {
@@ -268,11 +242,11 @@ public class CreateLobbyOptions
 
                 if (lobbies == null) { return; }
 
-                Debug.Log($"Found {lobbies.Results.Count} lobbies matching your criteria, namely:");
+                Debug.Log($"Found {lobbies.Results.Count} lobb{(lobbies.Results.Count == 1 ? "y" : "ies")} matching your criteria, namely:");
 
                 foreach (var lobby in lobbies.Results)
                 {
-                    Debug.Log($"{lobby.Name} ({lobby.MaxPlayers})");
+                    DisplayLobbyData(lobby);
                 }
             }
             catch (LobbyServiceException exception)
@@ -282,6 +256,7 @@ public class CreateLobbyOptions
             }
         }
 
+#nullable enable
         public async Task<QueryResponse?> EnumerateLobbiesAsync()
         {
             try
@@ -295,9 +270,9 @@ public class CreateLobbyOptions
                         //new QueryFilter(QueryFilter.FieldOptions.AvailableSlots, "5", QueryFilter.OpOptions.LT),
                     },
                     Order = new List<QueryOrder>()
-                {
-                    new QueryOrder(true, QueryOrder.FieldOptions.AvailableSlots),
-                }
+                    {
+                        new QueryOrder(true, QueryOrder.FieldOptions.AvailableSlots),
+                    }
                 };
 
                 QueryResponse response = await Lobbies.Instance.QueryLobbiesAsync(options);
@@ -311,20 +286,22 @@ public class CreateLobbyOptions
 
             return null;
         }
+#nullable disable
 
-#pragma warning enable
 
-        private void DisplayHostLobbyData()
+        public void DisplayHostLobbyData()
         {
             if (hostLobby == null) { return; }
 
-            Debug.Log($"Name: {hostLobby.Name} | Capacity: {hostLobby.MaxPlayers}, Private: {hostLobby.IsPrivate}");
-            Debug.Log($"ID: {hostLobby.Id} | Code: {hostLobby.LobbyCode}");
+            DisplayLobbyData(hostLobby);
+        }
 
+        public void DisplayLobbyData(Lobby lobby)
+        {
+            Debug.Log($"Name: {lobby.Name} | Capacity: {lobby.MaxPlayers} | Private: {lobby.IsPrivate}");
+            Debug.Log($"ID: {lobby.Id} | Code: {lobby.LobbyCode}");
 
-            Debug.Log("Special data");
-            var lobbyData = hostLobby.Data;
-            foreach (KeyValuePair<string, DataObject> kvp in lobbyData)
+            foreach (KeyValuePair<string, DataObject> kvp in lobby.Data)
             {
                 Debug.Log($"{kvp.Key}: {kvp.Value.Value}");
             }
@@ -351,9 +328,9 @@ public class CreateLobbyOptions
             return new Player(id: AuthenticationService.Instance.PlayerId)
             {
                 Data = new Dictionary<string, PlayerDataObject>()
-            {
-                {"Name", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "playerName") }
-            }
+                {
+                    {"Name", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "playerName") }
+                }
             };
         }
     }

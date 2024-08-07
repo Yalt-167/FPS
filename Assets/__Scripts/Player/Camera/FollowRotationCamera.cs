@@ -5,8 +5,7 @@ using UnityEngine;
 
 namespace Controller
 {
-
-    public class FollowRotationCamera : MonoBehaviour
+    public sealed class FollowRotationCamera : MonoBehaviour
     {
         private Transform playerTransform; // The GameObject whose rotation the camera will follow
         private PlayerMovement playerMovement;

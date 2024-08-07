@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class HandleGunAngle : MonoBehaviour
+public sealed class HandleGunAngle : MonoBehaviour
 {
 
     [SerializeField] private LayerMask shootableLayers;

@@ -11,14 +11,15 @@ namespace Controller
 {
 
     [DefaultExecutionOrder(-7)]
-    public class PlayerMovement : MonoBehaviour, IPlayerFrameMember
+    public sealed class PlayerMovement : MonoBehaviour, IPlayerFrameMember
     {
         #region Debug Things
 
+#pragma warning disable
         [SerializeField] private bool Tilting;
         [SerializeField] private bool Regulating;
         [SerializeField] private bool Idle;
-
+#pragma warning enable
 
         public VelocityDebug GlobalVelocityDebug;
         public VelocityDebug LocalVelocityDebug;

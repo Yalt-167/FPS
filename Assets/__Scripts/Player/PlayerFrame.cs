@@ -12,7 +12,7 @@ using System;
 /// Class that links all the player s classes for better communication between scripts and ease of access
 /// </summary>
 [DefaultExecutionOrder(-98)]
-public class PlayerFrame : NetworkBehaviour
+public sealed class PlayerFrame : NetworkBehaviour
 {
     //private NetworkLi
     [field: SerializeField] public ChampionStats ChampionStats { get; set; }
