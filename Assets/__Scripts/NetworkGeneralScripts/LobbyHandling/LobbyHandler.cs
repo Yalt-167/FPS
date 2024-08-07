@@ -29,30 +29,37 @@ public class LobbyHandler : MonoBehaviour
     {
         FiltersValues = new()
         {
-            GameModeFilter = DataObject.IndexOptions.S1,
+            GameMode = DataObject.IndexOptions.S1,
             HasPassword = DataObject.IndexOptions.S2,
+            IsRanked = DataObject.IndexOptions.S3,
         };
 
         Filters = new()
         {
-            GameModeFilter = QueryFilter.FieldOptions.S1,
+            GameMode = QueryFilter.FieldOptions.S1,
             HasPassword = QueryFilter.FieldOptions.S2,
+            IsRanked = QueryFilter.FieldOptions.S3,
         };
 
     }
+
     public struct FiltersValuesStruct
     {
-        public DataObject.IndexOptions GameModeFilter;
+        public DataObject.IndexOptions GameMode;
         public DataObject.IndexOptions HasPassword;
+        public DataObject.IndexOptions IsRanked;
     }
 
     public struct FiltersStruct
     {
-        public QueryFilter.FieldOptions GameModeFilter;
+        public QueryFilter.FieldOptions GameMode;
         public QueryFilter.FieldOptions HasPassword;
+        public QueryFilter.FieldOptions IsRanked;
     }
 
     #endregion
+
+    #region Init
 
     private async void Start()
     {
@@ -65,7 +72,14 @@ public class LobbyHandler : MonoBehaviour
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
     }
 
-    
+    public void SignInCallback()
+    {
+        Debug.Log($"Signed in as {AuthenticationService.Instance.PlayerId}");
+    }
+
+    #endregion
+
+    #region Update
 
     private void Update()
     {
@@ -84,10 +98,7 @@ public class LobbyHandler : MonoBehaviour
         }
     }
 
-    public void SignInCallback()
-    {
-        Debug.Log($"Signed in as {AuthenticationService.Instance.PlayerId}");
-    }
+    #endregion
 
 #pragma warning disable
 
@@ -96,6 +107,8 @@ public class LobbyHandler : MonoBehaviour
 
     public bool PrivateLobby; // Private lobbies are NEVER visible in query results and require the lobby CODE or ID to be manually provided to new players.
     public string Password;
+    public string LobbyCode;
+    public string LobbyId;
 
     public async void CreateLobby(string lobbyName, int lobbyCapacity, bool privateLobby, string password)
     {
@@ -118,7 +131,7 @@ public class CreateLobbyOptions
 
         var lobbyOptions = new CreateLobbyOptions()
         {
-            IsPrivate = true,
+            IsPrivate = privateLobby,
             Player = GetPlayer(),
             Data = new Dictionary<string, DataObject>()
             {
@@ -127,22 +140,10 @@ public class CreateLobbyOptions
                     new DataObject(
                         visibility: DataObject.VisibilityOptions.Public,
                         value: "Deathmatch",
-                        index: FiltersValues.GameModeFilter // GameModeFilter value being S1 -> it s now linked to the QueryFilter.FieldOptions.S1
+                        index: FiltersValues.GameMode // GameModeFilter value being S1 -> it s now linked to the QueryFilter.FieldOptions.S1
                     )
                 },
-
-                {
-                    "HasPassword",
-                    new DataObject(
-                        visibility: DataObject.VisibilityOptions.Public,
-                        value: "Deathmatch",
-                        index: FiltersValues.HasPassword // GameModeFilter value being S1 -> it s now linked to the QueryFilter.FieldOptions.S1
-                    )
-
-                }
             }
-
-
         };
 
         try
@@ -156,6 +157,8 @@ public class CreateLobbyOptions
         }
 
         Debug.Log($"Successfully created a new lobby named {hostLobby.Name} with {hostLobby.MaxPlayers} slots");
+        Debug.Log($"ID: {hostLobby.Id}");
+        Debug.Log($"Code: {hostLobby.LobbyCode}");
     }
 
     public string EditLobbyParamString;
