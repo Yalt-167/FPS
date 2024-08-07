@@ -1,25 +1,21 @@
-using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 public class LobbyHandler : MonoBehaviour
 {
     public int SpaceBetweenButtons = 20;
-    public Lobby hostLobby;
+    public Lobby hostLobby = null;
     private readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
     private float heartbeatTimer; // what pings the lobby for it to stay active when not interacted with (in seconds)
-
+    private readonly string noPassword = "        ";
     #region Filters Handling
 
     public FiltersValuesStruct FiltersValues;
@@ -88,13 +84,14 @@ public class LobbyHandler : MonoBehaviour
 
     private async void HandleHeartbeat()
     {
-        if (hostLobby != null) {  return; }
+        if (hostLobby == null) { return; }
 
         heartbeatTimer += Time.deltaTime;
         if (heartbeatTimer >= heartbeat)
         {
-            await LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
             heartbeatTimer = 0f;
+            await LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
+            Debug.Log("Heartbeat triggered");
         }
     }
 
@@ -107,8 +104,8 @@ public class LobbyHandler : MonoBehaviour
 
     public bool PrivateLobby; // Private lobbies are NEVER visible in query results and require the lobby CODE or ID to be manually provided to new players.
     public string Password;
-    public string LobbyCode;
-    public string LobbyId;
+    public string TargetLobbyCode;
+    public string TargetLobbyId;
 
     public async void CreateLobby(string lobbyName, int lobbyCapacity, bool privateLobby, string password)
     {
@@ -129,10 +126,18 @@ public class CreateLobbyOptions
 }
 #endif
 
+        var emptyPassword = string.IsNullOrEmpty(password);
+        if (!emptyPassword && password.Length < 8)
+        {
+            Debug.Log("Your lobby was not created as your password doesn t have enough characters (at least 8)");
+            return;
+        }
+
         var lobbyOptions = new CreateLobbyOptions()
         {
             IsPrivate = privateLobby,
             Player = GetPlayer(),
+            Password = emptyPassword ? noPassword : password,
             Data = new Dictionary<string, DataObject>()
             {
                 {
@@ -157,14 +162,46 @@ public class CreateLobbyOptions
         }
 
         Debug.Log($"Successfully created a new lobby named {hostLobby.Name} with {hostLobby.MaxPlayers} slots");
-        Debug.Log($"ID: {hostLobby.Id}");
+        Debug.Log($"ID: {hostLobby.Id} (was copied to your clipboard)");
+        GUIUtility.systemCopyBuffer = hostLobby.Id;
         Debug.Log($"Code: {hostLobby.LobbyCode}");
+
     }
 
     public string EditLobbyParamString;
-    public async void EditLobby()
+    public async void EditLobby(string lobbyID, string lobbyName, int lobbyCapacity, bool privateLobby, string password)
     {
-        throw new System.NotImplementedException();
+        var emptyPassword = string.IsNullOrEmpty(password);
+        if (!emptyPassword && password.Length < 8)
+        {
+            Debug.Log("Your lobby was not created as your password doesn t have enough characters (at least 8)");
+            return;
+        }
+
+        Lobby lobby = null;
+        UpdateLobbyOptions updateOptions = new UpdateLobbyOptions()
+        {
+            Name = lobbyName,
+            MaxPlayers = lobbyCapacity,
+            IsPrivate = privateLobby,
+            Password = emptyPassword ? noPassword : password
+
+            //Data = new Dictionary<string, DataObject>() // idk how to represent that as param so far
+            //{
+
+            //}
+        };
+        try
+        {
+            lobby = await LobbyService.Instance.UpdateLobbyAsync(lobbyID, updateOptions);
+        }
+        catch (LobbyServiceException exception)
+        {
+            Debug.Log(exception.Message);
+            return;
+        }
+
+        Debug.Log($"Succesfully edited lobby data name: {lobby.Name}, capacity: {lobby.MaxPlayers}, private: {lobby.IsPrivate}, data: {lobby.Data}");
     }
 
     public string DeleteLobbyParamString;

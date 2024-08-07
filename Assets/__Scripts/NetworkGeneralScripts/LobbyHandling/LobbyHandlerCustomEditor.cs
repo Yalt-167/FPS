@@ -35,7 +35,7 @@ public class LobbyHandlerCustomEditor : Editor
 
         if (GUILayout.Button("Edit lobby"))
         {
-            targetScript.EditLobby();
+            targetScript.EditLobby(targetScript.TargetLobbyId, targetScript.LobbyName, targetScript.LobbyCapacity, targetScript.PrivateLobby, targetScript.Password);
         }
 
         GUILayout.Space(spaceBetweenButtons);
