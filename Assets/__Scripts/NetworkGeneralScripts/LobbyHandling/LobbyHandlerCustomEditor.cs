@@ -73,7 +73,7 @@ namespace LobbyHandling
                 }
                 else
                 {
-                    targetScript.JoinLobbyByID(targetScript.TargetLobbyId);
+                    targetScript.JoinLobbyByID(targetScript.TargetLobbyId, targetScript.Password);
                 }
                 
             }
@@ -87,7 +87,7 @@ namespace LobbyHandling
                 }
                 else
                 {
-                    targetScript.JoinLobbyByCode(targetScript.TargetLobbyCode);
+                    targetScript.JoinLobbyByCode(targetScript.TargetLobbyCode, targetScript.Password);
                 }
                 
             }

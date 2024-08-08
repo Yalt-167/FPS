@@ -2328,6 +2328,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SpaceBetweenButtons: 4
+  ProfileName: Leath
   LobbyName: MyLobby
   LobbyCapacity: 4
   PrivateLobby: 0

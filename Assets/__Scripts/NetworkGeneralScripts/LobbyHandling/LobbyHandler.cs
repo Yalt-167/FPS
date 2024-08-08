@@ -85,7 +85,6 @@ namespace LobbyHandling
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
 
-
         private void SignInCallback()
         {
             Debug.Log($"Signed in as {AuthenticationService.Instance.PlayerId}");
@@ -265,11 +264,16 @@ namespace LobbyHandling
             }
         }
 
-        public async void JoinLobbyByID(string lobbyID)
+        public async void JoinLobbyByID(string lobbyID, string password)
         {
+            var joinOptions = new JoinLobbyByIdOptions()
+            {
+                Password = string.IsNullOrEmpty(password) ? noPassword : password
+            };
+
             try
             {
-                hostLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyID);
+                hostLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyID, joinOptions);
             }
             catch (LobbyServiceException exception)
             {
@@ -280,11 +284,16 @@ namespace LobbyHandling
             Debug.Log($"Succesfully joined lobby: {hostLobby.Name}");
         }
 
-        public async void JoinLobbyByCode(string lobbyCode)
+        public async void JoinLobbyByCode(string lobbyCode, string password)
         {
+            var joinOptions = new JoinLobbyByCodeOptions()
+            {
+                Password = string.IsNullOrEmpty(password) ? noPassword : password
+            };
+
             try
             {
-                hostLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode);
+                hostLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode, joinOptions);
             }
             catch (LobbyServiceException exception)
             {
