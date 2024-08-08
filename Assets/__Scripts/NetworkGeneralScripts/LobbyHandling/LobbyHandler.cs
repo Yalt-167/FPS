@@ -204,6 +204,19 @@ namespace LobbyHandling
             Debug.Log("Lobby was successfully deleted");
         }
 
+        public async void QuickJoinLobby()
+        {
+            try
+            {
+                hostLobby = await LobbyService.Instance.QuickJoinLobbyAsync();
+            }
+            catch (LobbyServiceException exception)
+            {
+                Debug.Log(exception.Message);
+                return;
+            }
+        }
+
         public async void JoinLobbyByID(string lobbyID)
         {
             try
@@ -221,7 +234,6 @@ namespace LobbyHandling
 
         public async void JoinLobbyByCode(string lobbyCode)
         {
-            Func<string, JoinLobbyByCodeOptions, Task<Lobby>> method = LobbyService.Instance.JoinLobbyByCodeAsync;
             try
             {
                 hostLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode);
@@ -233,6 +245,11 @@ namespace LobbyHandling
             }
 
             Debug.Log($"Succesfully joined lobby: {hostLobby.Name}");
+        }
+
+        public async void QuitLobby()
+        {
+            await LobbyService.Instance?.Qui
         }
 
 #nullable enable
