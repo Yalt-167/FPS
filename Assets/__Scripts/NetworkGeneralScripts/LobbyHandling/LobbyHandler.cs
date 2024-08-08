@@ -249,7 +249,15 @@ namespace LobbyHandling
 
         public async void QuitLobby()
         {
-            await LobbyService.Instance?.Qui
+            try
+            {
+                await LobbyService.Instance.RemovePlayerAsync(hostLobby.Id, AuthenticationService.Instance.PlayerId);
+            }
+            catch (LobbyServiceException exception)
+            {
+                Debug.Log(exception.Message);
+                return;
+            }
         }
 
 #nullable enable
@@ -271,7 +279,7 @@ namespace LobbyHandling
                     }
                 };
 
-                QueryResponse response = await Lobbies.Instance.QueryLobbiesAsync(options);
+                QueryResponse response = await LobbyService.Instance.QueryLobbiesAsync(options);
 
                 return response.Results.Count > 0 ? response : null;
             }
