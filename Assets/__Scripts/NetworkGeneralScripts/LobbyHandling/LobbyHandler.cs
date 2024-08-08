@@ -69,13 +69,52 @@ namespace LobbyHandling
             await UnityServices.InitializeAsync();
 
             AuthenticationService.Instance.SignedIn += SignInCallback;
+            AuthenticationService.Instance.SignInFailed += SignInFailedCallback;
+
+            AuthenticationService.Instance.SignedOut += SignOutCallback;
+            AuthenticationService.Instance.Expired += SessionExpiredCallback;
 
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
 
-        public void SignInCallback()
+        private void SignInCallback()
         {
             Debug.Log($"Signed in as {AuthenticationService.Instance.PlayerId}");
+        }
+
+        private void SignInFailedCallback(RequestFailedException exception)
+        {
+            Debug.Log(exception.Message);
+        }
+
+        private void SignOutCallback()
+        {
+            Debug.Log("Signed out");
+        }
+
+        private void SessionExpiredCallback()
+        {
+            Debug.Log("Session Expired");
+        }
+
+        public async void SignIn(SignInMethod signInMethod)
+        {
+            switch (signInMethod)
+            {
+                case SignInMethod.Anonymously:
+                    await AuthenticationService.Instance.SignInAnonymouslyAsync();
+                    break;
+
+                case SignInMethod.Google:
+                    //await AuthenticationService.Instance.SignInWithGoogleAsync(AuthenticationService.Instance.AccessToken);
+                    break;
+            }
+        }
+
+        public enum SignInMethod
+        {
+            Anonymously,
+            Google
         }
 
         #endregion
