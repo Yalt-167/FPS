@@ -3980,6 +3980,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2634945968615659665, guid: b378211f2dd648b45a09e6208c6e12e3,
+        type: 3}
+      propertyPath: m_ProtocolType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2741000013444039455, guid: b378211f2dd648b45a09e6208c6e12e3,
         type: 3}
       propertyPath: LogLevel

@@ -21,6 +21,8 @@ namespace LobbyHandling
         private float heartbeatTimer; // what pings the lobby for it to stay active when not interacted with (in seconds)
         private static readonly string noPassword = "        ";
 
+        public string ProfileName;
+
         #region Filters Handling
 
         public FiltersValuesStruct FiltersValues;
@@ -74,8 +76,15 @@ namespace LobbyHandling
             AuthenticationService.Instance.SignedOut += SignOutCallback;
             AuthenticationService.Instance.Expired += SessionExpiredCallback;
 
+        }
+
+        public async void PerformSignInAsync(string sighInAs)
+        {
+            AuthenticationService.Instance.SwitchProfile(sighInAs);
+
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
+
 
         private void SignInCallback()
         {

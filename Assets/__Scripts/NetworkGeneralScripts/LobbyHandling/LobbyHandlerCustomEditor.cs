@@ -25,6 +25,11 @@ namespace LobbyHandling
             spaceBetweenButtons = targetScript.SpaceBetweenButtons;
 
 
+            if (GUILayout.Button("Sign In"))
+            {
+                targetScript.PerformSignInAsync(targetScript.ProfileName);
+            }
+
             GUILayout.Space(spaceBetweenButtons * 2);
             GUILayout.Label("Those will use the options above");
             if (GUILayout.Button("Create"))
@@ -76,7 +81,6 @@ namespace LobbyHandling
             GUILayout.Space(spaceBetweenButtons);
             if (GUILayout.Button("Join lobby by code"))
             {
-
                 if (string.IsNullOrEmpty(targetScript.TargetLobbyCode))
                 {
                     Debug.Log("You must provide the lobby code");
