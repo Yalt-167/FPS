@@ -5,4 +5,5 @@ using UnityEngine;
 public static class LobbyData
 {
     public static readonly string GameMode = "GameMode";
+    public static readonly string Map = "Map";
 }

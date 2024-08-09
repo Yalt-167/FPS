@@ -315,9 +315,14 @@ namespace LobbyHandling
 
         public async void QuitLobby()
         {
+            await KickPlayer(AuthenticationService.Instance.PlayerId);
+        }
+
+        public async Task KickPlayer(string playerId)
+        {
             try
             {
-                await LobbyService.Instance.RemovePlayerAsync(hostLobby.Id, AuthenticationService.Instance.PlayerId);
+                await LobbyService.Instance.RemovePlayerAsync(hostLobby.Id, playerId);
             }
             catch (LobbyServiceException exception)
             {
@@ -329,32 +334,33 @@ namespace LobbyHandling
 #nullable enable
         public async Task<QueryResponse?> EnumerateLobbiesAsync()
         {
+            var options = new QueryLobbiesOptions()
+            {
+                Count = 25,
+                Filters = new List<QueryFilter>()
+                {
+                    //new QueryFilter(QueryFilter.FieldOptions.Name, "that ll do for now", QueryFilter.OpOptions.EQ),
+                    //new QueryFilter(QueryFilter.FieldOptions.AvailableSlots, "5", QueryFilter.OpOptions.LT),
+                },
+                Order = new List<QueryOrder>()
+                {
+                    new QueryOrder(false, QueryOrder.FieldOptions.AvailableSlots),
+                }
+            };
+
+            QueryResponse response;
+
             try
             {
-                QueryLobbiesOptions options = new QueryLobbiesOptions()
-                {
-                    Count = 25,
-                    Filters = new List<QueryFilter>()
-                    {
-                        //new QueryFilter(QueryFilter.FieldOptions.Name, "that ll do for now", QueryFilter.OpOptions.EQ),
-                        //new QueryFilter(QueryFilter.FieldOptions.AvailableSlots, "5", QueryFilter.OpOptions.LT),
-                    },
-                    Order = new List<QueryOrder>()
-                    {
-                        new QueryOrder(true, QueryOrder.FieldOptions.AvailableSlots),
-                    }
-                };
-
-                QueryResponse response = await LobbyService.Instance.QueryLobbiesAsync(options);
-
-                return response.Results.Count > 0 ? response : null;
+                response = await LobbyService.Instance.QueryLobbiesAsync(options);
             }
             catch (LobbyServiceException exception)
             {
                 Debug.Log(exception.Message);
+                return null;
             }
 
-            return null;
+            return response.Results.Count > 0 ? response : null;
         }
 #nullable disable
 
