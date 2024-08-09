@@ -217,7 +217,7 @@ namespace LobbyHandling
                 return;
             }
 
-            UpdateLobbyOptions updateOptions = new UpdateLobbyOptions()
+            var updateOptions = new UpdateLobbyOptions()
             {
                 Name = lobbyName,
                 MaxPlayers = lobbyCapacity,
@@ -318,17 +318,37 @@ namespace LobbyHandling
             await KickPlayer(AuthenticationService.Instance.PlayerId);
         }
 
-        public async Task KickPlayer(string playerId)
+        public async Task KickPlayer(string playerID)
         {
             try
             {
-                await LobbyService.Instance.RemovePlayerAsync(hostLobby.Id, playerId);
+                await LobbyService.Instance.RemovePlayerAsync(hostLobby.Id, playerID);
             }
             catch (LobbyServiceException exception)
             {
                 Debug.Log(exception.Message);
                 return;
             }
+        }
+
+        public async void SetHost(string newHostPlayerID)
+        {
+            var updateOptions = new UpdateLobbyOptions()
+            {
+                HostId = newHostPlayerID
+            };
+
+            try
+            {
+                hostLobby = await LobbyService.Instance.UpdateLobbyAsync(hostLobby.Id, updateOptions);
+            }
+            catch (LobbyServiceException exception)
+            {
+                Debug.Log(exception.Message);
+                return;
+            }
+
+            Debug.Log($"Successfully set new host");
         }
 
 #nullable enable
