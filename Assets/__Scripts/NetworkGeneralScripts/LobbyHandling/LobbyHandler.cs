@@ -19,6 +19,8 @@ namespace LobbyHandling
         private Lobby hostLobby;
         private static readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
         private float heartbeatTimer;
+        private static readonly float lobbyUpdateRate = 5f; // how often the lobby updates
+        private float lobbyUpdateTimer;
         private static readonly string noPassword = "        ";
 
         public string ProfileName;
@@ -139,6 +141,7 @@ namespace LobbyHandling
         private void Update()
         {
             HandleHeartbeat();
+            HandleLobbyUpdate();
         }
 
         private async void HandleHeartbeat()
@@ -149,8 +152,25 @@ namespace LobbyHandling
             if (heartbeatTimer >= heartbeat)
             {
                 heartbeatTimer = 0f;
+
                 if (hostLobby == null) { return; }
+
                 await LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
+            }
+        }
+
+        public async void HandleLobbyUpdate()
+        {
+            if (hostLobby == null) { return; }
+
+            lobbyUpdateTimer += Time.deltaTime;
+            if (lobbyUpdateTimer >= lobbyUpdateRate)
+            {
+                lobbyUpdateTimer = 0f;
+
+                if (hostLobby == null) { return; }
+
+                hostLobby = await LobbyService.Instance.GetLobbyAsync(hostLobby.Id);
             }
         }
 
