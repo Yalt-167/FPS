@@ -210,6 +210,12 @@ namespace LobbyHandling
 
         public async void EditLobby(string lobbyID, string lobbyName, int lobbyCapacity, bool privateLobby, string password)
         {
+            if (!IsLobbyHost())
+            {
+                Debug.Log("You don t have permission for this");
+                return;
+            }
+
             var emptyPassword = string.IsNullOrEmpty(password);
             if (!emptyPassword && password.Length < 8)
             {
@@ -245,6 +251,12 @@ namespace LobbyHandling
 
         public async void DeleteLobby(string lobbyID)
         {
+            if (!IsLobbyHost())
+            {
+                Debug.Log("You don t have permission for this");
+                return;
+            }
+
             try
             {
                 await LobbyService.Instance.DeleteLobbyAsync(lobbyID);
@@ -320,6 +332,12 @@ namespace LobbyHandling
 
         public async Task KickPlayer(string playerID)
         {
+            if (!IsLobbyHost())
+            {
+                Debug.Log("You don t have permission for this");
+                return;
+            }
+
             try
             {
                 await LobbyService.Instance.RemovePlayerAsync(hostLobby.Id, playerID);
@@ -333,6 +351,12 @@ namespace LobbyHandling
 
         public async void SetHost(string newHostPlayerID)
         {
+            if (!IsLobbyHost())
+            {
+                Debug.Log("You don t have permission for this");
+                return;
+            }
+
             var updateOptions = new UpdateLobbyOptions()
             {
                 HostId = newHostPlayerID
@@ -493,6 +517,13 @@ namespace LobbyHandling
 
             GUIUtility.systemCopyBuffer = hostLobby.LobbyCode;
             Debug.Log("Lobby code was copied to your clipboard");
+        }
+
+        public bool IsLobbyHost()
+        {
+            if (hostLobby == null) { return false; }
+
+            return hostLobby.HostId == localPlayer.Id;
         }
 
         #endregion
