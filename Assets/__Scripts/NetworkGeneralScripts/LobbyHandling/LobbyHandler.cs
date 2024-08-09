@@ -90,7 +90,7 @@ namespace LobbyHandling
             localPlayer = GetPlayer();
         }
 
-        #region Callbacks
+        #region Sign in/Out Callbacks
 
         private void SignInCallback()
         {
