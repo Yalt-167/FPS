@@ -16,9 +16,9 @@ namespace LobbyHandling
     public sealed class LobbyHandler : MonoBehaviour
     {
         public int SpaceBetweenButtons = 12;
-        public Lobby hostLobby;
+        private Lobby hostLobby;
         private static readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
-        private float heartbeatTimer; // what pings the lobby for it to stay active when not interacted with (in seconds)
+        private float heartbeatTimer;
         private static readonly string noPassword = "        ";
 
         public string ProfileName;
@@ -111,6 +111,7 @@ namespace LobbyHandling
         }
 
         #endregion
+
         public async void SignIn(SignInMethod signInMethod)
         {
             switch (signInMethod)
@@ -181,7 +182,7 @@ namespace LobbyHandling
                 Data = new Dictionary<string, DataObject>()
                 {
                     {
-                        "GameMode",
+                        LobbyData.GameMode,
                         new DataObject(
                             visibility: DataObject.VisibilityOptions.Public,
                             value: GameModes.DeathMatch,
@@ -427,7 +428,7 @@ namespace LobbyHandling
         {
             foreach (var player in lobby.Players)
             {
-                Debug.Log($"{player.Data["Username"].Value}");
+                Debug.Log($"{player.Data[LobbyPlayerData.Username].Value}");
             }
         }
 
@@ -476,7 +477,7 @@ namespace LobbyHandling
             {
                 Data = new Dictionary<string, PlayerDataObject>()
                 {
-                    {"Username", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, ProfileName) }
+                    { LobbyPlayerData.Username, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, ProfileName) }
                 }
             };
         }
