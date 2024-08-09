@@ -22,6 +22,7 @@ namespace LobbyHandling
         private static readonly string noPassword = "        ";
 
         public string ProfileName;
+        private Player localPlayer;
 
         #region Filters Handling
 
@@ -78,12 +79,16 @@ namespace LobbyHandling
 
         }
 
-        public async void PerformSignInAsync(string sighInAs)
+        public async void SignInAsync(string sighInAs)
         {
             AuthenticationService.Instance.SwitchProfile(sighInAs);
 
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
+
+            localPlayer = GetPlayer();
         }
+
+        #region Callbacks
 
         private void SignInCallback()
         {
@@ -105,6 +110,7 @@ namespace LobbyHandling
             Debug.Log("Session Expired");
         }
 
+        #endregion
         public async void SignIn(SignInMethod signInMethod)
         {
             switch (signInMethod)
@@ -170,7 +176,7 @@ namespace LobbyHandling
             var lobbyOptions = new CreateLobbyOptions()
             {
                 IsPrivate = privateLobby,
-                Player = GetPlayer(),
+                Player = localPlayer,
                 Password = emptyPassword ? noPassword : password,
                 Data = new Dictionary<string, DataObject>()
                 {
@@ -178,7 +184,7 @@ namespace LobbyHandling
                         "GameMode",
                         new DataObject(
                             visibility: DataObject.VisibilityOptions.Public,
-                            value: "Deathmatch",
+                            value: GameModes.DeathMatch,
                             index: FiltersValues.GameMode // GameModeFilter value being S1 -> it s now linked to the QueryFilter.FieldOptions.S1
                         )
                     },
@@ -268,6 +274,7 @@ namespace LobbyHandling
         {
             var joinOptions = new JoinLobbyByIdOptions()
             {
+                Player = localPlayer,
                 Password = string.IsNullOrEmpty(password) ? noPassword : password
             };
 
@@ -288,6 +295,7 @@ namespace LobbyHandling
         {
             var joinOptions = new JoinLobbyByCodeOptions()
             {
+                Player = localPlayer,
                 Password = string.IsNullOrEmpty(password) ? noPassword : password
             };
 
@@ -404,14 +412,40 @@ namespace LobbyHandling
                 Debug.Log(exception.Message);
                 return;
             }
-            
-            Debug.Log($"Name: {lobby.Name} | Capacity: {lobby.MaxPlayers} | Private: {lobby.IsPrivate}");
-            Debug.Log($"ID: {lobby.Id} | Code: {lobby.LobbyCode}");
 
-            foreach (KeyValuePair<string, DataObject> kvp in lobby.Data)
+            DisplayLobbyData(lobby);
+        }
+
+        public void DisplayHostLobbyPlayers()
+        {
+            if (hostLobby == null) { return; }
+
+            DisplayPlayers(hostLobby);
+        }
+
+        public void DisplayPlayers(Lobby lobby)
+        {
+            foreach (var player in lobby.Players)
             {
-                Debug.Log($"{kvp.Key}: {kvp.Value.Value}");
+                Debug.Log($"{player.Data["Username"].Value}");
             }
+        }
+
+        public async void DisplayPlayers(string lobbyID)
+        {
+            Lobby lobby;
+
+            try
+            {
+                lobby = await LobbyService.Instance.GetLobbyAsync(lobbyID);
+            }
+            catch (LobbyServiceException exception)
+            {
+                Debug.Log(exception.Message);
+                return;
+            }
+
+            DisplayPlayers(lobby);
         }
 
         #endregion
@@ -435,13 +469,14 @@ namespace LobbyHandling
         }
 
         #endregion
+
         private Player GetPlayer()
         {
             return new Player(id: AuthenticationService.Instance.PlayerId)
             {
                 Data = new Dictionary<string, PlayerDataObject>()
                 {
-                    {"Name", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "playerName") }
+                    {"Username", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, ProfileName) }
                 }
             };
         }

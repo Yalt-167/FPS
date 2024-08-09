@@ -27,7 +27,7 @@ namespace LobbyHandling
 
             if (GUILayout.Button("Sign In"))
             {
-                targetScript.PerformSignInAsync(targetScript.ProfileName);
+                targetScript.SignInAsync(targetScript.ProfileName);
             }
 
             GUILayout.Space(spaceBetweenButtons * 2);
@@ -89,7 +89,13 @@ namespace LobbyHandling
                 {
                     targetScript.JoinLobbyByCode(targetScript.TargetLobbyCode, targetScript.Password);
                 }
-                
+
+            }
+
+            GUILayout.Space(spaceBetweenButtons);
+            if (GUILayout.Button("Quit current lobby"))
+            {
+                targetScript.QuitLobby();
             }
 
             GUILayout.Space(spaceBetweenButtons);
@@ -100,13 +106,13 @@ namespace LobbyHandling
             }
 
             GUILayout.Space(spaceBetweenButtons);
-            if (GUILayout.Button("Copy ID"))
+            if (GUILayout.Button("Copy lobby ID"))
             {
                 targetScript.CopyLobbyID();
             }
 
             GUILayout.Space(spaceBetweenButtons);
-            if (GUILayout.Button("Copy code"))
+            if (GUILayout.Button("Copy lobby code"))
             {
                 targetScript.CopyLobbyCode();
             }
@@ -121,6 +127,18 @@ namespace LobbyHandling
             if (GUILayout.Button("Display lobby data by id"))
             {
                 targetScript.DisplayLobbyData(targetScript.TargetLobbyId);
+            }
+
+            GUILayout.Space(spaceBetweenButtons);
+            if (GUILayout.Button("Display current lobby players"))
+            {
+                targetScript.DisplayHostLobbyPlayers();
+            }
+
+            GUILayout.Space(spaceBetweenButtons);
+            if (GUILayout.Button("Display lobby players by id"))
+            {
+                targetScript.DisplayPlayers(targetScript.TargetLobbyId);
             }
         }
     }
