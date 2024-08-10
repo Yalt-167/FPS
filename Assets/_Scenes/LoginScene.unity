@@ -2293,6 +2293,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1013962245}
   - component: {fileID: 1013962246}
+  - component: {fileID: 1013962247}
   m_Layer: 0
   m_Name: LobbyHandler
   m_TagString: Untagged
@@ -2335,6 +2336,20 @@ MonoBehaviour:
   Password: 
   TargetLobbyCode: 
   TargetLobbyId: 
+--- !u!114 &1013962247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1013962243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e83349c5771551141967406d62e31ec2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Slots: 1
+  JoinCode: 
 --- !u!1 &1053669928
 GameObject:
   m_ObjectHideFlags: 0

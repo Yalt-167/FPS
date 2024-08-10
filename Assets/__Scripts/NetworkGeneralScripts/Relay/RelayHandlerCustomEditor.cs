@@ -17,7 +17,7 @@ namespace RelayHandling
             targetScript = (RelayHandler)target;
         }
 
-        public override async void OnInspectorGUI()
+        public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
 
@@ -28,7 +28,7 @@ namespace RelayHandling
 
             if (GUILayout.Button("Join relay"))
             {
-                // await targetScript.JoinRelay(targetScript.JoinCode);
+                targetScript.JoinRelay(targetScript.JoinCode);
             }
         }
 

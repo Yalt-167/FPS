@@ -532,7 +532,7 @@ namespace LobbyHandling
         {
             foreach (var player in lobby.Players)
             {
-                Debug.Log($"{player.Data[LobbyPlayerData.Username].Value}");
+                Debug.Log($"{player.Data[PlayerDataForLobby.Username].Value}");
             }
         }
 
@@ -575,9 +575,7 @@ namespace LobbyHandling
 
         public bool IsLobbyHost()
         {
-            if (hostLobby == null) { return false; }
-
-            return hostLobby.HostId == localPlayer.Id;
+            return IsLobbyHost(localPlayer.Id);
         }
 
         public bool IsLobbyHost(string playerID)
@@ -595,7 +593,7 @@ namespace LobbyHandling
             {
                 Data = new Dictionary<string, PlayerDataObject>()
                 {
-                    { LobbyPlayerData.Username, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, ProfileName) }
+                    { PlayerDataForLobby.Username, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, ProfileName) }
                 }
             };
         }

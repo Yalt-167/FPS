@@ -16,15 +16,15 @@ namespace RelayHandling
     public class RelayHandler : MonoBehaviour
     {
 		public int Slots;
+		public string JoinCode;
         public async Task<string> CreateRelay(int slots)
         {
 			Allocation allocation;
-            string joinCode;
 			try
 			{
 				allocation = await RelayService.Instance.CreateAllocationAsync(slots);
-				//await RelayService.Instance.ListRegionsAsync
-                joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+                //await RelayService.Instance.ListRegionsAsync
+                JoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 			}
 			catch (RelayServiceException exception)
 			{
@@ -43,7 +43,7 @@ namespace RelayHandling
 			NetworkManager.Singleton.StartServer();
 
 			Debug.Log("Successfully created relay");
-			return joinCode;
+			return JoinCode;
         }
 
 
