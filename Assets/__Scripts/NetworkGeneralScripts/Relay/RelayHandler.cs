@@ -13,9 +13,9 @@ using UnityEngine;
 
 namespace RelayHandling
 {
-
     public class RelayHandler : MonoBehaviour
     {
+		public int Slots;
         public async Task<string> CreateRelay(int slots)
         {
 			Allocation allocation;
@@ -23,6 +23,7 @@ namespace RelayHandling
 			try
 			{
 				allocation = await RelayService.Instance.CreateAllocationAsync(slots);
+				//await RelayService.Instance.ListRegionsAsync
                 joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 			}
 			catch (RelayServiceException exception)

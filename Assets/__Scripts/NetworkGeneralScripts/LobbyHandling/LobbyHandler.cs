@@ -230,6 +230,12 @@ namespace LobbyHandling
 
         public async void EditLobby(string lobbyID, string lobbyName, int lobbyCapacity, bool privateLobby, string password)
         {
+            if (string.IsNullOrEmpty(lobbyID))
+            {
+                Debug.Log("No lobby ID provided");
+                return;
+            }
+
             if (!IsLobbyHost())
             {
                 Debug.Log("You don t have permission for this");
@@ -271,6 +277,12 @@ namespace LobbyHandling
 
         public async void DeleteLobby(string lobbyID)
         {
+            if (string.IsNullOrEmpty(lobbyID))
+            {
+                Debug.Log("No lobby ID provided");
+                return;
+            }
+
             if (!IsLobbyHost())
             {
                 Debug.Log("You don t have permission for this");
@@ -305,6 +317,12 @@ namespace LobbyHandling
 
         public async void JoinLobbyByID(string lobbyID, string password)
         {
+            if (string.IsNullOrEmpty(lobbyID))
+            {
+                Debug.Log("No lobby ID provided");
+                return;
+            }
+
             var joinOptions = new JoinLobbyByIdOptions()
             {
                 Player = localPlayer,
@@ -326,6 +344,11 @@ namespace LobbyHandling
 
         public async void JoinLobbyByCode(string lobbyCode, string password)
         {
+            if (string.IsNullOrEmpty(lobbyCode))
+            {
+                Debug.Log("No lobby code provided");
+                return;
+            }
             var joinOptions = new JoinLobbyByCodeOptions()
             {
                 Player = localPlayer,

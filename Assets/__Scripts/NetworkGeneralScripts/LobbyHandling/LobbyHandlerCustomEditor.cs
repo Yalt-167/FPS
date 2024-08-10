@@ -9,11 +9,10 @@ namespace LobbyHandling
     [CustomEditor(typeof(LobbyHandler))]
     public sealed class LobbyHandlerCustomEditor : Editor
     {
-
         private LobbyHandler targetScript;
         private int spaceBetweenButtons;
 
-        public void OnEnable()
+        private void OnEnable()
         {
             targetScript = (LobbyHandler)target;
         }
