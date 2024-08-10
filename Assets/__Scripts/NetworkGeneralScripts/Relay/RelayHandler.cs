@@ -1,12 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
-using UnityEngine.Video;
+
 
 
 namespace RelayHandling
@@ -14,7 +16,7 @@ namespace RelayHandling
 
     public class RelayHandler : MonoBehaviour
     {
-        public async void CreateRelay(int slots)
+        public async Task<string> CreateRelay(int slots)
         {
 			Allocation allocation;
             string joinCode;
@@ -26,7 +28,7 @@ namespace RelayHandling
 			catch (RelayServiceException exception)
 			{
 				Debug.Log(exception.Message);
-				return;
+				return string.Empty;
 			}
 
 			NetworkManager.Singleton.GetComponent<UnityTransport>().SetHostRelayData(
@@ -40,6 +42,7 @@ namespace RelayHandling
 			NetworkManager.Singleton.StartServer();
 
 			Debug.Log("Successfully created relay");
+			return joinCode;
         }
 
 
