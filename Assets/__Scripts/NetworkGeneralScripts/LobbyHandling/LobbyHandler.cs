@@ -370,14 +370,14 @@ namespace LobbyHandling
 
         public async void QuitLobby()
         {
-            await KickPlayer(AuthenticationService.Instance.PlayerId);
+            await QuitLobby(AuthenticationService.Instance.PlayerId);
         }
 
-        public async Task KickPlayer(string playerID)
+        public async Task QuitLobby(string playerID)
         {
-            if (!IsLobbyHost())
+            if (hostLobby == null)
             {
-                Debug.Log("You don t have permission for this");
+                Debug.Log("No lobby to quit");
                 return;
             }
 
@@ -390,6 +390,17 @@ namespace LobbyHandling
                 Debug.Log(exception.Message);
                 return;
             }
+        }
+
+        public async void KickPlayer(string playerID)
+        {
+            if (!IsLobbyHost())
+            {
+                Debug.Log("You don t have permission for this");
+                return;
+            }
+
+            await QuitLobby(playerID);
         }
 
         public async void SetHost(string newHostPlayerID)
@@ -567,6 +578,13 @@ namespace LobbyHandling
             if (hostLobby == null) { return false; }
 
             return hostLobby.HostId == localPlayer.Id;
+        }
+
+        public bool IsLobbyHost(string playerID)
+        {
+            if (hostLobby == null) { return false; }
+
+            return hostLobby.HostId == playerID;
         }
 
         #endregion
