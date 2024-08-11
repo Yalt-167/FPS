@@ -26,6 +26,7 @@ namespace RelayHandling
                 CreateRelayWithoutAwaiting();
             }
 
+            GUILayout.Space(spaceBetweenButtons);
             if (GUILayout.Button("Join relay"))
             {
                 targetScript.JoinRelay(targetScript.JoinCode);
@@ -35,7 +36,7 @@ namespace RelayHandling
 
         private async void CreateRelayWithoutAwaiting()
         {
-            var joinCode = await targetScript.CreateRelay(targetScript.Slots);
+            var joinCode = await targetScript.CreateRelay(targetScript.Slots, targetScript.LaunchAsHost);
             if (!string.IsNullOrEmpty(joinCode))
             {
                 Debug.Log(joinCode);
