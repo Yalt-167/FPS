@@ -347,6 +347,10 @@ namespace LobbyHandling
                 Debug.Log(exception.Message);
                 return;
             }
+
+            Debug.Log($"Succesfully joined lobby: {hostLobby.Name}");
+
+            JoinRelay(hostLobby.Data[LobbyData.RelayJoinCode].Value);
         }
 
         public async void JoinLobbyByID(string lobbyID, string password)
@@ -374,6 +378,8 @@ namespace LobbyHandling
             }
 
             Debug.Log($"Succesfully joined lobby: {hostLobby.Name}");
+
+            JoinRelay(hostLobby.Data[LobbyData.RelayJoinCode].Value);
         }
 
         public async void JoinLobbyByCode(string lobbyCode, string password)
@@ -400,6 +406,8 @@ namespace LobbyHandling
             }
 
             Debug.Log($"Succesfully joined lobby: {hostLobby.Name}");
+
+            JoinRelay(hostLobby.Data[LobbyData.RelayJoinCode].Value);
         }
 
         public async void QuitLobby()
@@ -535,7 +543,36 @@ namespace LobbyHandling
             return success;
         }
 
-#endregion
+        public async void JoinRelay(string joinCode)
+        {
+            JoinAllocation joinAllocation;
+
+            try
+            {
+                joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+            }
+            catch (RelayServiceException exception)
+            {
+                Debug.Log(exception.Message);
+                return;
+            }
+
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetClientRelayData(
+                joinAllocation.RelayServer.IpV4,
+                (ushort)joinAllocation.RelayServer.Port,
+                joinAllocation.AllocationIdBytes,
+                joinAllocation.Key,
+                joinAllocation.ConnectionData,
+                joinAllocation.HostConnectionData
+            );
+
+            NetworkManager.Singleton.StartClient();
+
+            Debug.Log("Successfully joined relay");
+        }
+
+
+        #endregion
 
         #region Debug
 
