@@ -95,7 +95,7 @@ namespace RelayHandling
 
 			foreach (Region region in regions)
 			{
-				//region
+				Debug.Log(region.Description);
 			}
 		}
 	}

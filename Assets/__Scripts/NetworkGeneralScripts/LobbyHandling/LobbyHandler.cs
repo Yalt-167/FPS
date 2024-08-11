@@ -1,3 +1,5 @@
+//#define HEADLESS_ARCHITECTURE_SERVER
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,6 +12,10 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
+using Unity.Netcode.Transports.UTP;
+using Unity.Netcode;
+using Unity.Services.Relay.Models;
+using Unity.Services.Relay;
 
 namespace LobbyHandling
 {
@@ -177,13 +183,19 @@ namespace LobbyHandling
         #endregion
 
 
+        [Header("lobby settings")]
         public string LobbyName;
         public int LobbyCapacity;
 
         public bool PrivateLobby; // Private lobbies are NEVER visible in query results and require the lobby CODE or ID to be manually provided to new players.
         public string Password;
+
+        [Header("Target lobby")]
         public string TargetLobbyCode;
         public string TargetLobbyId;
+
+        [Header("Relay")]
+        public string RelayJoinCode;
 
         public async void CreateLobby(string lobbyName, int lobbyCapacity, bool privateLobby, string password)
         {
@@ -191,6 +203,20 @@ namespace LobbyHandling
             if (!emptyPassword && password.Length < 8)
             {
                 Debug.Log("Your lobby was not created as your password doesn t have enough characters (at least 8)");
+                return;
+            }
+
+            var relaySuccessfullyCreated = await CreateRelay(
+#if HEADLESS_ARCHITECTURE_SERVER
+            lobbyCapacity // is server so don t count as a player
+#else
+            lobbyCapacity - 1 // is hos so both a player and the server and therefore should be counted
+#endif
+            );
+
+            if (!relaySuccessfullyCreated)
+            {
+                Debug.Log("Your lobby was not created because the server failed to launch");
                 return;
             }
 
@@ -207,6 +233,14 @@ namespace LobbyHandling
                             visibility: DataObject.VisibilityOptions.Public,
                             value: GameModes.DeathMatch,
                             index: FiltersValues.GameMode // GameModeFilter value being S1 -> it s now linked to the QueryFilter.FieldOptions.S1
+                        )
+                    },
+
+                    {
+                        LobbyData.RelayJoinCode,
+                        new DataObject(
+                            visibility: DataObject.VisibilityOptions.Public,
+                            value: RelayJoinCode
                         )
                     },
                 }
@@ -462,6 +496,47 @@ namespace LobbyHandling
         }
 #nullable disable
 
+        #region Relay Handling
+
+        public async Task<bool> CreateRelay(int slots)
+        {
+            Allocation allocation;
+
+            try
+            {
+                allocation = await RelayService.Instance.CreateAllocationAsync(slots);
+                RelayJoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+            }
+            catch (RelayServiceException exception)
+            {
+                Debug.Log(exception.Message);
+                return false;
+            }
+
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetHostRelayData(
+                allocation.RelayServer.IpV4,
+                (ushort)allocation.RelayServer.Port,
+                allocation.AllocationIdBytes,
+                allocation.Key,
+                allocation.ConnectionData
+            );
+
+            Debug.Log("Successfully created relay");
+
+            bool success =
+#if HEADLESS_ARCHITECTURE_SERVER
+            NetworkManager.Singleton.StartServer()
+#else
+            NetworkManager.Singleton.StartHost()
+#endif
+                ;
+
+            Debug.Log(success ? "Server was successfully started" : "Failed to start server");
+            return success;
+        }
+
+#endregion
+
         #region Debug
 
         public async void DisplayLobbies()
@@ -571,6 +646,14 @@ namespace LobbyHandling
 
             GUIUtility.systemCopyBuffer = hostLobby.LobbyCode;
             Debug.Log("Lobby code was copied to your clipboard");
+        }
+
+        public void CopyRelayJoinCode() // should not be used but if needed it s here ig
+        {
+            if (string.IsNullOrEmpty(RelayJoinCode)) { return; }
+
+            GUIUtility.systemCopyBuffer = RelayJoinCode;
+            Debug.Log("Relay join code was copied to your clipboard");
         }
 
         public bool IsLobbyHost()
