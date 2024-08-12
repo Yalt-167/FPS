@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public sealed class ProjectilePierceOnHitWall : ProjectileOnHitWallBehaviour
+public class ProjectilePierceOnHitWall : ProjectileOnHitWallBehaviour
 {
     protected ushort maxWallAmountToPierce;
     protected ushort wallPierced;

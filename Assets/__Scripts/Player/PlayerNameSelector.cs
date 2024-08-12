@@ -9,6 +9,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using Unity.Netcode;
+using Unity.Services.Authentication;
 
 
 public sealed class PlayerNameSelector : NetworkBehaviour
@@ -96,6 +97,11 @@ public sealed class PlayerNameSelector : NetworkBehaviour
 #endif
             ).gameObject.SetActive(IsOwner);
 
+#if PLAYER_PACK_ARCHITECTURE
+        EnablePlayerServerRpc(new(AuthenticationService.Instance.Profile));
+#else
+                loginArchitectureMainCameraIndex
+#endif
         //TestServerRpc();
     }
 
@@ -198,7 +204,7 @@ public sealed class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.Server)]
     private void EnablePlayerServerRpc(NetworkSerializableString playerName)
     {
-        ActivatePlayerPackArchitectureClientRpc(/*playerName*/);
+        ActivatePlayerPackArchitectureClientRpc(playerName);
     }
 
     //[Rpc(SendTo.Server)]
@@ -234,7 +240,7 @@ public sealed class PlayerNameSelector : NetworkBehaviour
     
     
     [Rpc(SendTo.ClientsAndHost)]
-    private void ActivatePlayerPackArchitectureClientRpc(/*NetworkSerializableString playerName*/)
+    private void ActivatePlayerPackArchitectureClientRpc(NetworkSerializableString playerName)
     {
         GetComponent<Controller.PlayerMovement>().enabled = true;
         GetComponent<PlayerCombat>().enabled = true;
@@ -250,7 +256,7 @@ public sealed class PlayerNameSelector : NetworkBehaviour
         GetComponent<WeaponHandler>().enabled = true;
         GetComponent<PlayerHealthNetworked>().enabled = true;
 
-        GetComponent<PlayerFrame>().InitPlayerFrameLocal(/*playerName*/);
+        GetComponent<PlayerFrame>().InitPlayerFrameLocal(playerName);
         transform.GetChild(playerPackArchitectureMainCameraIndex).gameObject.SetActive(false);
         enabled = false;
 
@@ -260,7 +266,7 @@ public sealed class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void ActivatePlayerLoginArchitectureClientRpc(NetworkSerializableString playerName)
     {
-        playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrameLocal(/*playerName*/);
+        playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrameLocal(playerName);
     }
 
 

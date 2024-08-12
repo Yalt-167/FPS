@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public sealed class ProjectileBounceOnHitWall : ProjectileOnHitWallBehaviour
+public class ProjectileBounceOnHitWall : ProjectileOnHitWallBehaviour
 {
     protected int maxBounces;
     protected int bounces;

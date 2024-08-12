@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public sealed class Projectile : MonoBehaviour
+public class Projectile : MonoBehaviour
 {
     #warning PlaceHolderValue to remove here
     private ushort _____placeHolderTeamID;

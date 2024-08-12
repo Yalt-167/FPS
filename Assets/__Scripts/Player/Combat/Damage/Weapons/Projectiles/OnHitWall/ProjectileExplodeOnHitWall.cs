@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public sealed class ProjectileExplodeOnHitWall : ProjectileOnHitWallBehaviour
+public class ProjectileExplodeOnHitWall : ProjectileOnHitWallBehaviour
 {
     protected float explosionRadius;
     protected ushort explosionDamage;
