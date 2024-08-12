@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RaycastHitComparer : IComparer<RaycastHit>
+public sealed class RaycastHitComparer : IComparer<RaycastHit>
 {
     public int Compare(RaycastHit hit1, RaycastHit hit2)
     {

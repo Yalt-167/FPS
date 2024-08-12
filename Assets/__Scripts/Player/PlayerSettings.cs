@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class PlayerSettings : MonoBehaviour
+public sealed class PlayerSettings : MonoBehaviour
 {
     public DamageLogSettings DamageLogSettings;
 }

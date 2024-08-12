@@ -210,7 +210,7 @@ public sealed class Game : NetworkManager
     [Rpc(SendTo.ClientsAndHost)]
     private void SpawnNetworkObjectClientRpc(GameObject networkObjectPrefab, Vector3 position, Quaternion orientation)
     {
-        // Legitimately spawn the obj on the network
+        // Actually spawn the obj on the network
         Instantiate(networkObjectPrefab, position, orientation).GetComponent<NetworkObject>().Spawn();
     }
 

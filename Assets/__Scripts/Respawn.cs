@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Respawn : MonoBehaviour
+public sealed class Respawn : MonoBehaviour
 {
     public Transform respawnPoint;
 

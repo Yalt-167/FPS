@@ -1,10 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 using Unity.Netcode;
-using System.Diagnostics;
-using UnityEditor.PackageManager;
-using System;
+using Unity.Services.Authentication;
 
 
 
@@ -56,9 +56,6 @@ public sealed class PlayerFrame : NetworkBehaviour
         playerMovement = GetComponent<Controller.PlayerMovement>();
         playerMovement.InitPlayerFrame(this);
 
-        //handlePlayerNetworkBehaviour = GetComponent<HandlePlayerNetworkBehaviour>();
-        //handlePlayerNetworkBehaviour.InitPlayerFrame(this);
-        //handlePlayerNetworkBehaviour.ToggleCursor(false);
         ToggleCursor(false);
 
         playerName = playerName_;
@@ -89,9 +86,6 @@ public sealed class PlayerFrame : NetworkBehaviour
 
         playerMovement = GetComponent<Controller.PlayerMovement>();
         playerMovement.InitPlayerFrame(this);
-
-
-        //playerName = playerName_;
     }
 
     public NetworkedPlayerPrimitive AsPrimitive(/*ulong requestingClientID*/)
@@ -145,7 +139,7 @@ public sealed class PlayerFrame : NetworkBehaviour
     //    }
     //}
 
-    [ServerRpc]
+    [Rpc(SendTo.Server)]
     private void RequestPlayerNameServerRpc(ulong targetID, ulong requestingID)
     {
         foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
@@ -158,7 +152,7 @@ public sealed class PlayerFrame : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
+    [Rpc(SendTo.ClientsAndHost)]
     private void SendPlayerNameClientRpc(NetworkSerializableString playerName_, ulong targetClientID)
     {
         if (NetworkManager.Singleton.LocalClientId == targetClientID)
@@ -167,7 +161,7 @@ public sealed class PlayerFrame : NetworkBehaviour
         }
     }
 
-    //[ClientRpc]
+    //[Rpc(SendTo.ClientsAndHost)]
     //private void SendPlayerDataClientRpc(PlayerData data, ulong targetClientID)
     //{
     //    if (NetworkManager.Singleton.LocalClientId == targetClientID)

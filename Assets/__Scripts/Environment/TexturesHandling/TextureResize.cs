@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor;
 
 [ExecuteInEditMode]
-public class TextureResize : MonoBehaviour
+public sealed class TextureResize : MonoBehaviour
 {
 
     public float scaleFactor = 5.0f;

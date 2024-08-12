@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PartialUpdateChildTransform : MonoBehaviour
+public sealed class PartialUpdateChildTransform : MonoBehaviour
 {
     private MyTransform previousData;
 

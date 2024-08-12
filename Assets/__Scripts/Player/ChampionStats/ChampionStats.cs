@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "ChampionStats", menuName = "ScriptableObjects/ChampionStats")]
-public class ChampionStats : ScriptableObject
+public sealed class ChampionStats : ScriptableObject
 {
     public ChampionMovementStats MovementStats;
     public ChampionCooldowns Cooldowns;

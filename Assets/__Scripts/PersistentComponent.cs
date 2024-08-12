@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PersistentComponent : MonoBehaviour
+public sealed class PersistentComponent : MonoBehaviour
 {
     private void Awake()
     {

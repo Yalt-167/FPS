@@ -27,7 +27,7 @@ namespace LobbyHandling
             GUILayout.Space(spaceBetweenButtons * 2);
             if (GUILayout.Button("Sign In"))
             {
-                targetScript.SignInAsync(targetScript.ProfileName);
+                targetScript.SignInAsync();
             }
 
             GUILayout.Space(spaceBetweenButtons * 2);
@@ -65,7 +65,7 @@ namespace LobbyHandling
             }
 
             GUILayout.Space(spaceBetweenButtons);
-            if (GUILayout.Button("Join lobby by id"))
+            if (GUILayout.Button("Join lobby by ID"))
             {
                 if (string.IsNullOrEmpty(targetScript.TargetLobbyId))
                 {
@@ -136,7 +136,7 @@ namespace LobbyHandling
             }
 
             GUILayout.Space(spaceBetweenButtons);
-            if (GUILayout.Button("Display lobby players by id"))
+            if (GUILayout.Button("Display lobby players by ID"))
             {
                 targetScript.DisplayPlayers(targetScript.TargetLobbyId);
             }

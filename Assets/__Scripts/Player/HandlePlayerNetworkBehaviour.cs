@@ -6,7 +6,7 @@ using UnityEngine;
 
 [DefaultExecutionOrder(-97)]
 [Serializable]
-public class HandlePlayerNetworkBehaviour : NetworkBehaviour, IPlayerFrameMember
+public sealed class HandlePlayerNetworkBehaviour : NetworkBehaviour, IPlayerFrameMember
 {
 
     public PlayerFrame PlayerFrame { get; set; }

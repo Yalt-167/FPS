@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class GameModes
 {
-    public static readonly string ToBeVoted = "ToBeVoted";
-    public static readonly string TeamMacth = "Teammatch";
-    public static readonly string DeathMatch = "Deathmatch";
+    public static readonly string ToBeVoted = nameof(ToBeVoted);
+    public static readonly string TeamMatch = nameof(TeamMatch);
+    public static readonly string DeathMatch = nameof(DeathMatch);
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class TimerDisplay : MonoBehaviour
+public sealed class TimerDisplay : MonoBehaviour
 {
     public static TimerDisplay Instance;
     private TextMeshProUGUI textMeshPro;

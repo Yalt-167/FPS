@@ -6,7 +6,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 [DefaultExecutionOrder(-5)]
-public class PlayerCombatNetworked : NetworkBehaviour
+public sealed class PlayerCombatNetworked : NetworkBehaviour
 {
 
     [SerializeField] private GameObject landingShotEffect;

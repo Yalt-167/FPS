@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class ProjectileStopOnHitWall : ProjectileOnHitWallBehaviour
+public sealed class ProjectileStopOnHitWall : ProjectileOnHitWallBehaviour
 {
     public ProjectileStopOnHitWall(IProjectileBehaviourOnHitWallParam _) { }
 

@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using TMPro;
 
-public class DamageLogManager : MonoBehaviour
+public sealed class DamageLogManager : MonoBehaviour
 {
     [SerializeField] private GameObject damageLogPrefab;
     private readonly List<GameObject> activeDamageLogs = new();

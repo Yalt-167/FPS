@@ -6,7 +6,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 [Serializable]
-public class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
+public sealed class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
 {
     #warning PlaceHolderValue to remove here
     private ushort _____placeHolderTeamID = 0;
@@ -1403,9 +1403,9 @@ public class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
         var spreadStrength = spreadAngle / 45f;
         /*Most fucked explanantion to ever cross the frontier of reality
          / 45f -> to get value which we can use in a vector instead of an angle
-        ex in 2D:  a vector that has a 45° angle above X has a (1, 1) direction
+        ex in 2D:  a vector that has a 45ï¿½ angle above X has a (1, 1) direction
         while the X has a (1, 0)
-        so we essentially brought the 45° to a value we could use as a direction in the vector
+        so we essentially brought the 45ï¿½ to a value we could use as a direction in the vector
          */
         // perhaps do directionTransform.forward * 45 instead of other / 45 (for performances purposes)
         return (
@@ -1424,9 +1424,9 @@ public class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
     //    var spreadStrength = spreadAngle / 45f;
     //    /*Most fucked explanantion to ever cross the frontier of reality
     //     / 45f -> to get value which we can use iun a vector instead of an angle
-    //    ex in 2D:  a vector that has a 45° angle above X has a (1, 1) direction
+    //    ex in 2D:  a vector that has a 45ï¿½ angle above X has a (1, 1) direction
     //    while the X has a (1, 0)
-    //    so we essentially brought the 45° to a value we could use as a direction in the vector
+    //    so we essentially brought the 45ï¿½ to a value we could use as a direction in the vector
     //     */
     //    // perhaps do directionTransform.forward * 45 instead of other / 45 (for performances purposes)
     //    return (

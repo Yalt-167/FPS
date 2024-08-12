@@ -7,7 +7,7 @@ using Unity.Netcode;
 
 [DefaultExecutionOrder(-4)]
 [Serializable]
-public class PlayerHealthNetworked : NetworkBehaviour, IPlayerFrameMember
+public sealed class PlayerHealthNetworked : NetworkBehaviour, IPlayerFrameMember
 {
     [field: SerializeField] public PlayerHealthData HealthData { get; private set; }
 

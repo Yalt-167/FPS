@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlashable
+public sealed class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlashable
 {
     [SerializeField] private BodyParts bodyPart;
     private PlayerHealthNetworked playerHealth;

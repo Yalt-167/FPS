@@ -1,12 +1,14 @@
 #define PLAYER_PACK_ARCHITECTURE
+#define LOBBY_ARCHITECTURE
 #define LOG_EVENTS
 #define LOG_METHOD_CALLS
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 using Unity.Netcode;
-using System;
 
 
 public sealed class PlayerNameSelector : NetworkBehaviour
@@ -63,15 +65,35 @@ public sealed class PlayerNameSelector : NetworkBehaviour
 
     #endregion
 
+
+    #region Children Indexes
+#pragma warning disable
+
+    #region PlayerPackArchitecture (ppa)
+
+    private static readonly int playerPackArchitectureMainCameraIndex = 5;
+
+    #endregion
+
+    #region LoginArchitecture (la)
+
+    private static readonly int loginArchitectureMainCameraIndex = 0;
+
+    #endregion
+
+#pragma warning enable
+    #endregion
+
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
         transform.GetChild(
-            #if PLAYER_PACK_ARCHITECTURE
-            5
-            #else
-                0
-            #endif
+#if PLAYER_PACK_ARCHITECTURE
+            playerPackArchitectureMainCameraIndex
+#else
+                loginArchitectureMainCameraIndex
+#endif
             ).gameObject.SetActive(IsOwner);
 
         //TestServerRpc();
@@ -119,6 +141,9 @@ public sealed class PlayerNameSelector : NetworkBehaviour
 
     private void OnGUI()
     {
+#if LOBBY_ARCHITECTURE
+        return;
+#endif
         if (!wasInitialized)
         {
             Init();
@@ -173,10 +198,7 @@ public sealed class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.Server)]
     private void EnablePlayerServerRpc(NetworkSerializableString playerName)
     {
-        ActivatePlayerPackArchitectureClientRpc(playerName);
-
-        //DeactivateLoginPromptClientRpc();
-        //DeactivateLoginCameraClientRpc();
+        ActivatePlayerPackArchitectureClientRpc(/*playerName*/);
     }
 
     //[Rpc(SendTo.Server)]
@@ -212,7 +234,7 @@ public sealed class PlayerNameSelector : NetworkBehaviour
     
     
     [Rpc(SendTo.ClientsAndHost)]
-    private void ActivatePlayerPackArchitectureClientRpc(NetworkSerializableString playerName)
+    private void ActivatePlayerPackArchitectureClientRpc(/*NetworkSerializableString playerName*/)
     {
         GetComponent<Controller.PlayerMovement>().enabled = true;
         GetComponent<PlayerCombat>().enabled = true;
@@ -228,8 +250,8 @@ public sealed class PlayerNameSelector : NetworkBehaviour
         GetComponent<WeaponHandler>().enabled = true;
         GetComponent<PlayerHealthNetworked>().enabled = true;
 
-        GetComponent<PlayerFrame>().InitPlayerFrameLocal(playerName);
-        transform.GetChild(5).gameObject.SetActive(false); // Main Camera
+        GetComponent<PlayerFrame>().InitPlayerFrameLocal(/*playerName*/);
+        transform.GetChild(playerPackArchitectureMainCameraIndex).gameObject.SetActive(false);
         enabled = false;
 
         ManageFiles();
@@ -238,7 +260,7 @@ public sealed class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void ActivatePlayerLoginArchitectureClientRpc(NetworkSerializableString playerName)
     {
-        playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrameLocal(playerName);
+        playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrameLocal(/*playerName*/);
     }
 
 
@@ -398,7 +420,7 @@ public struct NetworkSerializableString : INetworkSerializable
     }
 }
 
-//public struct NetworkSerializableData<T> : INetworkSerializable 
+//public struct NetworkSerializableData<T> : INetworkSerializable
 //{
 //    public T Data;
 //    public NetworkSerializableData(T value) { Data = value; }

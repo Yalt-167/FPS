@@ -5,7 +5,7 @@ using UnityEngine;
 
 
 [Serializable]
-public class MovementInputQuery : InputQuery
+public sealed class MovementInputQuery : InputQuery
 {
 
     public FixedKeybind InitiateForward = new(KeyCode.Z, PlayerActionActivationType.OnKeyDown);
@@ -79,7 +79,7 @@ public class MovementInputQuery : InputQuery
 }
 
 [Serializable]
-public class CombatInputQuery : InputQuery
+public sealed class CombatInputQuery : InputQuery
 {
     public FixedKeybind Shoot;
     public VariableKeybind Aim;

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShieldCell
+public sealed class ShieldCell
 {
     public int Shield;
     private int maxShield;

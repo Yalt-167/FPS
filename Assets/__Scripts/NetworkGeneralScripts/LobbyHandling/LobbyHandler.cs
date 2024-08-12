@@ -1,4 +1,5 @@
 //#define HEADLESS_ARCHITECTURE_SERVER
+#define LOG_LOBBY_EVENTS
 
 using System;
 using System.Collections;
@@ -28,6 +29,7 @@ namespace LobbyHandling
         private static readonly float lobbyUpdateRate = 5f; // how often the lobby updates
         private float lobbyUpdateTimer;
         private static readonly string noPassword = "        ";
+        private static readonly string initializeToZero = "0";
 
         public string ProfileName;
         private Player localPlayer;
@@ -42,15 +44,15 @@ namespace LobbyHandling
             FiltersValues = new()
             {
                 GameMode = DataObject.IndexOptions.S1,
-                HasPassword = DataObject.IndexOptions.S2,
-                IsRanked = DataObject.IndexOptions.S3,
+                IsRanked = DataObject.IndexOptions.S2,
+                Map = DataObject.IndexOptions.S3,
             };
 
             Filters = new()
             {
                 GameMode = QueryFilter.FieldOptions.S1,
-                HasPassword = QueryFilter.FieldOptions.S2,
-                IsRanked = QueryFilter.FieldOptions.S3,
+                IsRanked = QueryFilter.FieldOptions.S2,
+                Map = QueryFilter.FieldOptions.S3,
             };
 
         }
@@ -60,6 +62,7 @@ namespace LobbyHandling
             public DataObject.IndexOptions GameMode;
             public DataObject.IndexOptions HasPassword;
             public DataObject.IndexOptions IsRanked;
+            public DataObject.IndexOptions Map;
         }
 
         public struct FiltersStruct
@@ -67,6 +70,7 @@ namespace LobbyHandling
             public QueryFilter.FieldOptions GameMode;
             public QueryFilter.FieldOptions HasPassword;
             public QueryFilter.FieldOptions IsRanked;
+            public QueryFilter.FieldOptions Map;
         }
 
         #endregion
@@ -87,9 +91,9 @@ namespace LobbyHandling
 
         }
 
-        public async void SignInAsync(string sighInAs)
+        public async void SignInAsync()
         {
-            AuthenticationService.Instance.SwitchProfile(sighInAs);
+            AuthenticationService.Instance.SwitchProfile(ProfileName);
 
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
 
@@ -182,6 +186,7 @@ namespace LobbyHandling
 
         #endregion
 
+        #region Lobby Actions
 
         [Header("lobby settings")]
         public string LobbyName;
@@ -206,11 +211,11 @@ namespace LobbyHandling
                 return;
             }
 
-            var relaySuccessfullyCreated = await CreateRelay(
+            var relaySuccessfullyCreated = await CreateRelayAsync(
 #if HEADLESS_ARCHITECTURE_SERVER
             lobbyCapacity // is server so don t count as a player
 #else
-            lobbyCapacity - 1 // is hos so both a player and the server and therefore should be counted
+            lobbyCapacity - 1 // is host so both a player and the server and therefore should be counted
 #endif
             );
 
@@ -233,6 +238,15 @@ namespace LobbyHandling
                             visibility: DataObject.VisibilityOptions.Public,
                             value: GameModes.DeathMatch,
                             index: FiltersValues.GameMode // GameModeFilter value being S1 -> it s now linked to the QueryFilter.FieldOptions.S1
+                        )
+                    },
+
+                    {
+                        LobbyData.Map,
+                        new DataObject(
+                            visibility: DataObject.VisibilityOptions.Public,
+                            value: Maps.ToBeVoted,
+                            index: FiltersValues.Map // GameModeFilter value being S1 -> it s now linked to the QueryFilter.FieldOptions.S1
                         )
                     },
 
@@ -412,10 +426,10 @@ namespace LobbyHandling
 
         public async void QuitLobby()
         {
-            await QuitLobby(AuthenticationService.Instance.PlayerId);
+            await QuitLobbyAsync(AuthenticationService.Instance.PlayerId);
         }
 
-        public async Task QuitLobby(string playerID)
+        public async Task QuitLobbyAsync(string playerID)
         {
             if (hostLobby == null)
             {
@@ -442,7 +456,7 @@ namespace LobbyHandling
                 return;
             }
 
-            await QuitLobby(playerID);
+            await QuitLobbyAsync(playerID);
         }
 
         public async void SetHost(string newHostPlayerID)
@@ -504,9 +518,11 @@ namespace LobbyHandling
         }
 #nullable disable
 
+        #endregion
+
         #region Relay Handling
 
-        public async Task<bool> CreateRelay(int slots)
+        public async Task<bool> CreateRelayAsync(int slots)
         {
             Allocation allocation;
 
@@ -713,7 +729,12 @@ namespace LobbyHandling
             {
                 Data = new Dictionary<string, PlayerDataObject>()
                 {
-                    { PlayerDataForLobby.Username, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, ProfileName) }
+                    { PlayerDataForLobby.Username, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, ProfileName) },
+                    { PlayerDataForLobby.Kills, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, initializeToZero) },
+                    { PlayerDataForLobby.Deaths, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, initializeToZero)},
+                    { PlayerDataForLobby.Assists, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, initializeToZero) },
+                    { PlayerDataForLobby.Damage, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, initializeToZero) },
+                    { PlayerDataForLobby.Accuracy, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Private, initializeToZero) }
                 }
             };
         }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [DefaultExecutionOrder(-6)]
-public class PlayerCombat : MonoBehaviour, IPlayerFrameMember
+public sealed class PlayerCombat : MonoBehaviour, IPlayerFrameMember
 {
 
     public PlayerFrame PlayerFrame { get; set; }

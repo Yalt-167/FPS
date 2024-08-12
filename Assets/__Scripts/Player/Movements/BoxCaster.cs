@@ -6,7 +6,7 @@ using UnityEngine;
 
 
 [DefaultExecutionOrder(-8)]
-public class BoxCaster : MonoBehaviour
+public sealed class BoxCaster : MonoBehaviour
 {
     [SerializeField] private bool debugBox;
     [field: SerializeField] public Vector3 Size { get; private set; }

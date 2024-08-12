@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using System;
 
-public class NetworkManagerHUD : MonoBehaviour
+public sealed class NetworkManagerHUD : MonoBehaviour
 {
     private Rect rectGUI = new(10, 10, 300, 300);
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerHealthDisplay : MonoBehaviour
+public sealed class PlayerHealthDisplay : MonoBehaviour
 {
     private PlayerHealthNetworked playerHealth;
     private Slider healthSlider;

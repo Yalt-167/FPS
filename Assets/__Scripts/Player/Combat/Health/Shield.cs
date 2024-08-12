@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
-public class Shield
+public sealed class Shield
 {
     private ShieldCell[] shieldCells;
     private ushort shieldCellAmount;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Weapon", menuName = "ScriptableObjects/Weapon")]
-public class Weapon : ScriptableObject
+public sealed class Weapon : ScriptableObject
 {
     public WeaponStats Stats;
 

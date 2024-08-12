@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "PlayerHealthData", menuName = "ScriptableObjects/PlayerHealthData")]
-public class PlayerHealthData : ScriptableObject
+public sealed class PlayerHealthData : ScriptableObject
 {
     public ushort MaxHealth;
     public ushort PassiveHealthRegenerationAmount;

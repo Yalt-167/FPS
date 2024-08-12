@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BulletTrail : MonoBehaviour
+public sealed class BulletTrail : MonoBehaviour
 {
     private LineRenderer lineRenderer;
     [SerializeField] private float lifeTime;

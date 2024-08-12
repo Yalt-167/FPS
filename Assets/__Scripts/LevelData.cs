@@ -4,7 +4,7 @@ using UnityEngine;
 
 
 [CreateAssetMenu(fileName = "LevelData", menuName = "ScriptableObjects/LevelData")]
-public class LevelData : ScriptableObject
+public sealed class LevelData : ScriptableObject
 {
     public int BottomOfTheWorld;
 }

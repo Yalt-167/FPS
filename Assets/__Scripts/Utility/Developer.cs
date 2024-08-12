@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class Developer
+public static class Developer
 {
     [MenuItem("Developer/BringDeathUponMortals")]
     public static void BringDeathUponMereMortals()

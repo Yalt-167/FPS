@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class ProjectileStopOnHitPlayer : ProjectileOnHitPlayerBehaviour
+public sealed class ProjectileStopOnHitPlayer : ProjectileOnHitPlayerBehaviour
 {
     public ProjectileStopOnHitPlayer(IProjectileBehaviourOnHitPlayerParam _) { }
 

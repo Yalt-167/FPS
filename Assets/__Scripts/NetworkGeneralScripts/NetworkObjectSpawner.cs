@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class NetworkObjectSpawner : NetworkBehaviour
+public sealed class NetworkObjectSpawner : NetworkBehaviour
 {
     [SerializeField]
     private GameObject networkObjectPrefab;

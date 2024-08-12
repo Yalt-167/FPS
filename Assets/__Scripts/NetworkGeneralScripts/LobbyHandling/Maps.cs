@@ -4,5 +4,5 @@ using UnityEngine;
 
 public static class Maps
 {
-    public static readonly string ToBeVoted = "ToBeVoted";
+    public static readonly string ToBeVoted = nameof(ToBeVoted);
 }

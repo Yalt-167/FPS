@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class CustomChildTransform : MonoBehaviour
+public sealed class CustomChildTransform : MonoBehaviour
 {
     [SerializeField] private Transform parentTransform;
 

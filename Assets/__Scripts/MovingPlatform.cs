@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MovingPlatform : MonoBehaviour
+public sealed class MovingPlatform : MonoBehaviour
 {
     [SerializeField] private List<Transform> nodes;
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class ProjectilePierceOnHitPlayer : ProjectileOnHitPlayerBehaviour
+public sealed class ProjectilePierceOnHitPlayer : ProjectileOnHitPlayerBehaviour
 {
     protected ushort maxPlayerPierceAmount;
     protected ushort currentPiercedPlayerCount;

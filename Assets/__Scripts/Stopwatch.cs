@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Stopwatch
+public sealed class Stopwatch
 {
     public float Elapsed { get; private set; }
     public bool Running { get; private set; }

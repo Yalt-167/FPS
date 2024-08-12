@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class DamageLog : MonoBehaviour
+public sealed class DamageLog : MonoBehaviour
 {
     private TextMeshProUGUI log;
     public RectTransform rectTransform;

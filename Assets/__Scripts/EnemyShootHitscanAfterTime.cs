@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyShootHitscanAfterTime : MonoBehaviour //, IShootable
+public sealed class EnemyShootHitscanAfterTime : MonoBehaviour //, IShootable
 {
     [SerializeField] private float timeToShoot;
     [SerializeField] private float viewDistance;
