@@ -3,31 +3,36 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public class ProjectileExplodeOnHitWall : ProjectileOnHitWallBehaviour
+namespace Projectiles
 {
-    protected float explosionRadius;
-    protected ushort explosionDamage;
 
-    public ProjectileExplodeOnHitWall(IProjectileBehaviourOnHitWallParam param_)
+    [Serializable]
+    public class ProjectileExplodeOnHitWall : ProjectileOnHitWallBehaviour
     {
-        var param = (ProjectileWallExplodeParams)param_;
+        protected float explosionRadius;
+        protected ushort explosionDamage;
 
-        explosionRadius = param.ExplosionRadius;
-        explosionDamage = param.ExplosionDamage;
-    }
-
-    public override void OnHitWall(Projectile relevantProjectile, Collider relevantWall)
-    {
-        var hits = Physics.OverlapSphere(relevantProjectile.Position, explosionRadius, Layers.PlayerHitBoxes, QueryTriggerInteraction.Ignore);
-        foreach (var hit in hits)
+        public ProjectileExplodeOnHitWall(IProjectileBehaviourOnHitWallParam param_)
         {
-            if (hit.TryGetComponent<IExplodable>(out var explodableComponent))
-            {
-                explodableComponent.ReactExplosion(explosionDamage, relevantProjectile.Position, relevantProjectile.Owner, relevantProjectile.CanBreakThings);
-            }
+            var param = (ProjectileWallExplodeParams)param_;
+
+            explosionRadius = param.ExplosionRadius;
+            explosionDamage = param.ExplosionDamage;
         }
 
-        relevantProjectile.Deactivate();
+        public override void OnHitWall(Projectile relevantProjectile, Collider relevantWall)
+        {
+            var hits = Physics.OverlapSphere(relevantProjectile.Position, explosionRadius, Layers.PlayerHitBoxes, QueryTriggerInteraction.Ignore);
+            foreach (var hit in hits)
+            {
+                if (hit.TryGetComponent<IExplodable>(out var explodableComponent))
+                {
+                    explodableComponent.ReactExplosion(explosionDamage, relevantProjectile.Position, relevantProjectile.Owner, relevantProjectile.CanBreakThings);
+                }
+            }
+
+            relevantProjectile.Deactivate();
+        }
     }
+
 }

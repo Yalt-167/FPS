@@ -3,27 +3,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public class ProjectilePierceOnHitPlayer : ProjectileOnHitPlayerBehaviour
+namespace Projectiles
 {
-    protected ushort maxPlayerPierceAmount;
-    protected ushort currentPiercedPlayerCount;
-
-    public ProjectilePierceOnHitPlayer(IProjectileBehaviourOnHitPlayerParam param_)
+    [Serializable]
+    public class ProjectilePierceOnHitPlayer : ProjectileOnHitPlayerBehaviour
     {
-        var param = (ProjectilePlayerPierceParams)param_;
+        protected ushort maxPlayerPierceAmount;
+        protected ushort currentPiercedPlayerCount;
 
-        maxPlayerPierceAmount = param.MaxPlayersToPierce;
-    }
-
-    public override void OnHitPlayer(Projectile relevantProjectile, IShootable relevantPlayer)
-    {
-        if (currentPiercedPlayerCount == maxPlayerPierceAmount)
+        public ProjectilePierceOnHitPlayer(IProjectileBehaviourOnHitPlayerParam param_)
         {
-            relevantProjectile.Deactivate();
-            return;
+            var param = (ProjectilePlayerPierceParams)param_;
+
+            maxPlayerPierceAmount = param.MaxPlayersToPierce;
         }
 
-        currentPiercedPlayerCount++;
+        public override void OnHitPlayer(Projectile relevantProjectile, IShootable relevantPlayer)
+        {
+            if (currentPiercedPlayerCount == maxPlayerPierceAmount)
+            {
+                relevantProjectile.Deactivate();
+                return;
+            }
+
+            currentPiercedPlayerCount++;
+        }
     }
 }

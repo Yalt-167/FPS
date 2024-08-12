@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using Projectiles;
 
 [Serializable]
 public sealed class WeaponHandler : NetworkBehaviour, IPlayerFrameMember

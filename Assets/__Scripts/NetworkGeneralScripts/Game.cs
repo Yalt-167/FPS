@@ -398,12 +398,6 @@ public sealed class Game : NetworkManager
         Manager = manager;
     }
 
-
-    //private void Start()
-    //{
-    //    Application.targetFrameRate = 60;
-    //}
-
     #region Debug
 
     //[SerializeField] private bool debugBottomPlane;

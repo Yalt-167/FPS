@@ -3,13 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public sealed class ProjectileStopOnHitPlayer : ProjectileOnHitPlayerBehaviour
+namespace Projectiles
 {
-    public ProjectileStopOnHitPlayer(IProjectileBehaviourOnHitPlayerParam _) { }
-
-    public override void OnHitPlayer(Projectile relevantProjectile, IShootable _)
+    [Serializable]
+    public sealed class ProjectileStopOnHitPlayer : ProjectileOnHitPlayerBehaviour
     {
-        relevantProjectile.Deactivate();
+        public ProjectileStopOnHitPlayer(IProjectileBehaviourOnHitPlayerParam _) { }
+
+        public override void OnHitPlayer(Projectile relevantProjectile, IShootable _)
+        {
+            relevantProjectile.Deactivate();
+        }
     }
 }

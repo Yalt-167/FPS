@@ -3,13 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public sealed class ProjectileStopOnHitWall : ProjectileOnHitWallBehaviour
+namespace Projectiles
 {
-    public ProjectileStopOnHitWall(IProjectileBehaviourOnHitWallParam _) { }
-
-    public override void OnHitWall(Projectile relevantProjectile, Collider _)
+    [Serializable]
+    public sealed class ProjectileStopOnHitWall : ProjectileOnHitWallBehaviour
     {
-        relevantProjectile.Deactivate();
-    }
+        public ProjectileStopOnHitWall(IProjectileBehaviourOnHitWallParam _) { }
+
+        public override void OnHitWall(Projectile relevantProjectile, Collider _)
+        {
+            relevantProjectile.Deactivate();
+        }
+    } 
 }
