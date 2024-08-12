@@ -24,6 +24,7 @@ namespace LobbyHandling
             spaceBetweenButtons = targetScript.SpaceBetweenButtons;
 
 
+            GUILayout.Space(spaceBetweenButtons * 2);
             if (GUILayout.Button("Sign In"))
             {
                 targetScript.SignInAsync(targetScript.ProfileName);
