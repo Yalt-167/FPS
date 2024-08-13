@@ -11,6 +11,8 @@ using UnityEngine;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 
+using static DebugUtility;
+
 
 public sealed class PlayerNameSelector : NetworkBehaviour
 {
@@ -89,18 +91,22 @@ public sealed class PlayerNameSelector : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        transform.GetChild(
-#if PLAYER_PACK_ARCHITECTURE
-            playerPackArchitectureMainCameraIndex
-#else
-                loginArchitectureMainCameraIndex
-#endif
-            ).gameObject.SetActive(IsOwner);
+//        transform.GetChild(
+//#if PLAYER_PACK_ARCHITECTURE
+//            playerPackArchitectureMainCameraIndex
+//#else
+//                loginArchitectureMainCameraIndex
+//#endif
+//            ).gameObject.SetActive(IsOwner);
 
 #if PLAYER_PACK_ARCHITECTURE
-        EnablePlayerServerRpc(new(AuthenticationService.Instance.Profile));
-#else
-                loginArchitectureMainCameraIndex
+        if (IsOwner)
+        {
+            EnablePlayerServerRpc(new(AuthenticationService.Instance.Profile));       
+        }
+
+        ManageFiles();
+        DeactivateScript();
 #endif
         //TestServerRpc();
     }
@@ -204,6 +210,7 @@ public sealed class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.Server)]
     private void EnablePlayerServerRpc(NetworkSerializableString playerName)
     {
+        //LogMethodCall();
         ActivatePlayerPackArchitectureClientRpc(playerName);
     }
 
@@ -242,25 +249,26 @@ public sealed class PlayerNameSelector : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void ActivatePlayerPackArchitectureClientRpc(NetworkSerializableString playerName)
     {
-        GetComponent<Controller.PlayerMovement>().enabled = true;
-        GetComponent<PlayerCombat>().enabled = true;
+        //GetComponent<Controller.PlayerMovement>().enabled = true;
+        //GetComponent<PlayerCombat>().enabled = true;
 
-        var headTransform = transform.GetChild(0);
-        headTransform.GetComponent<Controller.FollowRotationCamera>().enabled = true;
+        //var headTransform = transform.GetChild(0);
+        //headTransform.GetComponent<Controller.FollowRotationCamera>().enabled = true;
 
-        var cameraTransform = headTransform.GetChild(0).GetChild(0);
-        cameraTransform.GetComponent<Camera>().enabled = true;
-        cameraTransform.GetComponent<AudioListener>().enabled = true;
+        //var cameraTransform = headTransform.GetChild(0).GetChild(0);
+        //cameraTransform.GetComponent<Camera>().enabled = true;
+        //cameraTransform.GetComponent<AudioListener>().enabled = true;
 
-        GetComponent<PlayerHealthDisplay>().enabled = true;
-        GetComponent<WeaponHandler>().enabled = true;
-        GetComponent<PlayerHealthNetworked>().enabled = true;
+        //GetComponent<PlayerHealthDisplay>().enabled = true;
+        //GetComponent<WeaponHandler>().enabled = true;
+        //GetComponent<PlayerHealthNetworked>().enabled = true;
 
+        //GetComponent<PlayerFrame>().InitPlayerFrameLocal(playerName);
+        //transform.GetChild(playerPackArchitectureMainCameraIndex).gameObject.SetActive(false);
+        //enabled = false;
+
+      
         GetComponent<PlayerFrame>().InitPlayerFrameLocal(playerName);
-        transform.GetChild(playerPackArchitectureMainCameraIndex).gameObject.SetActive(false);
-        enabled = false;
-
-        ManageFiles();
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -282,6 +290,10 @@ public sealed class PlayerNameSelector : NetworkBehaviour
         transform.GetChild(0).gameObject.SetActive(false);
     }
 
+    private void DeactivateScript()
+    {
+        enabled = false;
+    }
 
     #region Handle Files
 

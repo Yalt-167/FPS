@@ -169,7 +169,7 @@ namespace LobbyHandling
             }
         }
 
-        public async void HandleLobbyUpdate()
+        public async void HandleLobbyUpdate() // polling rate not linear ? when some guy presses tab -> query else no need?
         {
             if (hostLobby == null) { return; }
 
@@ -730,7 +730,8 @@ namespace LobbyHandling
                 Data = new Dictionary<string, PlayerDataObject>()
                 {
                     { PlayerDataForLobby.Username, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, ProfileName) },
-                    { PlayerDataForLobby.Kills, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, initializeToZero) },
+                    // perhaps don t update that and just update it at the end of the game to save on lobby update
+                    { PlayerDataForLobby.Kills, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, initializeToZero) }, 
                     { PlayerDataForLobby.Deaths, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, initializeToZero)},
                     { PlayerDataForLobby.Assists, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, initializeToZero) },
                     { PlayerDataForLobby.Damage, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, initializeToZero) },

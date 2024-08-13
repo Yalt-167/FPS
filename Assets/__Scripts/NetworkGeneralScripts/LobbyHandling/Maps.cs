@@ -2,7 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Maps
+namespace LobbyHandling
 {
-    public static readonly string ToBeVoted = nameof(ToBeVoted);
+	public static class Maps
+	{
+		public static readonly string ToBeVoted = nameof(ToBeVoted);
+	} 
 }

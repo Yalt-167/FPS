@@ -14,7 +14,6 @@ using Unity.Services.Authentication;
 [DefaultExecutionOrder(-98)]
 public sealed class PlayerFrame : NetworkBehaviour
 {
-    //private NetworkLi
     [field: SerializeField] public ChampionStats ChampionStats { get; set; }
 
     private PlayerCombat playerCombat;
@@ -44,14 +43,10 @@ public sealed class PlayerFrame : NetworkBehaviour
 
     public void InitPlayerFrameLocal(string playerName_)
     {
+        InitPlayerCommon();
+
         playerCombat = GetComponent<PlayerCombat>();
         playerCombat.InitPlayerFrame(this);
-
-        weaponHandler = GetComponent<WeaponHandler>();
-        weaponHandler.InitPlayerFrame(this);
-
-        playerHealth = GetComponent<PlayerHealthNetworked>();
-        playerHealth.InitPlayerFrame(this);
 
         playerMovement = GetComponent<Controller.PlayerMovement>();
         playerMovement.InitPlayerFrame(this);
@@ -75,8 +70,14 @@ public sealed class PlayerFrame : NetworkBehaviour
 
     public void InitPlayerFrameRemote()
     {
-        playerCombat = GetComponent<PlayerCombat>();
-        playerCombat.InitPlayerFrame(this);
+        InitPlayerCommon();
+    }
+
+
+    private void InitPlayerCommon()
+    {
+        //playerCombat = GetComponent<PlayerCombat>();
+        //playerCombat.InitPlayerFrame(this);
 
         weaponHandler = GetComponent<WeaponHandler>();
         weaponHandler.InitPlayerFrame(this);
@@ -84,8 +85,8 @@ public sealed class PlayerFrame : NetworkBehaviour
         playerHealth = GetComponent<PlayerHealthNetworked>();
         playerHealth.InitPlayerFrame(this);
 
-        playerMovement = GetComponent<Controller.PlayerMovement>();
-        playerMovement.InitPlayerFrame(this);
+        //playerMovement = GetComponent<Controller.PlayerMovement>();
+        //playerMovement.InitPlayerFrame(this);
     }
 
     public NetworkedPlayerPrimitive AsPrimitive(/*ulong requestingClientID*/)
