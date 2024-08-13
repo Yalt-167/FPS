@@ -267,8 +267,14 @@ public sealed class PlayerNameSelector : NetworkBehaviour
         //transform.GetChild(playerPackArchitectureMainCameraIndex).gameObject.SetActive(false);
         //enabled = false;
 
-      
-        GetComponent<PlayerFrame>().InitPlayerFrameLocal(playerName);
+        if (IsOwner)
+        {
+            GetComponent<PlayerFrame>().InitPlayerFrameLocal(playerName);
+        }
+        else
+        {
+            GetComponent<PlayerFrame>().InitPlayerFrameRemote();
+        }
     }
 
     [Rpc(SendTo.ClientsAndHost)]

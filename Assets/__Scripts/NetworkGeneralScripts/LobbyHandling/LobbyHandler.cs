@@ -156,7 +156,7 @@ namespace LobbyHandling
 
         private async void HandleHeartbeat()
         {
-            if (hostLobby == null) { return; }
+            if (!IsLobbyHost()) { return; }
 
             heartbeatTimer += Time.deltaTime;
             if (heartbeatTimer >= heartbeat)
@@ -711,11 +711,13 @@ namespace LobbyHandling
 
         public bool IsLobbyHost()
         {
-            return IsLobbyHost(localPlayer.Id);
+            return IsLobbyHost(localPlayer?.Id);
         }
 
         public bool IsLobbyHost(string playerID)
         {
+            if (string.IsNullOrEmpty(playerID)) { return false; }
+
             if (hostLobby == null) { return false; }
 
             return hostLobby.HostId == playerID;

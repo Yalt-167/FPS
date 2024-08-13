@@ -2330,7 +2330,7 @@ MonoBehaviour:
   SpaceBetweenButtons: 4
   ProfileName: Yalt
   LobbyName: MyLobby
-  LobbyCapacity: 4
+  LobbyCapacity: 2
   PrivateLobby: 0
   Password: 
   TargetLobbyCode: 
