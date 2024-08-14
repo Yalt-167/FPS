@@ -40,14 +40,17 @@ namespace GameManagement
 
         public void DisconnectPlayer(ushort playerID)
         {
-            var player = players[playerID];
-            player.Online = false;
-            players[playerID] = player;
+            players[playerID].Online = false;
+        }
+
+        public void ReconnectPlayer(ushort playerID)
+        {
+            players[playerID].Online = true;
         }
 
         /// <summary>
-        /// <paramref name="whichComponentID"/> basically refers to which component ID was passed in the function.<br/>
-        /// For instance if the ID we have is the weaponHandler ID and we passed it we should also pass the relevant enum member 
+        /// <paramref name="whichComponentID"/> basically refers to which component ID was passed in the method.<br/>
+        /// For instance if we have is the weaponHandlerand passed its ID we should also pass the relevant enum member 
         /// </summary>
         /// <param name="componentID"></param>
         /// <param name="whichComponentID"></param>
@@ -118,8 +121,10 @@ namespace GameManagement
             Manager.DebugPlayerList();
         }
 
-        public void DebugPlayerList()
+        private void DebugPlayerList()
         {
+            if (players == null) { return; }
+
             var stringBuilder = new StringBuilder();
 
             stringBuilder.Append("[ ");
@@ -227,7 +232,7 @@ namespace GameManagement
 
         private NetworkedPlayer[] GetNetworkedPlayers()
         {
-            NetworkedPlayer[] players = new NetworkedPlayer[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count];
+            NetworkedPlayer[] players_ = new NetworkedPlayer[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count];
 
 #if DEBUG_MULTIPLAYER
         var stringBuilder = new StringBuilder();
@@ -241,14 +246,14 @@ namespace GameManagement
 #endif
                 if (element.Value.TryGetComponent<PlayerFrame>(out var playerFrameComponent))
                 {
-                    players[idx] = playerFrameComponent.AsNetworkedPlayer(idx++);
+                    players_[idx] = playerFrameComponent.AsNetworkedPlayer(idx++);
                 }
             }
 #if DEBUG_MULTIPLAYER
         stringBuilder.Append("]");
         print(stringBuilder.ToString());
 #endif
-            return players;
+            return players_;
         }
 
         #region Respawn Logic
@@ -297,6 +302,14 @@ namespace GameManagement
 
         private bool gameStarted;
 
+        [MenuItem("Developer/StartGame")]
+        public static void StaticStartGame()
+        {
+            Manager.StartGameServerRpc();
+        }
+
+
+
         [Rpc(SendTo.Server)]
         private void StartGameServerRpc()
         {
@@ -311,6 +324,7 @@ namespace GameManagement
         private void StartGameClientRpc()
         {
             RetrievePlayerList();
+            Debug.Log("Game started");
         }
 
 
@@ -320,8 +334,6 @@ namespace GameManagement
         }
 
         #endregion
-
-
 
         #region Debug
 
