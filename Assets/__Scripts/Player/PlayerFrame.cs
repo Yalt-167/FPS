@@ -58,21 +58,13 @@ public sealed class PlayerFrame : NetworkBehaviour
 
         _ = GetComponent<NetworkObject>() ?? throw new System.Exception("Does not have a network object");
         
-        Game.Manager.RetrieveExistingPlayerListServerRpc();
         Game.Manager.RegisterPlayerServerRpc(player);
-
-
-        //Game.Manager.UpdatePlayerListServerRpc();
-
-        //handlePlayerNetworkBehaviour.ManageFilesAllServerRpc();
     }
-
 
     public void InitPlayerFrameRemote()
     {
         InitPlayerCommon();
     }
-
 
     private void InitPlayerCommon()
     {

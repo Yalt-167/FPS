@@ -292,45 +292,6 @@ public sealed class Game : NetworkManager
             players.Add(playerPrimitives[i].AsNetworkedPlayer());
         }
     }
-
-
-    [Rpc(SendTo.Server)]
-    public void RetrieveExistingPlayerListServerRpc()
-    {
-        if (!IsServer) { return; }
-
-#if LOG_METHOD_CALLS
-        LogMethodCall();
-#endif
-
-        SetPlayerListClientRpc(players);
-    }
-
-    [ClientRpc]
-    private void SetPlayerListClientRpc(List<NetworkedPlayer> players_)
-    {
-#if LOG_METHOD_CALLS
-        LogMethodCall();
-#endif
-        
-        players = players_;
-#if DEBUG_MULTIPLAYER
-        print($"[Debug Multiplayer] Count: {players_.Count}");
-        foreach (var player in players_)
-        {
-            print(player.Name);
-        }
-
-        foreach (var player in players)
-        {
-            print(player.Name);
-        }
-#endif
-    }
-
-
-
-
     #region Respawn Logic
 
     private readonly Dictionary<ushort, List<SpawnPoint>> spawnPoints = new();
@@ -504,7 +465,7 @@ public struct NetworkedPlayerPrimitive : INetworkSerializable
         serializer.SerializeValue(ref ObjectNetworkID);
     }
 
-    public readonly NetworkedPlayer AsNetworkedPlayer() // findAnchor
+    public readonly NetworkedPlayer AsNetworkedPlayer()
     {
 #if DEBUG_MULTIPLAYER
         Debug.Log($"Name: {Name} | objectNetworkID: {ObjectNetworkID}");
@@ -535,3 +496,6 @@ public enum NetworkedComponent : byte
     WeaponHandler,
     PlayerHealthNetworked
 }
+
+
+// create the lists when all the clients are already spawned in
