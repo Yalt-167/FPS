@@ -4,13 +4,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using UnityEngine;
 using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using Unity.Netcode;
-using UnityEngine;
-using System.Linq;
-using Random = UnityEngine.Random;
+
 using UnityEditor;
-using System.Text;
+
+using Random = UnityEngine.Random;
 using static DebugUtility;
 
 
@@ -18,6 +21,15 @@ using static DebugUtility;
 public sealed class Game : NetworkManager
 {
     public static Game Manager;
+
+    #region Unity Handled
+
+    private void Awake()
+    {
+        Manager = this;
+    } 
+
+    #endregion
 
     #region Player List
 
@@ -120,7 +132,6 @@ public sealed class Game : NetworkManager
     [MenuItem("Developer/DebugPlayerList")]
     public static void DebugPlayerList()
     {
-        //PrintIterable(Manager.players);
         var stringBuilder = new StringBuilder();
 
         stringBuilder.Append("[ ");
@@ -334,30 +345,6 @@ public sealed class Game : NetworkManager
 
     #endregion
 
-    private void Awake()
-    {
-        Manager = this;
-    }
-
-
-    [ServerRpc]
-    private void UpdateGameManagerServerRpc()
-    {
-#if DEBUG_MULTIPLAYER
-        print("ServerRpc");
-#endif
-        UpdateGameManagerClientRpc(Manager);
-    }
-
-    [ClientRpc]
-    private void UpdateGameManagerClientRpc(Game manager)
-    {
-#if DEBUG_MULTIPLAYER
-        print("ClientRpc");
-#endif
-
-        Manager = manager;
-    }
 
     #region Debug
 
@@ -433,7 +420,7 @@ public struct NetworkedPlayer
         return $"{{Player: {Name} | Team: {TeamID}}}";
     }
 
-    public new readonly string ToString()
+    public override readonly string ToString()
     {
         return GetInfos();
     }

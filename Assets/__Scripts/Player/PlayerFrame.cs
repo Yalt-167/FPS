@@ -55,8 +55,12 @@ public sealed class PlayerFrame : NetworkBehaviour
 
         playerName = playerName_;
         player = new(playerName, NetworkObjectId);
+        PropagateNameToAllClientsServerRpc(new(playerName));
 
-        _ = GetComponent<NetworkObject>() ?? throw new System.Exception("Does not have a network object");
+        if (!TryGetComponent<NetworkObject>(out var _))
+        {
+            throw new System.Exception("Does not have a network object");
+        }
         
         Game.Manager.RegisterPlayerServerRpc(player);
     }
@@ -131,6 +135,19 @@ public sealed class PlayerFrame : NetworkBehaviour
     //        }
     //    }
     //}
+
+    [Rpc(SendTo.Server)]
+    private void PropagateNameToAllClientsServerRpc(NetworkSerializableString name)
+    {
+        SetNameOnClientClientRpc(name);
+    }
+
+    private void SetNameOnClientClientRpc(NetworkSerializableString name)
+    {
+        playerName = name;
+    }
+
+
 
     [Rpc(SendTo.Server)]
     private void RequestPlayerNameServerRpc(ulong targetID, ulong requestingID)
