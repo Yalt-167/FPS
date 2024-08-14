@@ -35,27 +35,8 @@ namespace GameManagement
 
         #region Player List
 
-        public NetworkedPlayer[] players;
-
-//        [Rpc(SendTo.Server)]
-//        public void RegisterPlayerServerRpc(NetworkedPlayerPrimitive player)
-//        {
-//#if LOG_METHOD_CALLS
-//            LogMethodCall();
-//#endif
-//            RegisterPlayerInternalClientRpc(player);
-//        }
-
-//        [Rpc(SendTo.ClientsAndHost)]
-//        private void RegisterPlayerInternalClientRpc(NetworkedPlayerPrimitive player)
-//        {
-
-//#if DEBUG_MULTIPLAYER
-//        print("[Debug Multiplayer] Added a player");
-//#endif
-//            players.Add(player.AsNetworkedPlayer());
-//        }
-
+        public NetworkedPlayer[] Players => players;
+        private NetworkedPlayer[] players;
 
         public void DisconnectPlayer(ushort playerID)
         {
@@ -89,9 +70,9 @@ namespace GameManagement
 
         }
 
-        public NetworkedPlayer RetrievePlayerFromAbsoluteID(ushort ID)
+        public NetworkedPlayer RetrievePlayerFromIndex(int index)
         {
-            return players[ID];
+            return players[index];
         }
 
         public IEnumerable<NetworkedPlayer> GetPlayers()
@@ -120,43 +101,32 @@ namespace GameManagement
 
         public NetworkedPlayer? GetPlayerWithName(string name)
         {
-            try
+            foreach (var player in players)
             {
-                return players.First(predicate: (each) => each.Name == name);
-            }
-            catch
-            {
-                return null;
+                if (player.Name == name)
+                {
+                    return player;
+                }
             }
 
+            return null;
         }
 
         [MenuItem("Developer/DebugPlayerList")]
-        public static void DebugPlayerList()
+        public static void StaticDebugPlayerList()
         {
-            var stringBuilder = new StringBuilder();
-
-            stringBuilder.Append("[ ");
-            var isFirst = true;
-            foreach (var player in Manager.players)
-            {
-                stringBuilder.Append(isFirst ? $"{player.GetInfos()}" : $", {player.GetInfos()}");
-                isFirst = false;
-            }
-            stringBuilder.Append(" ]");
-
-            Debug.Log(stringBuilder.ToString());
+            Manager.DebugPlayerList();
         }
 
-        public static void PrintIterable(IEnumerable iterable)
+        public void DebugPlayerList()
         {
             var stringBuilder = new StringBuilder();
 
             stringBuilder.Append("[ ");
             var isFirst = true;
-            foreach (var item in iterable)
+            foreach (var player in players)
             {
-                stringBuilder.Append(isFirst ? $"{item.ToString()}" : $", {item.ToString()}");
+                stringBuilder.Append(isFirst ? $"{player.GetInfos()}" : $", {player.GetInfos()}");
                 isFirst = false;
             }
             stringBuilder.Append(" ]");
@@ -263,7 +233,7 @@ namespace GameManagement
         var stringBuilder = new StringBuilder();
         stringBuilder.Append("[ ");
 #endif
-            var idx = 0;
+            ushort idx = 0;
             foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
             {
 #if DEBUG_MULTIPLAYER
@@ -271,7 +241,7 @@ namespace GameManagement
 #endif
                 if (element.Value.TryGetComponent<PlayerFrame>(out var playerFrameComponent))
                 {
-                    players[idx++] = playerFrameComponent.AsNetworkedPlayer();
+                    players[idx] = playerFrameComponent.AsNetworkedPlayer(idx++);
                 }
             }
 #if DEBUG_MULTIPLAYER
@@ -325,15 +295,22 @@ namespace GameManagement
 
         #region Game Start
 
+        private bool gameStarted;
+
         [Rpc(SendTo.Server)]
         private void StartGameServerRpc()
         {
-            StartGameClientRpc();
+            if (!gameStarted)
+            {
+                StartGameClientRpc();
+                gameStarted = true;
+            }
         }
 
+        [Rpc(SendTo.ClientsAndHost)]
         private void StartGameClientRpc()
         {
-
+            RetrievePlayerList();
         }
 
 

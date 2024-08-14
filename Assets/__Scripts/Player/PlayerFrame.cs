@@ -23,20 +23,20 @@ public sealed class PlayerFrame : NetworkBehaviour
     private PlayerHealthNetworked playerHealth;
 
     private PlayerMovement playerMovement;
-    private NetworkedPlayerPrimitive player;
+    private NetworkedPlayer player;
 
     private bool WasInitiated => string.IsNullOrEmpty(playerName);
     private string playerName;
 
 
-    public ushort PlayerID;
+    private ushort playerIndex;
     public ushort TeamID;
 
     public bool Alive => playerHealth.Alive;
 
-    public void SetPlayerID(ushort playerID)
+    public void SetPlayerID(ushort playerIndex_)
     {
-        PlayerID = playerID;
+        playerIndex = playerIndex_;
     }
 
     public void InitPlayerFrameLocal(string playerName_)
@@ -59,8 +59,6 @@ public sealed class PlayerFrame : NetworkBehaviour
         {
             throw new Exception("Does not have a network object");
         }
-        
-        Game.Manager.RegisterPlayerServerRpc(player);
     }
 
     public void InitPlayerFrameRemote()
@@ -85,16 +83,12 @@ public sealed class PlayerFrame : NetworkBehaviour
 
     public NetworkedPlayerPrimitive AsPrimitive(/*ulong requestingClientID*/)
     {
-        //if (!WasInitiated)
-        //{
-        //    RequestPlayerNameServerRpc(NetworkManager.Singleton.LocalClientId, requestingClientID);
-        //}
-
         return new(playerName, NetworkObjectId);
     }
 
-    public NetworkedPlayer AsNetworkedPlayer()
+    public NetworkedPlayer AsNetworkedPlayer(ushort index)
     {
+        playerIndex = index;
         return new NetworkedPlayer(playerName, 0, NetworkObject, GetComponent<ClientNetworkTransform>(), weaponHandler, playerHealth);
     }
 
@@ -137,7 +131,6 @@ public sealed class PlayerFrame : NetworkBehaviour
     {
         playerName = name;
     }
-
 
     #region Team Logic
 
