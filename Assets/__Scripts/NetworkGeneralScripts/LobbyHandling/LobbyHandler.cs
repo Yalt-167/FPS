@@ -26,7 +26,7 @@ namespace LobbyHandling
         private Lobby hostLobby;
         private static readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
         private float heartbeatTimer;
-        private static readonly float lobbyUpdateRate = 5f; // how often the lobby updates
+        private static readonly float lobbyUpdateRate = 5f; // how often the lobby updates (in seconds)
         private float lobbyUpdateTimer;
         private static readonly string noPassword = "        ";
         private static readonly string initializeToZero = "0";

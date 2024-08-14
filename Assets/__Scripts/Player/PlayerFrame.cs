@@ -4,9 +4,10 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Services.Authentication;
 
-
+using GameManagement;
+using Controller;
+using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 
 /// <summary>
 /// Class that links all the player s classes for better communication between scripts and ease of access
@@ -21,12 +22,11 @@ public sealed class PlayerFrame : NetworkBehaviour
 
     private PlayerHealthNetworked playerHealth;
 
-    private Controller.PlayerMovement playerMovement;
+    private PlayerMovement playerMovement;
     private NetworkedPlayerPrimitive player;
 
     private bool WasInitiated => string.IsNullOrEmpty(playerName);
     private string playerName;
-
 
 
     public ushort PlayerID;
@@ -46,7 +46,7 @@ public sealed class PlayerFrame : NetworkBehaviour
         playerCombat = GetComponent<PlayerCombat>();
         playerCombat.InitPlayerFrame(this);
 
-        playerMovement = GetComponent<Controller.PlayerMovement>();
+        playerMovement = GetComponent<PlayerMovement>();
         playerMovement.InitPlayerFrame(this);
 
         ToggleCursor(false);
@@ -57,7 +57,7 @@ public sealed class PlayerFrame : NetworkBehaviour
 
         if (!TryGetComponent<NetworkObject>(out var _))
         {
-            throw new System.Exception("Does not have a network object");
+            throw new Exception("Does not have a network object");
         }
         
         Game.Manager.RegisterPlayerServerRpc(player);
@@ -91,6 +91,11 @@ public sealed class PlayerFrame : NetworkBehaviour
         //}
 
         return new(playerName, NetworkObjectId);
+    }
+
+    public NetworkedPlayer AsNetworkedPlayer()
+    {
+        return new NetworkedPlayer(playerName, 0, NetworkObject, GetComponent<ClientNetworkTransform>(), weaponHandler, playerHealth);
     }
 
     #region Toggle Controls

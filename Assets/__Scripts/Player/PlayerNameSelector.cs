@@ -12,6 +12,7 @@ using Unity.Netcode;
 using Unity.Services.Authentication;
 
 using static DebugUtility;
+using GameManagement;
 
 
 public sealed class PlayerNameSelector : NetworkBehaviour
@@ -108,20 +109,10 @@ public sealed class PlayerNameSelector : NetworkBehaviour
         ManageFiles();
         DeactivateScript();
 #endif
-        //TestServerRpc();
     }
 
-    //[Rpc(SendTo.Server)]
-    //private void TestServerRpc()
-    //{
-    //    TestClientRpc();
-    //}
 
-    //[Rpc(SendTo.ClientsAndHost)]
-    //private void TestClientRpc()
-    //{
-    //    print("this was called here");
-    //}
+    #region Not in use RN
 
     private void Init()
     {
@@ -161,7 +152,7 @@ public sealed class PlayerNameSelector : NetworkBehaviour
             Init();
         }
 
-        if(!promptActive) { return; }
+        if (!promptActive) { return; }
 
         GUI.Label(labelRect, label, labelStyle);
 
@@ -191,8 +182,7 @@ public sealed class PlayerNameSelector : NetworkBehaviour
     [ServerRpc]
     private void CheckWetherNameAvailableServerRpc(NetworkSerializableString playerName, ServerRpcParams rpcParams = default)
     {
-
-        if (Game.Manager.PlayerWithNameExist(playerName))
+        if (GameManagement.Game.Manager.PlayerWithNameExist(playerName))
         {
             SetErrorMessageClientRpc(new($"Name {playerName} is already in use!"));
         }
@@ -206,6 +196,8 @@ public sealed class PlayerNameSelector : NetworkBehaviour
 #endif
         }
     }
+
+    #endregion
 
     [Rpc(SendTo.Server)]
     private void EnablePlayerServerRpc(NetworkSerializableString playerName)
@@ -444,7 +436,7 @@ public struct NetworkSerializableString : INetworkSerializable
     }
 }
 
-//public struct NetworkSerializableData<T> : INetworkSerializable
+//public struct NetworkSerializableData<T> : INetworkSerializable where T : struct
 //{
 //    public T Data;
 //    public NetworkSerializableData(T value) { Data = value; }
