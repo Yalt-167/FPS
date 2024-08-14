@@ -20,7 +20,7 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour, IPlayerFrameMember
     
     public bool Alive => CurrentHealth > 0;
 
-    public ushort TeamID;
+    public ushort TeamID => PlayerFrame?.TeamID ?? 0;
 
     public PlayerFrame PlayerFrame { get; set; }
 
@@ -60,7 +60,7 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour, IPlayerFrameMember
         {
             lastHealTime = Time.time;
             yield return new WaitUntil(() => lastHealTime + HealthData.PassiveShieldRegenerationRate < Time.time && CurrentHealth == HealthData.MaxHealth);
-            RegenerateShield(HealthData.PassiveShieldRegenerationAmount, false);
+            RegenerateShield(HealthData.PassiveShieldRegenerationAmount, canReviveCell: false);
         }
     }
 
@@ -80,18 +80,6 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour, IPlayerFrameMember
         currentShieldSlotRemainingPower = HealthData.ShieldSlotHealth;
 
         Shield = new(HealthData.MaxShieldSlots, HealthData.ShieldSlotHealth);
-    }
-
-    [Rpc(SendTo.Server)]
-    public void RequestSetTeamServerRpc(ushort teamID)
-    {
-        SetTeamClientRpc(teamID);
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    public void SetTeamClientRpc(ushort teamID)
-    {
-        TeamID = teamID;
     }
 
     [Rpc(SendTo.ClientsAndHost)]

@@ -24,15 +24,13 @@ public sealed class PlayerFrame : NetworkBehaviour
     private Controller.PlayerMovement playerMovement;
     private NetworkedPlayerPrimitive player;
 
-    //private HandlePlayerNetworkBehaviour handlePlayerNetworkBehaviour;
-
     private bool WasInitiated => string.IsNullOrEmpty(playerName);
     private string playerName;
 
 
 
     public ushort PlayerID;
-    public ushort TeamID => playerHealth.TeamID;
+    public ushort TeamID;
 
     public bool Alive => playerHealth.Alive;
 
@@ -123,78 +121,32 @@ public sealed class PlayerFrame : NetworkBehaviour
 
     #endregion
 
-    //[ServerRpc]
-    //private void RequestPlayersDataServerRpc(ulong requestingClientID)
-    //{
-    //    foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
-    //    {
-    //        if (client.ClientId != requestingClientID)
-    //        {
-
-    //            SendPlayerDataClientRpc(new(playerName, requestingClientID);
-    //        }
-    //    }
-    //}
-
     [Rpc(SendTo.Server)]
     private void PropagateNameToAllClientsServerRpc(NetworkSerializableString name)
     {
         SetNameOnClientClientRpc(name);
     }
 
+    [Rpc(SendTo.ClientsAndHost)]
     private void SetNameOnClientClientRpc(NetworkSerializableString name)
     {
         playerName = name;
     }
 
 
+    #region Team Logic
 
     [Rpc(SendTo.Server)]
-    private void RequestPlayerNameServerRpc(ulong targetID, ulong requestingID)
+    public void RequestSetTeamServerRpc(ushort teamID)
     {
-        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
-        {
-            if (client.ClientId == targetID)
-            {
-                SendPlayerNameClientRpc(new NetworkSerializableString(playerName), requestingID);
-                return;
-            }
-        }
+        SetTeamClientRpc(teamID);
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void SendPlayerNameClientRpc(NetworkSerializableString playerName_, ulong targetClientID)
+    public void SetTeamClientRpc(ushort teamID)
     {
-        if (NetworkManager.Singleton.LocalClientId == targetClientID)
-        {
-            playerName = playerName_;
-        }
+        TeamID = teamID;
     }
 
-    //[Rpc(SendTo.ClientsAndHost)]
-    //private void SendPlayerDataClientRpc(PlayerData data, ulong targetClientID)
-    //{
-    //    if (NetworkManager.Singleton.LocalClientId == targetClientID)
-    //    {
-
-    //    }
-    //}
-}
-
-public struct PlayerData : INetworkSerializable
-{
-    public string PlayerName;
-    public ulong ClientID;
-
-    public PlayerData(string playerName, ulong clientID)
-    {
-        PlayerName = playerName;
-        ClientID = clientID;
-    }
-
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref PlayerName);
-        serializer.SerializeValue(ref ClientID);
-    }
+    #endregion
 }
