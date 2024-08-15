@@ -23,16 +23,37 @@ namespace GameManagement
     public sealed class GameNetworkManager : NetworkManager
     {
         public static GameNetworkManager Manager;
+        [SerializeField] private GameObject gameManagerPrefab;
+        private GameObject gameManagerInstance;
 
         #region Unity Handled
 
         private void Awake()
         {
-            Debug.Log(Manager == null);
             Manager = this;
+            Manager.OnServerStarted += CreateManagerInstance;
         }
 
         #endregion
+
+        #region Netcode Handled
+
+        private void CreateManagerInstance()
+        {
+            gameManagerInstance = Instantiate(gameManagerPrefab);
+            gameManagerInstance.GetComponent<NetworkObject>().Spawn();
+        }
+
+
+        #endregion
+
+        [MenuItem("Developer/SetupDirty")]
+        public static void SetupDirty()
+        {
+            NetworkManager.Singleton.OnServerStarted += Manager.CreateManagerInstance;
+        }
+
+
 
         #region Player List
 

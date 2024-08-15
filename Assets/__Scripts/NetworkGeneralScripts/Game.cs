@@ -19,6 +19,11 @@ namespace GameManagement
     {
         public static Game Manager;
 
+        private void Awake()
+        {
+            Manager = this;
+        }
+
         #region Player Combat List
 
         private readonly List<WeaponHandler> networkedWeaponHandlers = new();
@@ -106,11 +111,6 @@ namespace GameManagement
         [MenuItem("Developer/StartGame")]
         public static void StaticStartGame()
         {
-            if (Manager == null)
-            {
-                //GameNetworkManager.Manager.
-            }
-
             Manager.StartGameServerRpc();
         }
 
@@ -159,5 +159,23 @@ namespace GameManagement
 
         #endregion
 
+
+        [MenuItem("Developer/StaticTestServerRpcCall")]
+        public static void StaticTestServerRpcCall()
+        {
+            Manager.TestServerRpc();
+        }
+
+        [Rpc(SendTo.Server)]
+        public void TestServerRpc()
+        {
+            TestClientRpc();
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void TestClientRpc()
+        {
+            Debug.Log("Happened here");
+        }
     }
 }
