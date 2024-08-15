@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using UnityEngine;
 using Unity.Netcode;
@@ -28,6 +29,7 @@ namespace GameManagement
 
         private bool WasInitiated => string.IsNullOrEmpty(playerName);
         private string playerName;
+        public string Name => playerName;
 
 
         private ushort playerIndex;
@@ -53,7 +55,8 @@ namespace GameManagement
             ToggleCursor(false);
 
             playerName = playerName_;
-            PropagateNameToAllClientsServerRpc(new(playerName));
+            PropagateNameToAllClientsServerRpc(playerName);
+            //Debug.Log($"Saved name {playerName}");
 
             if (!TryGetComponent<NetworkObject>(out var _))
             {
@@ -64,6 +67,7 @@ namespace GameManagement
         public void InitPlayerFrameRemote()
         {
             InitPlayerCommon();
+            RequestPlayerNameServerRpc();
         }
 
         private void InitPlayerCommon()
@@ -89,6 +93,11 @@ namespace GameManagement
         public NetworkedPlayer AsNetworkedPlayer(ushort index)
         {
             playerIndex = index;
+            if (string.IsNullOrEmpty(playerName))
+            {
+                RequestPlayerNameServerRpc();
+            }
+
             return new NetworkedPlayer(playerName, 0, NetworkObject, GetComponent<ClientNetworkTransform>(), weaponHandler, playerHealth);
         }
 
@@ -121,15 +130,22 @@ namespace GameManagement
         #endregion
 
         [Rpc(SendTo.Server)]
-        private void PropagateNameToAllClientsServerRpc(NetworkSerializableString name)
+        private void PropagateNameToAllClientsServerRpc(string name)
         {
             SetNameOnClientClientRpc(name);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        private void SetNameOnClientClientRpc(NetworkSerializableString name)
+        private void SetNameOnClientClientRpc(string name)
         {
+            Debug.Log(name, gameObject);
             playerName = name;
+        }
+
+        [Rpc(SendTo.Server)]
+        private void RequestPlayerNameServerRpc()
+        {
+            SetNameOnClientClientRpc(new(playerName));
         }
 
         #region Team Logic

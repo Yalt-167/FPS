@@ -1,12 +1,17 @@
 using System;
+using System.Linq;
+using System.Collections.Generic;
+
+
+using Unity.Services.Authentication;
+using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
+
+
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.Services.Core;
-using Unity.Services.Authentication;
-using System.Collections.Generic;
-using System.Linq;
+
 
 /// <summary>
 /// A simple sample showing how to use the Relay Allocation package. As the host, you can authenticate, request a relay allocation, get a join code and join the allocation.

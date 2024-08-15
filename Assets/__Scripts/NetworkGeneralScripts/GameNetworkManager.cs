@@ -18,7 +18,6 @@ using static DebugUtility;
 
 namespace GameManagement
 {
-
     [DefaultExecutionOrder(-99)]
     public sealed class GameNetworkManager : NetworkManager
     {
@@ -31,12 +30,13 @@ namespace GameManagement
         private void Awake()
         {
             Manager = this;
-            Manager.OnServerStarted += CreateManagerInstance;
+            OnServerStarted += CreateManagerInstance;
+            OnServerStopped += KillManagerInstance;
         }
 
         #endregion
 
-        #region Netcode Handled
+        #region Initialization & Cleanup
 
         private void CreateManagerInstance()
         {
@@ -44,16 +44,12 @@ namespace GameManagement
             gameManagerInstance.GetComponent<NetworkObject>().Spawn();
         }
 
-
-        #endregion
-
-        [MenuItem("Developer/SetupDirty")]
-        public static void SetupDirty()
+        private void KillManagerInstance(bool param)
         {
-            NetworkManager.Singleton.OnServerStarted += Manager.CreateManagerInstance;
+            Destroy(gameManagerInstance);
         }
 
-
+        #endregion
 
         #region Player List
 
@@ -145,7 +141,7 @@ namespace GameManagement
 
         private void DebugPlayerList()
         {
-            if (players == null) { return; }
+            if (players == null) { Debug.Log("Players is null");  return; }
 
             var stringBuilder = new StringBuilder();
 
@@ -220,7 +216,8 @@ namespace GameManagement
 
         private NetworkedPlayer[] GetNetworkedPlayers()
         {
-            NetworkedPlayer[] players_ = new NetworkedPlayer[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count];
+            //NetworkedPlayer[] players_ = new NetworkedPlayer[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count - 1]; // - 1 for the manager
+            NetworkedPlayer[] players_ = new NetworkedPlayer[NetworkManager.Singleton.ConnectedClientsList.Count];
 
 #if DEBUG_MULTIPLAYER
         var stringBuilder = new StringBuilder();
@@ -242,6 +239,19 @@ namespace GameManagement
         print(stringBuilder.ToString());
 #endif
             return players_;
+        }
+
+
+        [MenuItem("Developer/TestNames")]
+        public static void TestNames()
+        {
+            foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
+            {
+                if (element.Value.gameObject.TryGetComponent<PlayerFrame>(out var playerFrameComponent))
+                {
+                    Debug.Log(playerFrameComponent.Name);
+                }
+            }
         }
 
         #region Respawn Logic

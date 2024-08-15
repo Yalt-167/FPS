@@ -19,10 +19,14 @@ namespace GameManagement
     {
         public static Game Manager;
 
+        #region Unity Handled
+
         private void Awake()
         {
             Manager = this;
         }
+
+        #endregion
 
         #region Player Combat List
 
