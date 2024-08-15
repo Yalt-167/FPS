@@ -89,8 +89,6 @@ public sealed class HandlePlayerNetworkBehaviour : NetworkBehaviour, IPlayerFram
             Destroy(gameObj);
         }
 
-        GameNetworkManager.Manager.AddNetworkedWeaponHandler(GetComponent<WeaponHandler>());
-
         return null;
     }
 
@@ -105,8 +103,6 @@ public sealed class HandlePlayerNetworkBehaviour : NetworkBehaviour, IPlayerFram
         {
             Destroy(gameObj);
         }
-
-        GameNetworkManager.Manager.AddNetworkedWeaponHandler(GetComponent<WeaponHandler>());
 
         return null;
     }

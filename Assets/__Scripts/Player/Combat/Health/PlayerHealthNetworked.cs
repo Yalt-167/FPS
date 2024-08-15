@@ -140,7 +140,8 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour, IPlayerFrameMember
     {
         if (IsOwner) { return; }
 
-        GameNetworkManager.Manager.GetNetworkedWeaponHandlerFromNetworkObjectID(attackerNetworkID)?.SpawnDamageLog(targetType, damageDealt);
+        //GameNetworkManager.Manager.GetNetworkedWeaponHandlerFromNetworkObjectID(attackerNetworkID)?.SpawnDamageLog(targetType, damageDealt);
+        GameNetworkManager.Manager.RetrievePlayerFromComponentID(attackerNetworkID, NetworkedComponent.WeaponHandler).WeaponHandler.SpawnDamageLog(targetType, damageDealt);
     }
 
 

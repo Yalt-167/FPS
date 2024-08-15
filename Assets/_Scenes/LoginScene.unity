@@ -2066,6 +2066,7 @@ GameObject:
   - component: {fileID: 895959906}
   - component: {fileID: 895959904}
   - component: {fileID: 895959905}
+  - component: {fileID: 895959907}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2121,6 +2122,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &895959907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 895959903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd587403537c7aa478f1bbe112c0162e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &931117454
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2415,6 +2428,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1013962245}
   - component: {fileID: 1013962246}
+  - component: {fileID: 1013962247}
   m_Layer: 0
   m_Name: LobbyHandler
   m_TagString: Untagged
@@ -2458,6 +2472,18 @@ MonoBehaviour:
   TargetLobbyCode: 
   TargetLobbyId: 
   RelayJoinCode: 
+--- !u!114 &1013962247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1013962243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd587403537c7aa478f1bbe112c0162e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1053669928
 GameObject:
   m_ObjectHideFlags: 0
@@ -5884,8 +5910,8 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1568317669}
+  - {fileID: 895959906}
   - {fileID: 137306479}
   - {fileID: 567216993}
   - {fileID: 1053669930}
   - {fileID: 1013962245}
-  - {fileID: 895959906}

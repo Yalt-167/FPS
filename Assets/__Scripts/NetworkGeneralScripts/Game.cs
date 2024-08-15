@@ -106,6 +106,11 @@ namespace GameManagement
         [MenuItem("Developer/StartGame")]
         public static void StaticStartGame()
         {
+            if (Manager == null)
+            {
+                //GameNetworkManager.Manager.
+            }
+
             Manager.StartGameServerRpc();
         }
 
@@ -115,13 +120,13 @@ namespace GameManagement
             if (!gameStarted)
             {
                 StartGameClientRpc();
-                gameStarted = true;
             }
         }
 
         [Rpc(SendTo.ClientsAndHost)]
         private void StartGameClientRpc()
         {
+            gameStarted = true;
             GameNetworkManager.Manager.RetrievePlayerList();
         }
 
