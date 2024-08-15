@@ -7,140 +7,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using UnityEngine;
-using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using Unity.Netcode;
-
 using UnityEditor;
+using UnityEngine;
 
 using Random = UnityEngine.Random;
-using static DebugUtility;
 
 namespace GameManagement
 {
-
-    [DefaultExecutionOrder(-99)]
-    public sealed class Game : NetworkManager
+    public sealed class Game : NetworkBehaviour
     {
         public static Game Manager;
-
-        #region Unity Handled
-
-        private void Awake()
-        {
-            Manager = this;
-        }
-
-        #endregion
-
-        #region Player List
-
-        public NetworkedPlayer[] Players => players;
-        private NetworkedPlayer[] players;
-
-        public void DisconnectPlayer(ushort playerID)
-        {
-            players[playerID].Online = false;
-        }
-
-        public void ReconnectPlayer(ushort playerID)
-        {
-            players[playerID].Online = true;
-        }
-
-        /// <summary>
-        /// <paramref name="whichComponentID"/> basically refers to which component ID was passed in the method.<br/>
-        /// For instance if we have is the weaponHandlerand passed its ID we should also pass the relevant enum member 
-        /// </summary>
-        /// <param name="componentID"></param>
-        /// <param name="whichComponentID"></param>
-        public NetworkedPlayer RetrievePlayerFromComponentID(ulong componentID, NetworkedComponent whichComponentID)
-        {
-            return whichComponentID switch
-            {
-                NetworkedComponent.NetworkObject => players.First(predicate: (each) => each.NetworkObject.NetworkObjectId == componentID),
-
-                NetworkedComponent.ClientNetworkTransform => players.First(predicate: (each) => each.ClientNetworkTransform.NetworkObjectId == componentID),
-
-                //NetworkedComponent.HandlePlayerNetworkBehaviour => players.First(each => each.BehaviourHandler.NetworkObjectId == componentID),
-
-                NetworkedComponent.WeaponHandler => players.First(predicate: (each) => each.WeaponHandler.NetworkObjectId == componentID),
-
-                NetworkedComponent.PlayerHealthNetworked => players.First(predicate: (each) => each.Health.NetworkObjectId == componentID),
-
-                _ => throw new Exception($"This component provided ({whichComponentID}) does not match anything"),
-            };
-
-        }
-
-        public NetworkedPlayer RetrievePlayerFromIndex(int index)
-        {
-            return players[index];
-        }
-
-        public IEnumerable<NetworkedPlayer> GetPlayers()
-        {
-            foreach (var player in players)
-            {
-                yield return player;
-            }
-        }
-
-        public IEnumerable<NetworkedPlayer> GetPlayersOfTeam(ushort teamID)
-        {
-            foreach (var player in players)
-            {
-                if (player.TeamID == teamID)
-                {
-                    yield return player;
-                }
-            }
-        }
-
-        public bool PlayerWithNameExist(string name)
-        {
-            return GetPlayerWithName(name) != null;
-        }
-
-        public NetworkedPlayer? GetPlayerWithName(string name)
-        {
-            foreach (var player in players)
-            {
-                if (player.Name == name)
-                {
-                    return player;
-                }
-            }
-
-            return null;
-        }
-
-        [MenuItem("Developer/DebugPlayerList")]
-        public static void StaticDebugPlayerList()
-        {
-            Manager.DebugPlayerList();
-        }
-
-        private void DebugPlayerList()
-        {
-            if (players == null) { return; }
-
-            var stringBuilder = new StringBuilder();
-
-            stringBuilder.Append("[ ");
-            var isFirst = true;
-            foreach (var player in players)
-            {
-                stringBuilder.Append(isFirst ? $"{player.GetInfos()}" : $", {player.GetInfos()}");
-                isFirst = false;
-            }
-            stringBuilder.Append(" ]");
-
-            Debug.Log(stringBuilder.ToString());
-        }
-
-
-        #endregion
 
         #region Player Combat List
 
@@ -180,82 +57,6 @@ namespace GameManagement
 
         #endregion
 
-        #region Network Objects Spawning
-
-        [Rpc(SendTo.Server)]
-        public void RequestNetworkObjectClientSpawnServerRpc(GameObject networkObjectPrefab, Vector3 position, Quaternion orientation)
-        {
-            if (networkObjectPrefab.TryGetComponent<NetworkObject>(out var _))
-            {
-                SpawnNetworkObjectClientRpc(networkObjectPrefab, position, orientation);
-            }
-            else
-            {
-                Debug.LogError("NetworkPrefab is missing a NetworkObject component.");
-            }
-        }
-
-        [Rpc(SendTo.ClientsAndHost)]
-        private void SpawnNetworkObjectClientRpc(GameObject networkObjectPrefab, Vector3 position, Quaternion orientation)
-        {
-            // Actually spawn the obj on the network
-            Instantiate(networkObjectPrefab, position, orientation).GetComponent<NetworkObject>().Spawn();
-        }
-
-        #endregion
-
-        #region Network Objects Monitoring
-
-        [MenuItem("Developer/DebugNetworkObjects")]
-        public static void DebugNetworkObjects()
-        {
-            foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
-            {
-                print($"NetworkObjectId: {element.Key} | Obj: {element.Value.name}");
-            }
-        }
-
-        [MenuItem("Developer/DebugNetworkBehaviours")]
-        public static void DebugNetworkBehaviours()
-        {
-            foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
-            {
-                print($"NetworkObjectId: {element.Key} | Obj: {element.Value.name}");
-                foreach (NetworkBehaviour networkBehaviour in element.Value.GetComponents<NetworkBehaviour>())
-                {
-                    print($"Behaviour: {networkBehaviour.GetType()} | NetworkBehaviourId: {networkBehaviour.NetworkBehaviourId}");
-                }
-            }
-        }
-
-        #endregion
-
-        private NetworkedPlayer[] GetNetworkedPlayers()
-        {
-            NetworkedPlayer[] players_ = new NetworkedPlayer[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count];
-
-#if DEBUG_MULTIPLAYER
-        var stringBuilder = new StringBuilder();
-        stringBuilder.Append("[ ");
-#endif
-            ushort idx = 0;
-            foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
-            {
-#if DEBUG_MULTIPLAYER
-            stringBuilder.Append($"{{{element.Key}, {element.Value}}} ");
-#endif
-                if (element.Value.TryGetComponent<PlayerFrame>(out var playerFrameComponent))
-                {
-                    players_[idx] = playerFrameComponent.AsNetworkedPlayer(idx++);
-                }
-            }
-#if DEBUG_MULTIPLAYER
-        stringBuilder.Append("]");
-        print(stringBuilder.ToString());
-#endif
-            return players_;
-        }
-
         #region Respawn Logic
 
         private readonly Dictionary<ushort, List<SpawnPoint>> spawnPoints = new();
@@ -292,7 +93,7 @@ namespace GameManagement
 
         private Vector3 NoSpawnpointAvailableForThisTeam(ushort teamID)
         {
-            print($"There s no checkpoint available for this player with team ID: {teamID}");
+            Debug.Log($"There s no checkpoint available for this player with team ID: {teamID}");
             return Vector3.zero;
         }
 
@@ -308,8 +109,6 @@ namespace GameManagement
             Manager.StartGameServerRpc();
         }
 
-
-
         [Rpc(SendTo.Server)]
         private void StartGameServerRpc()
         {
@@ -323,14 +122,7 @@ namespace GameManagement
         [Rpc(SendTo.ClientsAndHost)]
         private void StartGameClientRpc()
         {
-            RetrievePlayerList();
-            Debug.Log("Game started");
-        }
-
-
-        private void RetrievePlayerList()
-        {
-            players = GetNetworkedPlayers();
+            GameNetworkManager.Manager.RetrievePlayerList();
         }
 
         #endregion
@@ -363,116 +155,4 @@ namespace GameManagement
         #endregion
 
     }
-
-    [Serializable]
-    public struct Settings
-    {
-        public bool viewBobbing;
-    }
-
-
-
-    [Serializable]
-    public struct NetworkedPlayer
-    {
-        public string Name;
-        public ushort TeamID;
-        public NetworkObject NetworkObject;
-        public ClientNetworkTransform ClientNetworkTransform;
-        //public HandlePlayerNetworkBehaviour BehaviourHandler;
-        public WeaponHandler WeaponHandler;
-        public PlayerHealthNetworked Health;
-        public bool Online;
-
-        public NetworkedPlayer(
-            string name,
-            ushort teamID,
-            NetworkObject object_,
-            ClientNetworkTransform transform_,
-            //HandlePlayerNetworkBehaviour behaviourHandler,
-            WeaponHandler weaponHandler,
-            PlayerHealthNetworked health
-        )
-        {
-            Name = name;
-            TeamID = teamID;
-            NetworkObject = object_;
-            ClientNetworkTransform = transform_;
-            //BehaviourHandler = behaviourHandler;
-            WeaponHandler = weaponHandler;
-            Health = health;
-            Online = true;
-        }
-
-        public readonly string GetInfos()
-        {
-            return $"{{Player: {Name} | Team: {TeamID}}}";
-        }
-
-        public override readonly string ToString()
-        {
-            return GetInfos();
-        }
-
-        public readonly NetworkedPlayerPrimitive AsNetworkedPlayerPrimitive()
-        {
-            return new NetworkedPlayerPrimitive(Name, NetworkObject.NetworkObjectId);
-        }
-    }
-
-    [Serializable]
-    public struct NetworkedPlayerPrimitive : INetworkSerializable
-    {
-        public string Name;
-        public ulong ObjectNetworkID;
-
-        public NetworkedPlayerPrimitive(string name, ulong objectNetworkID)
-        {
-            Name = name;
-            ObjectNetworkID = objectNetworkID;
-#if DEBUG_MULTIPLAYER
-        Debug.Log($"Name: {Name} | objectNetworkID: {ObjectNetworkID}");
-#endif
-        }
-
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref Name);
-            serializer.SerializeValue(ref ObjectNetworkID);
-        }
-
-        public readonly NetworkedPlayer AsNetworkedPlayer()
-        {
-#if DEBUG_MULTIPLAYER
-        Debug.Log($"Name: {Name} | objectNetworkID: {ObjectNetworkID}");
-#endif
-            if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(ObjectNetworkID, out var networkObject))
-            {
-                throw new System.Exception($"This player (ObjectNetworkID: {ObjectNetworkID}) was not properly spawned");
-            }
-
-            return new NetworkedPlayer(
-                    Name,
-                    0,
-                    networkObject,
-                    networkObject.GetComponent<ClientNetworkTransform>(),
-                    //networkObject.GetComponent<HandlePlayerNetworkBehaviour>(),
-                    networkObject.GetComponent<WeaponHandler>(),
-                    networkObject.GetComponent<PlayerHealthNetworked>()
-                );
-        }
-
-    }
-
-    public enum NetworkedComponent : byte
-    {
-        NetworkObject,
-        ClientNetworkTransform,
-        //HandlePlayerNetworkBehaviour,
-        WeaponHandler,
-        PlayerHealthNetworked
-    }
-
-
 }
-// create the lists when all the clients are already spawned in

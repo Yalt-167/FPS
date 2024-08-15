@@ -140,7 +140,7 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour, IPlayerFrameMember
     {
         if (IsOwner) { return; }
 
-        Game.Manager.GetNetworkedWeaponHandlerFromNetworkObjectID(attackerNetworkID)?.SpawnDamageLog(targetType, damageDealt);
+        GameNetworkManager.Manager.GetNetworkedWeaponHandlerFromNetworkObjectID(attackerNetworkID)?.SpawnDamageLog(targetType, damageDealt);
     }
 
 
@@ -173,6 +173,6 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour, IPlayerFrameMember
     private void RespawnClientRpc()
     {
         ResetHealth();
-        transform.position = Game.Manager.GetSpawnPosition(TeamID);
+        transform.position = GameNetworkManager.Manager.GetSpawnPosition(TeamID);
     }
 }

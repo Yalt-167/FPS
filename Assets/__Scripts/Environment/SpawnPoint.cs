@@ -12,11 +12,11 @@ public sealed class SpawnPoint : MonoBehaviour
 
     private void OnEnable()
     {
-        Game.Manager.AddRespawnPoint(this);
+        GameNetworkManager.Manager.AddRespawnPoint(this);
     }
 
     private void OnDisable()
     {
-        Game.Manager.DiscardRespawnPoint(this);
+        GameNetworkManager.Manager.DiscardRespawnPoint(this);
     }
 }

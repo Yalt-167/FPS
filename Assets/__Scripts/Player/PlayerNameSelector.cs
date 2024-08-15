@@ -182,7 +182,7 @@ public sealed class PlayerNameSelector : NetworkBehaviour
     [ServerRpc]
     private void CheckWetherNameAvailableServerRpc(NetworkSerializableString playerName, ServerRpcParams rpcParams = default)
     {
-        if (GameManagement.Game.Manager.PlayerWithNameExist(playerName))
+        if (GameManagement.GameNetworkManager.Manager.PlayerWithNameExist(playerName))
         {
             SetErrorMessageClientRpc(new($"Name {playerName} is already in use!"));
         }
