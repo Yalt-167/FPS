@@ -216,8 +216,8 @@ namespace GameManagement
 
         private NetworkedPlayer[] GetNetworkedPlayers()
         {
-            //NetworkedPlayer[] players_ = new NetworkedPlayer[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count - 1]; // - 1 for the manager
-            NetworkedPlayer[] players_ = new NetworkedPlayer[NetworkManager.Singleton.ConnectedClientsList.Count];
+            NetworkedPlayer[] players_ = new NetworkedPlayer[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count - 1]; // - 1 for the manager
+            //NetworkedPlayer[] players_ = new NetworkedPlayer[NetworkManager.Singleton.ConnectedClientsList.Count];
 
 #if DEBUG_MULTIPLAYER
         var stringBuilder = new StringBuilder();
