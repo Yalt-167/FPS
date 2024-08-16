@@ -1,6 +1,5 @@
 //#define DEBUG_MULTIPLAYER
 #define LOG_METHOD_CALLS
-#define USE_PLAYER_FRAME
 
 using System;
 using System.Collections;
@@ -9,9 +8,7 @@ using System.Linq;
 using System.Text;
 
 using UnityEngine;
-using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using Unity.Netcode;
-using Unity.Collections;
 
 using UnityEditor;
 
@@ -55,14 +52,9 @@ namespace GameManagement
 
         #region Player List
 
-#if USE_PLAYER_FRAME
         public PlayerFrame[] Players => players;
         private PlayerFrame[] players;
-#else
 
-        public NetworkedPlayer[] Players => players;
-        private NetworkedPlayer[] players;
-#endif
         public void DisconnectPlayer(ushort playerID)
         {
             players[playerID].IsOnline = false;
@@ -98,7 +90,6 @@ namespace GameManagement
 
         }
 
-        //public NetworkedPlayer RetrievePlayerFromIndex(int index)
         public PlayerFrame RetrievePlayerFromIndex(int index)
         {
             return players[index];
@@ -170,7 +161,6 @@ namespace GameManagement
 
         public void InitPlayerList()
         {
-            Debug.Log("Players was initiated");
             players = GetNetworkedPlayers();
         }
 
@@ -323,49 +313,6 @@ namespace GameManagement
 
         #endregion
 
-    }
-
-    [Serializable]
-    public struct NetworkedPlayer
-    {
-        public FixedString64Bytes Name;
-        public ushort TeamID;
-        public NetworkObject NetworkObject;
-        public ClientNetworkTransform ClientNetworkTransform;
-        //public HandlePlayerNetworkBehaviour BehaviourHandler;
-        public WeaponHandler WeaponHandler;
-        public PlayerHealthNetworked Health;
-        public bool Online;
-
-        public NetworkedPlayer(
-            FixedString64Bytes name,
-            ushort teamID,
-            NetworkObject object_,
-            ClientNetworkTransform transform_,
-            //HandlePlayerNetworkBehaviour behaviourHandler,
-            WeaponHandler weaponHandler,
-            PlayerHealthNetworked health
-        )
-        {
-            Name = name;
-            TeamID = teamID;
-            NetworkObject = object_;
-            ClientNetworkTransform = transform_;
-            //BehaviourHandler = behaviourHandler;
-            WeaponHandler = weaponHandler;
-            Health = health;
-            Online = true;
-        }
-
-        public readonly string GetInfos()
-        {
-            return $"{{Player: {Name} | Team: {TeamID}}}";
-        }
-
-        public override readonly string ToString()
-        {
-            return GetInfos();
-        }
     }
 
     public enum NetworkedComponent : byte

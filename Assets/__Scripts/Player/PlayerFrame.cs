@@ -81,19 +81,9 @@ namespace GameManagement
             //playerMovement.InitPlayerFrame(this);
         }
 
-        //public NetworkedPlayer AsNetworkedPlayer(ushort index)
-        //{
-        //    playerIndex = index;
-
-        //    return new NetworkedPlayer(playerName.Value, 0, NetworkObject, GetComponent<ClientNetworkTransform>(), weaponHandler, playerHealth);
-        //}
-
 
         public string GetInfos()
         {
-            _ = playerName.Value;
-            _ = TeamID;
-
             return $"{{Player: {playerName.Value} | Team: {TeamID}}}";
         }
 
