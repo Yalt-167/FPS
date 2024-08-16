@@ -1,5 +1,3 @@
-#define PLAYER_PACK_ARCHITECTURE
-#define LOBBY_ARCHITECTURE
 #define LOG_EVENTS
 #define LOG_METHOD_CALLS
 
@@ -17,59 +15,6 @@ using GameManagement;
 
 public sealed class PlayerNameSelector : NetworkBehaviour
 {
-    [SerializeField] private GameObject playerPrefab;
-    private GameObject playerGameObject;
-
-    private NetworkSerializableString netPlayerName = new();
-
-    public NetworkSerializableString netErrorMessage = new();
-    private bool wasInitialized = false;
-    private bool promptActive = true;
-
-    private static GUIStyle labelStyle;
-    private static GUIStyle buttonStyle;
-    private static GUIStyle textFieldStyle;
-
-    private static readonly int screenWidth = Screen.width;
-    private static readonly int screenHeight = Screen.height;
-
-    #region Label
-
-    private static readonly int labelWidth = 200;
-    private static readonly int labelHeight = 30;
-    private static readonly Rect labelRect = new((screenWidth - labelWidth) / 2, screenHeight / 2 - 60, labelWidth, labelHeight);
-    private static readonly string label = "Enter your name:";
-
-    #endregion
-
-    #region Input Field
-
-    private static readonly int inputFieldWidth = 200;
-    private static readonly int inputFieldHeight = 30;
-    private static readonly Rect inputFieldRect = new((screenWidth - inputFieldWidth) / 2, screenHeight / 2 - 20, inputFieldWidth, inputFieldHeight);
-
-    #endregion
-
-    #region Login Button
-
-    private static readonly int loginButtonWidth = 100;
-    private static readonly int loginButtonHeight = 30;
-    private static readonly Rect loginButtonRect = new((screenWidth - loginButtonWidth) / 2, screenHeight / 2 + 20, loginButtonWidth, loginButtonHeight);
-    private static readonly string loginButtonText = "Login";
-
-    #endregion
-
-    #region Feedback Message
-
-    private static readonly int messageWidth = 300;
-    private static readonly int messageHeight = 30;
-    private static readonly Rect messageRect = new((screenWidth - messageWidth) / 2, screenHeight / 2 + 60, messageWidth, messageHeight);
-
-    private static readonly string noNameEnteredMessage = "Please enter a name.";
-
-    #endregion
-
-
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -87,9 +32,7 @@ public sealed class PlayerNameSelector : NetworkBehaviour
     {
         ActivatePlayerPackArchitectureClientRpc(playerName);
     }
-
-    
-    
+   
     [Rpc(SendTo.ClientsAndHost)]
     private void ActivatePlayerPackArchitectureClientRpc(NetworkSerializableString playerName)
     {
@@ -230,7 +173,6 @@ public sealed class PlayerNameSelector : NetworkBehaviour
     #endregion
 }
 
-
 public struct NetworkSerializableString : INetworkSerializable
 {
     public string Value;
@@ -240,7 +182,7 @@ public struct NetworkSerializableString : INetworkSerializable
     {
         serializer.SerializeValue(ref Value);
     }
-    public override string ToString()
+    public readonly override string ToString()
     {
         return Value;
     }
