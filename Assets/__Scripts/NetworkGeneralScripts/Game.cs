@@ -131,7 +131,7 @@ namespace GameManagement
         private void StartGameClientRpc()
         {
             gameStarted = true;
-            GameNetworkManager.Manager.RetrievePlayerList();
+            GameNetworkManager.Manager.InitPlayerList();
         }
 
         #endregion

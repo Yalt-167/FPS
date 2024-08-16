@@ -142,7 +142,7 @@ namespace GameManagement
 
         private void DebugPlayerList()
         {
-            if (players == null) { Debug.Log("Players is null");  return; }
+            if (players == null) { Debug.Log("No player list RN");  return; }
 
             var stringBuilder = new StringBuilder();
 
@@ -158,7 +158,7 @@ namespace GameManagement
             Debug.Log(stringBuilder.ToString());
         }
 
-        public void RetrievePlayerList()
+        public void InitPlayerList()
         {
             players = GetNetworkedPlayers();
         }
@@ -218,7 +218,6 @@ namespace GameManagement
         private NetworkedPlayer[] GetNetworkedPlayers()
         {
             NetworkedPlayer[] players_ = new NetworkedPlayer[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count - 1]; // - 1 for the manager
-            //NetworkedPlayer[] players_ = new NetworkedPlayer[NetworkManager.Singleton.ConnectedClientsList.Count];
 
 #if DEBUG_MULTIPLAYER
         var stringBuilder = new StringBuilder();
@@ -240,19 +239,6 @@ namespace GameManagement
         print(stringBuilder.ToString());
 #endif
             return players_;
-        }
-
-
-        [MenuItem("Developer/TestWetherAllClientsHaveAName")]
-        public static void TestWetherAllClientsHaveAName()
-        {
-            foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
-            {
-                if (element.Value.gameObject.TryGetComponent<PlayerFrame>(out var playerFrameComponent))
-                {
-                    Debug.Log(playerFrameComponent.PlayerName);
-                }
-            }
         }
 
         #region Respawn Logic

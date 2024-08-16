@@ -31,7 +31,6 @@ namespace GameManagement
         public FixedString64Bytes PlayerName => playerName.Value;
         private readonly NetworkVariable<FixedString64Bytes> playerName = new(writePerm: NetworkVariableWritePermission.Owner, readPerm: NetworkVariableReadPermission.Everyone);
 
-
         private ushort playerIndex;
         public ushort TeamID;
 
