@@ -23,11 +23,15 @@ namespace LobbyHandling
     public sealed class LobbyHandler : MonoBehaviour
     {
         public int SpaceBetweenButtons = 12;
+
         private Lobby hostLobby;
+
         private static readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
         private float heartbeatTimer;
+
         private static readonly float lobbyUpdateRate = 300f; // how often the lobby updates (in seconds)
         private float lobbyUpdateTimer;
+
         private static readonly string noPassword = "        ";
         private static readonly string initializeToZero = "0";
 
@@ -699,14 +703,6 @@ namespace LobbyHandling
 
             GUIUtility.systemCopyBuffer = hostLobby.LobbyCode;
             Debug.Log("Lobby code was copied to your clipboard");
-        }
-
-        public void CopyRelayJoinCode() // should not be used but if needed it s here ig
-        {
-            if (string.IsNullOrEmpty(RelayJoinCode)) { return; }
-
-            GUIUtility.systemCopyBuffer = RelayJoinCode;
-            Debug.Log("Relay join code was copied to your clipboard");
         }
 
         public bool IsLobbyHost()

@@ -9,6 +9,7 @@ using Unity.Collections;
 using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 
 using Controller;
+using Unity.Services.Authentication;
 
 
 namespace GameManagement
@@ -19,6 +20,13 @@ namespace GameManagement
     [DefaultExecutionOrder(-98)]
     public sealed class PlayerFrame : NetworkBehaviour
     {
+
+        #region Spawn Logic
+
+        
+
+        #endregion
+
         [field: SerializeField] public ChampionStats ChampionStats { get; set; }
 
         private PlayerCombat playerCombat;
