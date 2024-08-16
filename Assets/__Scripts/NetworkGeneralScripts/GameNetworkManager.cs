@@ -15,6 +15,7 @@ using UnityEditor;
 
 using Random = UnityEngine.Random;
 using static DebugUtility;
+using Unity.Collections;
 
 namespace GameManagement
 {
@@ -242,8 +243,8 @@ namespace GameManagement
         }
 
 
-        [MenuItem("Developer/TestNames")]
-        public static void TestNames()
+        [MenuItem("Developer/TestWetherAllClientsHaveAName")]
+        public static void TestWetherAllClientsHaveAName()
         {
             foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
             {
@@ -328,7 +329,7 @@ namespace GameManagement
     [Serializable]
     public struct NetworkedPlayer
     {
-        public string Name;
+        public FixedString64Bytes Name;
         public ushort TeamID;
         public NetworkObject NetworkObject;
         public ClientNetworkTransform ClientNetworkTransform;
@@ -338,7 +339,7 @@ namespace GameManagement
         public bool Online;
 
         public NetworkedPlayer(
-            string name,
+            FixedString64Bytes name,
             ushort teamID,
             NetworkObject object_,
             ClientNetworkTransform transform_,
@@ -376,10 +377,10 @@ namespace GameManagement
     [Serializable]
     public struct NetworkedPlayerPrimitive : INetworkSerializable
     {
-        public string Name;
+        public FixedString64Bytes Name;
         public ulong ObjectNetworkID;
 
-        public NetworkedPlayerPrimitive(string name, ulong objectNetworkID)
+        public NetworkedPlayerPrimitive(FixedString64Bytes name, ulong objectNetworkID)
         {
             Name = name;
             ObjectNetworkID = objectNetworkID;

@@ -8,6 +8,7 @@ using Unity.Netcode;
 
 using Controller;
 using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
+using Unity.Collections;
 
 
 namespace GameManagement
@@ -29,7 +30,8 @@ namespace GameManagement
 
         private bool WasInitiated => string.IsNullOrEmpty(playerName);
         private string playerName;
-        public string Name => playerName;
+        public FixedString64Bytes Name => PlayerName.Value;
+        private readonly NetworkVariable<FixedString64Bytes> PlayerName = new(writePerm: NetworkVariableWritePermission.Owner, readPerm: NetworkVariableReadPermission.Everyone);
 
 
         private ushort playerIndex;
@@ -55,7 +57,8 @@ namespace GameManagement
             ToggleCursor(false);
 
             playerName = playerName_;
-            PropagateNameToAllClientsServerRpc(playerName);
+            PlayerName.Value = playerName_;
+            //PropagateNameToAllClientsServerRpc(playerName);
             //Debug.Log($"Saved name {playerName}");
 
             if (!TryGetComponent<NetworkObject>(out var _))
@@ -67,7 +70,7 @@ namespace GameManagement
         public void InitPlayerFrameRemote()
         {
             InitPlayerCommon();
-            RequestPlayerNameServerRpc();
+            //RequestPlayerNameServerRpc();
         }
 
         private void InitPlayerCommon()
@@ -93,12 +96,12 @@ namespace GameManagement
         public NetworkedPlayer AsNetworkedPlayer(ushort index)
         {
             playerIndex = index;
-            if (string.IsNullOrEmpty(playerName))
-            {
-                RequestPlayerNameServerRpc();
-            }
+            //if (string.IsNullOrEmpty(playerName))
+            //{
+            //    RequestPlayerNameServerRpc();
+            //}
 
-            return new NetworkedPlayer(playerName, 0, NetworkObject, GetComponent<ClientNetworkTransform>(), weaponHandler, playerHealth);
+            return new NetworkedPlayer(PlayerName.Value, 0, NetworkObject, GetComponent<ClientNetworkTransform>(), weaponHandler, playerHealth);
         }
 
         #region Toggle Controls
@@ -129,6 +132,8 @@ namespace GameManagement
 
         #endregion
 
+        #region Hopefully can remove soon
+
         [Rpc(SendTo.Server)]
         private void PropagateNameToAllClientsServerRpc(string name)
         {
@@ -145,8 +150,11 @@ namespace GameManagement
         [Rpc(SendTo.Server)]
         private void RequestPlayerNameServerRpc()
         {
+            print($"Name here (server): {playerName}");
             SetNameOnClientClientRpc(new(playerName));
         }
+
+        #endregion
 
         #region Team Logic
 
