@@ -70,195 +70,29 @@ public sealed class PlayerNameSelector : NetworkBehaviour
     #endregion
 
 
-    #region Children Indexes
-#pragma warning disable
-
-    #region PlayerPackArchitecture (ppa)
-
-    private static readonly int playerPackArchitectureMainCameraIndex = 5;
-
-    #endregion
-
-    #region LoginArchitecture (la)
-
-    private static readonly int loginArchitectureMainCameraIndex = 0;
-
-    #endregion
-
-#pragma warning enable
-    #endregion
-
-
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-//        transform.GetChild(
-//#if PLAYER_PACK_ARCHITECTURE
-//            playerPackArchitectureMainCameraIndex
-//#else
-//                loginArchitectureMainCameraIndex
-//#endif
-//            ).gameObject.SetActive(IsOwner);
-
-#if PLAYER_PACK_ARCHITECTURE
         if (IsOwner)
         {
             EnablePlayerServerRpc(new(AuthenticationService.Instance.Profile));       
         }
 
         ManageFiles();
-        DeactivateScript();
-#endif
+        enabled = false;
     }
-
-
-    #region Not in use RN
-
-    private void Init()
-    {
-        wasInitialized = true;
-
-        labelStyle = new(GUI.skin.label)
-        {
-            fontSize = 20,
-            alignment = TextAnchor.MiddleCenter,
-        };
-
-        buttonStyle = new(GUI.skin.button)
-        {
-            fontSize = 20,
-        };
-
-        textFieldStyle = new(GUI.skin.textField)
-        {
-            fontSize = 20,
-        };
-
-        promptActive = IsOwner;
-
-        //if (IsOwner)
-        //{
-        //    Game.Manager.RetrieveExistingPlayerListServerRpc();
-        //}
-    }
-
-    private void OnGUI()
-    {
-#if LOBBY_ARCHITECTURE
-        return;
-#endif
-        if (!wasInitialized)
-        {
-            Init();
-        }
-
-        if (!promptActive) { return; }
-
-        GUI.Label(labelRect, label, labelStyle);
-
-        netPlayerName.Value = GUI.TextField(inputFieldRect, netPlayerName, textFieldStyle);
-
-        if (GUI.Button(loginButtonRect, loginButtonText, buttonStyle))
-        {
-            if (!string.IsNullOrEmpty(netPlayerName))
-            {
-                CheckWetherNameAvailableServerRpc(netPlayerName);
-            }
-            else
-            {
-                netErrorMessage.Value = noNameEnteredMessage;
-            }
-        }
-
-        GUI.Label(messageRect, netErrorMessage.Value, labelStyle);
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    private void SetErrorMessageClientRpc(NetworkSerializableString message)
-    {
-        netErrorMessage.Value = message;
-    }
-
-    [ServerRpc]
-    private void CheckWetherNameAvailableServerRpc(NetworkSerializableString playerName, ServerRpcParams rpcParams = default)
-    {
-        if (GameManagement.GameNetworkManager.Manager.PlayerWithNameExist(playerName))
-        {
-            SetErrorMessageClientRpc(new($"Name {playerName} is already in use!"));
-        }
-        else
-        {
-
-#if PLAYER_PACK_ARCHITECTURE
-            EnablePlayerServerRpc(playerName);
-#else
-            RequestSpawnPlayerServerRpc(playerName, rpcParams.Receive.SenderClientId);
-#endif
-        }
-    }
-
-    #endregion
 
     [Rpc(SendTo.Server)]
     private void EnablePlayerServerRpc(NetworkSerializableString playerName)
     {
-        //LogMethodCall();
         ActivatePlayerPackArchitectureClientRpc(playerName);
     }
 
-    //[Rpc(SendTo.Server)]
-    //private void RequestSpawnPlayerServerRpc(int paramToAvoidCallingThisOne)
-    //{
-    //    playerGameObject = Instantiate(playerPrefab, Vector3.up * 5f, Quaternion.identity);
-    //    var networkObjectComponent = playerGameObject.GetComponent<NetworkObject>();
-    //    networkObjectComponent.SpawnAsPlayerObject(networkObjectComponent.OwnerClientId);
-    //    playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
-    //    transform.GetChild(0).gameObject.SetActive(active = false); // deactivate camera
-    //    // may cause issues when there are several clients (when spawning a new player) ? idk what I was thinking about but may be true tho
-
-    //    //InitSpawnedPlayerClientRpc();
-    //}
-
-    [Rpc(SendTo.Server)]
-    private void RequestSpawnPlayerServerRpc(NetworkSerializableString playerName, ulong senderClientID)
-    {
-        SpawnPlayerClientRpc();
-        playerGameObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(senderClientID);
-        //ActivatePlayerPackArchitectureClientRpc(playerName);
-        //playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrame(playerName);
-
-        DeactivateLoginPromptClientRpc();
-        DeactivateLoginCameraClientRpc();
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    private void SpawnPlayerClientRpc()
-    {
-        playerGameObject = Instantiate(playerPrefab, Vector3.up * 5f, Quaternion.identity);
-    }
     
     
     [Rpc(SendTo.ClientsAndHost)]
     private void ActivatePlayerPackArchitectureClientRpc(NetworkSerializableString playerName)
     {
-        //GetComponent<Controller.PlayerMovement>().enabled = true;
-        //GetComponent<PlayerCombat>().enabled = true;
-
-        //var headTransform = transform.GetChild(0);
-        //headTransform.GetComponent<Controller.FollowRotationCamera>().enabled = true;
-
-        //var cameraTransform = headTransform.GetChild(0).GetChild(0);
-        //cameraTransform.GetComponent<Camera>().enabled = true;
-        //cameraTransform.GetComponent<AudioListener>().enabled = true;
-
-        //GetComponent<PlayerHealthDisplay>().enabled = true;
-        //GetComponent<WeaponHandler>().enabled = true;
-        //GetComponent<PlayerHealthNetworked>().enabled = true;
-
-        //GetComponent<PlayerFrame>().InitPlayerFrameLocal(playerName);
-        //transform.GetChild(playerPackArchitectureMainCameraIndex).gameObject.SetActive(false);
-        //enabled = false;
-
         if (IsOwner)
         {
             GetComponent<PlayerFrame>().InitPlayerFrameLocal(playerName);
@@ -267,30 +101,6 @@ public sealed class PlayerNameSelector : NetworkBehaviour
         {
             GetComponent<PlayerFrame>().InitPlayerFrameRemote();
         }
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    private void ActivatePlayerLoginArchitectureClientRpc(NetworkSerializableString playerName)
-    {
-        playerGameObject.GetComponent<PlayerFrame>().InitPlayerFrameLocal(playerName);
-    }
-
-
-    [Rpc(SendTo.ClientsAndHost)]
-    private void DeactivateLoginPromptClientRpc()
-    {
-        promptActive = false;
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    private void DeactivateLoginCameraClientRpc()
-    {
-        transform.GetChild(0).gameObject.SetActive(false);
-    }
-
-    private void DeactivateScript()
-    {
-        enabled = false;
     }
 
     #region Handle Files
