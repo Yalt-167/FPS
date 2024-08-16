@@ -367,55 +367,6 @@ namespace GameManagement
         {
             return GetInfos();
         }
-
-        public readonly NetworkedPlayerPrimitive AsNetworkedPlayerPrimitive()
-        {
-            return new NetworkedPlayerPrimitive(Name, NetworkObject.NetworkObjectId);
-        }
-    }
-
-    [Serializable]
-    public struct NetworkedPlayerPrimitive : INetworkSerializable
-    {
-        public FixedString64Bytes Name;
-        public ulong ObjectNetworkID;
-
-        public NetworkedPlayerPrimitive(FixedString64Bytes name, ulong objectNetworkID)
-        {
-            Name = name;
-            ObjectNetworkID = objectNetworkID;
-#if DEBUG_MULTIPLAYER
-        Debug.Log($"Name: {Name} | objectNetworkID: {ObjectNetworkID}");
-#endif
-        }
-
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref Name);
-            serializer.SerializeValue(ref ObjectNetworkID);
-        }
-
-        public readonly NetworkedPlayer AsNetworkedPlayer()
-        {
-#if DEBUG_MULTIPLAYER
-        Debug.Log($"Name: {Name} | objectNetworkID: {ObjectNetworkID}");
-#endif
-            if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(ObjectNetworkID, out var networkObject))
-            {
-                throw new Exception($"This player (ObjectNetworkID: {ObjectNetworkID}) was not properly spawned");
-            }
-
-            return new NetworkedPlayer(
-                    Name,
-                    0,
-                    networkObject,
-                    networkObject.GetComponent<ClientNetworkTransform>(),
-                    //networkObject.GetComponent<HandlePlayerNetworkBehaviour>(),
-                    networkObject.GetComponent<WeaponHandler>(),
-                    networkObject.GetComponent<PlayerHealthNetworked>()
-                );
-        }
-
     }
 
     public enum NetworkedComponent : byte

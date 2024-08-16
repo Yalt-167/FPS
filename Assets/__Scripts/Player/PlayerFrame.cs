@@ -77,11 +77,6 @@ namespace GameManagement
             //playerMovement.InitPlayerFrame(this);
         }
 
-        public NetworkedPlayerPrimitive AsPrimitive(/*ulong requestingClientID*/)
-        {
-            return new(playerName.Value, NetworkObjectId);
-        }
-
         public NetworkedPlayer AsNetworkedPlayer(ushort index)
         {
             playerIndex = index;
