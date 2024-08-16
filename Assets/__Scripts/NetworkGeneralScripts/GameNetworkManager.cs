@@ -1,5 +1,6 @@
 //#define DEBUG_MULTIPLAYER
 #define LOG_METHOD_CALLS
+#define USE_PLAYER_FRAME
 
 using System;
 using System.Collections;
@@ -10,12 +11,12 @@ using System.Text;
 using UnityEngine;
 using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using Unity.Netcode;
+using Unity.Collections;
 
 using UnityEditor;
 
 using Random = UnityEngine.Random;
 using static DebugUtility;
-using Unity.Collections;
 
 namespace GameManagement
 {
@@ -54,17 +55,22 @@ namespace GameManagement
 
         #region Player List
 
+#if USE_PLAYER_FRAME
+        public PlayerFrame[] Players => players;
+        private PlayerFrame[] players;
+#else
+
         public NetworkedPlayer[] Players => players;
         private NetworkedPlayer[] players;
-
+#endif
         public void DisconnectPlayer(ushort playerID)
         {
-            players[playerID].Online = false;
+            players[playerID].IsOnline = false;
         }
 
         public void ReconnectPlayer(ushort playerID)
         {
-            players[playerID].Online = true;
+            players[playerID].IsOnline = true;
         }
 
         /// <summary>
@@ -73,7 +79,7 @@ namespace GameManagement
         /// </summary>
         /// <param name="componentID"></param>
         /// <param name="whichComponentID"></param>
-        public NetworkedPlayer RetrievePlayerFromComponentID(ulong componentID, NetworkedComponent whichComponentID)
+        public PlayerFrame RetrievePlayerFromComponentID(ulong componentID, NetworkedComponent whichComponentID)
         {
             return whichComponentID switch
             {
@@ -92,12 +98,13 @@ namespace GameManagement
 
         }
 
-        public NetworkedPlayer RetrievePlayerFromIndex(int index)
+        //public NetworkedPlayer RetrievePlayerFromIndex(int index)
+        public PlayerFrame RetrievePlayerFromIndex(int index)
         {
             return players[index];
         }
 
-        public IEnumerable<NetworkedPlayer> GetPlayers()
+        public IEnumerable<PlayerFrame> GetPlayers()
         {
             foreach (var player in players)
             {
@@ -105,7 +112,7 @@ namespace GameManagement
             }
         }
 
-        public IEnumerable<NetworkedPlayer> GetPlayersOfTeam(ushort teamID)
+        public IEnumerable<PlayerFrame> GetPlayersOfTeam(ushort teamID)
         {
             foreach (var player in players)
             {
@@ -121,7 +128,8 @@ namespace GameManagement
             return GetPlayerWithName(name) != null;
         }
 
-        public NetworkedPlayer? GetPlayerWithName(string name)
+#nullable enable
+        public PlayerFrame? GetPlayerWithName(string name)
         {
             foreach (var player in players)
             {
@@ -133,6 +141,7 @@ namespace GameManagement
 
             return null;
         }
+#nullable disable
 
         [MenuItem("Developer/DebugPlayerList")]
         public static void StaticDebugPlayerList()
@@ -150,7 +159,8 @@ namespace GameManagement
             var isFirst = true;
             foreach (var player in players)
             {
-                stringBuilder.Append(isFirst ? $"{player.GetInfos()}" : $", {player.GetInfos()}");
+                var playerInfos = player?.GetInfos() ?? throw new Exception("Somehow player is null here");
+                stringBuilder.Append(isFirst ? $"{playerInfos}" : $", {playerInfos}");
                 isFirst = false;
             }
             stringBuilder.Append(" ]");
@@ -160,10 +170,11 @@ namespace GameManagement
 
         public void InitPlayerList()
         {
+            Debug.Log("Players was initiated");
             players = GetNetworkedPlayers();
         }
 
-        #endregion
+#endregion
 
         #region Network Objects Spawning
 
@@ -215,9 +226,11 @@ namespace GameManagement
 
         #endregion
 
-        private NetworkedPlayer[] GetNetworkedPlayers()
+        private PlayerFrame[] GetNetworkedPlayers()
         {
-            NetworkedPlayer[] players_ = new NetworkedPlayer[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count - 1]; // - 1 for the manager
+
+            PlayerFrame[] players_ = new PlayerFrame[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count - 1]; // - 1 for the manager
+            //NetworkedPlayer[] players_ = new NetworkedPlayer[NetworkManager.Singleton.ConnectedClientsList.Count]; // not allowed to call on clients
 
 #if DEBUG_MULTIPLAYER
         var stringBuilder = new StringBuilder();
@@ -231,7 +244,7 @@ namespace GameManagement
 #endif
                 if (element.Value.TryGetComponent<PlayerFrame>(out var playerFrameComponent))
                 {
-                    players_[idx] = playerFrameComponent.AsNetworkedPlayer(idx++);
+                    players_[idx++] = playerFrameComponent;
                 }
             }
 #if DEBUG_MULTIPLAYER

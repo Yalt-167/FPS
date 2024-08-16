@@ -151,7 +151,7 @@ namespace LobbyHandling
         private void Update()
         {
             HandleHeartbeat();
-            HandleLobbyUpdate();
+            //HandleLobbyUpdate();
         }
 
         private async void HandleHeartbeat()

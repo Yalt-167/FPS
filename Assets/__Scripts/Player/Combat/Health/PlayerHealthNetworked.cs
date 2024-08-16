@@ -86,7 +86,7 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour, IPlayerFrameMember
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    public void TakeDamageClientRpc(ushort damage, BodyParts bodyPartShot, bool ignoreShield, ulong attackerNetworkID) // add shield only modifier ?
+    public void TakeDamageClientRpc(ushort damage, BodyParts bodyPartShot, bool ignoreShield, ulong attackerNetworkID) // add shield only modifier
     {
         // send the info about wether shielded here (bool)Shield
         if (IsOwner)
@@ -116,16 +116,20 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour, IPlayerFrameMember
     public ushort RegenerateHealth(ushort healProficiency)
     {
         CurrentHealth += healProficiency;
+
         if (CurrentHealth < HealthData.MaxHealth) { return 0; }
 
         var excessHeal = CurrentHealth - HealthData.MaxHealth;
         CurrentHealth = HealthData.MaxHealth;
+
         return (ushort)excessHeal;
    
     }
 
     public void RegenerateShield(ushort healProficiency, bool canReviveCell)
     {
+        if (healProficiency ==  0) { return; }
+
         Shield.Heal(healProficiency, canReviveCell);
     }
 

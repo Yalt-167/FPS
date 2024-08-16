@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 using UnityEngine;
 using Unity.Netcode;
+using Unity.Collections;
+using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 
 using Controller;
-using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
-using Unity.Collections;
 
 
 namespace GameManagement
@@ -22,11 +22,16 @@ namespace GameManagement
         [field: SerializeField] public ChampionStats ChampionStats { get; set; }
 
         private PlayerCombat playerCombat;
-        private WeaponHandler weaponHandler;
-
-        private PlayerHealthNetworked playerHealth;
 
         private PlayerMovement playerMovement;
+        public bool IsOnline;
+
+        public FixedString64Bytes Name;
+
+        public ClientNetworkTransform ClientNetworkTransform;
+        //public HandlePlayerNetworkBehaviour BehaviourHandler;
+        public WeaponHandler WeaponHandler;
+        public PlayerHealthNetworked Health;
 
         public FixedString64Bytes PlayerName => playerName.Value;
         private readonly NetworkVariable<FixedString64Bytes> playerName = new(writePerm: NetworkVariableWritePermission.Owner, readPerm: NetworkVariableReadPermission.Everyone);
@@ -34,7 +39,7 @@ namespace GameManagement
         private ushort playerIndex;
         public ushort TeamID;
 
-        public bool Alive => playerHealth.Alive;
+        public bool Alive => Health.Alive;
 
         public void InitPlayerFrameLocal(string playerName_)
         {
@@ -66,21 +71,30 @@ namespace GameManagement
             //playerCombat = GetComponent<PlayerCombat>();
             //playerCombat.InitPlayerFrame(this);
 
-            weaponHandler = GetComponent<WeaponHandler>();
-            weaponHandler.InitPlayerFrame(this);
+            WeaponHandler = GetComponent<WeaponHandler>();
+            WeaponHandler.InitPlayerFrame(this);
 
-            playerHealth = GetComponent<PlayerHealthNetworked>();
-            playerHealth.InitPlayerFrame(this);
+            Health = GetComponent<PlayerHealthNetworked>();
+            Health.InitPlayerFrame(this);
 
             //playerMovement = GetComponent<Controller.PlayerMovement>();
             //playerMovement.InitPlayerFrame(this);
         }
 
-        public NetworkedPlayer AsNetworkedPlayer(ushort index)
-        {
-            playerIndex = index;
+        //public NetworkedPlayer AsNetworkedPlayer(ushort index)
+        //{
+        //    playerIndex = index;
 
-            return new NetworkedPlayer(playerName.Value, 0, NetworkObject, GetComponent<ClientNetworkTransform>(), weaponHandler, playerHealth);
+        //    return new NetworkedPlayer(playerName.Value, 0, NetworkObject, GetComponent<ClientNetworkTransform>(), weaponHandler, playerHealth);
+        //}
+
+
+        public string GetInfos()
+        {
+            _ = playerName.Value;
+            _ = TeamID;
+
+            return $"{{Player: {playerName.Value} | Team: {TeamID}}}";
         }
 
         #region Toggle Controls
