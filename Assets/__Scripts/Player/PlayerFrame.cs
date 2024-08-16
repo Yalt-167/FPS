@@ -28,21 +28,14 @@ namespace GameManagement
 
         private PlayerMovement playerMovement;
 
-        private bool WasInitiated => string.IsNullOrEmpty(playerName);
-        private string playerName;
-        public FixedString64Bytes Name => PlayerName.Value;
-        private readonly NetworkVariable<FixedString64Bytes> PlayerName = new(writePerm: NetworkVariableWritePermission.Owner, readPerm: NetworkVariableReadPermission.Everyone);
+        public FixedString64Bytes PlayerName => playerName.Value;
+        private readonly NetworkVariable<FixedString64Bytes> playerName = new(writePerm: NetworkVariableWritePermission.Owner, readPerm: NetworkVariableReadPermission.Everyone);
 
 
         private ushort playerIndex;
         public ushort TeamID;
 
         public bool Alive => playerHealth.Alive;
-
-        public void SetPlayerID(ushort playerIndex_)
-        {
-            playerIndex = playerIndex_;
-        }
 
         public void InitPlayerFrameLocal(string playerName_)
         {
@@ -56,10 +49,7 @@ namespace GameManagement
 
             ToggleCursor(false);
 
-            playerName = playerName_;
-            PlayerName.Value = playerName_;
-            //PropagateNameToAllClientsServerRpc(playerName);
-            //Debug.Log($"Saved name {playerName}");
+            playerName.Value = playerName_;
 
             if (!TryGetComponent<NetworkObject>(out var _))
             {
@@ -70,7 +60,6 @@ namespace GameManagement
         public void InitPlayerFrameRemote()
         {
             InitPlayerCommon();
-            //RequestPlayerNameServerRpc();
         }
 
         private void InitPlayerCommon()
@@ -90,18 +79,14 @@ namespace GameManagement
 
         public NetworkedPlayerPrimitive AsPrimitive(/*ulong requestingClientID*/)
         {
-            return new(playerName, NetworkObjectId);
+            return new(playerName.Value, NetworkObjectId);
         }
 
         public NetworkedPlayer AsNetworkedPlayer(ushort index)
         {
             playerIndex = index;
-            //if (string.IsNullOrEmpty(playerName))
-            //{
-            //    RequestPlayerNameServerRpc();
-            //}
 
-            return new NetworkedPlayer(PlayerName.Value, 0, NetworkObject, GetComponent<ClientNetworkTransform>(), weaponHandler, playerHealth);
+            return new NetworkedPlayer(playerName.Value, 0, NetworkObject, GetComponent<ClientNetworkTransform>(), weaponHandler, playerHealth);
         }
 
         #region Toggle Controls
@@ -128,30 +113,6 @@ namespace GameManagement
             Cursor.lockState = towardOn ? CursorLockMode.None : CursorLockMode.Locked; //
             Cursor.visible = !towardOn;
             // those two may cause issues when destroying the script on remote players // chekc when loggin concurrently
-        }
-
-        #endregion
-
-        #region Hopefully can remove soon
-
-        [Rpc(SendTo.Server)]
-        private void PropagateNameToAllClientsServerRpc(string name)
-        {
-            SetNameOnClientClientRpc(name);
-        }
-
-        [Rpc(SendTo.ClientsAndHost)]
-        private void SetNameOnClientClientRpc(string name)
-        {
-            Debug.Log(name, gameObject);
-            playerName = name;
-        }
-
-        [Rpc(SendTo.Server)]
-        private void RequestPlayerNameServerRpc()
-        {
-            print($"Name here (server): {playerName}");
-            SetNameOnClientClientRpc(new(playerName));
         }
 
         #endregion

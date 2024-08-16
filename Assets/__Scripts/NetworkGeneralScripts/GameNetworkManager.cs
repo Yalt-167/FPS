@@ -250,7 +250,7 @@ namespace GameManagement
             {
                 if (element.Value.gameObject.TryGetComponent<PlayerFrame>(out var playerFrameComponent))
                 {
-                    Debug.Log(playerFrameComponent.Name);
+                    Debug.Log(playerFrameComponent.PlayerName);
                 }
             }
         }
