@@ -75,7 +75,7 @@ namespace LobbyHandling
                 {
                     targetScript.JoinLobbyByID(targetScript.TargetLobbyId, targetScript.Password);
                 }
-                
+
             }
 
             GUILayout.Space(spaceBetweenButtons);
@@ -89,6 +89,13 @@ namespace LobbyHandling
                 {
                     targetScript.JoinLobbyByCode(targetScript.TargetLobbyCode, targetScript.Password);
                 }
+
+            }
+
+            GUILayout.Space(spaceBetweenButtons);
+            if (GUILayout.Button("Join lobby with clipboard"))
+            {
+                targetScript.JoinLobbyByID(GUIUtility.systemCopyBuffer, targetScript.Password);
 
             }
 
