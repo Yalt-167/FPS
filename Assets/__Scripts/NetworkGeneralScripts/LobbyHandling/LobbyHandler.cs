@@ -50,6 +50,7 @@ namespace LobbyHandling
                 GameMode = DataObject.IndexOptions.S1,
                 IsRanked = DataObject.IndexOptions.S2,
                 Map = DataObject.IndexOptions.S3,
+                Region = DataObject.IndexOptions.S4,
             };
 
             Filters = new()
@@ -57,6 +58,7 @@ namespace LobbyHandling
                 GameMode = QueryFilter.FieldOptions.S1,
                 IsRanked = QueryFilter.FieldOptions.S2,
                 Map = QueryFilter.FieldOptions.S3,
+                Region= QueryFilter.FieldOptions.S4,
             };
 
         }
@@ -67,6 +69,7 @@ namespace LobbyHandling
             public DataObject.IndexOptions HasPassword;
             public DataObject.IndexOptions IsRanked;
             public DataObject.IndexOptions Map;
+            public DataObject.IndexOptions Region;
         }
 
         public struct FiltersStruct
@@ -75,6 +78,7 @@ namespace LobbyHandling
             public QueryFilter.FieldOptions HasPassword;
             public QueryFilter.FieldOptions IsRanked;
             public QueryFilter.FieldOptions Map;
+            public QueryFilter.FieldOptions Region;
         }
 
         #endregion
@@ -242,7 +246,7 @@ namespace LobbyHandling
                         new DataObject(
                             visibility: DataObject.VisibilityOptions.Public,
                             value: GameModes.DeathMatch,
-                            index: FiltersValues.GameMode // GameModeFilter value being S1 -> it s now linked to the QueryFilter.FieldOptions.S1
+                            index: FiltersValues.GameMode
                         )
                     },
 
@@ -251,7 +255,16 @@ namespace LobbyHandling
                         new DataObject(
                             visibility: DataObject.VisibilityOptions.Public,
                             value: Maps.ToBeVoted,
-                            index: FiltersValues.Map // GameModeFilter value being S1 -> it s now linked to the QueryFilter.FieldOptions.S1
+                            index: FiltersValues.Map
+                        )
+                    },
+
+                    {
+                        LobbyData.Region,
+                        new DataObject(
+                            visibility: DataObject.VisibilityOptions.Public,
+                            value: relayAllocation.Region,
+                            index: FiltersValues.Region
                         )
                     },
 
@@ -532,6 +545,8 @@ namespace LobbyHandling
         private UnityTransport localUnityTransport;
         private readonly int localUnityTransportIndex = 1;
 
+        private Allocation relayAllocation;
+
         private void InitUnityTransports()
         {
             var unityTransports = NetworkManager.Singleton.GetComponents<UnityTransport>();
@@ -579,26 +594,23 @@ namespace LobbyHandling
 
         public async Task<bool> CreateRelayAsync(int slots)
         {
-            Allocation allocation;
-
             try
             {
-                allocation = await RelayService.Instance.CreateAllocationAsync(slots);
-                RelayJoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+                relayAllocation = await RelayService.Instance.CreateAllocationAsync(slots);
+                RelayJoinCode = await RelayService.Instance.GetJoinCodeAsync(relayAllocation.AllocationId);
             }
             catch (RelayServiceException exception)
             {
                 Debug.Log(exception.Message);
                 return false;
             }
-
             SelectRelayUnityTransport();
             relayUnityTransport.SetHostRelayData(
-                allocation.RelayServer.IpV4,
-                (ushort)allocation.RelayServer.Port,
-                allocation.AllocationIdBytes,
-                allocation.Key,
-                allocation.ConnectionData
+                relayAllocation.RelayServer.IpV4,
+                (ushort)relayAllocation.RelayServer.Port,
+                relayAllocation.AllocationIdBytes,
+                relayAllocation.Key,
+                relayAllocation.ConnectionData
             );
 
             Debug.Log("Successfully created relay");
