@@ -324,3 +324,34 @@ namespace GameManagement
         PlayerHealthNetworked
     }
 }
+
+
+public struct NetworkSerializableString : INetworkSerializable
+{
+    public string Value;
+    public NetworkSerializableString(string value) { Value = value; }
+    public static implicit operator string(NetworkSerializableString value) { return value.Value; }
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Value);
+    }
+    public readonly override string ToString()
+    {
+        return Value;
+    }
+}
+
+//public struct NetworkSerializableData<T> : INetworkSerializable where T : struct
+//{
+//    public T Data;
+//    public NetworkSerializableData(T value) { Data = value; }
+//    public static implicit operator T(NetworkSerializableData<T> value) { return value.Data; }
+//    public void NetworkSerialize<Type>(BufferSerializer<Type> serializer) where Type : IReaderWriter
+//    {
+//        serializer.SerializeValue(ref Data);
+//    }
+//    public override string ToString()
+//    {
+//        return Data.ToString();
+//    }
+//}
