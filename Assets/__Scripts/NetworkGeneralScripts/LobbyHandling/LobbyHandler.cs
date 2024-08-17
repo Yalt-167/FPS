@@ -93,6 +93,7 @@ namespace LobbyHandling
             AuthenticationService.Instance.SignedOut += SignOutCallback;
             AuthenticationService.Instance.Expired += SessionExpiredCallback;
 
+            InitUnityTransports();
         }
 
         public async void SignInAsync()
@@ -526,6 +527,56 @@ namespace LobbyHandling
 
         #region Relay Handling
 
+        private UnityTransport relayUnityTransport;
+        private readonly int relayUnityTransportIndex = 0;
+        private UnityTransport localUnityTransport;
+        private readonly int localUnityTransportIndex = 1;
+
+        private void InitUnityTransports()
+        {
+            var unityTransports = NetworkManager.Singleton.GetComponents<UnityTransport>();
+
+            relayUnityTransport = unityTransports[relayUnityTransportIndex];
+
+            localUnityTransport = unityTransports[localUnityTransportIndex];
+
+
+        }
+
+        public void SelectRelayUnityTransport()
+        {
+            DisableLocalUnityTransport();
+
+            NetworkManager.Singleton.NetworkConfig.NetworkTransport = relayUnityTransport;
+
+            EnableRelayUnityTransport();
+        }
+        public void EnableRelayUnityTransport()
+        {
+            relayUnityTransport.enabled = true;
+        }
+        public void DisableRelayunityTransprt()
+        {
+            relayUnityTransport.enabled = false;
+        }
+
+        public void SelectLocalUnityTransport()
+        {
+            DisableRelayunityTransprt();
+
+            NetworkManager.Singleton.NetworkConfig.NetworkTransport = localUnityTransport;
+
+            EnableLocalUnityTransport();
+        }
+        public void EnableLocalUnityTransport()
+        {
+            localUnityTransport.enabled = true;
+        }
+        public void DisableLocalUnityTransport()
+        {
+            localUnityTransport.enabled = false;
+        }
+
         public async Task<bool> CreateRelayAsync(int slots)
         {
             Allocation allocation;
@@ -541,7 +592,8 @@ namespace LobbyHandling
                 return false;
             }
 
-            NetworkManager.Singleton.GetComponent<UnityTransport>().SetHostRelayData(
+            SelectRelayUnityTransport();
+            relayUnityTransport.SetHostRelayData(
                 allocation.RelayServer.IpV4,
                 (ushort)allocation.RelayServer.Port,
                 allocation.AllocationIdBytes,
@@ -591,6 +643,25 @@ namespace LobbyHandling
             Debug.Log("Successfully joined relay");
         }
 
+        public async void ListRegions()
+        {
+            List<Region> regions;
+            try
+            {
+                regions = await RelayService.Instance.ListRegionsAsync();
+            }
+            catch (RelayServiceException exception)
+            {
+                Debug.Log(exception.Message);
+                return;
+            }
+
+            foreach (var region in regions)
+            {
+                Debug.Log(region.Description);
+                //Debug.Log(region.)
+            }
+        }
 
         #endregion
 

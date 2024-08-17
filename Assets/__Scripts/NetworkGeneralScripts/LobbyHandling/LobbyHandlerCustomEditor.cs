@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+
 namespace LobbyHandling
 {
     [CustomEditor(typeof(LobbyHandler))]
@@ -147,6 +148,22 @@ namespace LobbyHandling
             {
                 targetScript.DisplayPlayers(targetScript.TargetLobbyId);
             }
+
+            GUILayout.Space(spaceBetweenButtons);
+            GUILayout.Label("Relay");
+            if (GUILayout.Button("List regions"))
+            {
+                targetScript.ListRegions();
+            }
+
+            GUILayout.Space(spaceBetweenButtons);
+            GUILayout.Label("Solo Testing");
+            if (GUILayout.Button("Start a solo session"))
+            {
+                targetScript.SelectLocalUnityTransport();
+                GameManagement.GameNetworkManager.Singleton.StartHost();
+            }
+
         }
     }
 }
