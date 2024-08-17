@@ -36,6 +36,7 @@ public sealed class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlash
 
         if (attackerTeamID == OwnerTeamID)
         {
+            Debug.Log("Shot teammate");
             return;
         }
 

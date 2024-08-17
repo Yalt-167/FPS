@@ -182,18 +182,16 @@ namespace GameManagement
         #endregion
 
         [field: SerializeField] public ChampionStats ChampionStats { get; set; }
-        private PlayerCombat playerCombat;
-        private PlayerMovement playerMovement;
-        public ClientNetworkTransform ClientNetworkTransform;
-        public WeaponHandler WeaponHandler;
-        public PlayerHealthNetworked Health;
+        [HideInInspector] public PlayerCombat Combat;
+        [HideInInspector] public PlayerMovement Movement;
+        [HideInInspector] public ClientNetworkTransform ClientNetworkTransform;
+        [HideInInspector] public WeaponHandler WeaponHandler;
+        [HideInInspector] public PlayerHealthNetworked Health;
 
-
-        public FixedString64Bytes Name;
-
-
-        public FixedString64Bytes PlayerName => playerName.Value;
+        public FixedString64Bytes Name => playerName.Value;
         private readonly NetworkVariable<FixedString64Bytes> playerName = new(writePerm: NetworkVariableWritePermission.Owner, readPerm: NetworkVariableReadPermission.Everyone);
+
+
 
         private ushort playerIndex;
         public ushort TeamID;
@@ -205,11 +203,11 @@ namespace GameManagement
         {
             InitPlayerCommon();
 
-            playerCombat = GetComponent<PlayerCombat>();
-            playerCombat.InitPlayerFrame(this);
+            Combat = GetComponent<PlayerCombat>();
+            Combat.InitPlayerFrame(this);
 
-            playerMovement = GetComponent<PlayerMovement>();
-            playerMovement.InitPlayerFrame(this);
+            Movement = GetComponent<PlayerMovement>();
+            Movement.InitPlayerFrame(this);
 
             ToggleCursor(false);
 
