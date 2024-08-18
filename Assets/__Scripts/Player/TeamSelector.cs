@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using Unity.Netcode;
 using UnityEngine;
 
 public sealed class TeamSelector : MonoBehaviour
@@ -25,9 +24,7 @@ public sealed class TeamSelector : MonoBehaviour
     
     private void OnTeamSelected(ushort teamID)
     {       
-        print("0");
         GetComponent<GameManagement.PlayerFrame>().RequestSetTeamServerRpc(teamID);
-        print("1");
 
         Destroy(this);
     }

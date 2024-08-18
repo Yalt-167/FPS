@@ -466,6 +466,40 @@ namespace LobbyHandling
             }
         }
 
+        public async void CloseLobbyAcess()
+        {
+            if (hostLobby == null)
+            {
+                Debug.Log("You are not in a lobby");
+                return;
+            }
+
+            if (!IsLobbyHost())
+            {
+                Debug.Log("You do not have permission for this");
+                return;
+            }
+
+            var updateLobbyOptions = new UpdateLobbyOptions()
+            {
+                IsLocked = true,
+                IsPrivate = true,
+            };
+
+            try
+            {
+                await LobbyService.Instance.UpdateLobbyAsync(hostLobby.Id, updateLobbyOptions);
+            }
+            catch (LobbyServiceException exception)
+            {
+                Debug.Log(exception.Message);
+                return;
+            }
+
+
+            Debug.Log("Suucessfully closed the lobby");
+        }
+
         public async void KickPlayer(string playerID)
         {
             if (!IsLobbyHost())

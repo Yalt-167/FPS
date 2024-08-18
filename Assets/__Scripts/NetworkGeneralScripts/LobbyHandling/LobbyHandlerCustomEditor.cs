@@ -97,7 +97,12 @@ namespace LobbyHandling
             if (GUILayout.Button("Join lobby with clipboard"))
             {
                 targetScript.JoinLobbyByID(GUIUtility.systemCopyBuffer, targetScript.Password);
+            }
 
+            GUILayout.Space(spaceBetweenButtons);
+            if (GUILayout.Button("Close lobby access"))
+            {
+                targetScript.CloseLobbyAcess();
             }
 
             GUILayout.Space(spaceBetweenButtons);
