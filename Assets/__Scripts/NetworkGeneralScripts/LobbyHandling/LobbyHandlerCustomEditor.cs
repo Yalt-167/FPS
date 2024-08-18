@@ -12,12 +12,13 @@ namespace LobbyHandling
     {
         private LobbyHandler targetScript;
         private int spaceBetweenButtons;
+        
 
         private void OnEnable()
         {
             targetScript = (LobbyHandler)target;
         }
-
+        
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
@@ -32,7 +33,7 @@ namespace LobbyHandling
             }
 
             GUILayout.Space(spaceBetweenButtons * 2);
-            GUILayout.Label("Those will use the options above");
+            GUILayout.Label("Lobby");
             if (GUILayout.Button("Create"))
             {
                 targetScript.CreateLobby(targetScript.LobbyName, targetScript.LobbyCapacity, targetScript.PrivateLobby, targetScript.Password);
@@ -162,11 +163,18 @@ namespace LobbyHandling
             }
 
             GUILayout.Space(spaceBetweenButtons);
-            GUILayout.Label("Solo Testing");
-            if (GUILayout.Button("Start a solo session"))
+            GUILayout.Label("Local Testing");
+            if (GUILayout.Button("Start a local session"))
             {
                 targetScript.SelectLocalUnityTransport();
                 GameManagement.GameNetworkManager.Singleton.StartHost();
+            }
+
+            GUILayout.Space(spaceBetweenButtons);
+            if (GUILayout.Button("Join a local session"))
+            {
+                targetScript.SelectLocalUnityTransport();
+                GameManagement.GameNetworkManager.Singleton.StartClient();
             }
 
         }

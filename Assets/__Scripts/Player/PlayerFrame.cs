@@ -1,5 +1,3 @@
-//#define NEW
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,10 +27,7 @@ namespace GameManagement
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            Debug.Log("Spawned", gameObject);
-#if NEW
-            EnablePlayerServerRpc(AuthenticationService.Instance.Profile);
-#else
+
             if (IsOwner)
             {
                 EnablePlayerServerRpc(AuthenticationService.Instance.Profile);
@@ -41,7 +36,7 @@ namespace GameManagement
             {
                 InitPlayerFrameRemote();
             }
-#endif
+
             ManageFiles(IsOwner);
         }
 
@@ -140,29 +135,24 @@ namespace GameManagement
         {
             foreach (var component in handleOnLocalPlayer.componentsToKill)
             {
-                //print($"Destroyed {component.name}");
                 Destroy(component);
             }
 
             foreach (var gameObj in handleOnLocalPlayer.gameObjectsToKill)
             {
-                //print($"Destroyed {gameObj.name}");
                 Destroy(gameObj);
             }
 
             foreach (var component in handleOnLocalPlayer.componentsToDisable)
             {
-                //print($"Tried deactivating {component.name}");
                 if (component is Behaviour behaviour)
                 {
-                    //print("managed to");
                     behaviour.enabled = false;
                 }
             }
 
             foreach (var gameObj in handleOnLocalPlayer.gameObjectsToDisable)
             {
-                //print($"Deactivated {gameObj.name}");
                 gameObj.SetActive(false);
             }
 
@@ -183,10 +173,8 @@ namespace GameManagement
 
             foreach (var component in handleOnRemotePlayer.componentsToDisable)
             {
-                //print($"Tried deactivating {component.name}");
                 if (component is Behaviour behaviour)
                 {
-                    //print("managed to");
                     behaviour.enabled = false;
                 }
             }
@@ -201,7 +189,7 @@ namespace GameManagement
 
         #endregion
 
-        private bool wasInitiated;
+        [field: Space(12)]
         [field: SerializeField] public ChampionStats ChampionStats { get; set; }
         [HideInInspector] public PlayerCombat Combat;
         [HideInInspector] public PlayerMovement Movement;
@@ -211,6 +199,7 @@ namespace GameManagement
 
         public FixedString64Bytes Name => playerName.Value;
         private readonly NetworkVariable<FixedString64Bytes> playerName = new(writePerm: NetworkVariableWritePermission.Owner, readPerm: NetworkVariableReadPermission.Everyone);
+        private readonly NetworkVariable<bool> playerNameSetOnOwner = new(writePerm: NetworkVariableWritePermission.Owner, readPerm: NetworkVariableReadPermission.Everyone);
 
 
 
@@ -222,7 +211,6 @@ namespace GameManagement
 
         public void InitPlayerFrameLocal(string playerName_)
         {
-            Debug.Log("Init Frame Local", gameObject);
             InitPlayerCommon();
 
             Combat = GetComponent<PlayerCombat>();
@@ -234,22 +222,36 @@ namespace GameManagement
             ToggleCursor(false);
 
             playerName.Value = playerName_;
+            //playerName.OnValueChanged +=
+            playerNameSetOnOwner.Value = true;
 
             if (!TryGetComponent<NetworkObject>(out var _))
             {
                 throw new Exception("Does not have a network object");
             }
+
+            gameObject.name = playerName_;
+
+            transform.position = Vector3.up * 5;
         }
 
         public void InitPlayerFrameRemote()
         {
-            Debug.Log("Init Frame Remote", gameObject);
             InitPlayerCommon();
+
+            StartCoroutine(SetPlayerNameInHierarchy());
         }
+
+        public IEnumerator SetPlayerNameInHierarchy()
+        {
+            yield return new WaitUntil(() => playerNameSetOnOwner.Value);
+
+            gameObject.name = playerName.Value.ToString();
+        }
+
 
         private void InitPlayerCommon()
         {
-            wasInitiated = true;
             WeaponHandler = GetComponent<WeaponHandler>();
             WeaponHandler.InitPlayerFrame(this);
 

@@ -150,8 +150,7 @@ namespace GameManagement
             var isFirst = true;
             foreach (var player in players)
             {
-                var playerInfos = player?.GetInfos() ?? throw new Exception("Somehow player is null here");
-                stringBuilder.Append(isFirst ? $"{playerInfos}" : $", {playerInfos}");
+                stringBuilder.Append(isFirst ? $"{player.GetInfos()}" : $", {player.GetInfos()}");
                 isFirst = false;
             }
             stringBuilder.Append(" ]");
