@@ -604,14 +604,14 @@ namespace LobbyHandling
         {
             relayUnityTransport.enabled = true;
         }
-        public void DisableRelayunityTransprt()
+        public void DisableRelayUnityTransprt()
         {
             relayUnityTransport.enabled = false;
         }
 
         public void SelectLocalUnityTransport()
         {
-            DisableRelayunityTransprt();
+            DisableRelayUnityTransprt();
 
             NetworkManager.Singleton.NetworkConfig.NetworkTransport = localUnityTransport;
 
@@ -638,6 +638,7 @@ namespace LobbyHandling
                 Debug.Log(exception.Message);
                 return false;
             }
+
             SelectRelayUnityTransport();
             relayUnityTransport.SetHostRelayData(
                 relayAllocation.RelayServer.IpV4,
@@ -675,7 +676,8 @@ namespace LobbyHandling
                 return;
             }
 
-            NetworkManager.Singleton.GetComponent<UnityTransport>().SetClientRelayData(
+            SelectRelayUnityTransport();
+            relayUnityTransport.SetClientRelayData(
                 joinAllocation.RelayServer.IpV4,
                 (ushort)joinAllocation.RelayServer.Port,
                 joinAllocation.AllocationIdBytes,

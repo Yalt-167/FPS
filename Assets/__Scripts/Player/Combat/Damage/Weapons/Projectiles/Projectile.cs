@@ -7,9 +7,6 @@ namespace Projectiles
 {
     public class Projectile : MonoBehaviour
     {
-#warning PlaceHolderValue to remove here
-        private ushort _____placeHolderTeamID;
-
         public Vector3 Position => transform.position;
         public Vector3 Direction => transform.forward;
         public ulong Owner => attackerNetworkID;
@@ -26,11 +23,13 @@ namespace Projectiles
         protected bool active;
         protected ProjectileOnHitWallBehaviour onHitWallBehaviour;
         protected ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour;
+        protected ushort shooterTeamID;
 
         public virtual void Init(
             DamageDealt damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, bool canBreakThings_, LayerMask layersToHit_,
             ProjectileOnHitWallBehaviour onHitWallBehaviour_,
-            ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour_
+            ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour_,
+            ushort shooterTeamID_
             )
         {
             active = true;
@@ -44,6 +43,8 @@ namespace Projectiles
             onHitWallBehaviour = onHitWallBehaviour_;
             onHitPlayerBehaviour = onHitPlayerBehaviour_;
 
+            shooterTeamID = shooterTeamID_;
+
             StartCoroutine(CleanUp());
         }
 
@@ -52,7 +53,7 @@ namespace Projectiles
             var col = collision.collider;
             if (col.TryGetComponent<IShootable>(out var shootableComponent))
             {
-                shootableComponent.ReactShot(damage, transform.forward, Vector3.zero, attackerNetworkID, _____placeHolderTeamID, canBreakThings);
+                shootableComponent.ReactShot(damage, transform.forward, Vector3.zero, attackerNetworkID, shooterTeamID, canBreakThings);
                 onHitPlayerBehaviour.OnHitPlayer(this, shootableComponent);
                 active = false;
             }

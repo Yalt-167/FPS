@@ -6,22 +6,23 @@ using UnityEngine;
 
 public sealed class NetworkObjectSpawner : NetworkBehaviour
 {
-    [SerializeField]
-    private GameObject networkObjectPrefab;
-
+    [SerializeField] private GameObject networkObjectPrefab;
 
     public void SpawnNetworkObject()
     {
-        // Ensure the prefab is registered with the NetworkManager
-        if (networkObjectPrefab != null && networkObjectPrefab.GetComponent<NetworkObject>() != null)
+        // ensure the prefab is registered on the NetworkManager
+        if (networkObjectPrefab == null)
         {
-            GameObject obj = Instantiate(networkObjectPrefab, Vector3.zero, Quaternion.identity);
-            NetworkObject networkObject = obj.GetComponent<NetworkObject>();
-            networkObject.Spawn();
+            Debug.Log("This NetworkObjectSpawner doesn t have an object to spawn", gameObject);
+            return;
         }
-        else
+
+        if (!networkObjectPrefab.TryGetComponent<NetworkObject>(out var _))
         {
-            Debug.LogError("Prefab is not properly set up or is missing a NetworkObject component.");
+            Debug.Log("this NetworkObjectSpawner s prefab does not have a NetworkObject component", gameObject);
+            return;
         }
+       
+        Instantiate(networkObjectPrefab, Vector3.zero, Quaternion.identity).GetComponent<NetworkObject>().Spawn();
     }
 }

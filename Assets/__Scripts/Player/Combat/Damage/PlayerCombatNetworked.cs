@@ -10,7 +10,7 @@ public sealed class PlayerCombatNetworked : NetworkBehaviour
 {
 
     [SerializeField] private GameObject landingShotEffect;
-    [SerializeField] private float hitEffectLifetime = .8f;
+    //[SerializeField] private float hitEffectLifetime = .8f;
 
     [SerializeField] private GameObject bulletTrailPrefab;
 

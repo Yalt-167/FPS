@@ -13,9 +13,6 @@ using GameManagement;
 [Serializable]
 public sealed class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
 {
-    #warning PlaceHolderValue to remove here
-    private ushort _____placeHolderTeamID = 0;
-
     #region References
 
     [SerializeField] private Weapon currentWeapon;
@@ -525,7 +522,7 @@ public sealed class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
             {
                 if (IsOwner)
                 {
-                    shootableComponent.ReactShot(currentWeaponStats.Damage, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
+                    shootableComponent.ReactShot(currentWeaponStats.Damage, hit.point, barrelEnd.forward, NetworkObjectId, PlayerFrame.TeamID, currentWeaponStats.CanBreakThings);
                 }
 
                 if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
@@ -644,7 +641,7 @@ public sealed class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
                 {
                     if (IsOwner)
                     {
-                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, PlayerFrame.TeamID, currentWeaponStats.CanBreakThings);
                     }
 
                     if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
@@ -763,7 +760,7 @@ public sealed class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
             {
                 if (IsOwner)
                 {
-                    shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
+                    shootableComponent.ReactShot(currentWeaponStats.Damage * chargeRatio, hit.point, barrelEnd.forward, NetworkObjectId, PlayerFrame.TeamID, currentWeaponStats.CanBreakThings);
                 }
 
                 if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
@@ -884,7 +881,7 @@ public sealed class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
                 {
                     if (IsOwner)
                     {
-                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, _____placeHolderTeamID, currentWeaponStats.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeaponStats.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, PlayerFrame.TeamID, currentWeaponStats.CanBreakThings);
                     }
 
                     if (!currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
@@ -951,7 +948,8 @@ public sealed class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
             currentWeaponStats.CanBreakThings,
             layersToHit,
             GetRelevantHitWallBehaviour(),
-            GetRelevantHitPlayerBehaviour()
+            GetRelevantHitPlayerBehaviour(),
+            PlayerFrame.TeamID
         );
 
         ApplyRecoil();
@@ -986,7 +984,8 @@ public sealed class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
                 currentWeaponStats.CanBreakThings,
                 layersToHit,
                 GetRelevantHitWallBehaviour(),
-                GetRelevantHitPlayerBehaviour()
+                GetRelevantHitPlayerBehaviour(),
+                PlayerFrame.TeamID
             );
             
         }
@@ -1021,7 +1020,8 @@ public sealed class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
             currentWeaponStats.CanBreakThings,
             layersToHit,
             GetRelevantHitWallBehaviour(),
-            GetRelevantHitPlayerBehaviour()
+            GetRelevantHitPlayerBehaviour(),
+            PlayerFrame.TeamID
         );
         
 
@@ -1058,7 +1058,8 @@ public sealed class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
                 currentWeaponStats.CanBreakThings,
                 layersToHit,
                 GetRelevantHitWallBehaviour(),
-                GetRelevantHitPlayerBehaviour()
+                GetRelevantHitPlayerBehaviour(),
+                PlayerFrame.TeamID
             );
         }
 
@@ -1115,7 +1116,7 @@ public sealed class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
             {
                 if (IsOwner)
                 {
-                    shootableComponent.ReactShot(shotInfos.WeaponInfos.Damage, hit.point, newShotDirection, NetworkObjectId, _____placeHolderTeamID, shotInfos.WeaponInfos.CanBreakThings);
+                    shootableComponent.ReactShot(shotInfos.WeaponInfos.Damage, hit.point, newShotDirection, NetworkObjectId, PlayerFrame.TeamID, shotInfos.WeaponInfos.CanBreakThings);
                 }
 
                 if (!shotInfos.WeaponInfos.PierceThroughPlayers)

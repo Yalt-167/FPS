@@ -4011,6 +4011,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 707704775623689261, guid: 4b4e12a012d70a44d9272e45076a58ae,
         type: 3}
+    - target: {fileID: 4798147695177033176, guid: b378211f2dd648b45a09e6208c6e12e3,
+        type: 3}
+      propertyPath: NetworkConfig.NetworkTransport
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 9183953863986021097, guid: b378211f2dd648b45a09e6208c6e12e3,
         type: 3}
       propertyPath: m_LocalPosition.x
