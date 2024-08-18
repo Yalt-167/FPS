@@ -97,7 +97,7 @@ namespace LobbyHandling
             AuthenticationService.Instance.SignedOut += SignOutCallback;
             AuthenticationService.Instance.Expired += SessionExpiredCallback;
 
-            InitUnityTransports();
+            InitializeUnityTransports();
         }
 
         public async void SignInAsync()
@@ -581,7 +581,7 @@ namespace LobbyHandling
 
         private Allocation relayAllocation;
 
-        private void InitUnityTransports()
+        private void InitializeUnityTransports()
         {
             var unityTransports = NetworkManager.Singleton.GetComponents<UnityTransport>();
 

@@ -1,15 +1,18 @@
+//#define NEW
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 using UnityEngine;
+
 using Unity.Netcode;
 using Unity.Collections;
 using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
+using Unity.Services.Authentication;
 
 using Controller;
-using Unity.Services.Authentication;
+
 
 
 namespace GameManagement
@@ -26,11 +29,19 @@ namespace GameManagement
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            Debug.Log("Spawned", gameObject);
+#if NEW
+            EnablePlayerServerRpc(AuthenticationService.Instance.Profile);
+#else
             if (IsOwner)
             {
                 EnablePlayerServerRpc(AuthenticationService.Instance.Profile);
             }
-
+            else
+            {
+                InitPlayerFrameRemote();
+            }
+#endif
             ManageFiles(IsOwner);
         }
 
@@ -55,7 +66,16 @@ namespace GameManagement
 
         #endregion
 
-        #region Handle Files
+        #region Despawn Logic
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+        }
+
+        #endregion
+
+        #region Manage Files
 
         [Serializable]
         public struct BehaviourGatherer
@@ -181,6 +201,7 @@ namespace GameManagement
 
         #endregion
 
+        private bool wasInitiated;
         [field: SerializeField] public ChampionStats ChampionStats { get; set; }
         [HideInInspector] public PlayerCombat Combat;
         [HideInInspector] public PlayerMovement Movement;
@@ -194,13 +215,14 @@ namespace GameManagement
 
 
         private ushort playerIndex;
-        public ushort TeamID;
-        public bool IsOnline;
+        [HideInInspector] public ushort TeamID;
+        [HideInInspector] public bool IsOnline;
 
         public bool Alive => Health.Alive;
 
         public void InitPlayerFrameLocal(string playerName_)
         {
+            Debug.Log("Init Frame Local", gameObject);
             InitPlayerCommon();
 
             Combat = GetComponent<PlayerCombat>();
@@ -221,11 +243,13 @@ namespace GameManagement
 
         public void InitPlayerFrameRemote()
         {
+            Debug.Log("Init Frame Remote", gameObject);
             InitPlayerCommon();
         }
 
         private void InitPlayerCommon()
         {
+            wasInitiated = true;
             WeaponHandler = GetComponent<WeaponHandler>();
             WeaponHandler.InitPlayerFrame(this);
 
