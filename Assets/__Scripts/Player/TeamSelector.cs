@@ -28,17 +28,10 @@ public sealed class TeamSelector : NetworkBehaviour
     private PlayerFrame playerFrame;
 
 
-    private Transform wholeTeamSelectionMenu;
     private Transform teamOneHeader;
     private Transform teamTwoHeader;
     private Button startGameButton;
 
-    private readonly int startGameButtonWith = 160;
-    private readonly int startGameButtonHeight = 30;
-
-    private Rect startGameButtonRect;
-
-    private float screenRatio;
     private void Awake()
     {
         active = true;
@@ -46,17 +39,14 @@ public sealed class TeamSelector : NetworkBehaviour
 
         playerFrame = GetComponent<PlayerFrame>();
 
-        wholeTeamSelectionMenu = transform.GetChild(5);
-
-        teamOneHeader = wholeTeamSelectionMenu.GetChild(1);
+        teamOneHeader = transform.GetChild(1);
         teamOneHeader.GetComponent<Button>().onClick.AddListener(JoinTeamOne);
 
-        teamTwoHeader = wholeTeamSelectionMenu.GetChild(2);
+        teamTwoHeader = transform.GetChild(2);
         teamTwoHeader.GetComponent<Button>().onClick.AddListener(JoinTeamTwo);
 
 
-        startGameButton = wholeTeamSelectionMenu.GetChild(3).GetComponent<Button>();
-        startGameButtonRect = new(Screen.width / 2 - startGameButtonWith / 2, 133 + startGameButtonHeight / 2, startGameButtonWith, startGameButtonHeight);
+        startGameButton = transform.GetChild(3).GetComponent<Button>();
     }
 
     public override void OnNetworkSpawn()
@@ -65,21 +55,22 @@ public sealed class TeamSelector : NetworkBehaviour
         SetRelevantPlayerFrame();
     }
 
-    private void OnGUI()
+    private void Update()
     {
-        if (!IsOwner) { return; }
+        if (!active) { return; }
+
+
+        if (!playerFrame.IsOwner) { return; }
 
         playerFrame.ToggleCursor(towardOn: active);
         playerFrame.ToggleGameControls(towardOn: !active);
-
-        if (!active) { return; }
 
         if (Input.GetMouseButtonDown(0))
         {
             OnTeamSelected((ushort)(Input.mousePosition.x < Screen.width / 2 ? 1 : 2));
         }
 
-        if (!IsHost) { return; }
+        if (!playerFrame.IsHost) { return; }
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
@@ -144,9 +135,6 @@ public sealed class TeamSelector : NetworkBehaviour
         (teamIndex == 0 ? teamOneHeader : teamTwoHeader).GetChild(teamsIndex[teamIndex]).GetComponent<TextMeshProUGUI>().text = player;
 
         teamsIndex[teamIndex]++;
-
-        //active = false;
-        //wholeTeamSelectionMenu.gameObject.SetActive(false);
     }
 
     private void RemovePlayerFromTeamList(int teamIndex, string nameToRemove)
@@ -189,7 +177,7 @@ public sealed class TeamSelector : NetworkBehaviour
 
     private bool IsOnStartGameButton()
     {
-        return IsHost && startGameButtonRect.Contains(Input.mousePosition);
+        return IsHost /*&& startGameButtonRect.Contains(Input.mousePosition)*/;
     }
 
     private IEnumerator CycleRandomActions()
@@ -211,7 +199,7 @@ public sealed class TeamSelector : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void DisableTeamSelectionScreenClientRpc()
     {
-        wholeTeamSelectionMenu.gameObject.SetActive(false);
+        gameObject.SetActive(false);
         playerFrame.ToggleCursor(towardOn: false);
         playerFrame.ToggleGameControls(towardOn: true);
     }

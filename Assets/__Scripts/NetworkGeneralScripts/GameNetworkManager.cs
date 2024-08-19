@@ -24,6 +24,9 @@ namespace GameManagement
         [SerializeField] private GameObject gameManagerPrefab;
         private GameObject gameManagerInstance;
 
+        [SerializeField] private GameObject teamSelectorPrefab;
+        private GameObject teamSelectorInstance;
+
         #region Unity Handled
 
         private void Awake()
@@ -312,6 +315,22 @@ namespace GameManagement
 
         #endregion
 
+        #region Team Selector Thingy
+
+        [MenuItem("Developer/SpawnTeamSelectionMenu")]
+        public static void StaticSpawnTeamSelectionMenu()
+        {
+            Manager.SpawnTeamSelectionMenu();
+        }
+
+        public void SpawnTeamSelectionMenu()
+        {
+            teamSelectorInstance = Instantiate(teamSelectorPrefab);
+            teamSelectorInstance.GetComponent<NetworkObject>().Spawn();
+        }
+
+
+        #endregion
     }
 
     public enum NetworkedComponent : byte

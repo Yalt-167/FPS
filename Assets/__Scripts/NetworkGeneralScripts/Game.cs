@@ -137,7 +137,7 @@ namespace GameManagement
         [MenuItem("Developer/CreatePlayerList")]
         public static void StaticCreatePlayerList()
         {
-            Manager.StartGameServerRpc();
+            Manager.CreatePlayerListServerRpc();
         }
 
         [Rpc(SendTo.Server)]
@@ -151,6 +151,7 @@ namespace GameManagement
         {
             GameNetworkManager.Manager.InitPlayerList();
         }
+
         #endregion
 
         #region Debug

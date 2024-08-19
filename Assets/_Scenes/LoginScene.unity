@@ -4026,6 +4026,12 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 4798147695177033176, guid: b378211f2dd648b45a09e6208c6e12e3,
         type: 3}
+      propertyPath: teamSelectorPrefab
+      value: 
+      objectReference: {fileID: 360743914923694614, guid: 023dff4f627cf12458844c5c3f1bd043,
+        type: 3}
+    - target: {fileID: 4798147695177033176, guid: b378211f2dd648b45a09e6208c6e12e3,
+        type: 3}
       propertyPath: NetworkConfig.NetworkTransport
       value: 
       objectReference: {fileID: 0}
