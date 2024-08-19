@@ -309,6 +309,11 @@ namespace GameManagement
             TeamID = teamID;
         }
 
+        public void SetTeam(ushort teamID)
+        {
+            TeamID = teamID;
+        }
+
         #endregion
     }
 }

@@ -311,6 +311,7 @@ GameObject:
   - component: {fileID: 3642262801787869716}
   - component: {fileID: 1233336824492739195}
   - component: {fileID: -833098347986521160}
+  - component: {fileID: 7592116745070088370}
   m_Layer: 5
   m_Name: TeamSelectionMenu
   m_TagString: Untagged
@@ -416,7 +417,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 0
+  GlobalObjectIdHash: 3817029476
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -425,6 +426,19 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &7592116745070088370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 360743914923694614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86f5b23c8a318a148a7254f3140773da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxTeamSize: 6
 --- !u!1 &732242118443947069
 GameObject:
   m_ObjectHideFlags: 0

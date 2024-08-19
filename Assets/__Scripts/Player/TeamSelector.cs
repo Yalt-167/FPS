@@ -59,9 +59,6 @@ public sealed class TeamSelector : NetworkBehaviour
     {
         if (!active) { return; }
 
-
-        if (!playerFrame.IsOwner) { return; }
-
         playerFrame.ToggleCursor(towardOn: active);
         playerFrame.ToggleGameControls(towardOn: !active);
 
@@ -79,27 +76,19 @@ public sealed class TeamSelector : NetworkBehaviour
         }
     }
 
-
     public void JoinTeamOne()
     {
-        Debug.Log("Join Team 1 was clicked");
         OnTeamSelected(1);
     }
 
     public void JoinTeamTwo()
     {
-        Debug.Log("Join Team 2 was clicked");
         OnTeamSelected(2);
     }
 
     private void OnTeamSelected(ushort teamID)
     {
-        var playerFrame = GetComponent<PlayerFrame>();
-
-        playerFrame.RequestSetTeamServerRpc(teamID);
         AddPlayerToTeamServerRpc(playerFrame.Name.ToString(), teamID);
-
-        //active = false;
     }
 
     [Rpc(SendTo.Server)]
@@ -121,6 +110,7 @@ public sealed class TeamSelector : NetworkBehaviour
         if (teams[teamIndex].Contains(player))
         {
             Debug.Log("You have already joined this team");
+            playerFrame.SetTeam((ushort)(teamIndex - 1)); // just in case
             return;
         }
 
@@ -135,6 +125,8 @@ public sealed class TeamSelector : NetworkBehaviour
         (teamIndex == 0 ? teamOneHeader : teamTwoHeader).GetChild(teamsIndex[teamIndex]).GetComponent<TextMeshProUGUI>().text = player;
 
         teamsIndex[teamIndex]++;
+
+        playerFrame.SetTeam((ushort)(teamIndex - 1));
     }
 
     private void RemovePlayerFromTeamList(int teamIndex, string nameToRemove)
@@ -164,7 +156,7 @@ public sealed class TeamSelector : NetworkBehaviour
 
     private void UpdateTeamDisplay()
     {
-        Transform relevantTransform = null;
+        Transform relevantTransform;
         for (int teamIndex = 0; teamIndex < teams.Length; teamIndex++)
         {
             relevantTransform = teamIndex == 0 ? teamOneHeader : teamTwoHeader;
@@ -226,8 +218,10 @@ public sealed class TeamSelector : NetworkBehaviour
     {
         foreach (var player in GameNetworkManager.Manager.Players)
         {
+            Debug.Log("Looped");
             if (player.IsOwner)
             {
+                Debug.Log($"Found {player.Name}");
                 playerFrame = player;
             }
         }
