@@ -204,7 +204,8 @@ namespace GameManagement
 
 
         private ushort playerIndex;
-        [HideInInspector] public ushort TeamID;
+        //[HideInInspector]
+        public ushort TeamID;
         [HideInInspector] public bool IsOnline;
 
         public bool Alive => Health.Alive;
@@ -276,13 +277,13 @@ namespace GameManagement
 
         public void ToggleCameraInputs(bool towardOn)
         {
-            transform.GetChild(0).GetComponent<Controller.FollowRotationCamera>().enabled = towardOn;
+            transform.GetChild(0).GetComponent<FollowRotationCamera>().enabled = towardOn;
         }
 
         public void ToggleActionInputs(bool towardOn)
         {
             GetComponent<PlayerCombat>().enabled = towardOn;
-            GetComponent<Controller.PlayerMovement>().enabled = towardOn;
+            GetComponent<PlayerMovement>().enabled = towardOn;
         }
 
         public void ToggleCursor(bool towardOn)

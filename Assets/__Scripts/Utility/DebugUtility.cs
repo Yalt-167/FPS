@@ -23,7 +23,7 @@ public static class DebugUtility
         var isFirst = true;
         foreach (var item in iterable)
         {
-            stringBuilder.Append(isFirst ? $"{item.ToString()}" : $", {item.ToString()}");
+            stringBuilder.Append(isFirst ? $"{item?.ToString()}" : $", {item?.ToString()}");
             isFirst = false;
         }
 
