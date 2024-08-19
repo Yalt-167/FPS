@@ -1,67 +1,104 @@
+#define I_COULD_VERY_WELL_BE_RETARDED
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using Unity.Netcode;
 using UnityEngine;
 
+using UnityEngine.UI;
+
+using TMPro;
+
 using GameManagement;
-using System.Linq;
-using UnityEngine.Rendering;
-using Unity.Services.Lobbies.Models;
+
+
 
 public sealed class TeamSelector : NetworkBehaviour
 {
-    private static readonly string Team1 = "Team 1";
-    private static readonly string Team2 = "Team 2";
-
-    private static readonly Rect areaRect = new(10, 10, 300, 300);
     private string[][] teams;
     [SerializeField] private ushort maxTeamSize = 6;
 
     private bool active;
 
-    private int[] teamsIndex = new int[2] {0, 0 };
+    private readonly int[] teamsIndex = new int[2] {0, 0 };
 
+    private PlayerFrame playerFrame;
+
+
+    private Transform wholeTeamSelectionMenu;
+    private Transform teamOneHeader;
+    private Transform teamTwoHeader;
+    private Button startGameButton;
+
+    private readonly int startGameButtonWith = 160;
+    private readonly int startGameButtonHeight = 30;
+
+    private Rect startGameButtonRect;
+
+    private float screenRatio;
     private void Awake()
     {
         active = true;
         teams = new string[2][] { new string[maxTeamSize], new string[maxTeamSize] };
+
+        playerFrame = GetComponent<PlayerFrame>();
+
+        wholeTeamSelectionMenu = transform.GetChild(5);
+
+        teamOneHeader = wholeTeamSelectionMenu.GetChild(1);
+        teamOneHeader.GetComponent<Button>().onClick.AddListener(JoinTeamOne);
+
+        teamTwoHeader = wholeTeamSelectionMenu.GetChild(2);
+        teamTwoHeader.GetComponent<Button>().onClick.AddListener(JoinTeamTwo);
+
+
+        startGameButton = wholeTeamSelectionMenu.GetChild(3).GetComponent<Button>();
+        startGameButtonRect = new(Screen.width / 2 - startGameButtonWith / 2, 133 + startGameButtonHeight / 2, startGameButtonWith, startGameButtonHeight);
     }
 
-
-    [SerializeField] private Transform redTeamHeader;
-    [SerializeField] private Transform blueTeamHeader;
-
-    [SerializeField] private Transform wholeTeamSelectionMenu;
-
-    //private void OnGUI()
-    //{
-    //    GUILayout.BeginArea(areaRect);
-
-    //    if (GUILayout.Button(Team1)) { OnTeamSelected(1); }
-    //    if (GUILayout.Button(Team2)) { OnTeamSelected(2); }
-
-    //    GUILayout.EndArea();
-    //}
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        SetRelevantPlayerFrame();
+    }
 
     private void OnGUI()
     {
-        GUILayout.Label($"MX: {Input.mousePosition}");
-    }
+        if (!IsOwner) { return; }
 
-    private void Update()
-    {
-        GetComponent<PlayerFrame>().ToggleCursor(towardOn: true);
+        playerFrame.ToggleCursor(towardOn: active);
+        playerFrame.ToggleGameControls(towardOn: !active);
 
         if (!active) { return; }
 
-
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log($"MX: {Input.mousePosition}, Half: {Screen.width / 2}");
             OnTeamSelected((ushort)(Input.mousePosition.x < Screen.width / 2 ? 1 : 2));
         }
+
+        if (!IsHost) { return; }
+
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            Game.StaticStartGame();
+            DisableTeamSelectionScreenServerRpc();
+        }
+    }
+
+
+    public void JoinTeamOne()
+    {
+        Debug.Log("Join Team 1 was clicked");
+        OnTeamSelected(1);
+    }
+
+    public void JoinTeamTwo()
+    {
+        Debug.Log("Join Team 2 was clicked");
+        OnTeamSelected(2);
     }
 
     private void OnTeamSelected(ushort teamID)
@@ -99,12 +136,12 @@ public sealed class TeamSelector : NetworkBehaviour
         var otherTeamIdx = teamIndex == 0 ? 1 : 0;
         if (teams[otherTeamIdx].Contains(player))
         {
-            ShiftPlayerList(otherTeamIdx, player);
+            RemovePlayerFromTeamList(otherTeamIdx, player);
         }
 
         teams[teamIndex][teamsIndex[teamIndex]] = player;
 
-        (teamIndex == 0 ? redTeamHeader : blueTeamHeader).GetChild(teamsIndex[teamIndex]).GetComponent<TMPro.TextMeshProUGUI>().text = player;
+        (teamIndex == 0 ? teamOneHeader : teamTwoHeader).GetChild(teamsIndex[teamIndex]).GetComponent<TextMeshProUGUI>().text = player;
 
         teamsIndex[teamIndex]++;
 
@@ -112,7 +149,7 @@ public sealed class TeamSelector : NetworkBehaviour
         //wholeTeamSelectionMenu.gameObject.SetActive(false);
     }
 
-    private void ShiftPlayerList(int teamIndex, string nameToRemove)
+    private void RemovePlayerFromTeamList(int teamIndex, string nameToRemove)
     {
         string[] newArray = new string[maxTeamSize];
 
@@ -120,12 +157,14 @@ public sealed class TeamSelector : NetworkBehaviour
         for (int i = 0; i < maxTeamSize; i++)
         {
             var current = teams[teamIndex][i];
-            if (!string.IsNullOrEmpty(current))
+            if (string.IsNullOrEmpty(current))
             {
-                if (current != nameToRemove)
-                {
-                    newArray[newArrayIndex++] = current;
-                }
+                break;
+            }
+
+            if (current != nameToRemove)
+            {
+                newArray[newArrayIndex++] = current;
             }
         }
 
@@ -140,11 +179,68 @@ public sealed class TeamSelector : NetworkBehaviour
         Transform relevantTransform = null;
         for (int teamIndex = 0; teamIndex < teams.Length; teamIndex++)
         {
-            relevantTransform = teamIndex == 0 ? redTeamHeader : blueTeamHeader;
+            relevantTransform = teamIndex == 0 ? teamOneHeader : teamTwoHeader;
             for (int playerIndex = 0;  playerIndex < maxTeamSize; playerIndex++)
             {
-                Debug.Log("Looped");
-                relevantTransform.GetChild(playerIndex).GetComponent<TMPro.TextMeshProUGUI>().text = teams[teamIndex][playerIndex];
+                relevantTransform.GetChild(playerIndex).GetComponent<TextMeshProUGUI>().text = teams[teamIndex][playerIndex];
+            }
+        }
+    }
+
+    private bool IsOnStartGameButton()
+    {
+        return IsHost && startGameButtonRect.Contains(Input.mousePosition);
+    }
+
+    private IEnumerator CycleRandomActions()
+    {
+        for (; ; )
+        {
+            //OnTeamSelected((ushort)UnityEngine.Random.Range(0f, 1f));
+            (UnityEngine.Random.Range(0f, 1f) < .5f ? teamOneHeader : teamTwoHeader).GetComponent<Button>().onClick.Invoke();
+            yield return new WaitForSeconds(1f);
+        }
+    }
+
+    [Rpc(SendTo.Server)]
+    private void DisableTeamSelectionScreenServerRpc()
+    {
+        DisableTeamSelectionScreenClientRpc();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void DisableTeamSelectionScreenClientRpc()
+    {
+        wholeTeamSelectionMenu.gameObject.SetActive(false);
+        playerFrame.ToggleCursor(towardOn: false);
+        playerFrame.ToggleGameControls(towardOn: true);
+    }
+
+    [Rpc(SendTo.Server)]
+    private void SetRelevantPlayerFrameServerRpc()
+    {
+        SetRelevantPlayerFrameClientRpc();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void SetRelevantPlayerFrameClientRpc()
+    {
+        foreach (var player in GameNetworkManager.Manager.Players)
+        {
+            if (player.IsOwner)
+            {
+                playerFrame = player;
+            }
+        }
+    }
+
+    private void SetRelevantPlayerFrame()
+    {
+        foreach (var player in GameNetworkManager.Manager.Players)
+        {
+            if (player.IsOwner)
+            {
+                playerFrame = player;
             }
         }
     }

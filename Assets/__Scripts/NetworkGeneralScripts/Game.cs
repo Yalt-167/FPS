@@ -131,9 +131,26 @@ namespace GameManagement
         private void StartGameClientRpc()
         {
             gameStarted = true;
-            GameNetworkManager.Manager.InitPlayerList();
         }
 
+
+        [MenuItem("Developer/CreatePlayerList")]
+        public static void StaticCreatePlayerList()
+        {
+            Manager.StartGameServerRpc();
+        }
+
+        [Rpc(SendTo.Server)]
+        private void CreatePlayerListServerRpc()
+        {
+           CreatePlayerListClientRpc();
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void CreatePlayerListClientRpc()
+        {
+            GameNetworkManager.Manager.InitPlayerList();
+        }
         #endregion
 
         #region Debug
@@ -162,24 +179,5 @@ namespace GameManagement
         //}
 
         #endregion
-
-
-        [MenuItem("Developer/StaticTestServerRpcCall")]
-        public static void StaticTestServerRpcCall()
-        {
-            Manager.TestServerRpc();
-        }
-
-        [Rpc(SendTo.Server)]
-        public void TestServerRpc()
-        {
-            TestClientRpc();
-        }
-
-        [Rpc(SendTo.ClientsAndHost)]
-        private void TestClientRpc()
-        {
-            Debug.Log("Happened here");
-        }
     }
 }
