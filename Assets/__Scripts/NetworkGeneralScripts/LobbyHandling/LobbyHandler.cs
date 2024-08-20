@@ -929,7 +929,11 @@ namespace LobbyHandling
 
             GUILayout.BeginHorizontal();
 
-                    GUILayout.BeginVertical("box");
+            GUILayout.FlexibleSpace();
+
+            #region Manage Lobby Vertical Boundary
+
+            GUILayout.BeginVertical("box");
 
                         GUILayout.Label(IsLobbyHost() ? "Edit your lobby" : "Create your lobby", titleLabelStyle);
 
@@ -1004,129 +1008,103 @@ namespace LobbyHandling
                         }
 
                 GUILayout.EndVertical();
+
+            #endregion
+
+
+                if (IsInLobby())
+                {
+                    if (!IsLobbyHost())
+                    {
+                        GUILayout.BeginVertical("box");
+
+                        if (GUILayout.Button("Quit Current Lobby"))
+                        {
+                            QuitLobby();
+                        }
+
+                        GUILayout.EndVertical();
+                    }
+                }      
+                else
+                {
+                    GUILayout.BeginVertical("box");
+                    GUILayout.Label("Join a friend lobby", titleLabelStyle);
+
+                    #region Target Lobby Code Prompt
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Target lobby Code", GUILayout.Width(labelWidth));
+                    TargetLobbyCode = GUILayout.TextField(TargetLobbyCode, GUILayout.Width(fieldWidth));
+                    GUILayout.EndHorizontal();
+                    if (GUILayout.Button("Join Lobby by Code"))
+                    {
+                        if (string.IsNullOrEmpty(TargetLobbyCode))
+                        {
+                            Debug.Log("You must provide the lobby code");
+                        }
+                        else
+                        {
+                            JoinLobbyByCode(TargetLobbyCode, Password);
+                        }
+                    }
+                    #endregion
+
+                    GUILayout.Space(SpaceBetweenButtons);
+
+                    #region Target Lobby ID Prompt
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Target lobby ID", GUILayout.Width(labelWidth));
+                    TargetLobbyID = GUILayout.TextField(TargetLobbyID, GUILayout.Width(fieldWidth));
+                    GUILayout.EndHorizontal();
+                    if (GUILayout.Button("Join Lobby by ID"))
+                    {
+                        if (string.IsNullOrEmpty(TargetLobbyID))
+                        {
+                            Debug.Log("You must provide the lobby ID");
+                        }
+                        else
+                        {
+                            JoinLobbyByID(TargetLobbyID, Password);
+                        }
+                    }
+                    #endregion
+
+                    GUILayout.Space(SpaceBetweenButtons);
+
+                    if (GUILayout.Button("Join Lobby with Clipboard"))
+                    {
+                        JoinLobbyByID(GUIUtility.systemCopyBuffer, Password);
+                    }
+
+                    GUILayout.EndVertical();
+            }
+
                 
 
-            GUILayout.BeginVertical("box");
-
-            if (IsInLobby())
+            if (!IsInLobby())
             {
-                if (GUILayout.Button("Quit Current Lobby"))
-                {
-                    QuitLobby();
-                }
-            }
-            else
-            {
+                #region Local testing
                 GUILayout.BeginVertical("box");
 
-                GUILayout.Label("Join a friend lobby", GUILayout.Width(labelWidth));
+                GUILayout.Label("Local Testing", titleLabelStyle);
 
-                #region Target Lobby Code Prompt
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Target lobby Code", GUILayout.Width(labelWidth));
-                TargetLobbyCode = GUILayout.TextField(TargetLobbyCode, GUILayout.Width(fieldWidth));
-                GUILayout.EndHorizontal();
-                if (GUILayout.Button("Join Lobby by Code"))
+                if (GUILayout.Button("Start a Local Session"))
                 {
-                    if (string.IsNullOrEmpty(TargetLobbyCode))
-                    {
-                        Debug.Log("You must provide the lobby code");
-                    }
-                    else
-                    {
-                        JoinLobbyByCode(TargetLobbyCode, Password);
-                    }
+                    SelectLocalUnityTransport();
+                    GameNetworkManager.Singleton.StartHost();
                 }
-                #endregion
 
-                GUILayout.Space(SpaceBetweenButtons);
-
-                #region Target Lobby ID Prompt
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Target lobby ID", GUILayout.Width(labelWidth));
-                TargetLobbyID = GUILayout.TextField(TargetLobbyID, GUILayout.Width(fieldWidth));
-                GUILayout.EndHorizontal();
-                if (GUILayout.Button("Join Lobby by ID"))
+                if (GUILayout.Button("Join a Local Session"))
                 {
-                    if (string.IsNullOrEmpty(TargetLobbyID))
-                    {
-                        Debug.Log("You must provide the lobby ID");
-                    }
-                    else
-                    {
-                        JoinLobbyByID(TargetLobbyID, Password);
-                    }
-                }
-                #endregion
-
-                GUILayout.Space(SpaceBetweenButtons);
-
-                if (GUILayout.Button("Join Lobby with Clipboard"))
-                {
-                    JoinLobbyByID(GUIUtility.systemCopyBuffer, Password);
+                    SelectLocalUnityTransport();
+                    GameNetworkManager.Singleton.StartClient();
                 }
 
                 GUILayout.EndVertical();
-            }
-            
-
-            if (GUILayout.Button("List Lobbies"))
-            {
-                DisplayLobbies();
+                #endregion
             }
 
-            if (GUILayout.Button("Display Current Lobby Data"))
-            {
-                DisplayHostLobbyData();
-            }
-
-            if (GUILayout.Button("Display Lobby Data by ID"))
-            {
-                DisplayLobbyData(TargetLobbyID);
-            }
-
-            if (GUILayout.Button("Display Current Lobby Players"))
-            {
-                DisplayHostLobbyPlayers();
-            }
-
-            if (GUILayout.Button("Display Lobby Players by ID"))
-            {
-                DisplayPlayers(TargetLobbyID);
-            }
-
-            GUILayout.Space(SpaceBetweenButtons);
-
-            GUILayout.Label("Relay", GUILayout.Width(labelWidth));
-
-            if (GUILayout.Button("List Regions"))
-            {
-                ListRegions();
-            }
-            GUILayout.Space(SpaceBetweenButtons);
-
-
-            #region Local testing
-            GUILayout.BeginVertical();
-
-            GUILayout.Label("Local Testing", titleLabelStyle);
-
-            if (GUILayout.Button("Start a Local Session"))
-            {
-                SelectLocalUnityTransport();
-                GameNetworkManager.Singleton.StartHost();
-            }
-
-            if (GUILayout.Button("Join a Local Session"))
-            {
-                SelectLocalUnityTransport();
-                GameNetworkManager.Singleton.StartClient();
-            }
-
-            GUILayout.EndVertical();
-            #endregion
-
-            GUILayout.EndVertical();
+            GUILayout.FlexibleSpace();
 
             GUILayout.EndHorizontal();
         }
