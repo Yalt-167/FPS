@@ -203,7 +203,7 @@ namespace GameManagement
 
 
 
-        private ushort playerIndex;
+        public ushort PlayerIndex;
         //[HideInInspector]
         public ushort TeamID;
         [HideInInspector] public bool IsOnline;
@@ -223,7 +223,6 @@ namespace GameManagement
             ToggleCursor(false);
 
             playerName.Value = playerName_;
-            //playerName.OnValueChanged +=
             playerNameSetOnOwner.Value = true;
 
             if (!TryGetComponent<NetworkObject>(out var _))
@@ -296,18 +295,6 @@ namespace GameManagement
         #endregion
 
         #region Team Logic
-
-        [Rpc(SendTo.Server)]
-        public void RequestSetTeamServerRpc(ushort teamID)
-        {
-            SetTeamClientRpc(teamID);
-        }
-
-        [Rpc(SendTo.ClientsAndHost)]
-        public void SetTeamClientRpc(ushort teamID)
-        {
-            TeamID = teamID;
-        }
 
         public void SetTeam(ushort teamID)
         {

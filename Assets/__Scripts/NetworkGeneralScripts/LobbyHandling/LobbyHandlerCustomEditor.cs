@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+using GameManagement;
 
 namespace LobbyHandling
 {
@@ -167,14 +168,14 @@ namespace LobbyHandling
             if (GUILayout.Button("Start a local session"))
             {
                 targetScript.SelectLocalUnityTransport();
-                GameManagement.GameNetworkManager.Singleton.StartHost();
+                GameNetworkManager.Singleton.StartHost();
             }
 
             GUILayout.Space(spaceBetweenButtons);
             if (GUILayout.Button("Join a local session"))
             {
                 targetScript.SelectLocalUnityTransport();
-                GameManagement.GameNetworkManager.Singleton.StartClient();
+                GameNetworkManager.Singleton.StartClient();
             }
 
         }

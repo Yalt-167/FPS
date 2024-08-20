@@ -325,8 +325,15 @@ namespace GameManagement
 
         public void SpawnTeamSelectionMenu()
         {
-            teamSelectorInstance = Instantiate(teamSelectorPrefab);
-            teamSelectorInstance.GetComponent<NetworkObject>().Spawn();
+            if (teamSelectorInstance == null)
+            {
+                teamSelectorInstance = Instantiate(teamSelectorPrefab);
+                teamSelectorInstance.GetComponent<NetworkObject>().Spawn();
+            }
+            else
+            {
+                teamSelectorInstance.SetActive(true);
+            }
         }
 
 

@@ -420,7 +420,7 @@ public sealed class WeaponHandler : NetworkBehaviour, IPlayerFrameMember
 
     private void UpdateOwnerSettingsUponShot()
     {
-        if (!IsOwner) {  return; }
+        if (!IsOwner) { return; }
 
         PlayShootingSound(currentWeaponStats.AmmoLeftInMagazineToWarn >= ammos);
 

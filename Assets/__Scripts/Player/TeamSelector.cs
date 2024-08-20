@@ -167,21 +167,6 @@ public sealed class TeamSelector : NetworkBehaviour
         }
     }
 
-    private bool IsOnStartGameButton()
-    {
-        return IsHost /*&& startGameButtonRect.Contains(Input.mousePosition)*/;
-    }
-
-    private IEnumerator CycleRandomActions()
-    {
-        for (; ; )
-        {
-            //OnTeamSelected((ushort)UnityEngine.Random.Range(0f, 1f));
-            (UnityEngine.Random.Range(0f, 1f) < .5f ? teamOneHeader : teamTwoHeader).GetComponent<Button>().onClick.Invoke();
-            yield return new WaitForSeconds(1f);
-        }
-    }
-
     [Rpc(SendTo.Server)]
     private void DisableTeamSelectionScreenServerRpc()
     {
@@ -194,24 +179,6 @@ public sealed class TeamSelector : NetworkBehaviour
         gameObject.SetActive(false);
         playerFrame.ToggleCursor(towardOn: false);
         playerFrame.ToggleGameControls(towardOn: true);
-    }
-
-    [Rpc(SendTo.Server)]
-    private void SetRelevantPlayerFrameServerRpc()
-    {
-        SetRelevantPlayerFrameClientRpc();
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    private void SetRelevantPlayerFrameClientRpc()
-    {
-        foreach (var player in GameNetworkManager.Manager.Players)
-        {
-            if (player.IsOwner)
-            {
-                playerFrame = player;
-            }
-        }
     }
 
     private void SetRelevantPlayerFrame()
