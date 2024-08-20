@@ -177,7 +177,6 @@ namespace LobbyHandling
                 targetScript.SelectLocalUnityTransport();
                 GameNetworkManager.Singleton.StartClient();
             }
-
         }
     }
 }
