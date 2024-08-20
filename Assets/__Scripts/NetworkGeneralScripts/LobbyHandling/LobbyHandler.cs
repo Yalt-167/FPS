@@ -102,7 +102,6 @@ namespace LobbyHandling
 
             InitializeUnityTransports();
 
-            InitLabelStyles();
             lobbyMenuActive = true;
         }
 
@@ -886,28 +885,30 @@ namespace LobbyHandling
         [SerializeField] private int fieldWidth;
         private GUIStyle titleLabelStyle;
 
-        private void InitLabelStyles()
+        private void UpdateLabelStyles()
         {
-            
+            titleLabelStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontStyle = FontStyle.Bold,
+                fontSize = 24,
+            };
         }
 
         private void OnGUI()
         {
             if (!lobbyMenuActive) { return; }
 
-            titleLabelStyle = new GUIStyle(GUI.skin.label)
-            {
-                fontStyle = FontStyle.Bold,
-                fontSize = 24,
-            };
+            UpdateLabelStyles();
 
             #region Sign In Button
             if (!isSignedIn)
             {
                 #region Profile Name Prompt
                 GUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
                 GUILayout.Label("Nickname", GUILayout.Width(labelWidth));
                 ProfileName = GUILayout.TextField(ProfileName, GUILayout.Width(fieldWidth));
+                GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
                 #endregion
 
@@ -931,88 +932,92 @@ namespace LobbyHandling
 
             GUILayout.FlexibleSpace();
 
-            #region Manage Lobby Vertical Boundary
+            if (IsLobbyHost() || !IsInLobby())
+            {
+                #region Manage Lobby Vertical Boundary
 
-            GUILayout.BeginVertical("box");
+                GUILayout.BeginVertical("box");
 
-                        GUILayout.Label(IsLobbyHost() ? "Edit your lobby" : "Create your lobby", titleLabelStyle);
+                GUILayout.Label(IsLobbyHost() ? "Edit your lobby" : "Create your lobby", titleLabelStyle);
 
-                        #region Lobby Name Prompt
-                        GUILayout.BeginHorizontal();
-                        GUILayout.Label("Lobby Name", GUILayout.Width(labelWidth));
-                        LobbyName = GUILayout.TextField(LobbyName, GUILayout.Width(fieldWidth));
-                        GUILayout.EndHorizontal();
-                        #endregion
+                #region Lobby Name Prompt
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Lobby Name", GUILayout.Width(labelWidth));
+                LobbyName = GUILayout.TextField(LobbyName, GUILayout.Width(fieldWidth));
+                GUILayout.EndHorizontal();
+                #endregion
 
-                        #region Lobby Capacity Prompt
-                        GUILayout.BeginHorizontal();
-                        GUILayout.Label("Lobby Capacity", GUILayout.Width(labelWidth));
-                        LobbyCapacity = int.Parse(GUILayout.TextField(LobbyCapacity.ToString(), GUILayout.Width(fieldWidth)));
-                        GUILayout.EndHorizontal();
-                        #endregion
+                #region Lobby Capacity Prompt
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Lobby Capacity", GUILayout.Width(labelWidth));
+                LobbyCapacity = int.Parse(GUILayout.TextField(LobbyCapacity.ToString(), GUILayout.Width(fieldWidth)));
+                GUILayout.EndHorizontal();
+                #endregion
 
-                        #region Lobby Privacy Prompt
-                        GUILayout.BeginHorizontal();
-                        PrivateLobby = GUILayout.Toggle(PrivateLobby, "Private Lobby");
-                        GUILayout.EndHorizontal();
-                        #endregion
+                #region Lobby Privacy Prompt
+                GUILayout.BeginHorizontal();
+                PrivateLobby = GUILayout.Toggle(PrivateLobby, "Private Lobby");
+                GUILayout.EndHorizontal();
+                #endregion
 
-                        #region Lobby Password Prompt
-                        GUILayout.BeginHorizontal();
-                        GUILayout.Label("Lobby Password (Blank or at least 8 caracters)", GUILayout.Width(labelWidth));
-                        Password = GUILayout.PasswordField(Password, '*', GUILayout.Width(fieldWidth));
-                        GUILayout.EndHorizontal();
-                        #endregion
+                #region Lobby Password Prompt
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Lobby Password (Blank or at least 8 caracters)", GUILayout.Width(labelWidth));
+                Password = GUILayout.PasswordField(Password, '*', GUILayout.Width(fieldWidth));
+                GUILayout.EndHorizontal();
+                #endregion
 
 
-                        if (IsLobbyHost())
-                        {
-                            if (GUILayout.Button("Edit Lobby"))
-                            {
-                                EditLobby(hostLobby.Id, LobbyName, LobbyCapacity, PrivateLobby, Password);
-                            }
+                if (IsLobbyHost())
+                {
+                    if (GUILayout.Button("Edit Lobby"))
+                    {
+                        EditLobby(hostLobby.Id, LobbyName, LobbyCapacity, PrivateLobby, Password);
+                    }
 
-                            GUILayout.Space(SpaceBetweenButtons);
+                    GUILayout.Space(SpaceBetweenButtons);
 
-                            if (GUILayout.Button("Close Lobby Access"))
-                            {
-                                CloseLobbyAcess();
-                            }
+                    if (GUILayout.Button("Close Lobby Access"))
+                    {
+                        CloseLobbyAcess();
+                    }
 
-                            GUILayout.Space(SpaceBetweenButtons);
+                    GUILayout.Space(SpaceBetweenButtons);
 
-                            if (GUILayout.Button("Delete Lobby"))
-                            {
-                                DeleteLobby(hostLobby.Id);
-                            }
+                    if (GUILayout.Button("Delete Lobby"))
+                    {
+                        DeleteLobby(hostLobby.Id);
+                    }
 
-                            GUILayout.Space(SpaceBetweenButtons * 2);
+                    GUILayout.Space(SpaceBetweenButtons * 2);
 
-                            GUILayout.Label("Share your lobby to a friend", titleLabelStyle);
-                            if (GUILayout.Button("Copy Lobby ID"))
-                            {
-                                CopyLobbyID();
-                            }
+                    GUILayout.Label("Share your lobby to a friend", titleLabelStyle);
+                    if (GUILayout.Button("Copy Lobby ID"))
+                    {
+                        CopyLobbyID();
+                    }
 
-                            if (GUILayout.Button("Copy Lobby Code"))
-                            {
-                                CopyLobbyCode();
-                            }
-                        }
-                        else
-                        {
-                            if (GUILayout.Button("Create Lobby"))
-                            {
-                                CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password);
-                            }
-                        }
+                    if (GUILayout.Button("Copy Lobby Code"))
+                    {
+                        CopyLobbyCode();
+                    }
+                }
+                else
+                {
+                    if (GUILayout.Button("Create Lobby"))
+                    {
+                        CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password);
+                    }
+                }
 
                 GUILayout.EndVertical();
 
-            #endregion
+                #endregion
+            }
 
 
-                if (IsInLobby())
+
+            if (IsInLobby())
                 {
                     if (!IsLobbyHost())
                     {
