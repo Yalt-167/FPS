@@ -43,26 +43,26 @@ namespace LobbyHandling
             GUILayout.Space(spaceBetweenButtons);
             if (GUILayout.Button("Edit lobby")) // add check to ensure you are the owner
             {
-                if (string.IsNullOrEmpty(targetScript.TargetLobbyId))
+                if (string.IsNullOrEmpty(targetScript.TargetLobbyID))
                 {
                     Debug.Log("You must provide the lobby id");
                 }
                 else
                 {
-                    targetScript.EditLobby(targetScript.TargetLobbyId, targetScript.LobbyName, targetScript.LobbyCapacity, targetScript.PrivateLobby, targetScript.Password);
+                    targetScript.EditLobby(targetScript.TargetLobbyID, targetScript.LobbyName, targetScript.LobbyCapacity, targetScript.PrivateLobby, targetScript.Password);
                 }
             }
 
             GUILayout.Space(spaceBetweenButtons);
             if (GUILayout.Button("Delete lobby")) // add check to ensure you are the owner
             {
-                if (string.IsNullOrEmpty(targetScript.TargetLobbyId))
+                if (string.IsNullOrEmpty(targetScript.TargetLobbyID))
                 {
                     Debug.Log("You must provide the lobby id");
                 }
                 else
                 {
-                    targetScript.DeleteLobby(targetScript.TargetLobbyId);
+                    targetScript.DeleteLobby(targetScript.TargetLobbyID);
                 }
                 
             }
@@ -70,13 +70,13 @@ namespace LobbyHandling
             GUILayout.Space(spaceBetweenButtons);
             if (GUILayout.Button("Join lobby by ID"))
             {
-                if (string.IsNullOrEmpty(targetScript.TargetLobbyId))
+                if (string.IsNullOrEmpty(targetScript.TargetLobbyID))
                 {
                     Debug.Log("You must provide the lobby id");
                 }
                 else
                 {
-                    targetScript.JoinLobbyByID(targetScript.TargetLobbyId, targetScript.Password);
+                    targetScript.JoinLobbyByID(targetScript.TargetLobbyID, targetScript.Password);
                 }
 
             }
@@ -141,7 +141,7 @@ namespace LobbyHandling
             GUILayout.Space(spaceBetweenButtons);
             if (GUILayout.Button("Display lobby data by id"))
             {
-                targetScript.DisplayLobbyData(targetScript.TargetLobbyId);
+                targetScript.DisplayLobbyData(targetScript.TargetLobbyID);
             }
 
             GUILayout.Space(spaceBetweenButtons);
@@ -153,7 +153,7 @@ namespace LobbyHandling
             GUILayout.Space(spaceBetweenButtons);
             if (GUILayout.Button("Display lobby players by ID"))
             {
-                targetScript.DisplayPlayers(targetScript.TargetLobbyId);
+                targetScript.DisplayPlayers(targetScript.TargetLobbyID);
             }
 
             GUILayout.Space(spaceBetweenButtons);

@@ -38,6 +38,7 @@ namespace LobbyHandling
         private static readonly string initializeToZero = "0";
 
         public string ProfileName;
+        private bool isSignedIn;
         private Player localPlayer;
 
         #region Filters Handling
@@ -100,6 +101,8 @@ namespace LobbyHandling
             AuthenticationService.Instance.Expired += SessionExpiredCallback;
 
             InitializeUnityTransports();
+
+            lobbyMenuActive = true;
         }
 
         public async void SignInAsync()
@@ -116,6 +119,7 @@ namespace LobbyHandling
         private void SignInCallback()
         {
             Debug.Log($"Signed in as {AuthenticationService.Instance.PlayerId}");
+            isSignedIn = true;
         }
 
         private void SignInFailedCallback(RequestFailedException exception)
@@ -208,7 +212,7 @@ namespace LobbyHandling
 
         [Header("Target lobby")]
         public string TargetLobbyCode;
-        public string TargetLobbyId;
+        public string TargetLobbyID;
 
         [Header("Relay")]
         public string RelayJoinCode;
@@ -292,6 +296,7 @@ namespace LobbyHandling
 
             Debug.Log($"Successfully created a new lobby");
             DisplayHostLobbyData();
+            FillInLobbyDataFields();
             CopyLobbyID();
 
         }
@@ -571,6 +576,14 @@ namespace LobbyHandling
             return response.Results.Count > 0 ? response : null;
         }
 #nullable disable
+
+        private void FillInLobbyDataFields()
+        {
+            if (hostLobby == null) { return; };
+
+            TargetLobbyCode = hostLobby.LobbyCode;
+            TargetLobbyID = hostLobby.Id;
+        }
 
         #endregion
 
@@ -859,14 +872,43 @@ namespace LobbyHandling
             };
         }
 
+        #region GUI
+
         [Header("Lobby GUI Settings")]
+        [SerializeField] private bool lobbyMenuActive;
         [SerializeField] private int labelWidth;
         [SerializeField] private int fieldWidth;
-        #region GUI
 
         private void OnGUI()
         {
-            // Start vertical layout
+            if (!lobbyMenuActive) { return; }
+
+            #region SignInButton
+            if (!isSignedIn)
+            {
+                #region ProfileNamePrompt
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Nickname", GUILayout.Width(labelWidth));
+                ProfileName = GUILayout.TextField(ProfileName, GUILayout.Width(fieldWidth));
+                GUILayout.EndHorizontal();
+                #endregion
+
+                GUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("     Sign In (required to use any lobby feature)     "))
+                {
+                    SignInAsync();
+                }
+                GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
+            }
+            else
+            {
+                GUILayout.Label($"Signed in as {ProfileName}", GUILayout.Width(labelWidth));
+            }
+
+            #endregion
+
             GUILayout.BeginHorizontal();
             
                 GUILayout.BeginVertical("box");
@@ -898,12 +940,18 @@ namespace LobbyHandling
                     GUILayout.Label("Lobby Password (Blank or at least 8 caracters)", GUILayout.Width(labelWidth));
                     Password = GUILayout.PasswordField(Password, '*', GUILayout.Width(fieldWidth));
                     GUILayout.EndHorizontal();
-                    #endregion
+            #endregion
 
-                GUILayout.EndVertical();
+                    if (!IsLobbyHost() && GUILayout.Button("Create Lobby"))
+                    {
+                        CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password);
+                    }
 
+            GUILayout.EndVertical();
+
+            if (IsLobbyHost())
+            {
                 GUILayout.BeginVertical("box");
-
 
                     GUILayout.Label("Target Lobby", GUILayout.Width(labelWidth));
 
@@ -917,59 +965,40 @@ namespace LobbyHandling
                     #region TargetLobbyIDPrompt
                     GUILayout.BeginHorizontal();
                     GUILayout.Label("Target lobby ID", GUILayout.Width(labelWidth));
-                    TargetLobbyId = GUILayout.TextField(TargetLobbyId, GUILayout.Width(fieldWidth));
+                    TargetLobbyID = GUILayout.TextField(TargetLobbyID, GUILayout.Width(fieldWidth));
                     GUILayout.EndHorizontal(); 
                     #endregion
 
-            GUILayout.Space(SpaceBetweenButtons * 2);
+                GUILayout.EndVertical();
+            }
 
-            // Relay
-            GUILayout.Label("Relay", GUILayout.Width(labelWidth));
-
-            RelayJoinCode = GUILayout.TextField(RelayJoinCode, GUILayout.Width(fieldWidth));
-
-            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
 
             GUILayout.BeginVertical("box");
 
-            GUILayout.Space(SpaceBetweenButtons * 2);
-
-            // Buttons
-            if (GUILayout.Button("Sign In"))
-            {
-                SignInAsync();
-            }
-
             GUILayout.Space(SpaceBetweenButtons);
-
-            GUILayout.Label("Lobby Actions", GUILayout.Width(labelWidth));
-
-            if (GUILayout.Button("Create Lobby"))
-            {
-                CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password);
-            }
 
             if (GUILayout.Button("Edit Lobby"))
             {
-                if (string.IsNullOrEmpty(TargetLobbyId))
+                if (string.IsNullOrEmpty(TargetLobbyID))
                 {
                     Debug.Log("You must provide the lobby ID");
                 }
                 else
                 {
-                    EditLobby(TargetLobbyId, LobbyName, LobbyCapacity, PrivateLobby, Password);
+                    EditLobby(TargetLobbyID, LobbyName, LobbyCapacity, PrivateLobby, Password);
                 }
             }
 
             if (GUILayout.Button("Delete Lobby"))
             {
-                if (string.IsNullOrEmpty(TargetLobbyId))
+                if (string.IsNullOrEmpty(TargetLobbyID))
                 {
                     Debug.Log("You must provide the lobby ID");
                 }
                 else
                 {
-                    DeleteLobby(TargetLobbyId);
+                    DeleteLobby(TargetLobbyID);
                 }
             }
 
@@ -977,13 +1006,13 @@ namespace LobbyHandling
 
             if (GUILayout.Button("Join Lobby by ID"))
             {
-                if (string.IsNullOrEmpty(TargetLobbyId))
+                if (string.IsNullOrEmpty(TargetLobbyID))
                 {
                     Debug.Log("You must provide the lobby ID");
                 }
                 else
                 {
-                    JoinLobbyByID(TargetLobbyId, Password);
+                    JoinLobbyByID(TargetLobbyID, Password);
                 }
             }
 
@@ -1041,7 +1070,7 @@ namespace LobbyHandling
 
             if (GUILayout.Button("Display Lobby Data by ID"))
             {
-                DisplayLobbyData(TargetLobbyId);
+                DisplayLobbyData(TargetLobbyID);
             }
 
             if (GUILayout.Button("Display Current Lobby Players"))
@@ -1051,8 +1080,9 @@ namespace LobbyHandling
 
             if (GUILayout.Button("Display Lobby Players by ID"))
             {
-                DisplayPlayers(TargetLobbyId);
+                DisplayPlayers(TargetLobbyID);
             }
+
             GUILayout.Space(SpaceBetweenButtons);
 
             GUILayout.Label("Relay", GUILayout.Width(labelWidth));
