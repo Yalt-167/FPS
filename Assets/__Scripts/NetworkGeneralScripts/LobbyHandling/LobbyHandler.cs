@@ -881,6 +881,7 @@ namespace LobbyHandling
 
         [Header("Lobby GUI Settings")]
         [SerializeField] private bool lobbyMenuActive;
+        private bool LobbyMenuActive => Input.GetKey(KeyCode.Tab);
         [SerializeField] private int labelWidth;
         [SerializeField] private int fieldWidth;
         private GUIStyle titleLabelStyle;
@@ -896,7 +897,7 @@ namespace LobbyHandling
 
         private void OnGUI_()
         {
-            if (!lobbyMenuActive) { return; }
+            if (!LobbyMenuActive) { return; }
 
             UpdateLabelStyles();
 
@@ -1287,7 +1288,19 @@ namespace LobbyHandling
 
             UpdateLabelStyles();
 
-            if (!isSignedIn)
+            if (isSignedIn)
+            {
+                GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
+
+                GUILayout.FlexibleSpace();
+
+                GUILayout.Label($"Signed in as {ProfileName}", GUILayout.Width(labelWidth));
+
+                GUILayout.FlexibleSpace();
+
+                GUILayout.EndHorizontal();   
+            }
+            else
             {
                 GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
 
@@ -1314,14 +1327,16 @@ namespace LobbyHandling
 
                 GUILayout.EndHorizontal();
             }
-            else
-            {
-                GUILayout.Label($"Signed in as {ProfileName}", GUILayout.Width(labelWidth));
-            }
 
 
             if (IsInLobby())
             {
+                GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
+
+                GUILayout.FlexibleSpace();
+
+                GUILayout.BeginVertical("box");
+
                 if (IsLobbyHost())
                 {
                     EditLobbyMenu();
@@ -1331,6 +1346,12 @@ namespace LobbyHandling
                     QuitLobbyMenu();
                 }
                 // ShowUrLobbyData();
+
+                GUILayout.EndVertical();
+
+                GUILayout.FlexibleSpace();
+
+                GUILayout.EndHorizontal();
             }
             else
             {
@@ -1341,9 +1362,13 @@ namespace LobbyHandling
                 GUILayout.BeginVertical("box");
 
                 CreateLobbyMenu();
+
                 GUILayout.Space(SpaceBetweenButtons);
+
                 JoinLobbyMenu();
+
                 GUILayout.Space(SpaceBetweenButtons);
+
                 LocalTestingMenu();
 
                 GUILayout.EndVertical();
