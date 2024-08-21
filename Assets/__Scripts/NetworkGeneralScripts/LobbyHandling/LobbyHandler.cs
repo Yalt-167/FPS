@@ -1380,9 +1380,8 @@ namespace LobbyHandling
                 // ShowLobbyList();
             }
         }
+
     }
-
-
 }
 
 // if not in lobby -> create + join + local + LOBBYLIST

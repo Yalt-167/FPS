@@ -1584,7 +1584,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 697401045}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &697401048
 Camera:
   m_ObjectHideFlags: 0
@@ -2476,7 +2476,7 @@ MonoBehaviour:
   TargetLobbyID: 
   RelayJoinCode: 
   lobbyMenuActive: 0
-  labelWidth: 200
+  labelWidth: 150
   fieldWidth: 150
 --- !u!114 &1013962247
 MonoBehaviour:
