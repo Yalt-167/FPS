@@ -22,7 +22,7 @@ namespace GameManagement
     [DefaultExecutionOrder(-98)]
     public sealed class PlayerFrame : NetworkBehaviour
     {
-        public static PlayerFrame LocalPlayer;
+        public static PlayerFrame LocalPlayer { get; private set; }
 
 
         #region Spawn Logic

@@ -101,8 +101,9 @@ public sealed class PlayerCombat : MonoBehaviour
         var scrollWheelInput = Input.GetAxis(ScrollWheelAxis);
         if (scrollWheelInput != 0f)
         {
-            currentWeaponIndex = Utility.ModuloThatWorksWithNegatives(scrollWheelInput > 0f ? ++currentWeaponIndex : --currentWeaponIndex, allowedWeaponsCount);
-            UpdateWeapon();
+            UpdateWeaponWithIndex(
+                Utility.ModuloThatWorksWithNegatives(scrollWheelInput > 0f ? ++currentWeaponIndex : --currentWeaponIndex, allowedWeaponsCount)
+            );
         }
     }
 

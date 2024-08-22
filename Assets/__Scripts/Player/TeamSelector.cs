@@ -25,8 +25,6 @@ public sealed class TeamSelector : NetworkBehaviour
 
     private readonly int[] teamsIndex = new int[2] {0, 0 };
 
-    private PlayerFrame playerFrame;
-
 
     private Transform teamOneHeader;
     private Transform teamTwoHeader;
@@ -36,8 +34,6 @@ public sealed class TeamSelector : NetworkBehaviour
     {
         active = true;
         teams = new string[2][] { new string[maxTeamSize], new string[maxTeamSize] };
-
-        playerFrame = GetComponent<PlayerFrame>();
 
         teamOneHeader = transform.GetChild(1);
         teamOneHeader.GetComponent<Button>().onClick.AddListener(JoinTeamOne);
@@ -52,22 +48,21 @@ public sealed class TeamSelector : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        SetRelevantPlayerFrame();
     }
 
     private void Update()
     {
         if (!active) { return; }
 
-        playerFrame.ToggleCursor(towardOn: active);
-        playerFrame.ToggleGameControls(towardOn: !active);
+        PlayerFrame.LocalPlayer.ToggleCursor(towardOn: active);
+        PlayerFrame.LocalPlayer.ToggleGameControls(towardOn: !active);
 
         if (Input.GetMouseButtonDown(0))
         {
             OnTeamSelected((ushort)(Input.mousePosition.x < Screen.width / 2 ? 1 : 2));
         }
 
-        if (!playerFrame.IsHost) { return; }
+        if (!PlayerFrame.LocalPlayer.IsHost) { return; }
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
@@ -86,9 +81,9 @@ public sealed class TeamSelector : NetworkBehaviour
         OnTeamSelected(2);
     }
 
-    private void OnTeamSelected(ushort teamID)
+    private void OnTeamSelected(ushort teamID)  
     {
-        AddPlayerToTeamServerRpc(playerFrame.Name.ToString(), teamID);
+        AddPlayerToTeamServerRpc(PlayerFrame.LocalPlayer.Name.ToString(), teamID);
     }
 
     [Rpc(SendTo.Server)]
@@ -110,7 +105,7 @@ public sealed class TeamSelector : NetworkBehaviour
         if (teams[teamIndex].Contains(player))
         {
             Debug.Log("You have already joined this team");
-            playerFrame.SetTeam((ushort)(teamIndex - 1)); // just in case
+            PlayerFrame.LocalPlayer.SetTeam((ushort)(teamIndex - 1)); // just in case
             return;
         }
 
@@ -126,7 +121,7 @@ public sealed class TeamSelector : NetworkBehaviour
 
         teamsIndex[teamIndex]++;
 
-        playerFrame.SetTeam((ushort)(teamIndex - 1));
+        PlayerFrame.LocalPlayer.SetTeam((ushort)(teamIndex - 1));
     }
 
     private void RemovePlayerFromTeamList(int teamIndex, string nameToRemove)
@@ -177,20 +172,7 @@ public sealed class TeamSelector : NetworkBehaviour
     private void DisableTeamSelectionScreenClientRpc()
     {
         gameObject.SetActive(false);
-        playerFrame.ToggleCursor(towardOn: false);
-        playerFrame.ToggleGameControls(towardOn: true);
-    }
-
-    private void SetRelevantPlayerFrame()
-    {
-        foreach (var player in GameNetworkManager.Manager.Players)
-        {
-            Debug.Log("Looped");
-            if (player.IsOwner)
-            {
-                Debug.Log($"Found {player.Name}");
-                playerFrame = player;
-            }
-        }
+        PlayerFrame.LocalPlayer.ToggleCursor(towardOn: false);
+        PlayerFrame.LocalPlayer.ToggleGameControls(towardOn: true);
     }
 }

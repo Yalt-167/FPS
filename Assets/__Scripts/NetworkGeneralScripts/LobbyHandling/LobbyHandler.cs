@@ -43,7 +43,6 @@ namespace LobbyHandling
         public string ProfileName;
         private bool isSignedIn;
         private Player localPlayer;
-        private PlayerFrame localPlayerFrame;
         private new Camera camera;
 
         #region Filters Handling
@@ -171,11 +170,6 @@ namespace LobbyHandling
         {
             Anonymously,
             Google
-        }
-
-        public void SetPlayerFrame(PlayerFrame playerFrame)
-        {
-            localPlayerFrame = playerFrame;
         }
 
         #endregion
@@ -1143,13 +1137,6 @@ namespace LobbyHandling
 
         private void OnGUI()
         {
-            if (localPlayerFrame != null)
-            {
-                Debug.Log("Been here somehow");
-                localPlayerFrame.ToggleCursor(towardOn: LobbyMenuActive);
-                localPlayerFrame.ToggleActionInputs(towardOn: !LobbyMenuActive);
-            }
-
             if (!LobbyMenuActive) { return; }
 
 
