@@ -17,10 +17,9 @@ using Unity.Netcode.Transports.UTP;
 using Unity.Netcode;
 using Unity.Services.Relay.Models;
 using Unity.Services.Relay;
-using AYellowpaper.SerializedCollections.Editor;
+
 using GameManagement;
-using Unity.VisualScripting;
-using UnityEngine.UIElements;
+
 
 namespace LobbyHandling
 {
@@ -43,7 +42,7 @@ namespace LobbyHandling
         public string ProfileName;
         private bool isSignedIn;
         private Player localPlayer;
-        private new Camera camera;
+        private Camera menuCamera;
 
         #region Filters Handling
 
@@ -115,7 +114,7 @@ namespace LobbyHandling
         {
             Instance = this;
 
-            camera = transform.GetChild(0).GetComponent<Camera>();
+            menuCamera = transform.GetChild(0).GetComponent<Camera>();
         }
 
         public async void SignInAsync()
@@ -143,11 +142,13 @@ namespace LobbyHandling
         private void SignOutCallback()
         {
             Debug.Log("Signed out");
+            isSignedIn = false;
         }
 
         private void SessionExpiredCallback()
         {
             Debug.Log("Session Expired");
+            isSignedIn = false;
         }
 
         #endregion
@@ -204,13 +205,24 @@ namespace LobbyHandling
             lobbyUpdateTimer += Time.deltaTime;
             if (lobbyUpdateTimer >= lobbyUpdateRate)
             {
-                lobbyUpdateTimer = 0f;
-
-                if (hostLobby == null) { return; }
-
-                hostLobby = await LobbyService.Instance.GetLobbyAsync(hostLobby.Id);
-                Debug.Log("Lobby was updated");
+                await UpdateLobby();
             }
+        }
+
+        public async void ForceLobbyUpdate()
+        {
+            if (hostLobby == null) { return; }
+
+            await UpdateLobby();
+        }
+
+        public async Task UpdateLobby()
+        {
+            lobbyUpdateTimer = 0f;
+
+            hostLobby = await LobbyService.Instance.GetLobbyAsync(hostLobby.Id);
+
+            Debug.Log("Lobby was updated");
         }
 
         #endregion
@@ -465,6 +477,8 @@ namespace LobbyHandling
         public async void QuitLobby()
         {
             await QuitLobbyAsync(AuthenticationService.Instance.PlayerId);
+
+            hostLobby = null;
         }
 
         public async Task QuitLobbyAsync(string playerID)
@@ -907,6 +921,11 @@ namespace LobbyHandling
             };
         }
 
+        public void ToggleMenuCamera(bool towardOn)
+        {
+            menuCamera.enabled = towardOn;
+        }
+
         #region GUI
 
         [field: Header("Lobby GUI Settings")]
@@ -1011,18 +1030,6 @@ namespace LobbyHandling
             GUILayout.EndHorizontal();
         }
 
-        private void QuitLobbyMenu()
-        {
-            GUILayout.BeginVertical("box");
-
-            if (GUILayout.Button("Quit Current Lobby"))
-            {
-                QuitLobby();
-            }
-
-            GUILayout.EndVertical();
-        }
-
         private void LocalTestingMenu()
         {
             GUILayout.BeginVertical("box");
@@ -1093,11 +1100,13 @@ namespace LobbyHandling
 
             GUILayout.EndVertical();
         }
+
         private void DisplayCurrentLobbyMenu()
         {
             if (hostLobby == null) { return; }
 
             GUILayout.BeginVertical("box");
+
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Current Lobby: ", titleLabelStyle);
                 GUILayout.Label($"{hostLobby.Name}");
@@ -1105,11 +1114,13 @@ namespace LobbyHandling
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Host: ", smallerTitleLabelStyle);
-            GUILayout.Label($"{GetLobbyHost().Data[PlayerDataForLobby.Username].Value}");
+                GUILayout.Label($"{GetLobbyHost().Data[PlayerDataForLobby.Username].Value}");
                 GUILayout.EndHorizontal();
+
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical("box");
+
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Players: ", smallerTitleLabelStyle);
                 GUILayout.EndHorizontal();
@@ -1121,65 +1132,80 @@ namespace LobbyHandling
 
             GUILayout.EndVertical();
 
-            if (IsLobbyHost())
-            {
-                GUILayout.BeginVertical("box");
+            GUILayout.BeginVertical("box");
 
-                if (GUILayout.Button("Start game"))
+                if (IsLobbyHost())
                 {
-                    Game.StaticCreatePlayerList();
-                    Game.StaticStartGame();
+                    if (GUILayout.Button("Start game"))
+                    {
+                        Game.StaticCreatePlayerList();
+                        Game.StaticStartGame();
+                    }
                 }
-                
-                GUILayout.EndVertical();
-            }
+                else
+                {
+                    if (GUILayout.Button("Quit lobby"))
+                    {
+                        QuitLobby();
+                    }
+                }
+
+            GUILayout.EndVertical();
         }
 
         private void OnGUI()
         {
             if (!LobbyMenuActive) { return; }
 
-
             UpdateLabelStyles();
+
+            GUILayout.BeginHorizontal(GUILayout.Width(Screen.width)); // H
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.BeginVertical("box"); // HV
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.BeginHorizontal(); // HVH
+
 
             if (isSignedIn)
             {
-                GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
+                GUILayout.Label($"Signed in as {ProfileName}");
+                GUILayout.EndHorizontal();   // HV
 
                 GUILayout.FlexibleSpace();
 
-                GUILayout.Label($"Signed in as {ProfileName}", GUILayout.Width(labelWidth));
+                GUILayout.EndVertical(); // H
 
                 GUILayout.FlexibleSpace();
 
-                GUILayout.EndHorizontal();   
+                GUILayout.EndHorizontal(); //
             }
             else
             {
-                GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
-
-                GUILayout.FlexibleSpace();
-
                 GUILayout.Label("Nickname", GUILayout.Width(labelWidth));
                 ProfileName = GUILayout.TextField(ProfileName, GUILayout.Width(fieldWidth));
 
-                GUILayout.FlexibleSpace();
-
-                GUILayout.EndHorizontal();
-
-
-                GUILayout.BeginHorizontal();
+                GUILayout.EndHorizontal(); // HV
 
                 GUILayout.FlexibleSpace();
+
+                GUILayout.BeginHorizontal(); // HVH
 
                 if (GUILayout.Button("     Sign In (required to use any lobby feature)     "))
                 {
                     SignInAsync();
                 }
 
+                GUILayout.EndHorizontal(); // HV
+
+                GUILayout.EndVertical(); // H
+
                 GUILayout.FlexibleSpace();
 
-                GUILayout.EndHorizontal();
+                GUILayout.EndHorizontal(); // 
             }
 
 
@@ -1189,20 +1215,16 @@ namespace LobbyHandling
 
                 GUILayout.FlexibleSpace();
 
-                    GUILayout.BeginVertical("box");
-
                     if (IsLobbyHost())
                     {
+                        GUILayout.BeginVertical("box");
+
                         EditLobbyMenu();
-                    }
-                    else
-                    {
-                        QuitLobbyMenu();
-                    }
 
-                    GUILayout.EndVertical();
+                        GUILayout.EndVertical();
 
-                GUILayout.FlexibleSpace();
+                        GUILayout.FlexibleSpace();
+                    }                
 
                     GUILayout.BeginVertical("box");
 

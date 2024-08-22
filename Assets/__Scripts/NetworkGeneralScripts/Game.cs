@@ -134,9 +134,12 @@ namespace GameManagement
             gameStarted = true;
 
             Debug.Log("Game was started");
+
+            LobbyHandler.Instance.ToggleLobbyMenu(false);
+            LobbyHandler.Instance.ToggleMenuCamera(false);
+
             PlayerFrame.LocalPlayer.SetGameplayInputMode();
             PlayerFrame.LocalPlayer.ToggleHUD(true);
-            LobbyHandler.Instance.ToggleLobbyMenu(false);
         }
 
 

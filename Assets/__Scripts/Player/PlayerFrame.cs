@@ -10,8 +10,6 @@ using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using Unity.Services.Authentication;
 
 using Controller;
-using LobbyHandling;
-
 
 
 namespace GameManagement
@@ -23,7 +21,6 @@ namespace GameManagement
     public sealed class PlayerFrame : NetworkBehaviour
     {
         public static PlayerFrame LocalPlayer { get; private set; }
-
 
         #region Spawn Logic
 
