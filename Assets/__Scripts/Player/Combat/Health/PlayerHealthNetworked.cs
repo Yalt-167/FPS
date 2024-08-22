@@ -10,7 +10,8 @@ using GameManagement;
 
 [DefaultExecutionOrder(-4)]
 [Serializable]
-public sealed class PlayerHealthNetworked : NetworkBehaviour, IPlayerFrameMember
+public sealed class PlayerHealthNetworked : NetworkBehaviour
+    //, IPlayerFrameMember
 {
     [field: SerializeField] public PlayerHealthData HealthData { get; private set; }
 
@@ -23,14 +24,15 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour, IPlayerFrameMember
     
     public bool Alive => CurrentHealth > 0;
 
-    public ushort TeamID => PlayerFrame?.TeamID ?? 0;
+    public ushort TeamID => PlayerFrame.LocalPlayer?.TeamID ?? 0;
+    //public ushort TeamID => PlayerFrame?.TeamID ?? 0;
 
-    public PlayerFrame PlayerFrame { get; set; }
+    //public PlayerFrame PlayerFrame { get; set; }
 
-    public void InitPlayerFrame(PlayerFrame playerFrame)
-    {
-        PlayerFrame = playerFrame;
-    }
+    //public void InitPlayerFrame(PlayerFrame playerFrame)
+    //{
+    //    PlayerFrame = playerFrame;
+    //}
 
 
     private void Awake()

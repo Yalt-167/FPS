@@ -131,6 +131,7 @@ namespace GameManagement
         private void StartGameClientRpc()
         {
             gameStarted = true;
+
             Debug.Log("Game was started");
         }
 

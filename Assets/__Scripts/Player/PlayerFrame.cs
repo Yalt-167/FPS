@@ -220,10 +220,10 @@ namespace GameManagement
             InitPlayerCommon();
 
             Combat = GetComponent<PlayerCombat>();
-            Combat.InitPlayerFrame(this);
+            //Combat.InitPlayerFrame(this);
 
             Movement = GetComponent<PlayerMovement>();
-            Movement.InitPlayerFrame(this);
+            //Movement.InitPlayerFrame(this);
 
             ToggleCursor(false);
 
@@ -242,6 +242,8 @@ namespace GameManagement
 
             SetMenuInputMode();
             ToggleHUD(false);   
+
+            LocalPlayer = this;
         }
 
         public void InitPlayerFrameRemote()
@@ -262,10 +264,10 @@ namespace GameManagement
         private void InitPlayerCommon()
         {
             WeaponHandler = GetComponent<WeaponHandler>();
-            WeaponHandler.InitPlayerFrame(this);
+            //WeaponHandler.InitPlayerFrame(this);
 
             Health = GetComponent<PlayerHealthNetworked>();
-            Health.InitPlayerFrame(this);
+            //Health.InitPlayerFrame(this);
 
             ClientNetworkTransform = GetComponent<ClientNetworkTransform>();
 

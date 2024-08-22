@@ -14,7 +14,8 @@ namespace Controller
 {
 
     [DefaultExecutionOrder(-7)]
-    public sealed class PlayerMovement : MonoBehaviour, IPlayerFrameMember
+    public sealed class PlayerMovement : MonoBehaviour
+        //, IPlayerFrameMember
     {
         #region Debug Things
 
@@ -84,12 +85,12 @@ namespace Controller
         private float targetSpeed;
         [SerializeField] private float airFriction;
         private float CroouchingSpeed => RunningSpeed * .25f;
-        private float RunningSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.RunningSpeed ?? 8f;
+        private float RunningSpeed => PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.SpeedStats.RunningSpeed ?? 8f;
         private float SpeedDifferenceBetweenWalkingAndSprinting => RunningSpeed - CroouchingSpeed;
         //private float StrafingSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeed ?? 7f;
-        private float StrafingSpeedCoefficient => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeedCoefficient ?? .75f;
-        private float BackwardSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.BackwardSpeed ?? 5f;
-        private float WallRunSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.WallRunningSpeed ?? 9f;
+        private float StrafingSpeedCoefficient => PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.SpeedStats.StrafingSpeedCoefficient ?? .75f;
+        private float BackwardSpeed => PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.SpeedStats.BackwardSpeed ?? 5f;
+        private float WallRunSpeed => PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.SpeedStats.WallRunningSpeed ?? 9f;
 
 
         [SerializeField] private float sidewayInertiaControlFactor; // when the direction changes apply it to control inertia and prevent the player from going sideway (former forward)
@@ -152,7 +153,7 @@ namespace Controller
 
         [Header("Jump")]
         [SerializeField] private float initialJumpSpeedBoost;
-        private float JumpForce => PlayerFrame?.ChampionStats.MovementStats.JumpStats.JumpForce ?? 1080f;
+        private float JumpForce => PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.JumpStats.JumpForce ?? 1080f;
         private float timeLeftGround;
         [SerializeField] private Vector3 longJumpForce;
 
@@ -175,13 +176,13 @@ namespace Controller
         [Header("Dash")]
         [SerializeField] private float afterDashMomentumConservationWindowDuration;
         private bool InDashMomentumConservationWindow => timeDashEnded + afterDashMomentumConservationWindowDuration > Time.time;
-        private float DashVelocity => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashVelocity ?? 90f;
-        private float DashDuration => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashDuration ?? .1f;
-        private float DashCooldown => PlayerFrame?.ChampionStats.MovementStats.DashStats.DashCooldown ?? 1f;
+        private float DashVelocity => PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.DashStats.DashVelocity ?? 90f;
+        private float DashDuration => PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.DashStats.DashDuration ?? .1f;
+        private float DashCooldown => PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.DashStats.DashCooldown ?? 1f;
         private bool dashOnCooldown;
 
         private bool dashReady;
-        private bool DashUsable => dashReady && !dashOnCooldown && (PlayerFrame?.ChampionStats.MovementStats.DashStats.HasDash ?? false);
+        private bool DashUsable => dashReady && !dashOnCooldown && (PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.DashStats.HasDash ?? false);
         private float timeDashTriggered = float.NegativeInfinity;
         private bool ShouldReplenishDash => isCollidingDown || isCollidingLeft || isCollidingRight;
         private float timeDashEnded = float.NegativeInfinity;
@@ -342,12 +343,12 @@ namespace Controller
 
         #region PlayerFrameHandling
 
-        public PlayerFrame PlayerFrame { get; set; }
+        //public PlayerFrame PlayerFrame { get; set; }
 
-        public void InitPlayerFrame(PlayerFrame playerFrame)
-        {
-            PlayerFrame = playerFrame;
-        }
+        //public void InitPlayerFrame(PlayerFrame playerFrame)
+        //{
+        //    PlayerFrame = playerFrame;
+        //}
 
         #endregion
 
