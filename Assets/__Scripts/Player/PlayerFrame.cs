@@ -10,6 +10,7 @@ using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using Unity.Services.Authentication;
 
 using Controller;
+using LobbyHandling;
 
 
 
@@ -31,6 +32,7 @@ namespace GameManagement
             if (IsOwner)
             {
                 EnablePlayerServerRpc(AuthenticationService.Instance.Profile);
+                //LobbyHandler.Instance.SetPlayerFrame(this);
             }
             else
             {
@@ -38,6 +40,7 @@ namespace GameManagement
             }
 
             ManageFiles(IsOwner);
+            SetMenuInputMode();
         }
 
         [Rpc(SendTo.Server)]
@@ -196,6 +199,9 @@ namespace GameManagement
         [HideInInspector] public ClientNetworkTransform ClientNetworkTransform;
         [HideInInspector] public WeaponHandler WeaponHandler;
         [HideInInspector] public PlayerHealthNetworked Health;
+        [HideInInspector] private Camera playerCamera;
+        [HideInInspector] private FollowRotationCamera followRotationCamera;
+        [HideInInspector] private Transform rootTransformHUD;
 
         public FixedString64Bytes Name => playerName.Value;
         private readonly NetworkVariable<FixedString64Bytes> playerName = new(writePerm: NetworkVariableWritePermission.Owner, readPerm: NetworkVariableReadPermission.Everyone);
@@ -232,6 +238,8 @@ namespace GameManagement
 
             gameObject.name = playerName_;
 
+            rootTransformHUD = transform.GetChild(4);
+
             transform.position = Vector3.up * 5;
         }
 
@@ -259,6 +267,9 @@ namespace GameManagement
             Health.InitPlayerFrame(this);
 
             ClientNetworkTransform = GetComponent<ClientNetworkTransform>();
+
+            playerCamera = transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<Camera>();
+            followRotationCamera = transform.GetChild(0).GetComponent<FollowRotationCamera>();
         }
 
         public string GetInfos()
@@ -276,20 +287,50 @@ namespace GameManagement
 
         public void ToggleCameraInputs(bool towardOn)
         {
-            transform.GetChild(0).GetComponent<FollowRotationCamera>().enabled = towardOn;
+            followRotationCamera.enabled = towardOn;
         }
 
         public void ToggleActionInputs(bool towardOn)
         {
-            GetComponent<PlayerCombat>().enabled = towardOn;
-            GetComponent<PlayerMovement>().enabled = towardOn;
+            if (!IsOwner)
+            {
+                Debug.LogError("ToggleActionInputs was called on a remote player");
+                return;
+            }
+
+            Combat.enabled = towardOn;
+            Movement.enabled = towardOn;
         }
 
         public void ToggleCursor(bool towardOn)
         {
-            Cursor.lockState = towardOn ? CursorLockMode.None : CursorLockMode.Locked; //
-            Cursor.visible = !towardOn;
+            Cursor.lockState = towardOn ? CursorLockMode.Confined : CursorLockMode.Locked; //
+            Cursor.visible = towardOn;
             // those two may cause issues when destroying the script on remote players // chekc when loggin concurrently
+        }
+
+        public void SetMenuInputMode()
+        {
+            ToggleGameControls(towardOn: false);
+            ToggleCursor(towardOn: true);
+            ToggleCamera(towardOn: false);
+        }
+
+        public void SetGameplayInputMode()
+        {
+            ToggleCursor(towardOn: false);
+            ToggleGameControls(towardOn: true);
+            ToggleCamera(towardOn: true);
+        }
+
+        public void ToggleCamera(bool towardOn)
+        {
+            playerCamera.enabled = towardOn;
+        }
+
+        public void ToggleHUD(bool towardOn)
+        {
+            rootTransformHUD.gameObject.SetActive(towardOn);
         }
 
         #endregion
