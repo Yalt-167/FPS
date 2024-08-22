@@ -932,8 +932,10 @@ namespace LobbyHandling
         public bool LobbyMenuActive { get; private set; }
         [SerializeField] private int labelWidth;
         [SerializeField] private int fieldWidth;
+        [SerializeField] private int fontSize;
         private GUIStyle titleLabelStyle;
         private GUIStyle smallerTitleLabelStyle;
+        private GUIStyle warningLabelStyle;
 
         private void UpdateLabelStyles()
         {
@@ -948,13 +950,26 @@ namespace LobbyHandling
                 fontStyle = FontStyle.Bold,
                 fontSize = 16,
             };
+
+            warningLabelStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontStyle = FontStyle.Bold,
+                fontSize = fontSize,
+            };
         }
 
         private void CreateLobbyMenu()
         {
+            GUI.enabled = isSignedIn;
             GUILayout.BeginVertical("box");
-
+            
+            GUILayout.BeginHorizontal();
             GUILayout.Label("Create your lobby", titleLabelStyle);
+            if (!isSignedIn)
+            {
+                GUILayout.Label("(Requires sign in)", warningLabelStyle);
+            }
+            GUILayout.EndHorizontal();
 
             DrawLobbySettings();
 
@@ -964,6 +979,7 @@ namespace LobbyHandling
             }
 
             GUILayout.EndVertical();
+            GUI.enabled = true;
         }
 
         private void EditLobbyMenu()
@@ -1053,9 +1069,17 @@ namespace LobbyHandling
 
         private void JoinLobbyMenu()
         {
+            GUI.enabled = isSignedIn;
             GUILayout.BeginVertical("box");
 
+            GUILayout.BeginHorizontal();
             GUILayout.Label("Join a friend lobby", titleLabelStyle);
+            if (!isSignedIn)
+            {
+                GUILayout.Label("(Requires sign in)", warningLabelStyle);
+            }
+            GUILayout.EndHorizontal();
+            
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Target lobby Code", GUILayout.Width(labelWidth));
@@ -1099,6 +1123,7 @@ namespace LobbyHandling
             }
 
             GUILayout.EndVertical();
+            GUI.enabled = true;
         }
 
         private void DisplayCurrentLobbyMenu()
@@ -1161,25 +1186,25 @@ namespace LobbyHandling
 
             GUILayout.BeginHorizontal(GUILayout.Width(Screen.width)); // H
 
-            GUILayout.FlexibleSpace();
+            GUILayout.FlexibleSpace(); // H-
 
-            GUILayout.BeginVertical("box"); // HV
+            GUILayout.BeginVertical("box"); // H-V
 
-            GUILayout.FlexibleSpace();
+            GUILayout.FlexibleSpace(); // H-V-
 
-            GUILayout.BeginHorizontal(); // HVH
+            GUILayout.BeginHorizontal(); // H-V-H
 
 
             if (isSignedIn)
             {
                 GUILayout.Label($"Signed in as {ProfileName}");
-                GUILayout.EndHorizontal();   // HV
+                GUILayout.EndHorizontal();   // H-V-
 
-                GUILayout.FlexibleSpace();
+                GUILayout.FlexibleSpace();  // H-V
 
-                GUILayout.EndVertical(); // H
+                GUILayout.EndVertical(); // H-
 
-                GUILayout.FlexibleSpace();
+                GUILayout.FlexibleSpace(); // H
 
                 GUILayout.EndHorizontal(); //
             }
@@ -1188,22 +1213,22 @@ namespace LobbyHandling
                 GUILayout.Label("Nickname", GUILayout.Width(labelWidth));
                 ProfileName = GUILayout.TextField(ProfileName, GUILayout.Width(fieldWidth));
 
-                GUILayout.EndHorizontal(); // HV
+                GUILayout.EndHorizontal(); // H-V-
 
-                GUILayout.FlexibleSpace();
+                GUILayout.FlexibleSpace(); // H-V
 
-                GUILayout.BeginHorizontal(); // HVH
+                GUILayout.BeginHorizontal(); // H-VH
 
                 if (GUILayout.Button("     Sign In (required to use any lobby feature)     "))
                 {
                     SignInAsync();
                 }
 
-                GUILayout.EndHorizontal(); // HV
+                GUILayout.EndHorizontal(); // H-V
 
-                GUILayout.EndVertical(); // H
+                GUILayout.EndVertical(); // H-
 
-                GUILayout.FlexibleSpace();
+                GUILayout.FlexibleSpace(); // H
 
                 GUILayout.EndHorizontal(); // 
             }
@@ -1253,6 +1278,23 @@ namespace LobbyHandling
                     GUILayout.Space(SpaceBetweenButtons);
 
                     LocalTestingMenu();
+
+                    GUILayout.EndVertical();
+
+                GUILayout.FlexibleSpace();
+
+                    GUILayout.BeginVertical("box");
+
+                    CreateLobbyMenu();
+
+                    GUILayout.Space(SpaceBetweenButtons);
+
+                    JoinLobbyMenu();
+
+                    GUILayout.Space(SpaceBetweenButtons);
+
+                    LocalTestingMenu();
+
 
                     GUILayout.EndVertical();
 
