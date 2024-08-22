@@ -22,6 +22,8 @@ namespace GameManagement
     [DefaultExecutionOrder(-98)]
     public sealed class PlayerFrame : NetworkBehaviour
     {
+        public static PlayerFrame LocalPlayer;
+
 
         #region Spawn Logic
 
@@ -40,7 +42,6 @@ namespace GameManagement
             }
 
             ManageFiles(IsOwner);
-            SetMenuInputMode();
         }
 
         [Rpc(SendTo.Server)]
@@ -205,8 +206,6 @@ namespace GameManagement
 
         public FixedString64Bytes Name => playerName.Value;
         private readonly NetworkVariable<FixedString64Bytes> playerName = new(writePerm: NetworkVariableWritePermission.Owner, readPerm: NetworkVariableReadPermission.Everyone);
-        private readonly NetworkVariable<bool> playerNameSetOnOwner = new(writePerm: NetworkVariableWritePermission.Owner, readPerm: NetworkVariableReadPermission.Everyone);
-
 
 
         public ushort PlayerIndex;
@@ -229,7 +228,6 @@ namespace GameManagement
             ToggleCursor(false);
 
             playerName.Value = playerName_;
-            playerNameSetOnOwner.Value = true;
 
             if (!TryGetComponent<NetworkObject>(out var _))
             {
@@ -241,6 +239,9 @@ namespace GameManagement
             rootTransformHUD = transform.GetChild(4);
 
             transform.position = Vector3.up * 5;
+
+            SetMenuInputMode();
+            ToggleHUD(false);   
         }
 
         public void InitPlayerFrameRemote()
@@ -252,7 +253,7 @@ namespace GameManagement
 
         public IEnumerator SetPlayerNameInHierarchy()
         {
-            yield return new WaitUntil(() => playerNameSetOnOwner.Value);
+            yield return new WaitUntil(() => !string.IsNullOrEmpty(playerName.Value.ToString()));
 
             gameObject.name = playerName.Value.ToString();
         }
