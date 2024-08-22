@@ -315,8 +315,8 @@ namespace GameManagement
         public void SetMenuInputMode()
         {
             ToggleGameControls(towardOn: false);
-            ToggleCursor(towardOn: true);
             ToggleCamera(towardOn: false);
+            ToggleCursor(towardOn: true);
         }
 
         public void SetGameplayInputMode()

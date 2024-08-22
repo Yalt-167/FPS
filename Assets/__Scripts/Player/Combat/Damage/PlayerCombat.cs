@@ -7,15 +7,16 @@ using UnityEngine;
 using GameManagement;
 
 [DefaultExecutionOrder(-6)]
-public sealed class PlayerCombat : MonoBehaviour, IPlayerFrameMember
+public sealed class PlayerCombat : MonoBehaviour
+    //, IPlayerFrameMember
 {
 
-    public PlayerFrame PlayerFrame { get; set; }
+    //public PlayerFrame PlayerFrame { get; set; }
 
-    public void InitPlayerFrame(PlayerFrame playerFrame)
-    {
-        PlayerFrame = playerFrame;
-    }
+    //public void InitPlayerFrame(PlayerFrame playerFrame)
+    //{
+    //    PlayerFrame = playerFrame;
+    //}
 
 
     [SerializeField] private int allowedWeaponsCount = 3;

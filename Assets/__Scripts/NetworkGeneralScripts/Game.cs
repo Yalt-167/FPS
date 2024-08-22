@@ -1,6 +1,7 @@
 //#define DEBUG_MULTIPLAYER
 #define LOG_METHOD_CALLS
 
+using LobbyHandling;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -133,6 +134,9 @@ namespace GameManagement
             gameStarted = true;
 
             Debug.Log("Game was started");
+            PlayerFrame.LocalPlayer.SetGameplayInputMode();
+            PlayerFrame.LocalPlayer.ToggleHUD(true);
+            LobbyHandler.Instance.ToggleLobbyMenu(false);
         }
 
 

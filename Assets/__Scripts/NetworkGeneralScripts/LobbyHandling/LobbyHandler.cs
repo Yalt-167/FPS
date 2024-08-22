@@ -26,7 +26,7 @@ namespace LobbyHandling
 {
     public sealed class LobbyHandler : MonoBehaviour
     {
-        //public static LobbyHandler Instance { get; private set; }
+        public static LobbyHandler Instance { get; private set; }
         public int SpaceBetweenButtons = 12;
 
         private Lobby hostLobby;
@@ -109,12 +109,12 @@ namespace LobbyHandling
 
             InitializeUnityTransports();
 
-            lobbyMenuActive = true;
+            LobbyMenuActive = true;
         }
 
         private void InitializeLobbyHandler()
         {
-            //Instance = this;
+            Instance = this;
 
             camera = transform.GetChild(0).GetComponent<Camera>();
         }
@@ -915,8 +915,8 @@ namespace LobbyHandling
 
         #region GUI
 
-        [Header("Lobby GUI Settings")]
-        [SerializeField] private bool lobbyMenuActive;
+        [field: Header("Lobby GUI Settings")]
+        public bool LobbyMenuActive { get; private set; }
         [SerializeField] private int labelWidth;
         [SerializeField] private int fieldWidth;
         private GUIStyle titleLabelStyle;
@@ -1099,16 +1099,58 @@ namespace LobbyHandling
 
             GUILayout.EndVertical();
         }
+        private void DisplayCurrentLobbyMenu()
+        {
+            if (hostLobby == null) { return; }
+
+            GUILayout.BeginVertical("box");
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Current Lobby: ", titleLabelStyle);
+                GUILayout.Label($"{hostLobby.Name}");
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Host: ", smallerTitleLabelStyle);
+            GUILayout.Label($"{GetLobbyHost().Data[PlayerDataForLobby.Username].Value}");
+                GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+
+            GUILayout.BeginVertical("box");
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Players: ", smallerTitleLabelStyle);
+                GUILayout.EndHorizontal();
+
+                foreach (var player in hostLobby.Players)
+                {
+                    GUILayout.Label(player.Data[PlayerDataForLobby.Username].Value);
+                }
+
+            GUILayout.EndVertical();
+
+            if (IsLobbyHost())
+            {
+                GUILayout.BeginVertical("box");
+
+                if (GUILayout.Button("Start game"))
+                {
+                    Game.StaticCreatePlayerList();
+                    Game.StaticStartGame();
+                }
+                
+                GUILayout.EndVertical();
+            }
+        }
 
         private void OnGUI()
         {
             if (localPlayerFrame != null)
             {
-                localPlayerFrame.ToggleCursor(towardOn: lobbyMenuActive);
-                localPlayerFrame.ToggleActionInputs(towardOn: !lobbyMenuActive);
+                Debug.Log("Been here somehow");
+                localPlayerFrame.ToggleCursor(towardOn: LobbyMenuActive);
+                localPlayerFrame.ToggleActionInputs(towardOn: !LobbyMenuActive);
             }
 
-            if (!lobbyMenuActive) { return; }
+            if (!LobbyMenuActive) { return; }
 
 
             UpdateLabelStyles();
@@ -1213,46 +1255,9 @@ namespace LobbyHandling
             }
         }
 
-        private void DisplayCurrentLobbyMenu()
+        public void ToggleLobbyMenu(bool towardOn)
         {
-            if (hostLobby == null) { return; }
-
-            GUILayout.BeginVertical("box");
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Current Lobby: ", titleLabelStyle);
-                GUILayout.Label($"{hostLobby.Name}");
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Host: ", smallerTitleLabelStyle);
-            GUILayout.Label($"{GetLobbyHost().Data[PlayerDataForLobby.Username].Value}");
-                GUILayout.EndHorizontal();
-            GUILayout.EndVertical();
-
-            GUILayout.BeginVertical("box");
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Players: ", smallerTitleLabelStyle);
-                GUILayout.EndHorizontal();
-
-                foreach (var player in hostLobby.Players)
-                {
-                    GUILayout.Label(player.Data[PlayerDataForLobby.Username].Value);
-                }
-
-            GUILayout.EndVertical();
-
-            if (IsLobbyHost())
-            {
-                GUILayout.BeginVertical("box");
-
-                if (GUILayout.Button("Start game"))
-                {
-                    Game.StaticCreatePlayerList();
-                    Game.StaticStartGame();
-                }
-                
-                GUILayout.EndVertical();
-            }
+            LobbyMenuActive = towardOn;
         }
 
         #endregion
