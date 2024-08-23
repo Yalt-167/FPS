@@ -38,7 +38,7 @@ namespace LobbyHandling
         private float lobbyUpdateTimer;
 
         private static readonly string noPassword = "        ";
-        private static readonly string initializeToZero = "0";
+        //private static readonly string initializeToZero = "0";
 
         public string ProfileName;
         private bool isSignedIn;
@@ -1242,14 +1242,18 @@ namespace LobbyHandling
                 {
                     foreach (var lobby in availableLobbies.Results)
                     {
-                        GUILayout.BeginVertical("box");
+                        Rect r = EditorGUILayout.BeginVertical("box");
+                        if (GUI.Button(r, GUIContent.none))
+                        {
+                            Debug.Log("I was clicked");
+                        }                      
 
                         _ = PlayerDataForLobby.Username ?? throw new System.Exception("Literally public static readonly string Username = nameof(Username);");
                         _ = lobby ?? throw new System.Exception("Lobby is null somehow");
                         Player host = GetLobbyHost(lobby) ?? throw new System.Exception("Host is null");
                         Dictionary<string, PlayerDataObject> hostData = host.Data ?? throw new System.Exception("Host has no data");
                         PlayerDataObject usernameAsDataObject = hostData[PlayerDataForLobby.Username] ?? throw new System.Exception("Host has no name");
-                        string usernameAsString = usernameAsDataObject.Value ?? throw new System.Exception("Name hass no value");
+                        string usernameAsString = usernameAsDataObject.Value ?? throw new System.Exception("Name has no value");
 
                         GUILayout.Label($"{lobby.Name ?? "Unnamed"} by {usernameAsString ?? "Unknown"}");
                         GUILayout.Label($"Has password: {lobby.HasPassword}");
@@ -1385,8 +1389,6 @@ namespace LobbyHandling
                 GUILayout.FlexibleSpace();
 
                 GUILayout.EndHorizontal();
-
-                // ShowLobbyList();
             }
         }
 

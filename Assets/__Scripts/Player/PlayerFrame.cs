@@ -260,10 +260,8 @@ namespace GameManagement
         private void InitPlayerCommon()
         {
             WeaponHandler = GetComponent<WeaponHandler>();
-            //WeaponHandler.InitPlayerFrame(this);
 
             Health = GetComponent<PlayerHealthNetworked>();
-            //Health.InitPlayerFrame(this);
 
             ClientNetworkTransform = GetComponent<ClientNetworkTransform>();
 
