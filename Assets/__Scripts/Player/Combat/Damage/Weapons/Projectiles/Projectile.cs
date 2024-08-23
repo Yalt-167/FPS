@@ -23,13 +23,13 @@ namespace Projectiles
         protected bool active;
         protected ProjectileOnHitWallBehaviour onHitWallBehaviour;
         protected ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour;
-        protected ushort shooterTeamID;
+        protected ushort shooterTeamNumber;
 
         public virtual void Init(
             DamageDealt damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, bool canBreakThings_, LayerMask layersToHit_,
             ProjectileOnHitWallBehaviour onHitWallBehaviour_,
             ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour_,
-            ushort shooterTeamID_
+            ushort shooterTeamNumber_
             )
         {
             active = true;
@@ -43,7 +43,7 @@ namespace Projectiles
             onHitWallBehaviour = onHitWallBehaviour_;
             onHitPlayerBehaviour = onHitPlayerBehaviour_;
 
-            shooterTeamID = shooterTeamID_;
+            shooterTeamNumber = shooterTeamNumber_;
 
             StartCoroutine(CleanUp());
         }
@@ -53,7 +53,7 @@ namespace Projectiles
             var col = collision.collider;
             if (col.TryGetComponent<IShootable>(out var shootableComponent))
             {
-                shootableComponent.ReactShot(damage, transform.forward, Vector3.zero, attackerNetworkID, shooterTeamID, canBreakThings);
+                shootableComponent.ReactShot(damage, transform.forward, Vector3.zero, attackerNetworkID, shooterTeamNumber, canBreakThings);
                 onHitPlayerBehaviour.OnHitPlayer(this, shootableComponent);
                 active = false;
             }

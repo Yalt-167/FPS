@@ -208,7 +208,7 @@ namespace GameManagement
 
         public ushort PlayerIndex;
         //[HideInInspector]
-        public ushort TeamID;
+        public ushort TeamNumber;
         [HideInInspector] public bool IsOnline;
 
         public bool Alive => Health.Alive;
@@ -256,7 +256,6 @@ namespace GameManagement
             gameObject.name = playerName.Value.ToString();
         }
 
-
         private void InitPlayerCommon()
         {
             WeaponHandler = GetComponent<WeaponHandler>();
@@ -271,7 +270,7 @@ namespace GameManagement
 
         public string GetInfos()
         {
-            return $"{{Player: {playerName.Value} | Team: {TeamID}}}";
+            return $"{{Player: {playerName.Value} | Team: {TeamNumber}}}";
         }
 
         #region Toggle Controls
@@ -336,7 +335,7 @@ namespace GameManagement
 
         public void SetTeam(ushort teamID)
         {
-            TeamID = teamID;
+            TeamNumber = teamID;
         }
 
         #endregion

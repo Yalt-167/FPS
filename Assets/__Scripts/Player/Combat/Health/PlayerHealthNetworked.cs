@@ -24,7 +24,7 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
     
     public bool Alive => CurrentHealth > 0;
 
-    public ushort TeamID => PlayerFrame.LocalPlayer?.TeamID ?? 0;
+    public ushort TeamNumber => PlayerFrame.LocalPlayer?.TeamNumber ?? 0;
     //public ushort TeamID => PlayerFrame?.TeamID ?? 0;
 
     //public PlayerFrame PlayerFrame { get; set; }
@@ -180,6 +180,6 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
     private void RespawnClientRpc()
     {
         ResetHealth();
-        transform.position = GameNetworkManager.Manager.GetSpawnPosition(TeamID);
+        transform.position = GameNetworkManager.Manager.GetSpawnPosition(TeamNumber);
     }
 }
