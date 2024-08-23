@@ -1096,12 +1096,16 @@ namespace LobbyHandling
             {
                 SelectLocalUnityTransport();
                 GameNetworkManager.Singleton.StartHost();
+                ToggleMenuCamera(towardOn: false);
+                ToggleLobbyMenu(towardOn: false);
             }
 
             if (GUILayout.Button("Join a Local Session"))
             {
                 SelectLocalUnityTransport();
                 GameNetworkManager.Singleton.StartClient();
+                ToggleMenuCamera(towardOn: false);
+                ToggleLobbyMenu(towardOn: false);
             }
 
             GUILayout.EndVertical();

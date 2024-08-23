@@ -2469,7 +2469,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpaceBetweenButtons: 4
   ProfileName: Yalt
-  cooldownBeforeCanRefreshLobbyList: 0
+  cooldownBeforeCanRefreshLobbyList: 5
   LobbyName: MyLobby
   LobbyCapacity: 2
   PrivateLobby: 0
