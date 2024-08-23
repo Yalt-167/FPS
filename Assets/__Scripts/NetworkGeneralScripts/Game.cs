@@ -150,7 +150,7 @@ namespace GameManagement
         }
 
         [Rpc(SendTo.Server)]
-        private void CreatePlayerListServerRpc()
+        public void CreatePlayerListServerRpc()
         {
            CreatePlayerListClientRpc();
         }
@@ -159,6 +159,19 @@ namespace GameManagement
         private void CreatePlayerListClientRpc()
         {
             GameNetworkManager.Manager.InitPlayerList();
+        }
+
+
+        [Rpc(SendTo.Server)]
+        public void ToggleLobbyMenuServerRpc(bool towardOn)
+        {
+            ToggleLobbyMenuClientRpc(towardOn);
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void ToggleLobbyMenuClientRpc(bool towardOn)
+        {
+            LobbyHandler.Instance.ToggleLobbyMenu(towardOn);
         }
 
         #endregion

@@ -494,6 +494,9 @@ namespace LobbyHandling
             await QuitLobbyAsync(AuthenticationService.Instance.PlayerId);
 
             hostLobby = null;
+
+            NetworkManager.Singleton.Shutdown();
+            // kick from netcode perhaps XD
         }
 
         public async Task QuitLobbyAsync(string playerID)
@@ -537,7 +540,7 @@ namespace LobbyHandling
 
             try
             {
-                await LobbyService.Instance.UpdateLobbyAsync(hostLobby.Id, updateLobbyOptions);
+                hostLobby = await LobbyService.Instance.UpdateLobbyAsync(hostLobby.Id, updateLobbyOptions);
             }
             catch (LobbyServiceException exception)
             {
@@ -546,7 +549,7 @@ namespace LobbyHandling
             }
 
 
-            Debug.Log("Suucessfully closed the lobby");
+            Debug.Log("Successfully closed the lobby");
         }
 
         public async void KickPlayer(string playerID)
@@ -1205,10 +1208,12 @@ namespace LobbyHandling
 
                 if (IsLobbyHost())
                 {
-                    if (GUILayout.Button("Start game"))
+                    if (GUILayout.Button("Close lobby and start team selection"))
                     {
-                        Game.StaticCreatePlayerList();
-                        Game.StaticStartGame();
+                        CloseLobbyAcess();
+                        Game.Manager.ToggleLobbyMenuServerRpc(towardOn: false);
+                        Game.Manager.CreatePlayerListServerRpc();
+                        GameNetworkManager.Manager.SpawnTeamSelectionMenu(2, 6); // as it s a nertwork spawn it automatically propagates to all clients
                     }
                 }
                 else
@@ -1236,13 +1241,13 @@ namespace LobbyHandling
             }
             GUILayout.EndHorizontal();
 
-            GUILayout.BeginVertical("box");
+            GUILayout.BeginVertical();
 
             if (isSignedIn)
             {
                 if (availableLobbies == null)
                 {
-                    GUILayout.BeginHorizontal();
+                    GUILayout.BeginHorizontal("box");
                     GUILayout.Label("No lobby found");
                     if (!isSearchingForLobbies && canRefreshLobbyList && GUILayout.Button("Search for lobbies"))
                     {
@@ -1269,20 +1274,20 @@ namespace LobbyHandling
                         GUILayout.EndVertical();
                     }
 #if false
-                    //for (int i = 0; i < 10; i++)
-                    //{
-                    //    Rect r = EditorGUILayout.BeginVertical("box");
+                    for (int i = 0; i < 5; i++)
+                    {
+                        Rect r = EditorGUILayout.BeginVertical("box");
 
-                    //    if (GUI.Button(r, GUIContent.none))
-                    //    {
-                    //        Debug.Log($"Clicked: {i}");
-                    //    }
+                        if (GUI.Button(r, GUIContent.none))
+                        {
+                            Debug.Log($"Clicked: {i}");
+                        }
 
-                    //    GUILayout.Label($"Unnamed {i} by Unknown", GUILayout.Width(200));
-                    //    GUILayout.Label($"Slots: {1} / {2}");
+                        GUILayout.Label($"Unnamed {i} by Unknown", GUILayout.Width(200));
+                        GUILayout.Label($"Slots: {1} / {2}");
 
-                    //    GUILayout.EndVertical();
-                    //}
+                        GUILayout.EndVertical();
+                    }
 #endif
                     GUILayout.EndScrollView();
                 }
@@ -1294,9 +1299,9 @@ namespace LobbyHandling
 
             GUILayout.EndVertical();
 
-            GUILayout.BeginVertical("box");
+            GUILayout.BeginVertical();
 
-            GUILayout.BeginHorizontal();
+            GUILayout.BeginHorizontal("box");
 
             GUILayout.Label("Password", GUILayout.Width(labelWidth));
             passwordToJoinListLobby = GUILayout.TextField(passwordToJoinListLobby, GUILayout.Width(fieldWidth));

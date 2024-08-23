@@ -110,7 +110,7 @@ namespace GameManagement
         {
             foreach (var player in players)
             {
-                if (player.TeamID == teamID)
+                if (player.TeamNumber == teamID)
                 {
                     yield return player;
                 }
@@ -317,13 +317,13 @@ namespace GameManagement
 
         #region Team Selector Thingy
 
-        [MenuItem("Developer/SpawnTeamSelectionMenu")]
-        public static void StaticSpawnTeamSelectionMenu()
-        {
-            Manager.SpawnTeamSelectionMenu();
-        }
+        //[MenuItem("Developer/SpawnTeamSelectionMenu")]
+        //public static void StaticSpawnTeamSelectionMenu()
+        //{
+        //    Manager.SpawnTeamSelectionMenu();
+        //}
 
-        public void SpawnTeamSelectionMenu()
+        public void SpawnTeamSelectionMenu(ushort teamsCount, ushort teamsSize)
         {
             if (teamSelectorInstance == null)
             {
@@ -334,6 +334,8 @@ namespace GameManagement
             {
                 teamSelectorInstance.SetActive(true);
             }
+
+            teamSelectorInstance.GetComponent<TeamSelector>().SetDataServerRpc(teamsCount, teamsSize);
         }
 
 

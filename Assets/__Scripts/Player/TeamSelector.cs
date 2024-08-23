@@ -1,4 +1,4 @@
-#define I_COULD_VERY_WELL_BE_RETARDED
+#define USING_UNITY_GUI_SYSTEM
 
 using System;
 using System.Collections;
@@ -8,10 +8,6 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
-using UnityEngine.UI;
-
-using TMPro;
-
 using GameManagement;
 
 
@@ -19,22 +15,26 @@ using GameManagement;
 public sealed class TeamSelector : NetworkBehaviour
 {
     private string[][] teams;
-    [SerializeField] private ushort maxTeamSize = 6;
+    [SerializeField] private ushort teamsCount;
+    [SerializeField] private ushort maxTeamSize;
+    private int[] teamsIndex;
 
     private bool active;
 
-    private readonly int[] teamsIndex = new int[2] {0, 0 };
 
+#if USING_UNITY_GUI_SYSTEM
 
+#else
     private Transform teamOneHeader;
     private Transform teamTwoHeader;
     private Button startGameButton;
+#endif
 
     private void Awake()
     {
-        active = true;
-        teams = new string[2][] { new string[maxTeamSize], new string[maxTeamSize] };
+#if USING_UNITY_GUI_SYSTEM
 
+#else
         teamOneHeader = transform.GetChild(1);
         teamOneHeader.GetComponent<Button>().onClick.AddListener(JoinTeamOne);
 
@@ -43,6 +43,34 @@ public sealed class TeamSelector : NetworkBehaviour
 
 
         startGameButton = transform.GetChild(3).GetComponent<Button>();
+#endif
+    }
+
+    [Rpc(SendTo.Server)]
+    public void SetDataServerRpc(ushort teamsCount_, ushort teamsSize_)
+    {
+        SetDataClientRpc(teamsCount_, teamsSize_);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void SetDataClientRpc(ushort teamsCount_, ushort teamsSize_)
+    {
+        teamsCount = teamsCount_;
+        maxTeamSize = teamsSize_;
+
+        UpdateData();
+    }
+
+    private void UpdateData()
+    {
+        active = true;
+        teams = new string[teamsCount][];
+        teamsIndex = new int[teamsCount];
+        for (int i = 0; i < teamsCount; i++)
+        {
+            teams[i] = new string[maxTeamSize];
+            teamsIndex[i] = 0;
+        }
     }
 
     public override void OnNetworkSpawn()
@@ -71,25 +99,70 @@ public sealed class TeamSelector : NetworkBehaviour
         }
     }
 
-    public void JoinTeamOne()
+    private void CreateTeamMenu(int teamNumber)
     {
-        OnTeamSelected(1);
+        GUILayout.BeginVertical("box");
+
+            GUILayout.Label($"Team{teamNumber}");
+
+            GUILayout.BeginHorizontal("box");
+
+                if (GUILayout.Button("Join team"))
+                {
+                    OnTeamSelected((ushort)teamNumber);
+                }
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginVertical("box");
+
+                foreach (var playerName in teams[teamNumber - 1])
+                {
+                    GUILayout.Label(playerName);
+                }
+
+            GUILayout.EndVertical();
+
+        GUILayout.EndVertical();
     }
 
-    public void JoinTeamTwo()
+    private void OnGUI()
     {
-        OnTeamSelected(2);
+        GUILayout.BeginVertical();
+
+        GUILayout.FlexibleSpace();
+
+        GUILayout.BeginHorizontal();
+
+        GUILayout.FlexibleSpace();
+
+        for (int i = 0; i < teamsCount; i++)
+        {
+            GUILayout.BeginVertical("box");
+
+                CreateTeamMenu(i + 1);
+
+            GUILayout.EndVertical();
+
+            GUILayout.FlexibleSpace();
+        }
+
+        GUILayout.EndHorizontal();
+
+        GUILayout.FlexibleSpace();
+
+        GUILayout.EndVertical();
     }
 
-    private void OnTeamSelected(ushort teamID)  
+    private void OnTeamSelected(ushort teamNumber)  
     {
-        AddPlayerToTeamServerRpc(PlayerFrame.LocalPlayer.Name.ToString(), teamID);
+        AddPlayerToTeamServerRpc(PlayerFrame.LocalPlayer.Name.ToString(), teamNumber);
     }
 
     [Rpc(SendTo.Server)]
-    private void AddPlayerToTeamServerRpc(string player, ushort teamID)
+    private void AddPlayerToTeamServerRpc(string player, ushort teamNumber)
     {
-        int teamIndex = teamID - 1; 
+        int teamIndex = teamNumber - 1; 
         if (teamsIndex[teamIndex] > maxTeamSize - 1)
         {
             Debug.Log("Cannot join this team because it s full");
@@ -116,8 +189,11 @@ public sealed class TeamSelector : NetworkBehaviour
         }
 
         teams[teamIndex][teamsIndex[teamIndex]] = player;
+#if USING_UNITY_GUI_SYSTEM
 
+#else
         (teamIndex == 0 ? teamOneHeader : teamTwoHeader).GetChild(teamsIndex[teamIndex]).GetComponent<TextMeshProUGUI>().text = player;
+#endif
 
         teamsIndex[teamIndex]++;
 
@@ -151,6 +227,9 @@ public sealed class TeamSelector : NetworkBehaviour
 
     private void UpdateTeamDisplay()
     {
+#if USING_UNITY_GUI_SYSTEM
+
+#else
         Transform relevantTransform;
         for (int teamIndex = 0; teamIndex < teams.Length; teamIndex++)
         {
@@ -160,6 +239,7 @@ public sealed class TeamSelector : NetworkBehaviour
                 relevantTransform.GetChild(playerIndex).GetComponent<TextMeshProUGUI>().text = teams[teamIndex][playerIndex];
             }
         }
+#endif
     }
 
     [Rpc(SendTo.Server)]
