@@ -30,7 +30,7 @@ namespace LobbyHandling
             GUILayout.Space(spaceBetweenButtons * 2);
             if (GUILayout.Button("Sign In"))
             {
-                targetScript.SignInAsync();
+                targetScript.SignIn();
             }
 
             GUILayout.Space(spaceBetweenButtons * 2);

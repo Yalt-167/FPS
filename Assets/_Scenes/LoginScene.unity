@@ -2469,6 +2469,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpaceBetweenButtons: 4
   ProfileName: Yalt
+  cooldownBeforeCanRefreshLobbyList: 0
   LobbyName: MyLobby
   LobbyCapacity: 2
   PrivateLobby: 0
@@ -2476,7 +2477,6 @@ MonoBehaviour:
   TargetLobbyCode: 
   TargetLobbyID: 
   RelayJoinCode: 
-  lobbyMenuActive: 0
   labelWidth: 150
   fieldWidth: 150
 --- !u!114 &1013962247

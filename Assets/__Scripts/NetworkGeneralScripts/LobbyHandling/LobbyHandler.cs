@@ -19,6 +19,7 @@ using Unity.Services.Relay.Models;
 using Unity.Services.Relay;
 
 using GameManagement;
+using Unity.VisualScripting;
 
 
 namespace LobbyHandling
@@ -43,6 +44,13 @@ namespace LobbyHandling
         private bool isSignedIn;
         private Player localPlayer;
         private Camera menuCamera;
+#nullable enable
+        private QueryResponse? availableLobbies;
+#nullable disable
+        private bool isSearchingForLobbies;
+        private bool canRefreshLobbyList = true;
+        [SerializeField] private float cooldownBeforeCanRefreshLobbyList;
+
 
         #region Filters Handling
 
@@ -117,7 +125,7 @@ namespace LobbyHandling
             menuCamera = transform.GetChild(0).GetComponent<Camera>();
         }
 
-        public async void SignInAsync()
+        public async void SignIn()
         {
             AuthenticationService.Instance.SwitchProfile(ProfileName);
 
@@ -205,7 +213,7 @@ namespace LobbyHandling
             lobbyUpdateTimer += Time.deltaTime;
             if (lobbyUpdateTimer >= lobbyUpdateRate)
             {
-                await UpdateLobby();
+                await UpdateLobbyAsync();
             }
         }
 
@@ -213,10 +221,10 @@ namespace LobbyHandling
         {
             if (hostLobby == null) { return; }
 
-            await UpdateLobby();
+            await UpdateLobbyAsync();
         }
 
-        public async Task UpdateLobby()
+        public async Task UpdateLobbyAsync()
         {
             lobbyUpdateTimer = 0f;
 
@@ -603,6 +611,32 @@ namespace LobbyHandling
             return response.Results.Count > 0 ? response : null;
         }
 #nullable disable
+        private async void UpdateLobbyList()
+        {
+            if (!canRefreshLobbyList) {  return; }
+
+            await UpdateLobbyListInternalAsync();
+        }
+
+        private async Task UpdateLobbyListInternalAsync()
+        {
+            isSearchingForLobbies = true;
+
+            availableLobbies = await EnumerateLobbiesAsync();
+
+            isSearchingForLobbies = false;
+
+            StartCoroutine(CooldownBeforeCanRefreshLobbyListAgain());
+        }
+
+        private IEnumerator CooldownBeforeCanRefreshLobbyListAgain()
+        {
+            canRefreshLobbyList = false;
+
+            yield return new WaitForSeconds(cooldownBeforeCanRefreshLobbyList);
+
+            canRefreshLobbyList = true;
+        }
 
         private void FillInLobbyDataFields()
         {
@@ -759,24 +793,16 @@ namespace LobbyHandling
 
         public async void DisplayLobbies()
         {
-            try
+            var lobbies = await EnumerateLobbiesAsync();
+
+            if (lobbies == null) { return; }
+
+            Debug.Log($"Found {lobbies.Results.Count} lobb{(lobbies.Results.Count == 1 ? "y" : "ies")} matching your criteria, namely:");
+
+            foreach (var lobby in lobbies.Results)
             {
-                var lobbies = await EnumerateLobbiesAsync();
-
-                if (lobbies == null) { return; }
-
-                Debug.Log($"Found {lobbies.Results.Count} lobb{(lobbies.Results.Count == 1 ? "y" : "ies")} matching your criteria, namely:");
-
-                foreach (var lobby in lobbies.Results)
-                {
-                    DisplayLobbyData(lobby);
-                }
-            }
-            catch (LobbyServiceException exception)
-            {
-                Debug.Log(exception.Message);
-                return;
-            }
+                DisplayLobbyData(lobby);
+            }   
         }
 
         public void DisplayHostLobbyData()
@@ -900,6 +926,19 @@ namespace LobbyHandling
 
             return null; // CANNOT happen so should be fine
         }
+
+        public Player? GetLobbyHost(Lobby lobby)
+        {
+            foreach (var player in lobby.Players)
+            {
+                if (player.Id == lobby.HostId)
+                {
+                    return player;
+                }
+            }
+
+            return null; // means that the host quit and the lobby wasn t destroyed yet
+        }
 #nullable disable
 
         #endregion
@@ -907,18 +946,12 @@ namespace LobbyHandling
         private Player GetPlayer()
         {
             return new Player(id: AuthenticationService.Instance.PlayerId)
-            {
-                Data = new Dictionary<string, PlayerDataObject>()
                 {
-                    { PlayerDataForLobby.Username, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, ProfileName) },
-                    // perhaps don t update that and just update it at the end of the game to save on lobby update
-                    { PlayerDataForLobby.Kills, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, initializeToZero) }, 
-                    { PlayerDataForLobby.Deaths, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, initializeToZero)},
-                    { PlayerDataForLobby.Assists, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, initializeToZero) },
-                    { PlayerDataForLobby.Damage, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, initializeToZero) },
-                    { PlayerDataForLobby.Accuracy, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Private, initializeToZero) }
-                }
-            };
+                    Data = new Dictionary<string, PlayerDataObject>()
+                    {
+                        { PlayerDataForLobby.Username, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, ProfileName) },
+                    }
+                };
         }
 
         public void ToggleMenuCamera(bool towardOn)
@@ -932,7 +965,6 @@ namespace LobbyHandling
         public bool LobbyMenuActive { get; private set; }
         [SerializeField] private int labelWidth;
         [SerializeField] private int fieldWidth;
-        [SerializeField] private int fontSize;
         private GUIStyle titleLabelStyle;
         private GUIStyle smallerTitleLabelStyle;
         private GUIStyle warningLabelStyle;
@@ -954,7 +986,7 @@ namespace LobbyHandling
             warningLabelStyle = new GUIStyle(GUI.skin.label)
             {
                 fontStyle = FontStyle.Bold,
-                fontSize = fontSize,
+                fontSize = 10,
             };
         }
 
@@ -1178,6 +1210,67 @@ namespace LobbyHandling
             GUILayout.EndVertical();
         }
 
+#nullable enable
+        private void DisplayAvailableLobbiesMenu()
+        {            
+            GUI.enabled = isSignedIn;
+            GUILayout.BeginVertical("box");
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Lobbies", titleLabelStyle);
+            if (!isSignedIn)
+            {
+                GUILayout.Label("(Requires sign in)", warningLabelStyle);
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginVertical("box");
+
+            if (isSignedIn)
+            {
+                if (availableLobbies == null)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("No lobby found");
+                    if (!isSearchingForLobbies && canRefreshLobbyList && GUILayout.Button("Search for lobbies"))
+                    {
+                        UpdateLobbyList();
+                    }
+                    GUILayout.EndHorizontal();
+                }
+                else
+                {
+                    foreach (var lobby in availableLobbies.Results)
+                    {
+                        GUILayout.BeginVertical("box");
+
+                        _ = PlayerDataForLobby.Username ?? throw new System.Exception("Literally public static readonly string Username = nameof(Username);");
+                        _ = lobby ?? throw new System.Exception("Lobby is null somehow");
+                        Player host = GetLobbyHost(lobby) ?? throw new System.Exception("Host is null");
+                        Dictionary<string, PlayerDataObject> hostData = host.Data ?? throw new System.Exception("Host has no data");
+                        PlayerDataObject usernameAsDataObject = hostData[PlayerDataForLobby.Username] ?? throw new System.Exception("Host has no name");
+                        string usernameAsString = usernameAsDataObject.Value ?? throw new System.Exception("Name hass no value");
+
+                        GUILayout.Label($"{lobby.Name ?? "Unnamed"} by {usernameAsString ?? "Unknown"}");
+                        GUILayout.Label($"Has password: {lobby.HasPassword}");
+                        GUILayout.Label($"Slots: {lobby.Players.Count} / {lobby.MaxPlayers}");
+
+                        GUILayout.EndVertical();
+                    }
+                }
+            }
+            else
+            {
+                GUILayout.Space(50); // trust
+            }
+
+            GUILayout.EndVertical();
+
+            GUILayout.EndVertical();
+            GUI.enabled = true;
+        }
+#nullable disable
+
         private void OnGUI()
         {
             if (!LobbyMenuActive) { return; }
@@ -1221,7 +1314,7 @@ namespace LobbyHandling
 
                 if (GUILayout.Button("     Sign In (required to use any lobby feature)     "))
                 {
-                    SignInAsync();
+                    SignIn();
                 }
 
                 GUILayout.EndHorizontal(); // H-V
@@ -1253,7 +1346,7 @@ namespace LobbyHandling
 
                     GUILayout.BeginVertical("box");
 
-                    DisplayCurrentLobbyMenu();
+                        DisplayCurrentLobbyMenu();
 
                     GUILayout.EndVertical();
 
@@ -1269,15 +1362,15 @@ namespace LobbyHandling
 
                     GUILayout.BeginVertical("box");
 
-                    CreateLobbyMenu();
+                        CreateLobbyMenu();
 
-                    GUILayout.Space(SpaceBetweenButtons);
+                        GUILayout.Space(SpaceBetweenButtons);
 
-                    JoinLobbyMenu();
+                        JoinLobbyMenu();
 
-                    GUILayout.Space(SpaceBetweenButtons);
+                        GUILayout.Space(SpaceBetweenButtons);
 
-                    LocalTestingMenu();
+                        LocalTestingMenu();
 
                     GUILayout.EndVertical();
 
@@ -1285,16 +1378,7 @@ namespace LobbyHandling
 
                     GUILayout.BeginVertical("box");
 
-                    CreateLobbyMenu();
-
-                    GUILayout.Space(SpaceBetweenButtons);
-
-                    JoinLobbyMenu();
-
-                    GUILayout.Space(SpaceBetweenButtons);
-
-                    LocalTestingMenu();
-
+                        DisplayAvailableLobbiesMenu();
 
                     GUILayout.EndVertical();
 

@@ -205,6 +205,7 @@ namespace GameManagement
         private readonly NetworkVariable<FixedString64Bytes> playerName = new(writePerm: NetworkVariableWritePermission.Owner, readPerm: NetworkVariableReadPermission.Everyone);
 
 
+
         public ushort PlayerIndex;
         //[HideInInspector]
         public ushort TeamID;
@@ -217,10 +218,8 @@ namespace GameManagement
             InitPlayerCommon();
 
             Combat = GetComponent<PlayerCombat>();
-            //Combat.InitPlayerFrame(this);
 
             Movement = GetComponent<PlayerMovement>();
-            //Movement.InitPlayerFrame(this);
 
             ToggleCursor(false);
 
