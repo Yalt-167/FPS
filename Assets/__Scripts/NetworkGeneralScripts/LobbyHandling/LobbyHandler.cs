@@ -44,12 +44,19 @@ namespace LobbyHandling
         private bool isSignedIn;
         private Player localPlayer;
         private Camera menuCamera;
+
+        #region Lobby list
+
 #nullable enable
         private QueryResponse? availableLobbies;
 #nullable disable
         private bool isSearchingForLobbies;
         private bool canRefreshLobbyList = true;
         [SerializeField] private float cooldownBeforeCanRefreshLobbyList;
+        private Vector2 scrollPosition = Vector2.zero;
+        private string passwordToJoinListLobby;
+
+        #endregion
 
 
         #region Filters Handling
@@ -1019,6 +1026,7 @@ namespace LobbyHandling
             GUILayout.BeginVertical("box");
 
             GUILayout.Label("Edit your lobby", titleLabelStyle);
+
             DrawLobbySettings();
 
             if (GUILayout.Button("Edit Lobby"))
@@ -1212,7 +1220,7 @@ namespace LobbyHandling
 
 #nullable enable
         private void DisplayAvailableLobbiesMenu()
-        {            
+        {     
             GUI.enabled = isSignedIn;
             GUILayout.BeginVertical("box");
 
@@ -1240,33 +1248,56 @@ namespace LobbyHandling
                 }
                 else
                 {
+                    scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+
                     foreach (var lobby in availableLobbies.Results)
                     {
                         Rect r = EditorGUILayout.BeginVertical("box");
+
                         if (GUI.Button(r, GUIContent.none))
                         {
-                            Debug.Log("I was clicked");
-                        }                      
+                            JoinLobbyByID(lobby.Id, string.IsNullOrEmpty(passwordToJoinListLobby) ? noPassword : passwordToJoinListLobby);
+                        }
 
-                        _ = PlayerDataForLobby.Username ?? throw new System.Exception("Literally public static readonly string Username = nameof(Username);");
-                        _ = lobby ?? throw new System.Exception("Lobby is null somehow");
-                        Player host = GetLobbyHost(lobby) ?? throw new System.Exception("Host is null");
-                        Dictionary<string, PlayerDataObject> hostData = host.Data ?? throw new System.Exception("Host has no data");
-                        PlayerDataObject usernameAsDataObject = hostData[PlayerDataForLobby.Username] ?? throw new System.Exception("Host has no name");
-                        string usernameAsString = usernameAsDataObject.Value ?? throw new System.Exception("Name has no value");
-
-                        GUILayout.Label($"{lobby.Name ?? "Unnamed"} by {usernameAsString ?? "Unknown"}");
-                        GUILayout.Label($"Has password: {lobby.HasPassword}");
+                        GUILayout.Label($"{lobby.Name ?? "Unnamed"} by {GetLobbyHost(lobby)?.Data[PlayerDataForLobby.Username].Value ?? "Unknown"}");
                         GUILayout.Label($"Slots: {lobby.Players.Count} / {lobby.MaxPlayers}");
 
                         GUILayout.EndVertical();
                     }
+#if false
+                    //for (int i = 0; i < 10; i++)
+                    //{
+                    //    Rect r = EditorGUILayout.BeginVertical("box");
+
+                    //    if (GUI.Button(r, GUIContent.none))
+                    //    {
+                    //        Debug.Log($"Clicked: {i}");
+                    //    }
+
+                    //    GUILayout.Label($"Unnamed {i} by Unknown", GUILayout.Width(200));
+                    //    GUILayout.Label($"Slots: {1} / {2}");
+
+                    //    GUILayout.EndVertical();
+                    //}
+#endif
+                    GUILayout.EndScrollView();
                 }
             }
             else
             {
                 GUILayout.Space(50); // trust
             }
+
+            GUILayout.EndVertical();
+
+            GUILayout.BeginVertical("box");
+
+            GUILayout.BeginHorizontal();
+
+            GUILayout.Label("Password", GUILayout.Width(labelWidth));
+            passwordToJoinListLobby = GUILayout.TextField(passwordToJoinListLobby, GUILayout.Width(fieldWidth));
+
+            GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
 
@@ -1397,7 +1428,7 @@ namespace LobbyHandling
             LobbyMenuActive = towardOn;
         }
 
-        #endregion
+#endregion
     }
 
 }
