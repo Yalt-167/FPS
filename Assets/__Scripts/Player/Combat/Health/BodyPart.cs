@@ -9,7 +9,7 @@ public sealed class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlash
     [SerializeField] private BodyParts bodyPart;
     private PlayerHealthNetworked playerHealth;
     public ulong OwnerHealthNetworkID => playerHealth.NetworkObjectId;
-    public ushort OwnerTeamID => playerHealth.TeamNumber;
+    public ushort OwnerTeamNumber => playerHealth.TeamNumber;
 
     public bool OnImmunityAfterHit { get; set; }
     public float ImmunityAfterHitDuration { get; set; } = .3f;
@@ -34,9 +34,9 @@ public sealed class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlash
     {
         //if (!IsOwner) { return; }
 
-        if (attackerTeamNumber == OwnerTeamID)
+        if (attackerTeamNumber == OwnerTeamNumber)
         {
-            Debug.Log("Shot teammate");
+            Debug.Log($"Shot teammate: Team{attackerTeamNumber}");
             return;
         }
 

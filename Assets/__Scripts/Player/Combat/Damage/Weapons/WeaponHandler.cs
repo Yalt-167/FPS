@@ -32,6 +32,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     private PlayerSettings playerSettings;
     private DamageLogSettings DamageLogsSettings => playerSettings.DamageLogSettings;
     [SerializeField] private DamageLogManager damageLogManager;
+    private PlayerFrame ownerFrame;
 
     #endregion
 
@@ -146,6 +147,8 @@ public sealed class WeaponHandler : NetworkBehaviour
         {
             audioSources.Add(gameObject.AddComponent<AudioSource>());
         }
+
+        ownerFrame = GetComponent<PlayerFrame>();
     }
 
     private void FixedUpdate()

@@ -23,20 +23,12 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
     public Shield Shield { get; private set; }
     
     public bool Alive => CurrentHealth > 0;
-
-    public ushort TeamNumber => PlayerFrame.LocalPlayer?.TeamNumber ?? 0;
-    //public ushort TeamID => PlayerFrame?.TeamID ?? 0;
-
-    //public PlayerFrame PlayerFrame { get; set; }
-
-    //public void InitPlayerFrame(PlayerFrame playerFrame)
-    //{
-    //    PlayerFrame = playerFrame;
-    //}
-
+    private PlayerFrame ownerFrame;
+    public ushort TeamNumber => ownerFrame == null ? (ushort)0 : ownerFrame.TeamNumber;
 
     private void Awake()
     {
+        ownerFrame = GetComponent<PlayerFrame>();
         ResetHealth();
         PassiveRegen();
     }

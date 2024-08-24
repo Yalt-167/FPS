@@ -208,7 +208,7 @@ namespace GameManagement
 
         public ushort PlayerIndex;
         //[HideInInspector]
-        public ushort TeamNumber;
+        public ushort TeamNumber { get; private set; }
         [HideInInspector] public bool IsOnline;
 
         public bool Alive => Health.Alive;
@@ -333,9 +333,9 @@ namespace GameManagement
 
         #region Team Logic
 
-        public void SetTeam(ushort teamID)
+        public void SetTeam(ushort teamNumber)
         {
-            TeamNumber = teamID;
+            TeamNumber = teamNumber;
         }
 
         #endregion
