@@ -81,7 +81,6 @@ namespace GameManagement
             spawnPoints[spawnPoint.TeamID].Add(spawnPoint);
         }
 
-
         public void DiscardRespawnPoint(SpawnPoint spawnPoint)
         {
             spawnPoints[spawnPoint.TeamID].Remove(spawnPoint);
@@ -135,7 +134,6 @@ namespace GameManagement
 
             Debug.Log("Game was started");
 
-            LobbyHandler.Instance.ToggleLobbyMenu(false);
             LobbyHandler.Instance.ToggleMenuCamera(false);
 
             PlayerFrame.LocalPlayer.SetGameplayInputMode();

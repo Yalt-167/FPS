@@ -119,11 +119,11 @@ namespace GameManagement
 
         public bool PlayerWithNameExist(string name)
         {
-            return GetPlayerWithName(name) != null;
+            return GetPlayerFromName(name) != null;
         }
 
 #nullable enable
-        public PlayerFrame? GetPlayerWithName(string name)
+        public PlayerFrame? GetPlayerFromName(string name)
         {
             foreach (var player in players)
             {
