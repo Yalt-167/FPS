@@ -80,6 +80,9 @@ public sealed class TeamSelector : NetworkBehaviour
 
     private void Update()
     {
+#if USING_UNITY_GUI_SYSTEM
+
+#else
         if (!active) { return; }
 
         PlayerFrame.LocalPlayer.ToggleCursor(towardOn: active);
@@ -97,6 +100,7 @@ public sealed class TeamSelector : NetworkBehaviour
             Game.StaticStartGame();
             DisableTeamSelectionScreenServerRpc();
         }
+#endif
     }
 
     private void CreateTeamMenu(int teamNumber)

@@ -1,0 +1,26 @@
+Nom du jeu: ?Projet Olympe?
+FPS fast paced en equipe avec des champions ayant des capacites unique (style Overwatch)
+plusieurs modes de jeu
+base sur la mythologie Grecque
+
+USP?
+genre: FPS
+plateforme: PC
+audience cible: joueurs competitifs
+
+2. Histoire
+{
+Plot Summary: An outline of the main story or narrative arc.
+Setting: Description of the game's world, including time period, locations, and environmental themes.
+Characters: Details on main characters, including backstories, personalities, and roles in the story.
+Dialogue: Examples of dialogue or writing style that will be used.
+}
+
+3. Gameplay Mechanics
+Core Mechanics: The fundamental rules and systems that define how the game is played (e.g., movement, combat, puzzles).
+Game Modes: team fights / CTF / Hardpoint / escort / FFA (uniquement team fight dans le cadre du projet)
+
+5. Art and Aesthetics
+Visual Style: style futuriste -> voir Moodboard
+
+boucle gameplay: 
