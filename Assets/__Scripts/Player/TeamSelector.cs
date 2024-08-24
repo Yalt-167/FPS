@@ -14,17 +14,18 @@ using GameManagement;
 
 public sealed class TeamSelector : NetworkBehaviour
 {
+    public static TeamSelector Instance { get; private set; }
     private string[][] teams;
     [SerializeField] private ushort teamsCount;
     [SerializeField] private ushort maxTeamSize;
+    [SerializeField] private int teamSelectionMenuWidth;
+    [SerializeField] private int teamSelectionMenuPlayerRegionHeightPerExpectedPlayer;
     private int[] teamsIndex;
 
-    private bool active;
+    private bool teamSelectorMenuActive;
 
 
-#if USING_UNITY_GUI_SYSTEM
-
-#else
+#if !USING_UNITY_GUI_SYSTEM
     private Transform teamOneHeader;
     private Transform teamTwoHeader;
     private Button startGameButton;
@@ -32,15 +33,14 @@ public sealed class TeamSelector : NetworkBehaviour
 
     private void Awake()
     {
-#if USING_UNITY_GUI_SYSTEM
-
-#else
+        Instance = this;
+        ToggleSelectionScreenMenu(towardOn: true);
+#if !USING_UNITY_GUI_SYSTEM
         teamOneHeader = transform.GetChild(1);
         teamOneHeader.GetComponent<Button>().onClick.AddListener(JoinTeamOne);
 
         teamTwoHeader = transform.GetChild(2);
         teamTwoHeader.GetComponent<Button>().onClick.AddListener(JoinTeamTwo);
-
 
         startGameButton = transform.GetChild(3).GetComponent<Button>();
 #endif
@@ -63,7 +63,7 @@ public sealed class TeamSelector : NetworkBehaviour
 
     private void UpdateData()
     {
-        active = true;
+        teamSelectorMenuActive = true;
         teams = new string[teamsCount][];
         teamsIndex = new int[teamsCount];
         for (int i = 0; i < teamsCount; i++)
@@ -73,16 +73,10 @@ public sealed class TeamSelector : NetworkBehaviour
         }
     }
 
-    public override void OnNetworkSpawn()
-    {
-        base.OnNetworkSpawn();
-    }
-
     private void Update()
     {
-#if USING_UNITY_GUI_SYSTEM
+#if !USING_UNITY_GUI_SYSTEM
 
-#else
         if (!active) { return; }
 
         PlayerFrame.LocalPlayer.ToggleCursor(towardOn: active);
@@ -105,38 +99,40 @@ public sealed class TeamSelector : NetworkBehaviour
 
     private void CreateTeamMenu(int teamNumber)
     {
-        GUILayout.BeginVertical("box");
+        GUILayout.BeginVertical("box"); // V
 
             GUILayout.Label($"Team{teamNumber}");
 
-            GUILayout.BeginHorizontal("box");
+            GUILayout.BeginHorizontal("box", GUILayout.Width(teamSelectionMenuWidth)); // VH
 
                 if (GUILayout.Button("Join team"))
                 {
                     OnTeamSelected((ushort)teamNumber);
                 }
 
-            GUILayout.EndHorizontal();
+            GUILayout.EndHorizontal(); // V
 
-            GUILayout.BeginVertical("box");
+            GUILayout.BeginVertical("box", GUILayout.Height(teamSelectionMenuPlayerRegionHeightPerExpectedPlayer * maxTeamSize)); // VV
 
                 foreach (var playerName in teams[teamNumber - 1])
                 {
                     GUILayout.Label(playerName);
                 }
 
-            GUILayout.EndVertical();
-
-        GUILayout.EndVertical();
+            GUILayout.EndVertical(); // V
+         
+        GUILayout.EndVertical(); //
     }
 
     private void OnGUI()
     {
-        GUILayout.BeginVertical();
+        if (!teamSelectorMenuActive) { return; }
+
+        GUILayout.BeginVertical(GUILayout.Height(Screen.height));
 
         GUILayout.FlexibleSpace();
 
-        GUILayout.BeginHorizontal();
+        GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
 
         GUILayout.FlexibleSpace();
 
@@ -155,10 +151,26 @@ public sealed class TeamSelector : NetworkBehaviour
 
         GUILayout.FlexibleSpace();
 
+        if (LobbyHandling.LobbyHandler.Instance.IsLobbyHost())
+        {
+            GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
+
+            GUILayout.FlexibleSpace();
+
+            if (GUILayout.Button("Start game"))
+            {
+                DisableTeamSelectionScreenServerRpc();
+            }
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.EndHorizontal();
+        }
+
         GUILayout.EndVertical();
     }
 
-    private void OnTeamSelected(ushort teamNumber)  
+    private void OnTeamSelected(ushort teamNumber)
     {
         AddPlayerToTeamServerRpc(PlayerFrame.LocalPlayer.Name.ToString(), teamNumber);
     }
@@ -169,7 +181,7 @@ public sealed class TeamSelector : NetworkBehaviour
         int teamIndex = teamNumber - 1; 
         if (teamsIndex[teamIndex] > maxTeamSize - 1)
         {
-            Debug.Log("Cannot join this team because it s full");
+            Debug.Log("Cannot join this team because it s full already");
             return;
         }
 
@@ -179,29 +191,22 @@ public sealed class TeamSelector : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void AddPlayerToTeamClientRpc(string player, int teamIndex)
     {
-        if (teams[teamIndex].Contains(player))
-        {
-            Debug.Log("You have already joined this team");
-            PlayerFrame.LocalPlayer.SetTeam((ushort)(teamIndex - 1)); // just in case
-            return;
-        }
+        if (teams[teamIndex].Contains(player)) { return; }
 
-        var otherTeamIdx = teamIndex == 0 ? 1 : 0;
-        if (teams[otherTeamIdx].Contains(player))
+        var otherTeamIndex = teamIndex == 0 ? 1 : 0;
+        if (teams[otherTeamIndex].Contains(player))
         {
-            RemovePlayerFromTeamList(otherTeamIdx, player);
+            RemovePlayerFromTeamList(otherTeamIndex, player);
         }
 
         teams[teamIndex][teamsIndex[teamIndex]] = player;
-#if USING_UNITY_GUI_SYSTEM
-
-#else
+#if !USING_UNITY_GUI_SYSTEM
         (teamIndex == 0 ? teamOneHeader : teamTwoHeader).GetChild(teamsIndex[teamIndex]).GetComponent<TextMeshProUGUI>().text = player;
 #endif
 
         teamsIndex[teamIndex]++;
 
-        PlayerFrame.LocalPlayer.SetTeam((ushort)(teamIndex - 1));
+        GameNetworkManager.Manager.GetPlayerFromName(player).SetTeam((ushort)(teamIndex + 1));
     }
 
     private void RemovePlayerFromTeamList(int teamIndex, string nameToRemove)
@@ -231,9 +236,7 @@ public sealed class TeamSelector : NetworkBehaviour
 
     private void UpdateTeamDisplay()
     {
-#if USING_UNITY_GUI_SYSTEM
-
-#else
+#if !USING_UNITY_GUI_SYSTEM
         Transform relevantTransform;
         for (int teamIndex = 0; teamIndex < teams.Length; teamIndex++)
         {
@@ -255,8 +258,17 @@ public sealed class TeamSelector : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void DisableTeamSelectionScreenClientRpc()
     {
-        gameObject.SetActive(false);
+        ToggleSelectionScreenMenu(towardOn: false);
+
         PlayerFrame.LocalPlayer.ToggleCursor(towardOn: false);
+
         PlayerFrame.LocalPlayer.ToggleGameControls(towardOn: true);
+        PlayerFrame.LocalPlayer.ToggleCamera(towardOn: true);
+        PlayerFrame.LocalPlayer.ToggleHUD(towardOn: true);
+    }
+
+    private void ToggleSelectionScreenMenu(bool towardOn)
+    {
+        teamSelectorMenuActive = towardOn;
     }
 }
