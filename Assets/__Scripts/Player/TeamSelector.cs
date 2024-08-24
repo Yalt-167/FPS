@@ -58,20 +58,20 @@ public sealed class TeamSelector : NetworkBehaviour
 
     private void CreateTeamMenu(int teamNumber)
     {
-        GUILayout.BeginVertical("box"); // V
+        GUILayout.BeginVertical(CachedGUIStylesNames.Box); // V
 
             GUILayout.Label($"Team{teamNumber}");
 
-            GUILayout.BeginHorizontal("box", GUILayout.Width(teamSelectionMenuWidth)); // VH
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(teamSelectionMenuWidth)); // VH
 
-                if (GUILayout.Button("Join team"))
+                if (GUILayout.Button(TeamSelectorGUILabels.JoinTeam))
                 {
                     OnTeamSelected((ushort)teamNumber);
                 }
 
             GUILayout.EndHorizontal(); // V
 
-            GUILayout.BeginVertical("box", GUILayout.Height(teamSelectionMenuPlayerRegionHeightPerExpectedPlayer * maxTeamSize)); // VV
+            GUILayout.BeginVertical(CachedGUIStylesNames.Box, GUILayout.Height(teamSelectionMenuPlayerRegionHeightPerExpectedPlayer * maxTeamSize)); // VV
 
                 foreach (var playerName in teams[teamNumber - 1])
                 {
@@ -97,7 +97,7 @@ public sealed class TeamSelector : NetworkBehaviour
 
         for (int i = 0; i < teamsCount; i++)
         {
-            GUILayout.BeginVertical("box");
+            GUILayout.BeginVertical(CachedGUIStylesNames.Box);
 
                 CreateTeamMenu(i + 1);
 
@@ -116,7 +116,7 @@ public sealed class TeamSelector : NetworkBehaviour
 
             GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button("Start game"))
+            if (GUILayout.Button(TeamSelectorGUILabels.StartGame))
             {
                 ToggleTeamSelectionScreenServerRpc(towardOn__: false);
             }
@@ -188,7 +188,6 @@ public sealed class TeamSelector : NetworkBehaviour
         teamsIndex[teamIndex] = newArrayIndex;
     }
 
-
     [Rpc(SendTo.Server)]
     public void ToggleTeamSelectionScreenServerRpc(bool towardOn__)
     {
@@ -210,5 +209,12 @@ public sealed class TeamSelector : NetworkBehaviour
     private void ToggleSelectionScreenMenu(bool towardOn)
     {
         teamSelectorMenuActive = towardOn;
+    }
+
+
+    public static class TeamSelectorGUILabels
+    {
+        public static readonly string StartGame = "Start game";
+        public static readonly string JoinTeam = "Join team";
     }
 }
