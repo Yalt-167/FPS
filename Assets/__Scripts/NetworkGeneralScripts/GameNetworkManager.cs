@@ -330,12 +330,10 @@ namespace GameManagement
                 teamSelectorInstance = Instantiate(teamSelectorPrefab);
                 teamSelectorInstance.GetComponent<NetworkObject>().Spawn();
             }
-            else
-            {
-                teamSelectorInstance.SetActive(true);
-            }
 
-            teamSelectorInstance.GetComponent<TeamSelector>().SetDataServerRpc(teamsCount, teamsSize);
+            var teamSelector = teamSelectorInstance.GetComponent<TeamSelector>();
+            teamSelector.SetDataServerRpc(teamsCount, teamsSize);
+            teamSelector.ToggleTeamSelectionScreenServerRpc(towardOn__: true);
         }
 
 

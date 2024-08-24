@@ -142,7 +142,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         camera = cameraTransform.GetComponent<Camera>();
 
         InitWeapon();
-        audioSourcePoolSize = 10;// (int)(Mathf.Max(currentWeaponSounds.ShootingSound.length, currentWeaponSounds.NearEmptyMagazineShootSound.length) / currentWeaponStats.CooldownBetweenShots);
+        audioSourcePoolSize = 10; // (int)(Mathf.Max(currentWeaponSounds.ShootingSound.length, currentWeaponSounds.NearEmptyMagazineShootSound.length) / currentWeaponStats.CooldownBetweenShots);
         for (int i = 0; i < audioSourcePoolSize; i++)
         {
             audioSources.Add(gameObject.AddComponent<AudioSource>());

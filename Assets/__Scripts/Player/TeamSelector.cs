@@ -24,26 +24,9 @@ public sealed class TeamSelector : NetworkBehaviour
 
     private bool teamSelectorMenuActive;
 
-
-#if !USING_UNITY_GUI_SYSTEM
-    private Transform teamOneHeader;
-    private Transform teamTwoHeader;
-    private Button startGameButton;
-#endif
-
     private void Awake()
     {
         Instance = this;
-        ToggleSelectionScreenMenu(towardOn: true);
-#if !USING_UNITY_GUI_SYSTEM
-        teamOneHeader = transform.GetChild(1);
-        teamOneHeader.GetComponent<Button>().onClick.AddListener(JoinTeamOne);
-
-        teamTwoHeader = transform.GetChild(2);
-        teamTwoHeader.GetComponent<Button>().onClick.AddListener(JoinTeamTwo);
-
-        startGameButton = transform.GetChild(3).GetComponent<Button>();
-#endif
     }
 
     [Rpc(SendTo.Server)]
@@ -71,30 +54,6 @@ public sealed class TeamSelector : NetworkBehaviour
             teams[i] = new string[maxTeamSize];
             teamsIndex[i] = 0;
         }
-    }
-
-    private void Update()
-    {
-#if !USING_UNITY_GUI_SYSTEM
-
-        if (!active) { return; }
-
-        PlayerFrame.LocalPlayer.ToggleCursor(towardOn: active);
-        PlayerFrame.LocalPlayer.ToggleGameControls(towardOn: !active);
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            OnTeamSelected((ushort)(Input.mousePosition.x < Screen.width / 2 ? 1 : 2));
-        }
-
-        if (!PlayerFrame.LocalPlayer.IsHost) { return; }
-
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            Game.StaticStartGame();
-            DisableTeamSelectionScreenServerRpc();
-        }
-#endif
     }
 
     private void CreateTeamMenu(int teamNumber)
@@ -159,7 +118,7 @@ public sealed class TeamSelector : NetworkBehaviour
 
             if (GUILayout.Button("Start game"))
             {
-                DisableTeamSelectionScreenServerRpc();
+                ToggleTeamSelectionScreenServerRpc(towardOn__: false);
             }
 
             GUILayout.FlexibleSpace();
@@ -200,9 +159,6 @@ public sealed class TeamSelector : NetworkBehaviour
         }
 
         teams[teamIndex][teamsIndex[teamIndex]] = player;
-#if !USING_UNITY_GUI_SYSTEM
-        (teamIndex == 0 ? teamOneHeader : teamTwoHeader).GetChild(teamsIndex[teamIndex]).GetComponent<TextMeshProUGUI>().text = player;
-#endif
 
         teamsIndex[teamIndex]++;
 
@@ -230,41 +186,25 @@ public sealed class TeamSelector : NetworkBehaviour
 
         teams[teamIndex] = newArray;
         teamsIndex[teamIndex] = newArrayIndex;
-
-        UpdateTeamDisplay();
     }
 
-    private void UpdateTeamDisplay()
-    {
-#if !USING_UNITY_GUI_SYSTEM
-        Transform relevantTransform;
-        for (int teamIndex = 0; teamIndex < teams.Length; teamIndex++)
-        {
-            relevantTransform = teamIndex == 0 ? teamOneHeader : teamTwoHeader;
-            for (int playerIndex = 0;  playerIndex < maxTeamSize; playerIndex++)
-            {
-                relevantTransform.GetChild(playerIndex).GetComponent<TextMeshProUGUI>().text = teams[teamIndex][playerIndex];
-            }
-        }
-#endif
-    }
 
     [Rpc(SendTo.Server)]
-    private void DisableTeamSelectionScreenServerRpc()
+    public void ToggleTeamSelectionScreenServerRpc(bool towardOn__)
     {
-        DisableTeamSelectionScreenClientRpc();
+        ToggleTeamSelectionScreenClientRpc(towardOn_: towardOn__);
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void DisableTeamSelectionScreenClientRpc()
+    private void ToggleTeamSelectionScreenClientRpc(bool towardOn_)
     {
-        ToggleSelectionScreenMenu(towardOn: false);
+        ToggleSelectionScreenMenu(towardOn: towardOn_);
 
-        PlayerFrame.LocalPlayer.ToggleCursor(towardOn: false);
+        PlayerFrame.LocalPlayer.ToggleCursor(towardOn: towardOn_);
 
-        PlayerFrame.LocalPlayer.ToggleGameControls(towardOn: true);
-        PlayerFrame.LocalPlayer.ToggleCamera(towardOn: true);
-        PlayerFrame.LocalPlayer.ToggleHUD(towardOn: true);
+        PlayerFrame.LocalPlayer.ToggleGameControls(towardOn: !towardOn_);
+        PlayerFrame.LocalPlayer.ToggleCamera(towardOn: !towardOn_);
+        PlayerFrame.LocalPlayer.ToggleHUD(towardOn: !towardOn_);
     }
 
     private void ToggleSelectionScreenMenu(bool towardOn)
