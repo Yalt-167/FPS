@@ -1093,9 +1093,15 @@ namespace LobbyHandling
             Password = GUILayout.PasswordField(Password, LobbyGUILabels.CensoredChar, GUILayout.Width(fieldWidth));
             GUILayout.EndHorizontal();
 
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(LobbyGUILabels.SelectAGameMode, GUILayout.Width(labelWidth));
             ChooseGameModeDropdownMenu();
+            GUILayout.EndHorizontal();
 
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(LobbyGUILabels.SelectAMap, GUILayout.Width(labelWidth));
             ChooseMapDropdownMenu();
+            GUILayout.EndHorizontal();
         }
 
         private void LocalTestingMenu()
@@ -1588,6 +1594,8 @@ namespace LobbyHandling
             public static readonly string SearchForLobbies = "Search for lobbies";
             public static readonly string Unnamed = "Unnamed";
             public static readonly string Unknown = "Unknown"; 
+            public static readonly string SelectAMap = "Select a map"; 
+            public static readonly string SelectAGameMode = "Select a gamemode"; 
         }
 
         #endregion
