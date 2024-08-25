@@ -1372,6 +1372,8 @@ namespace LobbyHandling
             {
                 for (int index = 0; index < gameModeDropdownOptions.Length; index++)
                 {
+                    if (index == selectedGameModeIndex) { continue; }
+
                     if (GUILayout.Button(gameModeDropdownOptions[index], GUILayout.Height(25)))
                     {
                         selectedGameModeIndex = index;
@@ -1415,6 +1417,8 @@ namespace LobbyHandling
             {
                 for (int index = 0; index < mapDropdownOptions.Length; index++)
                 {
+                    if (index == selectedMapIndex) { continue; }
+
                     if (GUILayout.Button(mapDropdownOptions[index], GUILayout.Height(25)))
                     {
                         selectedMapIndex = index;
