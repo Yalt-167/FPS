@@ -1023,7 +1023,7 @@ namespace LobbyHandling
 
             if (GUILayout.Button(LobbyGUILabels.CreateLobby))
             {
-                CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password, string.Empty, gameModesDropDown.Current);
+                CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password, mapsDropDown.Current, gameModesDropDown.Current); 
             }
 
             GUILayout.EndVertical();
@@ -1211,6 +1211,16 @@ namespace LobbyHandling
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(LobbyGUILabels.HostColon, smallerTitleLabelStyle);
                 GUILayout.Label($"{GetLobbyHost().Data[PlayerDataForLobby.Username].Value}");
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(LobbyGUILabels.GameMode, smallerTitleLabelStyle);
+                GUILayout.Label($"{hostLobby.Data[LobbyData.GameMode].Value}");
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(LobbyGUILabels.Map, smallerTitleLabelStyle);
+                GUILayout.Label($"{hostLobby.Data[LobbyData.Map].Value}");
                 GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
@@ -1533,7 +1543,7 @@ namespace LobbyHandling
             public static readonly string LobbyName = "Lobby Name";
             public static readonly string LobbyCapacity = "Lobby Capacity";
             public static readonly string MakeLobbyPrivate = "Make lobby private";
-            public static readonly string LobbyPassword = "Lobby Password (Blank or at least 8 caracters)";
+            public static readonly string LobbyPassword = "Lobby password (Blank or at least 8 caracters)";
             public static readonly char CensoredChar = '*';
             public static readonly string LocalTesting = "Local Testing";
             public static readonly string StartALocalSession = "Start a local session";
@@ -1561,12 +1571,14 @@ namespace LobbyHandling
             public static readonly string Unknown = "Unknown"; 
             public static readonly string SelectAMap = "Select a map"; 
             public static readonly string SelectAGameMode = "Select a gamemode"; 
+            public static readonly string GameMode = "Gamemode"; 
+            public static readonly string Map = "Map"; 
         }
 
         #endregion
     }
-
 }
 
 // if not in lobby -> create + join + local + LOBBYLIST
 // if in lobby -> (host ? edit + share : quit) + LOBBYDATA
+
