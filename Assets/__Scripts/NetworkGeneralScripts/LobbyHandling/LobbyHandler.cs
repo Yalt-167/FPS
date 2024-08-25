@@ -412,6 +412,8 @@ namespace LobbyHandling
             }
 
             Debug.Log("Lobby was successfully deleted");
+
+            hostLobby = null;
         }
 
         public async void QuickJoinLobby()
@@ -495,7 +497,6 @@ namespace LobbyHandling
             hostLobby = null;
 
             NetworkManager.Singleton.Shutdown();
-            // kick from netcode perhaps XD
         }
 
         public async Task QuitLobbyAsync(string playerID)
@@ -559,7 +560,7 @@ namespace LobbyHandling
                 return;
             }
 
-            await QuitLobbyAsync(playerID);
+            await QuitLobbyAsync(playerID); // still has hostLobby set but IDk how to address that as of RN
         }
 
         public async void SetHost(string newHostPlayerID)
@@ -622,7 +623,7 @@ namespace LobbyHandling
 #nullable disable
         private async void UpdateLobbyList()
         {
-            if (!canRefreshLobbyList) {  return; }
+            if (!canRefreshLobbyList) { return; }
 
             await UpdateLobbyListInternalAsync();
         }
