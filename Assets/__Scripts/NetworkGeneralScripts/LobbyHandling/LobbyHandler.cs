@@ -22,6 +22,7 @@ using GameManagement;
 using Unity.VisualScripting;
 using static UnityEditor.Progress;
 using System.Reflection;
+using Newtonsoft.Json.Linq;
 
 
 namespace LobbyHandling
@@ -132,8 +133,8 @@ namespace LobbyHandling
 
             menuCamera = transform.GetChild(0).GetComponent<Camera>();
 
-            InitGameModeDropDownOptions();
-            InitMapDropdownOptions();
+            InitDropdownOptions(typeof(GameModes), ref gameModesDropDown.DropdownOptions);
+            InitDropdownOptions(typeof(Maps), ref mapsDropDown.DropdownOptions);
         }
 
         public async void SignIn()
@@ -1022,7 +1023,7 @@ namespace LobbyHandling
 
             if (GUILayout.Button(LobbyGUILabels.CreateLobby))
             {
-                CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password, string.Empty, gameModeDropdownOptions[selectedGameModeIndex]);
+                CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password, string.Empty, gameModesDropdownOptions[selectedGameModeIndex]);
             }
 
             GUILayout.EndVertical();
@@ -1095,12 +1096,12 @@ namespace LobbyHandling
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(LobbyGUILabels.SelectAGameMode, GUILayout.Width(labelWidth));
-            ChooseGameModeDropdownMenu();
+            ChooseDropdownMenu(ref gameModesDropDown);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(LobbyGUILabels.SelectAMap, GUILayout.Width(labelWidth));
-            ChooseMapDropdownMenu();
+            ChooseDropdownMenu(ref mapsDropDown);
             GUILayout.EndHorizontal();
         }
 
@@ -1338,91 +1339,49 @@ namespace LobbyHandling
         }
 #nullable disable
 
-
-        private bool showGameModeDropdown;
-        private int selectedGameModeIndex;
-        private string[] gameModeDropdownOptions;
-
-        private void InitGameModeDropDownOptions()
+        public struct DropdownData
         {
-            FieldInfo[] fields = typeof(GameModes).GetFields(BindingFlags.Public | BindingFlags.Static);
+            public bool ShowThisDropDown;
+            public int SelectedIndex;
+            public string[] DropdownOptions;
+        }
+        private DropdownData gameModesDropDown = new();
+        private DropdownData mapsDropDown = new();
 
-            gameModeDropdownOptions = new string[fields.Length];
+        private void InitDropdownOptions(Type type, ref string[] array)
+        {
+            FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
+
+            array = new string[fields.Length];
             for (int i = 0; i < fields.Length; i++)
             {
-                gameModeDropdownOptions[i] = (string)fields[i].GetValue(null);
+                array[i] = (string)fields[i].GetValue(null);
             }
         }
 
-        private void ChooseGameModeDropdownMenu()
+        private void ChooseDropdownMenu(ref DropdownData dropdownData)
         {
             GUILayout.BeginVertical(GUILayout.Width(150));
 
-            GUI.enabled = !showGameModeDropdown;
+            GUI.color = dropdownData.ShowThisDropDown ? Color.grey : Color.white;
 
-            if (GUILayout.Button(gameModeDropdownOptions[selectedGameModeIndex], GUILayout.Height(30)))
+            if (GUILayout.Button(dropdownData.DropdownOptions[dropdownData.SelectedIndex], GUILayout.Height(30)))
             {
-                showGameModeDropdown = !showGameModeDropdown;
+                dropdownData.ShowThisDropDown = !dropdownData.ShowThisDropDown;
             }
 
-            GUI.enabled = true;
+            GUI.color = Color.white;
 
-
-            if (showGameModeDropdown)
+            if (dropdownData.ShowThisDropDown)
             {
-                for (int index = 0; index < gameModeDropdownOptions.Length; index++)
+                for (int index = 0; index < dropdownData.DropdownOptions.Length; index++)
                 {
-                    if (index == selectedGameModeIndex) { continue; }
+                    if (index == dropdownData.SelectedIndex) { continue; }
 
-                    if (GUILayout.Button(gameModeDropdownOptions[index], GUILayout.Height(25)))
+                    if (GUILayout.Button(dropdownData.DropdownOptions[index], GUILayout.Height(25)))
                     {
-                        selectedGameModeIndex = index;
-                        showGameModeDropdown = false;
-                    }
-                }
-            }
-
-            GUILayout.EndVertical();
-        }
-
-        private bool showMapDropdown;
-        private int selectedMapIndex;
-        private string[] mapDropdownOptions;
-        private void InitMapDropdownOptions()
-        {
-            FieldInfo[] fields = typeof(Maps).GetFields(BindingFlags.Public | BindingFlags.Static);
-
-            mapDropdownOptions = new string[fields.Length];
-            for (int i = 0; i < fields.Length; i++)
-            {
-                mapDropdownOptions[i] = (string)fields[i].GetValue(null);
-            }
-        }
-
-        private void ChooseMapDropdownMenu()
-        {
-            GUILayout.BeginVertical(GUILayout.Width(150));
-
-            GUI.enabled = !showMapDropdown;
-
-            if (GUILayout.Button(mapDropdownOptions[selectedMapIndex], GUILayout.Height(30)))
-            {
-                showMapDropdown = !showMapDropdown;
-            }
-
-            GUI.enabled = true;
-
-
-            if (showMapDropdown)
-            {
-                for (int index = 0; index < mapDropdownOptions.Length; index++)
-                {
-                    if (index == selectedMapIndex) { continue; }
-
-                    if (GUILayout.Button(mapDropdownOptions[index], GUILayout.Height(25)))
-                    {
-                        selectedMapIndex = index;
-                        showMapDropdown = false;
+                        dropdownData.SelectedIndex = index;
+                        dropdownData.ShowThisDropDown = false;
                     }
                 }
             }
