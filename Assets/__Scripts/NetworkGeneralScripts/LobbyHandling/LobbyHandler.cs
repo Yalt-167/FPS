@@ -133,6 +133,7 @@ namespace LobbyHandling
             menuCamera = transform.GetChild(0).GetComponent<Camera>();
 
             InitGameModeDropDownOptions();
+            InitMapDropdownOptions();
         }
 
         public async void SignIn()
@@ -261,7 +262,7 @@ namespace LobbyHandling
         [Header("Relay")]
         public string RelayJoinCode;
 
-        public async void CreateLobby(string lobbyName, int lobbyCapacity, bool privateLobby, string password)
+        public async void CreateLobby(string lobbyName, int lobbyCapacity, bool privateLobby, string password, string map, string gamemode)
         {
             var emptyPassword = string.IsNullOrEmpty(password);
             if (!emptyPassword && password.Length < 8)
@@ -295,7 +296,7 @@ namespace LobbyHandling
                         LobbyData.GameMode,
                         new DataObject(
                             visibility: DataObject.VisibilityOptions.Public,
-                            value: GameModes.DeathMatch,
+                            value: gamemode,
                             index: FiltersValues.GameMode
                         )
                     },
@@ -304,7 +305,7 @@ namespace LobbyHandling
                         LobbyData.Map,
                         new DataObject(
                             visibility: DataObject.VisibilityOptions.Public,
-                            value: Maps.ToBeVoted,
+                            value: map,
                             index: FiltersValues.Map
                         )
                     },
@@ -1021,7 +1022,7 @@ namespace LobbyHandling
 
             if (GUILayout.Button(LobbyGUILabels.CreateLobby))
             {
-                CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password);
+                CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password, string.Empty, gameModeDropdownOptions[selectedGameModeIndex]);
             }
 
             GUILayout.EndVertical();
@@ -1093,6 +1094,8 @@ namespace LobbyHandling
             GUILayout.EndHorizontal();
 
             ChooseGameModeDropdownMenu();
+
+            ChooseMapDropdownMenu();
         }
 
         private void LocalTestingMenu()
@@ -1330,8 +1333,8 @@ namespace LobbyHandling
 #nullable disable
 
 
-        private bool showDropdown;
-        private int selectedIndex;
+        private bool showGameModeDropdown;
+        private int selectedGameModeIndex;
         private string[] gameModeDropdownOptions;
 
         private void InitGameModeDropDownOptions()
@@ -1349,31 +1352,72 @@ namespace LobbyHandling
         {
             GUILayout.BeginVertical(GUILayout.Width(150));
 
-            GUI.enabled = !showDropdown;
+            GUI.enabled = !showGameModeDropdown;
 
-            if (GUILayout.Button(gameModeDropdownOptions[selectedIndex], GUILayout.Height(30)))
+            if (GUILayout.Button(gameModeDropdownOptions[selectedGameModeIndex], GUILayout.Height(30)))
             {
-                showDropdown = !showDropdown; // Toggle dropdown display on button press
+                showGameModeDropdown = !showGameModeDropdown;
             }
 
             GUI.enabled = true;
 
-            // If the dropdown is open, display the list of options
-            if (showDropdown)
+
+            if (showGameModeDropdown)
             {
-                // Loop through each option
-                for (int i = 0; i < gameModeDropdownOptions.Length; i++)
+                for (int index = 0; index < gameModeDropdownOptions.Length; index++)
                 {
-                    // If the option button is pressed, update the selected index
-                    if (GUILayout.Button(gameModeDropdownOptions[i], GUILayout.Height(25)))
+                    if (GUILayout.Button(gameModeDropdownOptions[index], GUILayout.Height(25)))
                     {
-                        selectedIndex = i;    // Set the selected option
-                        showDropdown = false; // Close the dropdown
+                        selectedGameModeIndex = index;
+                        showGameModeDropdown = false;
                     }
                 }
             }
 
-            GUILayout.EndVertical();  // End the vertical layout group
+            GUILayout.EndVertical();
+        }
+
+        private bool showMapDropdown;
+        private int selectedMapIndex;
+        private string[] mapDropdownOptions;
+        private void InitMapDropdownOptions()
+        {
+            FieldInfo[] fields = typeof(Maps).GetFields(BindingFlags.Public | BindingFlags.Static);
+
+            mapDropdownOptions = new string[fields.Length];
+            for (int i = 0; i < fields.Length; i++)
+            {
+                mapDropdownOptions[i] = (string)fields[i].GetValue(null);
+            }
+        }
+
+        private void ChooseMapDropdownMenu()
+        {
+            GUILayout.BeginVertical(GUILayout.Width(150));
+
+            GUI.enabled = !showMapDropdown;
+
+            if (GUILayout.Button(mapDropdownOptions[selectedMapIndex], GUILayout.Height(30)))
+            {
+                showMapDropdown = !showMapDropdown;
+            }
+
+            GUI.enabled = true;
+
+
+            if (showMapDropdown)
+            {
+                for (int index = 0; index < mapDropdownOptions.Length; index++)
+                {
+                    if (GUILayout.Button(mapDropdownOptions[index], GUILayout.Height(25)))
+                    {
+                        selectedMapIndex = index;
+                        showMapDropdown = false;
+                    }
+                }
+            }
+
+            GUILayout.EndVertical();
         }
 
         private void OnGUI()

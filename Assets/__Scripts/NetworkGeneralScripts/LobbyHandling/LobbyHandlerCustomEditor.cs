@@ -37,7 +37,7 @@ namespace LobbyHandling
             GUILayout.Label("Lobby");
             if (GUILayout.Button("Create"))
             {
-                targetScript.CreateLobby(targetScript.LobbyName, targetScript.LobbyCapacity, targetScript.PrivateLobby, targetScript.Password);
+                targetScript.CreateLobby(targetScript.LobbyName, targetScript.LobbyCapacity, targetScript.PrivateLobby, targetScript.Password, string.Empty, string.Empty);
             }
 
             GUILayout.Space(spaceBetweenButtons);
