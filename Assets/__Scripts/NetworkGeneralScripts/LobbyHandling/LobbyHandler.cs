@@ -1023,7 +1023,7 @@ namespace LobbyHandling
 
             if (GUILayout.Button(LobbyGUILabels.CreateLobby))
             {
-                CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password, string.Empty, gameModesDropdownOptions[selectedGameModeIndex]);
+                CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password, string.Empty, gameModesDropDown.Current);
             }
 
             GUILayout.EndVertical();
@@ -1344,6 +1344,8 @@ namespace LobbyHandling
             public bool ShowThisDropDown;
             public int SelectedIndex;
             public string[] DropdownOptions;
+
+            public readonly string Current => DropdownOptions[SelectedIndex];
         }
         private DropdownData gameModesDropDown = new();
         private DropdownData mapsDropDown = new();
