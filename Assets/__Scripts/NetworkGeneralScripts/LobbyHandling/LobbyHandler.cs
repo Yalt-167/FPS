@@ -20,6 +20,8 @@ using Unity.Services.Relay;
 
 using GameManagement;
 using Unity.VisualScripting;
+using static UnityEditor.Progress;
+using System.Reflection;
 
 
 namespace LobbyHandling
@@ -129,6 +131,8 @@ namespace LobbyHandling
             Instance = this;
 
             menuCamera = transform.GetChild(0).GetComponent<Camera>();
+
+            InitGameModeDropDownOptions();
         }
 
         public async void SignIn()
@@ -1087,6 +1091,8 @@ namespace LobbyHandling
             GUILayout.Label(LobbyGUILabels.LobbyPassword, GUILayout.Width(labelWidth));
             Password = GUILayout.PasswordField(Password, LobbyGUILabels.CensoredChar, GUILayout.Width(fieldWidth));
             GUILayout.EndHorizontal();
+
+            ChooseGameModeDropdownMenu();
         }
 
         private void LocalTestingMenu()
@@ -1323,6 +1329,53 @@ namespace LobbyHandling
         }
 #nullable disable
 
+
+        private bool showDropdown;
+        private int selectedIndex;
+        private string[] gameModeDropdownOptions;
+
+        private void InitGameModeDropDownOptions()
+        {
+            FieldInfo[] fields = typeof(GameModes).GetFields(BindingFlags.Public | BindingFlags.Static);
+
+            gameModeDropdownOptions = new string[fields.Length];
+            for (int i = 0; i < fields.Length; i++)
+            {
+                gameModeDropdownOptions[i] = (string)fields[i].GetValue(null);
+            }
+        }
+
+        private void ChooseGameModeDropdownMenu()
+        {
+            GUILayout.BeginVertical(GUILayout.Width(150));
+
+            GUI.enabled = !showDropdown;
+
+            if (GUILayout.Button(gameModeDropdownOptions[selectedIndex], GUILayout.Height(30)))
+            {
+                showDropdown = !showDropdown; // Toggle dropdown display on button press
+            }
+
+            GUI.enabled = true;
+
+            // If the dropdown is open, display the list of options
+            if (showDropdown)
+            {
+                // Loop through each option
+                for (int i = 0; i < gameModeDropdownOptions.Length; i++)
+                {
+                    // If the option button is pressed, update the selected index
+                    if (GUILayout.Button(gameModeDropdownOptions[i], GUILayout.Height(25)))
+                    {
+                        selectedIndex = i;    // Set the selected option
+                        showDropdown = false; // Close the dropdown
+                    }
+                }
+            }
+
+            GUILayout.EndVertical();  // End the vertical layout group
+        }
+
         private void OnGUI()
         {
             if (!LobbyMenuActive) { return; }
@@ -1447,7 +1500,7 @@ namespace LobbyHandling
 
         #endregion
 
-        #region Negate GUI s Memory Muncher Abilities
+        #region Massively hinder GUI s memory muncher abilities
 
         public static class LobbyGUILabels
         {
