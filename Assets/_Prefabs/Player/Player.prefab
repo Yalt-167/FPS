@@ -1411,6 +1411,7 @@ GameObject:
   - component: {fileID: 7053344651727101131}
   - component: {fileID: 5284269051849885546}
   - component: {fileID: 6958501662965233336}
+  - component: {fileID: 5314762285684912620}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1500,7 +1501,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 169908227
+  GlobalObjectIdHash: 2957232829
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1554,7 +1555,7 @@ MonoBehaviour:
   ClientNetworkTransform: {fileID: 0}
   WeaponHandler: {fileID: 0}
   Health: {fileID: 0}
-  TeamID: 0
+  PlayerIndex: 0
   IsOnline: 0
 --- !u!54 &5516743904902779326
 Rigidbody:
@@ -2022,6 +2023,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <HealthData>k__BackingField: {fileID: 11400000, guid: 31b3be51212c77744b1e8161efdb4a23,
     type: 2}
+--- !u!114 &5314762285684912620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5705630700605972737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd587403537c7aa478f1bbe112c0162e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5814794369634734712
 GameObject:
   m_ObjectHideFlags: 0

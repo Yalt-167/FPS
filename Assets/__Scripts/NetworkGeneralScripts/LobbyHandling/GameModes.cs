@@ -8,5 +8,7 @@ namespace LobbyHandling
         public static readonly string CaptureTheFlag = nameof(CaptureTheFlag);
         public static readonly string HardPoint = nameof(HardPoint);
         public static readonly string Escort = nameof(Escort);
+        public static readonly string Arena = nameof(Arena);
+        public static readonly string Touchdown = nameof(Touchdown);
     } 
 }

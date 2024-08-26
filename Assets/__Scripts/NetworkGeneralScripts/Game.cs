@@ -2,6 +2,7 @@
 #define LOG_METHOD_CALLS
 
 using LobbyHandling;
+using SceneHandling;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -173,6 +174,19 @@ namespace GameManagement
         }
 
         #endregion
+
+        [Rpc(SendTo.Server)]
+        public void LoadMapServerRpc(string map)
+        {
+            LoadMapClientRpc(map);
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void LoadMapClientRpc(string map)
+        {
+            SceneLoader.Instance.LoadSceneAsync(map, additive: false);
+        }
+
 
         #region Debug
 

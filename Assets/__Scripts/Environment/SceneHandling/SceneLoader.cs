@@ -18,7 +18,7 @@ namespace SceneHandling
             Instance = this;
         }
 
-        public  void LoadSceneAsyncByName(string sceneName, bool additive)
+        public  void LoadSceneAsync(string sceneName, bool additive)
         {
             if (loadedScenes.Contains(sceneName)) { return; }
 
@@ -37,7 +37,7 @@ namespace SceneHandling
             loadedScenes.Add(sceneName);
         }
 
-        public void UnloadSceneByName(string sceneName)
+        public void UnloadSceneAsync(string sceneName)
         {
             if (!loadedScenes.Contains(sceneName)) { return; }
 

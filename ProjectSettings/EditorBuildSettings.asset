@@ -26,4 +26,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Scenes/LoginScene.unity
     guid: 2dfd189fec265e344bc5cabf0ae7e515
+  - enabled: 1
+    path: Assets/_Scenes/CaptureTheFlag.unity
+    guid: 430dc5c8bd86cfa499efeda95b10a9f0
   m_configObjects: {}

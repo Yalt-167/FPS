@@ -1248,6 +1248,7 @@ namespace LobbyHandling
                         Game.Manager.ToggleLobbyMenuServerRpc(towardOn: false);
                         Game.Manager.CreatePlayerListServerRpc();
                         GameNetworkManager.Manager.SpawnTeamSelectionMenu(2, 6); // as it s a nertwork spawn it automatically propagates to all clients
+                        Game.Manager.LoadMapServerRpc(gameModesDropDown.Current);
                     }
                 }
                 else
