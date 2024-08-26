@@ -1102,6 +1102,7 @@ namespace LobbyHandling
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(LobbyGUILabels.SelectAMap, GUILayout.Width(labelWidth));
+            InitDropdownOptions(Maps.GetRelevantTypeForMapOfGamemode(gameModesDropDown.Current), ref mapsDropDown.DropdownOptions);
             ChooseDropdownMenu(ref mapsDropDown);
             GUILayout.EndHorizontal();
         }
