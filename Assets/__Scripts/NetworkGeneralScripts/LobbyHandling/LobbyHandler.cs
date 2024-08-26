@@ -134,8 +134,8 @@ namespace LobbyHandling
 
             menuCamera = transform.GetChild(0).GetComponent<Camera>();
 
-            InitDropdownOptions(typeof(GameModes), ref gameModesDropDown.DropdownOptions);
-            InitDropdownOptions(typeof(Maps), ref mapsDropDown.DropdownOptions);
+            UpdateDropdownOptions(typeof(GameModes), ref gameModesDropDown.DropdownOptions);
+            UpdateDropdownOptions(typeof(Maps), ref mapsDropDown.DropdownOptions);
         }
 
         public async void SignIn()
@@ -1102,7 +1102,7 @@ namespace LobbyHandling
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(LobbyGUILabels.SelectAMap, GUILayout.Width(labelWidth));
-            InitDropdownOptions(Maps.GetRelevantTypeForMapOfGamemode(gameModesDropDown.Current), ref mapsDropDown.DropdownOptions);
+            UpdateDropdownOptions(Maps.GetRelevantTypeForMapOfGamemode(gameModesDropDown.Current), ref mapsDropDown.DropdownOptions);
             ChooseDropdownMenu(ref mapsDropDown);
             GUILayout.EndHorizontal();
         }
@@ -1363,7 +1363,7 @@ namespace LobbyHandling
         private DropdownData gameModesDropDown = new();
         private DropdownData mapsDropDown = new();
 
-        private void InitDropdownOptions(Type type, ref string[] array)
+        private void UpdateDropdownOptions(Type type, ref string[] array)
         {
             FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
 
@@ -1374,7 +1374,7 @@ namespace LobbyHandling
             }
         }
 
-        private void InitDropdownOptions(Type type, ref string[] array, string[] extraChoices, bool extraChoicesAtTheStart)
+        private void UpdateDropdownOptions(Type type, ref string[] array, string[] extraChoices, bool extraChoicesAtTheStart)
         {
             FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
 

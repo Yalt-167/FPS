@@ -2,7 +2,7 @@ namespace LobbyHandling
 {
 	public static class Maps
 	{
-        public static Type GetRelevantTypeForMapOfGamemode(string gamemode)
+        public static System.Type GetRelevantTypeForMapOfGamemode(string gamemode)
         {
             return gamemode switch
             {
