@@ -44,7 +44,7 @@ namespace LobbyHandling
             public static readonly string Map1 = nameof(Map1);
         }
 
-        public static class Touchdown
+        public static class Breakthrough
         {
             public static readonly string Map1 = nameof(Map1);
             public static readonly string Map2 = nameof(Map2);
