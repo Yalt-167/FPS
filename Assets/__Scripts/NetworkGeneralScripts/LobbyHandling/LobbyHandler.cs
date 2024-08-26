@@ -48,6 +48,7 @@ namespace LobbyHandling
         private Player localPlayer;
         private Camera menuCamera;
 
+
         #region Lobby list
 
 #nullable enable
@@ -1369,6 +1370,26 @@ namespace LobbyHandling
             for (int i = 0; i < fields.Length; i++)
             {
                 array[i] = (string)fields[i].GetValue(null);
+            }
+        }
+
+        private void InitDropdownOptions(Type type, ref string[] array, string[] extraChoices, bool extraChoicesAtTheStart)
+        {
+            FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
+
+            array = new string[fields.Length + extraChoices.Length];
+
+            int fieldStartIndex = extraChoicesAtTheStart ? extraChoices.Length : 0;
+            int extraChoicesStartIndex = extraChoicesAtTheStart ? 0 : fields.Length;
+
+            for (int i = 0; i < extraChoices.Length; i++)
+            {
+                array[extraChoicesStartIndex + i] = extraChoices[i];
+            }
+
+            for (int i = 0; i < fields.Length; i++)
+            {
+                array[fieldStartIndex + i] = (string)fields[i].GetValue(null);
             }
         }
 

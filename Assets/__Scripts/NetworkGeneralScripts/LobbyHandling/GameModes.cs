@@ -3,7 +3,7 @@ namespace LobbyHandling
     public static class GameModes
     {
         public static readonly string ToBeVoted = nameof(ToBeVoted);
-        public static readonly string TeamMatch = nameof(TeamMatch);
+        public static readonly string TeamFight = nameof(TeamFight);
         public static readonly string DeathMatch = nameof(DeathMatch); // AKA FFA
         public static readonly string CaptureTheFlag = nameof(CaptureTheFlag);
         public static readonly string HardPoint = nameof(HardPoint);
