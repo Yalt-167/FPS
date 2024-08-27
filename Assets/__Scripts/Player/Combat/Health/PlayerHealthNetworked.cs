@@ -11,7 +11,6 @@ using GameManagement;
 [DefaultExecutionOrder(-4)]
 [Serializable]
 public sealed class PlayerHealthNetworked : NetworkBehaviour
-    //, IPlayerFrameMember
 {
     [field: SerializeField] public PlayerHealthData HealthData { get; private set; }
 
@@ -25,7 +24,7 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
     public bool Alive => CurrentHealth > 0;
     private PlayerFrame ownerFrame;
     public ushort TeamNumber => ownerFrame == null ? (ushort)0 : ownerFrame.TeamNumber;
-
+    private bool respawning;
     private void Awake()
     {
         ownerFrame = GetComponent<PlayerFrame>();
@@ -63,8 +62,9 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
 
     private void Update()
     {
-        if (!Alive || Input.GetKeyDown(KeyCode.C))
+        if (!Alive && !respawning)
         {
+            respawning = true;
             RequestRespawnServerRpc();
             return;
         }
@@ -171,6 +171,7 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void RespawnClientRpc()
     {
+        respawning = false;
         ResetHealth();
         transform.position = GameNetworkManager.Manager.GetSpawnPosition(TeamNumber);
     }
