@@ -18,42 +18,57 @@ namespace SceneHandling
             Instance = this;
         }
 
-        public  void LoadSceneAsync(string sceneName, bool additive)
+        public  void LoadSceneAsync(string scene, bool additive)
         {
-            if (loadedScenes.Contains(sceneName)) { return; }
+            if (SceneMissing(scene)) { return; }
 
-            StartCoroutine(LoadSceneAsyncInternal(sceneName, additive));
+            if (loadedScenes.Contains(scene)) { return; }
+
+            StartCoroutine(LoadSceneAsyncInternal(scene, additive));
         }
 
-        private IEnumerator LoadSceneAsyncInternal(string sceneName, bool additive)
+        private IEnumerator LoadSceneAsyncInternal(string scene, bool additive)
         {
-            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(scene, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
 
             while (!asyncLoad.isDone)
             {
                 yield return null;
             }
 
-            loadedScenes.Add(sceneName);
+            loadedScenes.Add(scene);
         }
 
-        public void UnloadSceneAsync(string sceneName)
+        public void UnloadSceneAsync(string scene)
         {
-            if (!loadedScenes.Contains(sceneName)) { return; }
+            if (!loadedScenes.Contains(scene)) { return; }
 
-            StartCoroutine(UnloadSceneAsyncInternal(sceneName));
+            StartCoroutine(UnloadSceneAsyncInternal(scene));
         }
 
-        private IEnumerator UnloadSceneAsyncInternal(string sceneName)
+        private IEnumerator UnloadSceneAsyncInternal(string scene)
         {
-            AsyncOperation asyncUnload = SceneManager.UnloadSceneAsync(sceneName);
+            AsyncOperation asyncUnload = SceneManager.UnloadSceneAsync(scene);
 
             while (!asyncUnload.isDone)
             {
                 yield return null;
             }
 
-            loadedScenes.Remove(sceneName);
+            loadedScenes.Remove(scene);
+        }
+
+        private bool SceneMissing(string scene)
+        {
+            if (SceneManager.GetSceneByName(scene).IsValid())
+            {
+                return false;
+            }
+            else
+            {
+                Debug.Log($"Tried loading the scene: {scene} however it doesn t exist or isn t registered");
+                return true;
+            }
         }
     }
 }
