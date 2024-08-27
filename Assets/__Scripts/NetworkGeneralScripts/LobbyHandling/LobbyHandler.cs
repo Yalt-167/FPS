@@ -133,7 +133,10 @@ namespace LobbyHandling
 
             menuCamera = transform.GetChild(0).GetComponent<Camera>();
 
+
             UpdateDropdownOptions(typeof(GameModes), ref gameModesDropDown);
+
+            currentMapDropDownModelType = typeof(Maps);
             UpdateDropdownOptions(typeof(Maps), ref mapsDropDown);
         }
 
@@ -1101,7 +1104,12 @@ namespace LobbyHandling
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(LobbyGUILabels.SelectAMap, GUILayout.Width(labelWidth));
-            UpdateDropdownOptions(Maps.GetRelevantTypeForMapOfGamemode(gameModesDropDown.Current), ref mapsDropDown);
+            var relevantTypeModelForMapDropDown = Maps.GetRelevantTypeForMapOfGamemode(gameModesDropDown.Current);
+            if (currentMapDropDownModelType != relevantTypeModelForMapDropDown)
+            {
+                currentMapDropDownModelType = relevantTypeModelForMapDropDown;
+                UpdateDropdownOptions(currentMapDropDownModelType, ref mapsDropDown);
+            }
             DropdownMenu(ref mapsDropDown);
             GUILayout.EndHorizontal();
         }
@@ -1362,6 +1370,7 @@ namespace LobbyHandling
         }
         private DropdownData gameModesDropDown = new();
         private DropdownData mapsDropDown = new();
+        private Type currentMapDropDownModelType;
 
         private void UpdateDropdownOptions(Type type, ref DropdownData dropDown)
         {
