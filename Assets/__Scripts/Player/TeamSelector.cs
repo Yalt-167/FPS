@@ -1,5 +1,3 @@
-#define USING_UNITY_GUI_SYSTEM
-
 using System;
 using System.Collections;
 using System.Collections.Generic;

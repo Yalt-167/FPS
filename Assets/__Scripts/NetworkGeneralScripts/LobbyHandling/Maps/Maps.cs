@@ -71,6 +71,5 @@ namespace LobbyHandling
             public static readonly string BreakthroughMap2 = nameof(BreakthroughMap2);
             public static readonly string BreakthroughMap3 = nameof(BreakthroughMap3);
         }
-
     }
 }

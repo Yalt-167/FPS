@@ -1,5 +1,4 @@
-//#define HEADLESS_ARCHITECTURE_SERVER
-#define LOG_LOBBY_EVENTS
+
 
 using System;
 using System.Collections;
@@ -14,14 +13,12 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
-using Unity.Netcode.Transports.UTP;
-using Unity.Netcode;
 using Unity.Services.Relay.Models;
 using Unity.Services.Relay;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 
 using GameManagement;
-using UnityEngine.UI;
-
 
 
 namespace LobbyHandling
