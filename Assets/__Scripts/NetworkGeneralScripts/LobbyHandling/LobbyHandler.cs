@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Reflection;
 
 using UnityEditor;
 using UnityEngine;
@@ -19,10 +20,8 @@ using Unity.Services.Relay.Models;
 using Unity.Services.Relay;
 
 using GameManagement;
-using Unity.VisualScripting;
-using static UnityEditor.Progress;
-using System.Reflection;
-using Newtonsoft.Json.Linq;
+using UnityEngine.UI;
+
 
 
 namespace LobbyHandling
@@ -134,8 +133,8 @@ namespace LobbyHandling
 
             menuCamera = transform.GetChild(0).GetComponent<Camera>();
 
-            UpdateDropdownOptions(typeof(GameModes), ref gameModesDropDown.DropdownOptions);
-            UpdateDropdownOptions(typeof(Maps), ref mapsDropDown.DropdownOptions);
+            UpdateDropdownOptions(typeof(GameModes), ref gameModesDropDown);
+            UpdateDropdownOptions(typeof(Maps), ref mapsDropDown);
         }
 
         public async void SignIn()
@@ -1097,13 +1096,13 @@ namespace LobbyHandling
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(LobbyGUILabels.SelectAGameMode, GUILayout.Width(labelWidth));
-            ChooseDropdownMenu(ref gameModesDropDown);
+            DropdownMenu(ref gameModesDropDown);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(LobbyGUILabels.SelectAMap, GUILayout.Width(labelWidth));
-            UpdateDropdownOptions(Maps.GetRelevantTypeForMapOfGamemode(gameModesDropDown.Current), ref mapsDropDown.DropdownOptions);
-            ChooseDropdownMenu(ref mapsDropDown);
+            UpdateDropdownOptions(Maps.GetRelevantTypeForMapOfGamemode(gameModesDropDown.Current), ref mapsDropDown);
+            DropdownMenu(ref mapsDropDown);
             GUILayout.EndHorizontal();
         }
 
@@ -1250,7 +1249,7 @@ namespace LobbyHandling
                         Game.Manager.ToggleLobbyMenuServerRpc(towardOn: false);
                         Game.Manager.CreatePlayerListServerRpc();
                         GameNetworkManager.Manager.SpawnTeamSelectionMenu(2, 6); // as it s a nertwork spawn it automatically propagates to all clients
-                        Game.Manager.LoadMapServerRpc(gameModesDropDown.Current);
+                        Game.Manager.LoadMapServerRpc(mapsDropDown.Current);
                     }
                 }
                 else
@@ -1354,69 +1353,111 @@ namespace LobbyHandling
 
         public struct DropdownData
         {
-            public bool ShowThisDropDown;
+            public bool Expanded;
             public int SelectedIndex;
-            public string[] DropdownOptions;
+            public string[] Options;
 
-            public readonly string Current => DropdownOptions[SelectedIndex];
+            public readonly bool Invalid => Options.Length == 0;
+            public readonly string Current => Options[SelectedIndex];
         }
         private DropdownData gameModesDropDown = new();
         private DropdownData mapsDropDown = new();
 
-        private void UpdateDropdownOptions(Type type, ref string[] array)
+        private void UpdateDropdownOptions(Type type, ref DropdownData dropDown)
         {
+            dropDown.SelectedIndex = 0;
+            
             FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
 
-            array = new string[fields.Length];
+            dropDown.Options = new string[fields.Length];
             for (int i = 0; i < fields.Length; i++)
             {
-                array[i] = (string)fields[i].GetValue(null);
+                dropDown.Options[i] = (string)fields[i].GetValue(null);
             }
         }
 
-        private void UpdateDropdownOptions(Type type, ref string[] array, string[] extraChoices, bool extraChoicesAtTheStart)
+        private void UpdateDropdownOptions(Type type, ref DropdownData dropDown, string[] extraChoices, bool extraChoicesAtTheStart)
         {
+            dropDown.SelectedIndex = 0;
+
             FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
 
-            array = new string[fields.Length + extraChoices.Length];
+            dropDown.Options = new string[fields.Length + extraChoices.Length];
 
             int fieldStartIndex = extraChoicesAtTheStart ? extraChoices.Length : 0;
             int extraChoicesStartIndex = extraChoicesAtTheStart ? 0 : fields.Length;
 
             for (int i = 0; i < extraChoices.Length; i++)
             {
-                array[extraChoicesStartIndex + i] = extraChoices[i];
+                dropDown.Options[extraChoicesStartIndex + i] = extraChoices[i];
             }
 
             for (int i = 0; i < fields.Length; i++)
             {
-                array[fieldStartIndex + i] = (string)fields[i].GetValue(null);
+                dropDown.Options[fieldStartIndex + i] = (string)fields[i].GetValue(null);
             }
         }
 
-        private void ChooseDropdownMenu(ref DropdownData dropdownData)
+        private void UpdateDropdownOptions(string[] choices, ref DropdownData dropDown)
+        {
+            dropDown.SelectedIndex = 0;
+
+            dropDown.Options = new string[choices.Length];
+            for (int i = 0; i < choices.Length; i++)
+            {
+                dropDown.Options[i] = choices[i];
+            }
+        }
+
+        private void UpdateDropdownOptions(string[] choices, ref DropdownData dropDown, string[] extraChoices, bool extraChoicesAtTheStart)
+        {
+            dropDown.SelectedIndex = 0;
+
+            dropDown.Options = new string[choices.Length + extraChoices.Length];
+
+            int fieldStartIndex = extraChoicesAtTheStart ? extraChoices.Length : 0;
+            int extraChoicesStartIndex = extraChoicesAtTheStart ? 0 : choices.Length;
+
+            for (int i = 0; i < extraChoices.Length; i++)
+            {
+                dropDown.Options[extraChoicesStartIndex + i] = extraChoices[i];
+            }
+
+            for (int i = 0; i < choices.Length; i++)
+            {
+                dropDown.Options[fieldStartIndex + i] = choices[i];
+            }
+        }
+
+        private void DropdownMenu(ref DropdownData dropdown)
         {
             GUILayout.BeginVertical(GUILayout.Width(150));
 
-            GUI.color = dropdownData.ShowThisDropDown ? Color.grey : Color.white;
-
-            if (GUILayout.Button(dropdownData.DropdownOptions[dropdownData.SelectedIndex], GUILayout.Height(30)))
+            if (dropdown.Invalid)
             {
-                dropdownData.ShowThisDropDown = !dropdownData.ShowThisDropDown;
+                GUILayout.Label("This dropdown is invalid");
+                GUILayout.EndVertical();
+            }
+
+            GUI.color = dropdown.Expanded ? Color.grey : Color.white;
+
+            if (GUILayout.Button(dropdown.Options[dropdown.SelectedIndex], GUILayout.Height(30)))
+            {
+                dropdown.Expanded = !dropdown.Expanded;
             }
 
             GUI.color = Color.white;
 
-            if (dropdownData.ShowThisDropDown)
+            if (dropdown.Expanded)
             {
-                for (int index = 0; index < dropdownData.DropdownOptions.Length; index++)
+                for (int index = 0; index < dropdown.Options.Length; index++)
                 {
-                    if (index == dropdownData.SelectedIndex) { continue; }
+                    if (index == dropdown.SelectedIndex) { continue; }
 
-                    if (GUILayout.Button(dropdownData.DropdownOptions[index], GUILayout.Height(25)))
+                    if (GUILayout.Button(dropdown.Options[index], GUILayout.Height(25)))
                     {
-                        dropdownData.SelectedIndex = index;
-                        dropdownData.ShowThisDropDown = false;
+                        dropdown.SelectedIndex = index;
+                        dropdown.Expanded = false;
                     }
                 }
             }
