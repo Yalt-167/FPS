@@ -21,6 +21,7 @@ namespace LobbyHandling
 		public static readonly string ToBeVoted = nameof(ToBeVoted);
         public static class TeamFight
         {
+		    public static readonly string ToBeVoted = nameof(ToBeVoted);
             public static readonly string TeamFightMap1 = nameof(TeamFightMap1);
             public static readonly string TeamFightMap2 = nameof(TeamFightMap2);
             public static readonly string TeamFightMap3 = nameof(TeamFightMap3);
@@ -28,6 +29,7 @@ namespace LobbyHandling
 
         public static class DeathMatch
         {
+            public static readonly string ToBeVoted = nameof(ToBeVoted);
             public static readonly string DeathMatchMap1 = nameof(DeathMatchMap1);
             public static readonly string DeathMatchMap2 = nameof(DeathMatchMap2);
             public static readonly string DeathMatchMap3 = nameof(DeathMatchMap3);
@@ -35,6 +37,7 @@ namespace LobbyHandling
 
         public static class Escort
         {
+            public static readonly string ToBeVoted = nameof(ToBeVoted);
             public static readonly string EscortMap1 = nameof(EscortMap1);
             public static readonly string EscortMap2 = nameof(EscortMap2);
             public static readonly string EscortMap3 = nameof(EscortMap3);
@@ -42,6 +45,7 @@ namespace LobbyHandling
 
         public static class CaptureTheFlag
         {
+            public static readonly string ToBeVoted = nameof(ToBeVoted);
             public static readonly string CaptureTheFlagMap1 = nameof(CaptureTheFlagMap1);
             public static readonly string CaptureTheFlagMap2 = nameof(CaptureTheFlagMap2);
             public static readonly string CaptureTheFlagMap3 = nameof(CaptureTheFlagMap3);
@@ -49,6 +53,7 @@ namespace LobbyHandling
 
         public static class HardPoint
         {
+            public static readonly string ToBeVoted = nameof(ToBeVoted);
             public static readonly string HardPointMap1 = nameof(HardPointMap1);
             public static readonly string HardPointMap2 = nameof(HardPointMap2);
             public static readonly string HardPointMap3 = nameof(HardPointMap3);
@@ -61,6 +66,7 @@ namespace LobbyHandling
 
         public static class Breakthrough
         {
+            public static readonly string ToBeVoted = nameof(ToBeVoted);
             public static readonly string BreakthroughMap1 = nameof(BreakthroughMap1);
             public static readonly string BreakthroughMap2 = nameof(BreakthroughMap2);
             public static readonly string BreakthroughMap3 = nameof(BreakthroughMap3);
