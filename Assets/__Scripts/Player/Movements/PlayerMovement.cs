@@ -37,7 +37,7 @@ namespace Controller
 
         #region References
 
-        [SerializeField] private MovementInputQuery inputQuery;
+        [SerializeField] private Inputs.MovementInputQuery inputQuery;
         private Rigidbody Rigidbody;
         private FollowRotationCamera followRotationCamera;
         private int ForwardAxisInput => MyInput.GetAxis(inputQuery.Back, inputQuery.Forward);

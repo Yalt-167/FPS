@@ -20,7 +20,7 @@ public sealed class PlayerCombat : MonoBehaviour
 
 
     [SerializeField] private int allowedWeaponsCount = 3;
-    [SerializeField] private CombatInputQuery inputQuery;
+    [SerializeField] private Inputs.CombatInputQuery inputQuery;
     [SerializeField] private Weapon[] weapons;
     private WeaponHandler weaponHandler;
     private int currentWeaponIndex;
