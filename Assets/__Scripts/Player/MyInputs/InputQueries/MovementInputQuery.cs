@@ -42,8 +42,6 @@ namespace Inputs
         public FixedKeybind SwitchCameraPosition = new(KeyCode.W, PlayerActionActivationType.OnKeyDown);
         public VariableKeybind QuickReset = new(KeyCode.X, new List<PlayerActionActivationType>() { PlayerActionActivationType.OnKeyDown, PlayerActionActivationType.OnHeldForTime }, .5f);
 
-        public FixedKeybind Pause = new(KeyCode.Escape, PlayerActionActivationType.OnKeyDown);
-
         public override void Init()
         {
             InitiateForward.Init();
@@ -76,7 +74,6 @@ namespace Inputs
             SwitchCameraPosition.Init();
 
             QuickReset.Init();
-            Pause.Init();
         }
     }
 }

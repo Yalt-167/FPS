@@ -29,7 +29,6 @@ namespace Inputs
 
         public FixedKeybind Slash;
         public FixedKeybind Parry;
-        public FixedKeybind ChangeCrosshair;
 
 
         public override void Init()
@@ -54,7 +53,6 @@ namespace Inputs
 
             Slash.Init();
             Parry.Init();
-            ChangeCrosshair.Init();
         }
     }
 }
