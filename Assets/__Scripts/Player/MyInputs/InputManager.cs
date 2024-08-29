@@ -11,6 +11,8 @@ namespace Inputs
         public MovementInputQuery MovementInputs;
         public CombatInputQuery CombatInputs;
         public CombatInputQuery GenericInputs;
+        public float cameraXSensitivity = 4f;
+        public float cameraYSensitivity = 4f;
 
 
         private void Awake()

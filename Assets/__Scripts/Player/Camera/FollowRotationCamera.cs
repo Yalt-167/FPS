@@ -1,3 +1,4 @@
+using Inputs;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -9,7 +10,6 @@ namespace Controller
     {
         private Transform playerTransform; // The GameObject whose rotation the camera will follow
         private PlayerMovement playerMovement;
-        [SerializeField] private float sensitivity = 5f; // Sensitivity of camera rotation
 
         private float xRotation = 0f; // Current rotation around the x-axis
         private float yRotation = 0f; // Current rotation around the y-axis
@@ -20,9 +20,13 @@ namespace Controller
         [SerializeField] private float cameraRollLerpCoefficient;
         private float cameraRollAngle;
 
+        private InputManager inputManager;
+        private float SensitivityX => inputManager.cameraXSensitivity;
+        private float SensitivityY => inputManager.cameraYSensitivity;
 
         private void Awake()
         {
+            inputManager = GetComponentInParent<InputManager>();
             playerTransform = transform.parent;
             playerMovement = playerTransform.GetComponent<PlayerMovement>();
         }
@@ -30,7 +34,7 @@ namespace Controller
         private void Update()
         {
             // around x-axis(and z with the cameraTilt thingy)
-            xRotation -= Input.GetAxis(MouseYAxis) * sensitivity;
+            xRotation -= Input.GetAxis(MouseYAxis) * SensitivityY;
             xRotation = Mathf.Clamp(xRotation, -89f, 89f); // Clamp in order to avoid doing a flip when looking up/down too intensely
 
             //cameraRollAngle = Mathf.Lerp(transform.localRotation.eulerAngles.z, playerMovement.RelevantCameraTiltAngle, cameraRollLerpCoefficient);
@@ -39,7 +43,7 @@ namespace Controller
             transform.localRotation = Quaternion.Euler(xRotation, 0f, playerMovement.RelevantCameraTiltAngle);
 
             // around y-axis
-            yRotation += Input.GetAxis(MouseXAxis) * sensitivity;
+            yRotation += Input.GetAxis(MouseXAxis) * SensitivityX;
             playerTransform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
         }
     }

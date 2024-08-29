@@ -1387,7 +1387,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91b2d715ae7cffc419e1b6b7ee9b9e65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sensitivity: 4
   cameraRollLerpCoefficient: 0.5
 --- !u!1 &5705630700605972737
 GameObject:
@@ -1502,7 +1501,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 169908227
+  GlobalObjectIdHash: 2957232829
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1640,97 +1639,6 @@ MonoBehaviour:
   doDebugCollidingDown: 0
   doDebugCollidingUp: 0
   doDebugCollidinAnySide: 0
-  inputQuery:
-    InitiateForward:
-      RelevantKey: 122
-      howToActivate: 0
-      holdForSeconds: 0
-    Forward:
-      RelevantKey: 122
-      howToActivate: 2
-      holdForSeconds: 0
-    InitiateBack:
-      RelevantKey: 115
-      howToActivate: 0
-      holdForSeconds: 0
-    Back:
-      RelevantKey: 115
-      howToActivate: 2
-      holdForSeconds: 0
-    InitiateRight:
-      RelevantKey: 100
-      howToActivate: 0
-      holdForSeconds: 0
-    HoldRightForTime:
-      RelevantKey: 100
-      howToActivate: 4
-      holdForSeconds: 0
-    Right:
-      RelevantKey: 100
-      howToActivate: 2
-      holdForSeconds: 0
-    InitiateLeft:
-      RelevantKey: 113
-      howToActivate: 0
-      holdForSeconds: 0
-    HoldLeftForTime:
-      RelevantKey: 113
-      howToActivate: 4
-      holdForSeconds: 0
-    Left:
-      RelevantKey: 113
-      howToActivate: 2
-      holdForSeconds: 0
-    InitiateJump:
-      RelevantKey: 32
-      howToActivate: 0
-      holdForSeconds: 0
-    HoldJump:
-      RelevantKey: 32
-      howToActivate: 2
-      holdForSeconds: 0
-    InterruptJump:
-      RelevantKey: 32
-      howToActivate: 1
-      holdForSeconds: 0
-    InitiateSlide:
-      RelevantKey: 304
-      howToActivate: 0
-      holdForSeconds: 0
-    HoldSlide:
-      RelevantKey: 304
-      howToActivate: 2
-      holdForSeconds: 0
-    HoldCrouch:
-      RelevantKey: 306
-      howToActivate: 2
-      holdForSeconds: 0
-      allowedActivationTypes: 0200000003000000
-    Dash:
-      RelevantKey: 57
-      howToActivate: 0
-      holdForSeconds: 0
-    InitiateGrapplingHook:
-      RelevantKey: 120
-      howToActivate: 0
-      holdForSeconds: 0
-    HoldGrapplingHook:
-      RelevantKey: 120
-      howToActivate: 2
-      holdForSeconds: 0
-    ReleaseGrapplingHook:
-      RelevantKey: 120
-      howToActivate: 1
-      holdForSeconds: 0
-    SwitchCameraPosition:
-      RelevantKey: 119
-      howToActivate: 0
-      holdForSeconds: 0
-    QuickReset:
-      RelevantKey: 120
-      howToActivate: 0
-      holdForSeconds: 0.5
-      allowedActivationTypes: 0000000004000000
   currentMovementMode: 0
   validatedActionBufferDuration: 0
   timeToReachMaxSprintSpeed: 0.5
@@ -1820,64 +1728,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allowedWeaponsCount: 3
-  inputQuery:
-    Shoot:
-      RelevantKey: 323
-      howToActivate: 2
-      holdForSeconds: 0
-    Aim:
-      RelevantKey: 324
-      howToActivate: 2
-      holdForSeconds: 0
-      allowedActivationTypes: 0200000003000000
-    Reload:
-      RelevantKey: 114
-      howToActivate: 0
-      holdForSeconds: 0
-    FirstGun:
-      RelevantKey: 49
-      howToActivate: 0
-      holdForSeconds: 0
-    SecondGun:
-      RelevantKey: 50
-      howToActivate: 0
-      holdForSeconds: 0
-    ThirdGun:
-      RelevantKey: 51
-      howToActivate: 0
-      holdForSeconds: 0
-    InitiatePrimaryAbility:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    ReleasePrimaryAbility:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    InitiateSecondaryAbility:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    ReleaseSecondaryAbility:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    InitiateUltimate:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    ReleaseUltimate:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    Slash:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    Parry:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
   weapons:
   - {fileID: 11400000, guid: 04d6e4d4b098bf34a81282a3674c4d48, type: 2}
   - {fileID: 11400000, guid: a433c898e9c4f23459862abe5b0d9826, type: 2}
@@ -2259,6 +2109,8 @@ MonoBehaviour:
       RelevantKey: 0
       howToActivate: 0
       holdForSeconds: 0
+  cameraXSensitivity: 3
+  cameraYSensitivity: 3
 --- !u!1 &5814794369634734712
 GameObject:
   m_ObjectHideFlags: 0
