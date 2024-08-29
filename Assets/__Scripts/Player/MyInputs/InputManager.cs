@@ -8,16 +8,16 @@ namespace Inputs
 {
     public sealed class InputManager : MonoBehaviour
     {
-        public MovementInputQuery movementInputs;
-        public CombatInputQuery combatInputs;
-        public CombatInputQuery genericInputs;
+        public MovementInputQuery MovementInputs;
+        public CombatInputQuery CombatInputs;
+        public CombatInputQuery GenericInputs;
 
 
         private void Awake()
         {
-            movementInputs.Init();
-            combatInputs.Init();
-            genericInputs.Init();
+            MovementInputs.Init();
+            CombatInputs.Init();
+            GenericInputs.Init();
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using GameManagement;
+using Inputs;
 
 [DefaultExecutionOrder(-6)]
 public sealed class PlayerCombat : MonoBehaviour
@@ -20,7 +21,8 @@ public sealed class PlayerCombat : MonoBehaviour
 
 
     [SerializeField] private int allowedWeaponsCount = 3;
-    [SerializeField] private Inputs.CombatInputQuery inputQuery;
+    private InputManager inputManager;
+    private CombatInputQuery InputQuery => inputManager.CombatInputs;
     [SerializeField] private Weapon[] weapons;
     private WeaponHandler weaponHandler;
     private int currentWeaponIndex;
@@ -58,7 +60,8 @@ public sealed class PlayerCombat : MonoBehaviour
     {
         //cameraTransform = transform.GetChild(0).GetChild(0);
         weaponHandler = GetComponent<WeaponHandler>();
-        inputQuery.Init();
+        inputManager = GetComponent<InputManager>();
+        InputQuery.Init();
         UpdateWeapon();
     }
 
@@ -68,29 +71,29 @@ public sealed class PlayerCombat : MonoBehaviour
         HandleWeaponSwitch(); // upon check: there is
 
 
-        weaponHandler.UpdateAimingState(inputQuery.Aim);
+        weaponHandler.UpdateAimingState(InputQuery.Aim);
 
-        if (inputQuery.Reload)
+        if (InputQuery.Reload)
         {
             weaponHandler.Reload();
         }
 
-        weaponHandler.UpdateState(inputQuery.Shoot);
+        weaponHandler.UpdateState(InputQuery.Shoot);
     }
 
     private void HandleWeaponSwitch()
     {
-        if (inputQuery.FirstGun)
+        if (InputQuery.FirstGun)
         {
             UpdateWeaponWithIndex(0);
             return;
         }
-        else if (inputQuery.SecondGun)
+        else if (InputQuery.SecondGun)
         {
             UpdateWeaponWithIndex(1);
             return;
         }
-        else if (inputQuery.ThirdGun)
+        else if (InputQuery.ThirdGun)
         {
             UpdateWeaponWithIndex(2);
             return;

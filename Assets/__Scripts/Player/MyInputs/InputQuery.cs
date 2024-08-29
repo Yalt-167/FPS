@@ -6,16 +6,8 @@ using UnityEngine;
 
 namespace Inputs
 {
-    public abstract class InputQuery : MonoBehaviour
+    public abstract class InputQuery
     {
-        public static InputQuery Manager;
-        private void Awake() { Manager = this; }
-
-        public void InitBinds()
-        {
-
-        }
-
         public abstract void Init();
     }
 }

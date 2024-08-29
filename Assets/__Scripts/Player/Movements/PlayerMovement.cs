@@ -9,6 +9,7 @@ using System.Linq;
 using UnityEngine;
 
 using GameManagement;
+using Inputs;
 
 namespace Controller
 {
@@ -37,12 +38,13 @@ namespace Controller
 
         #region References
 
-        [SerializeField] private Inputs.MovementInputQuery inputQuery;
+        private InputManager inputManager;
+        private MovementInputQuery InputQuery => inputManager.MovementInputs;
         private Rigidbody Rigidbody;
         private FollowRotationCamera followRotationCamera;
-        private int ForwardAxisInput => MyInput.GetAxis(inputQuery.Back, inputQuery.Forward);
-        private int SidewayAxisInput => MyInput.GetAxis(inputQuery.Left, inputQuery.Right);
-        private bool PressingForwardOrStrafeInput => inputQuery.Forward || inputQuery.Left || inputQuery.Right;
+        private int ForwardAxisInput => MyInput.GetAxis(InputQuery.Back, InputQuery.Forward);
+        private int SidewayAxisInput => MyInput.GetAxis(InputQuery.Left, InputQuery.Right);
+        private bool PressingForwardOrStrafeInput => InputQuery.Forward || InputQuery.Left || InputQuery.Right;
         public Vector3 Position => transform.position;
         public Vector3 FeetPosition => transform.position + Vector3.down;
         public float CurrentSpeed => Rigidbody.velocity.Mask(1f, 0f, 1f).magnitude;
@@ -57,7 +59,7 @@ namespace Controller
 
         private bool IsJumping { get; set; }
         private bool IsRunning => currentMovementMode == MovementMode.Run;
-        private bool IsSprinting => !inputQuery.HoldCrouch && PressingForwardOrStrafeInput;
+        private bool IsSprinting => !InputQuery.HoldCrouch && PressingForwardOrStrafeInput;
         private bool IsCrouching { get; set; }
         private bool IsSliding => currentMovementMode == MovementMode.Slide;
         private bool IsDashing => currentMovementMode == MovementMode.Dash;
@@ -167,7 +169,7 @@ namespace Controller
         private bool CanUseCoyote => coyoteUsable && !isCollidingDown && timeLeftGround + coyoteTimeThreshold > Time.time;
         private bool HasBufferedJump => isCollidingDown && lastJumpPressed + jumpBuffer > Time.time;
 
-        private bool ShouldLongJump => DashUsable && inputQuery.Dash && inputQuery.Forward;
+        private bool ShouldLongJump => DashUsable && InputQuery.Dash && InputQuery.Forward;
         private bool forceResetJumping;
         #endregion
 
@@ -356,7 +358,8 @@ namespace Controller
 
         private void Awake()
         {
-            inputQuery.Init();
+            inputManager = GetComponent<InputManager>();
+            InputQuery.Init();
 
             Rigidbody = GetComponent<Rigidbody>();
             cameraTransform = transform.GetChild(0);
@@ -388,17 +391,17 @@ namespace Controller
             // this is true for each key with an exoected long lasting effects namely:
             // HoldForTime -> may miss the frame where stopped holding if it was nt checked this frame
             // Toggle -> may misss the frame where toggled it if it was nt checked this frame
-            _ = inputQuery.HoldLeftForTime;
-            _ = inputQuery.HoldRightForTime;
-            _ = inputQuery.QuickReset;
-            _ = inputQuery.HoldSlide;
-            _ = inputQuery.HoldCrouch;
+            _ = InputQuery.HoldLeftForTime;
+            _ = InputQuery.HoldRightForTime;
+            _ = InputQuery.QuickReset;
+            _ = InputQuery.HoldSlide;
+            _ = InputQuery.HoldCrouch;
 
             currentMovementMethod();
             currentCameraHandlingMethod();
             TryReplenishDash();
 
-            if (inputQuery.SwitchCameraPosition) { SwitchCameraPosition(); }
+            if (InputQuery.SwitchCameraPosition) { SwitchCameraPosition(); }
 
             LocalVelocityDebug = new(transform.InverseTransformDirection(Rigidbody.velocity));
             GlobalVelocityDebug = new(Rigidbody.velocity);
@@ -603,7 +606,7 @@ namespace Controller
         {
             if (IsJumping) { return (false, false); }
 
-            if (inputQuery.InitiateJump)
+            if (InputQuery.InitiateJump)
             {
                 lastJumpPressed = Time.time; // for jump buffer
 
@@ -616,7 +619,7 @@ namespace Controller
             else if (HasBufferedJump)
             {
                 //Jump(inputQuery.HoldJump);
-                return (true, inputQuery.HoldJump);
+                return (true, InputQuery.HoldJump);
             }
 
             return (false, false);
@@ -635,7 +638,7 @@ namespace Controller
 
             ResetYVelocity();
 
-            if (inputQuery.Forward)
+            if (InputQuery.Forward)
             {
                 Rigidbody.AddForce(initialJumpSpeedBoost * transform.forward, ForceMode.Impulse);
             }
@@ -710,13 +713,13 @@ namespace Controller
                 return;
             }
 
-            if (DashUsable && inputQuery.Dash)
+            if (DashUsable && InputQuery.Dash)
             {
                 StartCoroutine(Dash());
                 return;
             }
 
-            if (inputQuery.InitiateSlide && CurrentSpeed != 0f) // HoldSlide or InitiateSlide ? -> run some tests
+            if (InputQuery.InitiateSlide && CurrentSpeed != 0f) // HoldSlide or InitiateSlide ? -> run some tests
             {
                 StartCoroutine(Slide()); // add some kind of coyote threshold where the velocity is conserved even tho the player walked a bit (which should kill his momentum)
                 return;
@@ -724,7 +727,7 @@ namespace Controller
 
             if (!isCollidingDown)
             {
-                var sideToWallRunOn = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
+                var sideToWallRunOn = MyInput.GetAxis(InputQuery.Left && isCollidingLeft, InputQuery.Right && isCollidingRight);
                 if (sideToWallRunOn != 0f)
                 {
                     StartCoroutine(Wallrun(sideToWallRunOn));
@@ -738,7 +741,7 @@ namespace Controller
                 return;
             }
 
-            HandleCrouch(inputQuery.HoldCrouch && isCollidingDown);
+            HandleCrouch(InputQuery.HoldCrouch && isCollidingDown);
         }
 
         private void Run()
@@ -1035,9 +1038,9 @@ namespace Controller
 
             var shouldAwardVelocityBoostForFalling = !isCollidingDown;
 
-            yield return new WaitUntil(() => isCollidingDown || !inputQuery.HoldSlide); // await the landing to initiate the slide
+            yield return new WaitUntil(() => isCollidingDown || !InputQuery.HoldSlide); // await the landing to initiate the slide
 
-            if (!inputQuery.HoldSlide) { yield break; } // if changed his mind
+            if (!InputQuery.HoldSlide) { yield break; } // if changed his mind
 
             SetMovementMode(MovementMode.Slide);
             transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
@@ -1070,7 +1073,7 @@ namespace Controller
 
                         ApplySlowdown(benefitedFromDashMomentum && CurrentSpeed > RunningSpeed ? slideSlowdownForceWhenHasDashMomentum : slideSlowdownForce);
 
-                        if (DashUsable && inputQuery.Dash)
+                        if (DashUsable && InputQuery.Dash)
                         {
                             dashed = true;
                             return true;
@@ -1080,7 +1083,7 @@ namespace Controller
 
                         return
                             Rigidbody.velocity.magnitude < slideCancelThreshold ||
-                            !inputQuery.HoldSlide ||
+                            !InputQuery.HoldSlide ||
                             triedJumping
                             ;
                     }
@@ -1088,7 +1091,7 @@ namespace Controller
 
             if (triedJumping)
             {
-                Jump(wouldVeBeenFullJump, dashed && inputQuery.Forward);
+                Jump(wouldVeBeenFullJump, dashed && InputQuery.Forward);
                 CommonSlideExit(MovementMode.Run);
                 yield break;
             }
@@ -1166,7 +1169,7 @@ namespace Controller
                         //Rigidbody.velocity = dashVelocity * cameraTransform.forward; // perhaps do sth less brutal with gradual velocity loss
                         Rigidbody.velocity = DashVelocity * dir; // perhaps do sth less brutal with gradual velocity loss
 
-                        if (inputQuery.InitiateSlide && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
+                        if (InputQuery.InitiateSlide && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
                         {
                             slid = true;
                             return true;
@@ -1185,7 +1188,7 @@ namespace Controller
 
             if (!isCollidingDown)
             {
-                var shouldWallrunLeftRight = MyInput.GetAxis(inputQuery.Left && isCollidingLeft, inputQuery.Right && isCollidingRight);
+                var shouldWallrunLeftRight = MyInput.GetAxis(InputQuery.Left && isCollidingLeft, InputQuery.Right && isCollidingRight);
                 if (shouldWallrunLeftRight != 0f)
                 {
                     CommonDashExit(MovementMode.Wallrun);
@@ -1240,7 +1243,7 @@ namespace Controller
 
         private bool CheckLedgeClimb(out Collider[] ledges)
         {
-            if (!CanLedgeClimb || inputQuery.Back || !inputQuery.Forward && !inputQuery.InitiateJump)
+            if (!CanLedgeClimb || InputQuery.Back || !InputQuery.Forward && !InputQuery.InitiateJump)
             {
                 ledges = new Collider[0];
                 return false;
@@ -1307,7 +1310,7 @@ namespace Controller
 
         private IEnumerator Wallrun(int side)
         {
-            if (!inputQuery.Forward || inputQuery.Back || !CanWallRunAfterDash) { yield break; }
+            if (!InputQuery.Forward || InputQuery.Back || !CanWallRunAfterDash) { yield break; }
 
             SetMovementMode(MovementMode.Wallrun);
             ResetYVelocity();
@@ -1317,8 +1320,8 @@ namespace Controller
 
             timeStartedWallRunning = Time.time;
             var startedTiltingCamera = false;
-            inputQuery.HoldLeftForTime.ResetState(); // avoid insta quitting the wallrun due to this triggering while you held it to jump
-            inputQuery.HoldRightForTime.ResetState(); // same but other side :)
+            InputQuery.HoldLeftForTime.ResetState(); // avoid insta quitting the wallrun due to this triggering while you held it to jump
+            InputQuery.HoldRightForTime.ResetState(); // same but other side :)
 
             var leftEarly = false;
             var directionAlongWall = (transform.forward - Vector3.Dot(transform.forward, forceDirection) * forceDirection).normalized;
@@ -1333,15 +1336,15 @@ namespace Controller
                     Rigidbody.AddForce(wallRunForceCoefficient * WallRunSpeed * Time.deltaTime * directionAlongWall, ForceMode.Force);
                     Rigidbody.velocity = Vector3.ClampMagnitude(Rigidbody.velocity.Mask(1f, 0f, 1f), WallRunSpeed);
 
-                    if (inputQuery.InitiateJump)
+                    if (InputQuery.InitiateJump)
                     {
                         CommonWallRunExit(MovementMode.Run, onRight);
-                        WallJump(!onRight, onRight ? inputQuery.Left : inputQuery.Right);
+                        WallJump(!onRight, onRight ? InputQuery.Left : InputQuery.Right);
                         leftEarly = true;
                         return true;
                     }
 
-                    if (dashReady && inputQuery.Dash)
+                    if (dashReady && InputQuery.Dash)
                     {
                         CommonWallRunExit(MovementMode.Dash, onRight);
                         StartCoroutine(Dash());
@@ -1358,7 +1361,7 @@ namespace Controller
                         return true;
                     }
 
-                    if (inputQuery.InitiateSlide)
+                    if (InputQuery.InitiateSlide)
                     {
                         CommonWallRunExit(MovementMode.Slide, onRight);
                         StartCoroutine(Slide());
@@ -1369,9 +1372,9 @@ namespace Controller
                     if (!isCollidingOnAnySide) { return true; } // out of the final return bc didn t work for reasons that are beyond me
 
                     return
-                        inputQuery.Back ||
-                        !inputQuery.Forward ||
-                        onRight ? inputQuery.HoldLeftForTime : inputQuery.HoldRightForTime
+                        InputQuery.Back ||
+                        !InputQuery.Forward ||
+                        onRight ? InputQuery.HoldLeftForTime : InputQuery.HoldRightForTime
                         ;
                 }
             );
@@ -1505,7 +1508,7 @@ namespace Controller
         }
 
         //private float TargetRunCameraTiltAngle => MyInput.GetAxis(inputQuery.Right, inputQuery.Left) * maxRunCameraTiltAngle;
-        private float TargetRunCameraTiltAngle => MyInput.GetAxis(inputQuery.Right && !isCollidingRight, inputQuery.Left & !isCollidingLeft) * maxRunCameraTiltAngle;
+        private float TargetRunCameraTiltAngle => MyInput.GetAxis(InputQuery.Right && !isCollidingRight, InputQuery.Left & !isCollidingLeft) * maxRunCameraTiltAngle;
         //
         //private float TargetRunCameraTiltAngle => Rigidbody != null ? CurrentStrafeSpeed / Mathf.Abs(CurrentStrafeSpeed) * maxRunCameraTiltAngle : 0f;
         // as dir in {-1, 0, 1} dir * maxRunCameraTiltAngle in {-maxRunCameraTiltAngle, 0 (regulateCameraTilt), maxRunCameraTiltAngle}
