@@ -57,9 +57,19 @@ namespace Inputs
             SetRelevantOutputSettings();
         }
 
-        public override void OnRenderRebingMenu()
+        public override void OnRenderRebindMenu()
         {
-            throw new NotImplementedException();
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+
+            GUILayout.Label(name);
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+            GUILayout.Label(RelevantKey.ToString()); // eventually store that as a memeber variable to avoid unecessary garbage collection
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+            GUILayout.Label(howToActivate.ToString()); // eventually store that as a memeber variable to avoid unecessary garbage collection
+            GUILayout.EndHorizontal();
+            GUI.enabled = true;
         }
     }
 }

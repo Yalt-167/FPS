@@ -9,39 +9,40 @@ namespace Inputs
     [Serializable]
     public sealed class MovementInputQuery : IInputQuery
     {
-        public FixedKeybind InitiateForward = new(KeyCode.Z, PlayerActionActivationType.OnKeyDown);
-        public FixedKeybind Forward = new(KeyCode.Z, PlayerActionActivationType.OnKeyHeld);
+        public FixedKeybind InitiateForward = new(KeyCode.Z, PlayerActionActivationType.OnKeyDown, nameof(InitiateForward));
+        public FixedKeybind Forward = new(KeyCode.Z, PlayerActionActivationType.OnKeyHeld, nameof(Forward));
 
-        public FixedKeybind InitiateBack = new(KeyCode.S, PlayerActionActivationType.OnKeyDown);
-        public FixedKeybind Back = new(KeyCode.S, PlayerActionActivationType.OnKeyHeld);
+        public FixedKeybind InitiateBack = new(KeyCode.S, PlayerActionActivationType.OnKeyDown, nameof(InitiateBack));
+        public FixedKeybind Back = new(KeyCode.S, PlayerActionActivationType.OnKeyHeld, nameof(Back));
 
-        public FixedKeybind InitiateRight = new(KeyCode.D, PlayerActionActivationType.OnKeyDown);
-        public FixedKeybind HoldRightForTime = new(KeyCode.D, PlayerActionActivationType.OnHeldForTime);
-        public FixedKeybind Right = new(KeyCode.D, PlayerActionActivationType.OnKeyHeld);
+        public FixedKeybind InitiateRight = new(KeyCode.D, PlayerActionActivationType.OnKeyDown, nameof(InitiateRight));
+        public FixedKeybind HoldRightForTime = new(KeyCode.D, PlayerActionActivationType.OnHeldForTime, nameof(HoldRightForTime));
+        public FixedKeybind Right = new(KeyCode.D, PlayerActionActivationType.OnKeyHeld, nameof(Right));
 
-        public FixedKeybind InitiateLeft = new(KeyCode.Q, PlayerActionActivationType.OnKeyDown);
-        public FixedKeybind HoldLeftForTime = new(KeyCode.Q, PlayerActionActivationType.OnHeldForTime);
-        public FixedKeybind Left = new(KeyCode.Q, PlayerActionActivationType.OnKeyHeld);
+        public FixedKeybind InitiateLeft = new(KeyCode.Q, PlayerActionActivationType.OnKeyDown, nameof(InitiateLeft));
+        public FixedKeybind HoldLeftForTime = new(KeyCode.Q, PlayerActionActivationType.OnHeldForTime, nameof(HoldLeftForTime));
+        public FixedKeybind Left = new(KeyCode.Q, PlayerActionActivationType.OnKeyHeld, nameof(Left));
 
-        public FixedKeybind InitiateJump = new(KeyCode.Space, PlayerActionActivationType.OnKeyDown);
-        public FixedKeybind HoldJump = new(KeyCode.Space, PlayerActionActivationType.OnKeyHeld);
-        public FixedKeybind InterruptJump = new(KeyCode.Space, PlayerActionActivationType.OnKeyUp);
+        public FixedKeybind InitiateJump = new(KeyCode.Space, PlayerActionActivationType.OnKeyDown, nameof(InitiateJump));
+        public FixedKeybind HoldJump = new(KeyCode.Space, PlayerActionActivationType.OnKeyHeld, nameof(HoldJump));
+        public FixedKeybind InterruptJump = new(KeyCode.Space, PlayerActionActivationType.OnKeyUp, nameof(InterruptJump));
 
-        public FixedKeybind InitiateSlide = new(KeyCode.LeftShift, PlayerActionActivationType.OnKeyDown);
-        public FixedKeybind HoldSlide = new(KeyCode.LeftShift, PlayerActionActivationType.OnKeyHeld);
+        public FixedKeybind InitiateSlide = new(KeyCode.LeftShift, PlayerActionActivationType.OnKeyDown, nameof(InitiateSlide));
+        public FixedKeybind HoldSlide = new(KeyCode.LeftShift, PlayerActionActivationType.OnKeyHeld, nameof(HoldSlide));
 
-        public VariableKeybind HoldCrouch = new(KeyCode.LeftControl, new List<PlayerActionActivationType>() { PlayerActionActivationType.OnKeyHeld, PlayerActionActivationType.Toggle });
+        public VariableKeybind HoldCrouch = new(KeyCode.LeftControl, new List<PlayerActionActivationType>() { PlayerActionActivationType.OnKeyHeld, PlayerActionActivationType.Toggle }, nameof(HoldCrouch));
 
-        public FixedKeybind Dash = new(KeyCode.Alpha9, PlayerActionActivationType.OnKeyDown);
+        public FixedKeybind Dash = new(KeyCode.Alpha9, PlayerActionActivationType.OnKeyDown, nameof(Dash));
 
-        public FixedKeybind InitiateGrapplingHook = new(KeyCode.X, PlayerActionActivationType.OnKeyDown);
-        public FixedKeybind HoldGrapplingHook = new(KeyCode.X, PlayerActionActivationType.OnKeyHeld);
-        public FixedKeybind ReleaseGrapplingHook = new(KeyCode.X, PlayerActionActivationType.OnKeyUp);
+        public FixedKeybind InitiateGrapplingHook = new(KeyCode.X, PlayerActionActivationType.OnKeyDown, nameof(InitiateGrapplingHook));
+        public FixedKeybind HoldGrapplingHook = new(KeyCode.X, PlayerActionActivationType.OnKeyHeld, nameof(HoldGrapplingHook));
+        public FixedKeybind ReleaseGrapplingHook = new(KeyCode.X, PlayerActionActivationType.OnKeyUp, nameof(ReleaseGrapplingHook));
 
-        public FixedKeybind SwitchCameraPosition = new(KeyCode.W, PlayerActionActivationType.OnKeyDown);
-        public VariableKeybind QuickReset = new(KeyCode.X, new List<PlayerActionActivationType>() { PlayerActionActivationType.OnKeyDown, PlayerActionActivationType.OnHeldForTime }, .5f);
+        public FixedKeybind SwitchCameraPosition = new(KeyCode.W, PlayerActionActivationType.OnKeyDown, nameof(SwitchCameraPosition));
+        public VariableKeybind QuickReset = new(KeyCode.X, new List<PlayerActionActivationType>() { PlayerActionActivationType.OnKeyDown, PlayerActionActivationType.OnHeldForTime }, .5f, nameof(QuickReset));
 
-        public List<Keybind> Keybinds { get; private set; } = new();
+
+        public List<Keybind> Keybinds { get; private set; }
 
         public bool DoRenderRebindMenu { get; private set; }
 
@@ -83,7 +84,7 @@ namespace Inputs
         {
             foreach (var keybind in Keybinds)
             {
-                keybind.OnRenderRebingMenu();
+                keybind.OnRenderRebindMenu();
             }
         }
 

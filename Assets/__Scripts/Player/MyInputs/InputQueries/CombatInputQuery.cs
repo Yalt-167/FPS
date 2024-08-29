@@ -9,15 +9,13 @@ namespace Inputs
     [Serializable]
     public sealed class CombatInputQuery : IInputQuery
     {
-        public FixedKeybind Shoot = new(KeyCode.Mouse0, PlayerActionActivationType.OnKeyHeld);
-        public VariableKeybind Aim = new(KeyCode.Mouse1, new() { PlayerActionActivationType.OnKeyHeld, PlayerActionActivationType.Toggle });
-        public FixedKeybind Reload = new(KeyCode.R, PlayerActionActivationType.OnKeyDown);
+        public FixedKeybind Shoot = new(KeyCode.Mouse0, PlayerActionActivationType.OnKeyHeld, nameof(Shoot));
+        public VariableKeybind Aim = new(KeyCode.Mouse1, new() { PlayerActionActivationType.OnKeyHeld, PlayerActionActivationType.Toggle }, nameof(Aim));
+        public FixedKeybind Reload = new(KeyCode.R, PlayerActionActivationType.OnKeyDown, nameof(Reload));
 
-
-        public FixedKeybind FirstGun = new(KeyCode.Alpha1, PlayerActionActivationType.OnKeyDown);
-        public FixedKeybind SecondGun = new(KeyCode.Alpha2, PlayerActionActivationType.OnKeyDown);
-        public FixedKeybind ThirdGun = new(KeyCode.Alpha3, PlayerActionActivationType.OnKeyDown);
-
+        public FixedKeybind FirstGun = new(KeyCode.Alpha1, PlayerActionActivationType.OnKeyDown, nameof(FirstGun));
+        public FixedKeybind SecondGun = new(KeyCode.Alpha2, PlayerActionActivationType.OnKeyDown, nameof(SecondGun));
+        public FixedKeybind ThirdGun = new(KeyCode.Alpha3, PlayerActionActivationType.OnKeyDown, nameof(ThirdGun));
 
         public FixedKeybind InitiatePrimaryAbility;
         public FixedKeybind ReleasePrimaryAbility;
@@ -30,7 +28,7 @@ namespace Inputs
         public FixedKeybind Slash;
         public FixedKeybind Parry;
 
-        public List<Keybind> Keybinds { get; private set; } = new();
+        public List<Keybind> Keybinds { get; private set; }
         public bool DoRenderRebindMenu { get; private set; }
 
         public void Init()
@@ -61,7 +59,7 @@ namespace Inputs
         {
             foreach (var keybind in Keybinds)
             {
-                keybind.OnRenderRebingMenu();
+                keybind.OnRenderRebindMenu();
             }
         }
 

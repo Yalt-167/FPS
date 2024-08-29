@@ -113,6 +113,6 @@ namespace Inputs
             return bind.shouldOutput();
         }
 
-        public abstract void OnRenderRebingMenu();
+        public abstract void OnRenderRebindMenu();
     }
 }

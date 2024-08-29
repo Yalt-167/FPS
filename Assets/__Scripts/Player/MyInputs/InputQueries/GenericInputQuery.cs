@@ -8,9 +8,9 @@ namespace Inputs
 {
     public sealed class GenericInputQuery : IInputQuery
     {
-        public FixedKeybind TogglePauseMenu = new(KeyCode.Escape, PlayerActionActivationType.OnKeyDown);
+        public FixedKeybind TogglePauseMenu = new(KeyCode.Escape, PlayerActionActivationType.OnKeyDown, nameof(TogglePauseMenu));
 
-        public List<Keybind> Keybinds { get; private set; } = new();
+        public List<Keybind> Keybinds { get; private set; }
 
         public bool DoRenderRebindMenu { get; private set; }
 
@@ -23,7 +23,7 @@ namespace Inputs
         {
             foreach (var keybind in Keybinds)
             {
-                keybind.OnRenderRebingMenu();
+                keybind.OnRenderRebindMenu();
             }
         }
 

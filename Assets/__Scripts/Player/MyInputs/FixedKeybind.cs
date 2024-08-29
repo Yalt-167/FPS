@@ -24,10 +24,20 @@ namespace Inputs
             name = name_;
         }
 
-        public override void OnRenderRebingMenu()
+        public override void OnRenderRebindMenu()
         {
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
 
+            GUILayout.Label(name);
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+            GUILayout.Label(RelevantKey.ToString()); // eventually store that as a memeber variable to avoid unecessary garbage collection
+            GUILayout.EndHorizontal();
+
+            GUI.enabled = false;
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+            GUILayout.Label(howToActivate.ToString()); // eventually store that as a memeber variable to avoid unecessary garbage collection
+            GUILayout.EndHorizontal();
+            GUI.enabled = true;
 
             GUILayout.EndHorizontal();
         }
