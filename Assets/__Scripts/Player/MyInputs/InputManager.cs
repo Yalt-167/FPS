@@ -10,9 +10,9 @@ namespace Inputs
     {
         public MovementInputQuery MovementInputs;
         public CombatInputQuery CombatInputs;
-        public CombatInputQuery GenericInputs;
-        public float cameraXSensitivity = 4f;
-        public float cameraYSensitivity = 4f;
+        public GenericInputQuery GenericInputs;
+        public float cameraHorizontalSenitivity = 3f;
+        public float cameraVerticalSensitivity = 3f;
 
 
         private void Awake()

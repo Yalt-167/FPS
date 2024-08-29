@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-namespace Inputs
+namespace NameSpace
 {
-    public abstract class InputQuery
+    public sealed class SettingsMenu : MonoBehaviour
     {
-        public abstract void Init();
+
     }
 }

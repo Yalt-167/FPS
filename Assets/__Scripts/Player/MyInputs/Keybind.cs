@@ -8,6 +8,7 @@ namespace Inputs
 {
     public abstract class Keybind
     {
+        protected string name;
         [SerializeField] protected KeyCode RelevantKey;
         [SerializeField] protected PlayerActionActivationType howToActivate;
 
@@ -16,10 +17,11 @@ namespace Inputs
         protected float heldSince;
         [SerializeField] protected float holdForSeconds;
 
-        public void Init()
+        public void Init(IInputQuery inputQuery)
         {
             heldSince = float.PositiveInfinity;
             SetRelevantOutputSettings();
+            inputQuery.RegisterKeybind(this);
         }
 
         public void ResetState()
@@ -30,6 +32,11 @@ namespace Inputs
         public void SetKey(KeyCode newKey)
         {
             RelevantKey = newKey;
+        }
+
+        public KeyCode GetKey()
+        {
+            return RelevantKey;
         }
 
         protected void SetRelevantOutputSettings()
@@ -105,5 +112,7 @@ namespace Inputs
         {
             return bind.shouldOutput();
         }
+
+        public abstract void OnRenderRebingMenu();
     }
 }

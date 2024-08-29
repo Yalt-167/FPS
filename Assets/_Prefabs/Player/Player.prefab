@@ -1412,6 +1412,7 @@ GameObject:
   - component: {fileID: 6958501662965233336}
   - component: {fileID: 5314762285684912620}
   - component: {fileID: 3274016814467245242}
+  - component: {fileID: 3018800575568115996}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1501,7 +1502,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2957232829
+  GlobalObjectIdHash: 169908227
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -2051,66 +2052,20 @@ MonoBehaviour:
       RelevantKey: 0
       howToActivate: 0
       holdForSeconds: 0
-  GenericInputs:
-    Shoot:
-      RelevantKey: 323
-      howToActivate: 2
-      holdForSeconds: 0
-    Aim:
-      RelevantKey: 324
-      howToActivate: 2
-      holdForSeconds: 0
-      allowedActivationTypes: 0200000003000000
-    Reload:
-      RelevantKey: 114
-      howToActivate: 0
-      holdForSeconds: 0
-    FirstGun:
-      RelevantKey: 49
-      howToActivate: 0
-      holdForSeconds: 0
-    SecondGun:
-      RelevantKey: 50
-      howToActivate: 0
-      holdForSeconds: 0
-    ThirdGun:
-      RelevantKey: 51
-      howToActivate: 0
-      holdForSeconds: 0
-    InitiatePrimaryAbility:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    ReleasePrimaryAbility:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    InitiateSecondaryAbility:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    ReleaseSecondaryAbility:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    InitiateUltimate:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    ReleaseUltimate:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    Slash:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    Parry:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-  cameraXSensitivity: 3
-  cameraYSensitivity: 3
+  cameraHorizontalSenitivity: 3
+  cameraVerticalSensitivity: 3
+--- !u!114 &3018800575568115996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5705630700605972737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c88f6f1e8c9865d4b9a014d1ed9b8200, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5814794369634734712
 GameObject:
   m_ObjectHideFlags: 0

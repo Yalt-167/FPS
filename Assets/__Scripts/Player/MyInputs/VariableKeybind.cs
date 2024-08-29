@@ -21,24 +21,26 @@ namespace Inputs
         /// </summary>
         /// <param name="relevantKey"></param>
         /// <param name="_allowedActivationTypes"></param>
-        public VariableKeybind(KeyCode relevantKey, List<PlayerActionActivationType> _allowedActivationTypes)
+        public VariableKeybind(KeyCode relevantKey, List<PlayerActionActivationType> _allowedActivationTypes, string name_)
         {
             RelevantKey = relevantKey;
             allowedActivationTypes = _allowedActivationTypes;
             howToActivate = allowedActivationTypes[0];
+            name = name_;
         }
 
-        public VariableKeybind(KeyCode relevantKey, List<PlayerActionActivationType> _allowedActivationTypes, float _holdForSeconds)
+        public VariableKeybind(KeyCode relevantKey, List<PlayerActionActivationType> _allowedActivationTypes, float _holdForSeconds, string name_)
         {
             RelevantKey = relevantKey;
             allowedActivationTypes = _allowedActivationTypes;
             howToActivate = allowedActivationTypes[0];
             holdForSeconds = _holdForSeconds;
+            name = name_;
         }
 
-        public new void Init()
+        public new void Init(IInputQuery inputQuery)
         {
-            base.Init();
+            base.Init(inputQuery);
             activationTypeIndex = allowedActivationTypes.IndexOf(howToActivate);
             activationTypesLength = allowedActivationTypes.Count;
         }
@@ -53,6 +55,11 @@ namespace Inputs
         {
             howToActivate = allowedActivationTypes[++activationTypeIndex % activationTypesLength];
             SetRelevantOutputSettings();
+        }
+
+        public override void OnRenderRebingMenu()
+        {
+            throw new NotImplementedException();
         }
     }
 }

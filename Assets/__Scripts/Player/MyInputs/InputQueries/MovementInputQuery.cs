@@ -7,9 +7,8 @@ using UnityEngine;
 namespace Inputs
 {
     [Serializable]
-    public sealed class MovementInputQuery : InputQuery
+    public sealed class MovementInputQuery : IInputQuery
     {
-
         public FixedKeybind InitiateForward = new(KeyCode.Z, PlayerActionActivationType.OnKeyDown);
         public FixedKeybind Forward = new(KeyCode.Z, PlayerActionActivationType.OnKeyHeld);
 
@@ -42,38 +41,55 @@ namespace Inputs
         public FixedKeybind SwitchCameraPosition = new(KeyCode.W, PlayerActionActivationType.OnKeyDown);
         public VariableKeybind QuickReset = new(KeyCode.X, new List<PlayerActionActivationType>() { PlayerActionActivationType.OnKeyDown, PlayerActionActivationType.OnHeldForTime }, .5f);
 
-        public override void Init()
+        public List<Keybind> Keybinds { get; private set; } = new();
+
+        public bool DoRenderRebindMenu { get; private set; }
+
+        public void Init()
         {
-            InitiateForward.Init();
-            Forward.Init();
+            InitiateForward.Init(this);
+            Forward.Init(this);
 
-            InitiateBack.Init();
-            Back.Init();
+            InitiateBack.Init(this);
+            Back.Init(this);
 
-            InitiateRight.Init();
-            Right.Init();
-            HoldRightForTime.Init();
+            InitiateRight.Init(this);
+            Right.Init(this);
+            HoldRightForTime.Init(this);
 
-            InitiateLeft.Init();
-            Left.Init();
-            HoldLeftForTime.Init();
+            InitiateLeft.Init(this);
+            Left.Init(this);
+            HoldLeftForTime.Init(this);
 
-            InitiateJump.Init();
-            HoldJump.Init();
-            InterruptJump.Init();
+            InitiateJump.Init(this);
+            HoldJump.Init(this);
+            InterruptJump.Init(this);
 
-            InitiateSlide.Init();
-            HoldSlide.Init();
-            HoldCrouch.Init();
-            Dash.Init();
+            InitiateSlide.Init(this);
+            HoldSlide.Init(this);
+            HoldCrouch.Init(this);
+            Dash.Init(this);
 
-            InitiateGrapplingHook.Init();
-            HoldGrapplingHook.Init();
-            ReleaseGrapplingHook.Init();
+            InitiateGrapplingHook.Init(this);
+            HoldGrapplingHook.Init(this);
+            ReleaseGrapplingHook.Init(this);
 
-            SwitchCameraPosition.Init();
+            SwitchCameraPosition.Init(this);
 
-            QuickReset.Init();
+            QuickReset.Init(this);
+        }
+
+        public void OnRenderRebindMenu()
+        {
+            foreach (var keybind in Keybinds)
+            {
+                keybind.OnRenderRebingMenu();
+            }
+        }
+
+        public void RegisterKeybind(Keybind bind)
+        {
+            Keybinds.Add(bind);
         }
     }
 }

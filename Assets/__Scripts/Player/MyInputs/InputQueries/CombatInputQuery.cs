@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Inputs
 {
     [Serializable]
-    public sealed class CombatInputQuery : InputQuery
+    public sealed class CombatInputQuery : IInputQuery
     {
         public FixedKeybind Shoot = new(KeyCode.Mouse0, PlayerActionActivationType.OnKeyHeld);
         public VariableKeybind Aim = new(KeyCode.Mouse1, new() { PlayerActionActivationType.OnKeyHeld, PlayerActionActivationType.Toggle });
@@ -30,29 +30,44 @@ namespace Inputs
         public FixedKeybind Slash;
         public FixedKeybind Parry;
 
+        public List<Keybind> Keybinds { get; private set; } = new();
+        public bool DoRenderRebindMenu { get; private set; }
 
-        public override void Init()
+        public void Init()
         {
-            Shoot.Init();
-            Aim.Init();
-            Reload.Init();
+            Shoot.Init(this);
+            Aim.Init(this);
+            Reload.Init(this);
 
             //NextWeapon.Init();
             //PreviousWeapon.Init();
 
-            FirstGun.Init();
-            SecondGun.Init();
-            ThirdGun.Init();
+            FirstGun.Init(this);
+            SecondGun.Init(this);
+            ThirdGun.Init(this);
 
-            InitiatePrimaryAbility.Init();
-            ReleasePrimaryAbility.Init();
-            InitiateSecondaryAbility.Init();
-            ReleaseSecondaryAbility.Init();
-            InitiateUltimate.Init();
-            ReleaseUltimate.Init();
+            InitiatePrimaryAbility.Init(this);
+            ReleasePrimaryAbility.Init(this);
+            InitiateSecondaryAbility.Init(this);
+            ReleaseSecondaryAbility.Init(this);
+            InitiateUltimate.Init(this);
+            ReleaseUltimate.Init(this);
 
-            Slash.Init();
-            Parry.Init();
+            Slash.Init(this);
+            Parry.Init(this);
+        }
+
+        public void OnRenderRebindMenu()
+        {
+            foreach (var keybind in Keybinds)
+            {
+                keybind.OnRenderRebingMenu();
+            }
+        }
+
+        public void RegisterKeybind(Keybind bind)
+        {
+            Keybinds.Add(bind);
         }
     }
 }
