@@ -169,7 +169,7 @@ namespace Controller
         private bool CanUseCoyote => coyoteUsable && !isCollidingDown && timeLeftGround + coyoteTimeThreshold > Time.time;
         private bool HasBufferedJump => isCollidingDown && lastJumpPressed + jumpBuffer > Time.time;
 
-        private bool ShouldLongJump => DashUsable && InputQuery.Dash && InputQuery.Forward;
+        private bool ShouldLongJump => DashUsable && InputQuery.Dash && InputQuery.Forward["Hold"];
         private bool forceResetJumping;
         #endregion
 
@@ -1091,7 +1091,7 @@ namespace Controller
 
             if (triedJumping)
             {
-                Jump(wouldVeBeenFullJump, dashed && InputQuery.Forward);
+                Jump(wouldVeBeenFullJump, dashed && InputQuery.Forward["Hold"]);
                 CommonSlideExit(MovementMode.Run);
                 yield break;
             }
@@ -1188,7 +1188,7 @@ namespace Controller
 
             if (!isCollidingDown)
             {
-                var shouldWallrunLeftRight = MyInput.GetAxis(InputQuery.Left && isCollidingLeft, InputQuery.Right && isCollidingRight);
+                var shouldWallrunLeftRight = MyInput.GetAxis(InputQuery.Left["Hold"] && isCollidingLeft, InputQuery.Right["Hold"] && isCollidingRight);
                 if (shouldWallrunLeftRight != 0f)
                 {
                     CommonDashExit(MovementMode.Wallrun);
@@ -1310,7 +1310,7 @@ namespace Controller
 
         private IEnumerator Wallrun(int side)
         {
-            if (!InputQuery.Forward || InputQuery.Back || !CanWallRunAfterDash) { yield break; }
+            if (!InputQuery.Forward["Hold"] || InputQuery.Back["Hold"] || !CanWallRunAfterDash) { yield break; }
 
             SetMovementMode(MovementMode.Wallrun);
             ResetYVelocity();
@@ -1339,7 +1339,7 @@ namespace Controller
                     if (InputQuery.Jump["Initiate"])
                     {
                         CommonWallRunExit(MovementMode.Run, onRight);
-                        WallJump(!onRight, onRight ? InputQuery.Left : InputQuery.Right);
+                        WallJump(!onRight, onRight ? InputQuery.Left["Hold"] : InputQuery.Right["Hold"]);
                         leftEarly = true;
                         return true;
                     }
@@ -1372,8 +1372,8 @@ namespace Controller
                     if (!isCollidingOnAnySide) { return true; } // out of the final return bc didn t work for reasons that are beyond me
 
                     return
-                        InputQuery.Back ||
-                        !InputQuery.Forward ||
+                        InputQuery.Back["Hold"] ||
+                        !InputQuery.Forward["Hold"] ||
                         onRight ? InputQuery.Left["HoldForTime"] : InputQuery.Right["HoldForTime"]
                         ;
                 }
@@ -1508,7 +1508,7 @@ namespace Controller
         }
 
         //private float TargetRunCameraTiltAngle => MyInput.GetAxis(inputQuery.Right, inputQuery.Left) * maxRunCameraTiltAngle;
-        private float TargetRunCameraTiltAngle => MyInput.GetAxis(InputQuery.Right && !isCollidingRight, InputQuery.Left & !isCollidingLeft) * maxRunCameraTiltAngle;
+        private float TargetRunCameraTiltAngle => MyInput.GetAxis(InputQuery.Right["Hold"] && !isCollidingRight, InputQuery.Left["Hold"] & !isCollidingLeft) * maxRunCameraTiltAngle;
         //
         //private float TargetRunCameraTiltAngle => Rigidbody != null ? CurrentStrafeSpeed / Mathf.Abs(CurrentStrafeSpeed) * maxRunCameraTiltAngle : 0f;
         // as dir in {-1, 0, 1} dir * maxRunCameraTiltAngle in {-maxRunCameraTiltAngle, 0 (regulateCameraTilt), maxRunCameraTiltAngle}
