@@ -391,10 +391,10 @@ namespace Controller
             // this is true for each key with an exoected long lasting effects namely:
             // HoldForTime -> may miss the frame where stopped holding if it was nt checked this frame
             // Toggle -> may misss the frame where toggled it if it was nt checked this frame
-            _ = InputQuery.HoldLeftForTime;
-            _ = InputQuery.HoldRightForTime;
+            _ = InputQuery.Left["HoldForTime"];
+            _ = InputQuery.Right["HoldForTime"];
             _ = InputQuery.QuickReset;
-            _ = InputQuery.HoldSlide;
+            _ = InputQuery.Slide["Hold"];
             _ = InputQuery.HoldCrouch;
 
             currentMovementMethod();
@@ -606,7 +606,7 @@ namespace Controller
         {
             if (IsJumping) { return (false, false); }
 
-            if (InputQuery.InitiateJump)
+            if (InputQuery.Jump["Initiate"])
             {
                 lastJumpPressed = Time.time; // for jump buffer
 
@@ -619,7 +619,7 @@ namespace Controller
             else if (HasBufferedJump)
             {
                 //Jump(inputQuery.HoldJump);
-                return (true, InputQuery.HoldJump);
+                return (true, InputQuery.Jump["Hold"]);
             }
 
             return (false, false);
@@ -719,7 +719,7 @@ namespace Controller
                 return;
             }
 
-            if (InputQuery.InitiateSlide && CurrentSpeed != 0f) // HoldSlide or InitiateSlide ? -> run some tests
+            if (InputQuery.Slide["Initiate"] && CurrentSpeed != 0f) // HoldSlide or InitiateSlide ? -> run some tests
             {
                 StartCoroutine(Slide()); // add some kind of coyote threshold where the velocity is conserved even tho the player walked a bit (which should kill his momentum)
                 return;
@@ -1038,9 +1038,9 @@ namespace Controller
 
             var shouldAwardVelocityBoostForFalling = !isCollidingDown;
 
-            yield return new WaitUntil(() => isCollidingDown || !InputQuery.HoldSlide); // await the landing to initiate the slide
+            yield return new WaitUntil(() => isCollidingDown || !InputQuery.Slide["Hold"]); // await the landing to initiate the slide
 
-            if (!InputQuery.HoldSlide) { yield break; } // if changed his mind
+            if (!InputQuery.Slide["Hold"]) { yield break; } // if changed his mind
 
             SetMovementMode(MovementMode.Slide);
             transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
@@ -1083,7 +1083,7 @@ namespace Controller
 
                         return
                             Rigidbody.velocity.magnitude < slideCancelThreshold ||
-                            !InputQuery.HoldSlide ||
+                            !InputQuery.Slide["Hold"] ||
                             triedJumping
                             ;
                     }
@@ -1169,7 +1169,7 @@ namespace Controller
                         //Rigidbody.velocity = dashVelocity * cameraTransform.forward; // perhaps do sth less brutal with gradual velocity loss
                         Rigidbody.velocity = DashVelocity * dir; // perhaps do sth less brutal with gradual velocity loss
 
-                        if (InputQuery.InitiateSlide && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
+                        if (InputQuery.Slide["Initiate"] && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
                         {
                             slid = true;
                             return true;
@@ -1243,7 +1243,7 @@ namespace Controller
 
         private bool CheckLedgeClimb(out Collider[] ledges)
         {
-            if (!CanLedgeClimb || InputQuery.Back || !InputQuery.Forward && !InputQuery.InitiateJump)
+            if (!CanLedgeClimb || InputQuery.Back || !InputQuery.Forward && !InputQuery.Jump["Initiate"])
             {
                 ledges = new Collider[0];
                 return false;
@@ -1320,8 +1320,8 @@ namespace Controller
 
             timeStartedWallRunning = Time.time;
             var startedTiltingCamera = false;
-            InputQuery.HoldLeftForTime.ResetState(); // avoid insta quitting the wallrun due to this triggering while you held it to jump
-            InputQuery.HoldRightForTime.ResetState(); // same but other side :)
+            InputQuery.Left.ResetHeldSince(); // avoid insta quitting the wallrun due to this triggering while you held it to jump
+            InputQuery.Right.ResetHeldSince(); // same but other side :)
 
             var leftEarly = false;
             var directionAlongWall = (transform.forward - Vector3.Dot(transform.forward, forceDirection) * forceDirection).normalized;
@@ -1336,7 +1336,7 @@ namespace Controller
                     Rigidbody.AddForce(wallRunForceCoefficient * WallRunSpeed * Time.deltaTime * directionAlongWall, ForceMode.Force);
                     Rigidbody.velocity = Vector3.ClampMagnitude(Rigidbody.velocity.Mask(1f, 0f, 1f), WallRunSpeed);
 
-                    if (InputQuery.InitiateJump)
+                    if (InputQuery.Jump["Initiate"])
                     {
                         CommonWallRunExit(MovementMode.Run, onRight);
                         WallJump(!onRight, onRight ? InputQuery.Left : InputQuery.Right);
@@ -1361,7 +1361,7 @@ namespace Controller
                         return true;
                     }
 
-                    if (InputQuery.InitiateSlide)
+                    if (InputQuery.Slide["Initiate"])
                     {
                         CommonWallRunExit(MovementMode.Slide, onRight);
                         StartCoroutine(Slide());
@@ -1374,7 +1374,7 @@ namespace Controller
                     return
                         InputQuery.Back ||
                         !InputQuery.Forward ||
-                        onRight ? InputQuery.HoldLeftForTime : InputQuery.HoldRightForTime
+                        onRight ? InputQuery.Left["HoldForTime"] : InputQuery.Right["HoldForTime"]
                         ;
                 }
             );

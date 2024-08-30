@@ -18,7 +18,7 @@ namespace Inputs
         public FixedKeybind ThirdGun = new(KeyCode.Alpha3, PlayerInputType.OnKeyDown, nameof(ThirdGun));
 
         public GroupKeybind PrimaryAbility = new(KeyCode.None, new Dictionary<string, PlayerInputType>() { { "Initiate", PlayerInputType.OnKeyDown }, { "Release", PlayerInputType.OnKeyUp } }, nameof(PrimaryAbility));
-        public GroupKeybind SecondaryAbility = new(KeyCode.None, new Dictionary<string, PlayerInputType>() { { "Initiate", PlayerInputType.OnKeyDown }, { "Release", PlayerInputType.OnKeyUp } }, nameof(SecondaryAbility)        );
+        public GroupKeybind SecondaryAbility = new(KeyCode.None, new Dictionary<string, PlayerInputType>() { { "Initiate", PlayerInputType.OnKeyDown }, { "Release", PlayerInputType.OnKeyUp } }, nameof(SecondaryAbility));
         public GroupKeybind Ultimate = new(KeyCode.None, new Dictionary<string, PlayerInputType>() { { "Initiate", PlayerInputType.OnKeyDown }, { "Release", PlayerInputType.OnKeyUp } }, nameof(Ultimate));
 
         public FixedKeybind Slash;

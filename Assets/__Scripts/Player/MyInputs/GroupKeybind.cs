@@ -51,6 +51,11 @@ namespace Inputs
             }
         }
 
+        public override void ResetHeldSince()
+        {
+            heldSince = Time.time;
+        }
+
         public override void OnRenderRebindMenu()
         {
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);

@@ -24,7 +24,7 @@ namespace Inputs
             inputQuery.RegisterKeybind(this);
         }
 
-        public void ResetState()
+        public virtual void ResetHeldSince()
         {
             heldSince = Time.time;
         }
