@@ -9,26 +9,22 @@ namespace Inputs
     [Serializable]
     public sealed class CombatInputQuery : IInputQuery
     {
-        public FixedKeybind Shoot = new(KeyCode.Mouse0, PlayerActionActivationType.OnKeyHeld, nameof(Shoot));
-        public VariableKeybind Aim = new(KeyCode.Mouse1, new() { PlayerActionActivationType.OnKeyHeld, PlayerActionActivationType.Toggle }, nameof(Aim));
-        public FixedKeybind Reload = new(KeyCode.R, PlayerActionActivationType.OnKeyDown, nameof(Reload));
+        public FixedKeybind Shoot = new(KeyCode.Mouse0, PlayerInputType.OnKeyHeld, nameof(Shoot));
+        public VariableKeybind Aim = new(KeyCode.Mouse1, new() { PlayerInputType.OnKeyHeld, PlayerInputType.Toggle }, nameof(Aim));
+        public FixedKeybind Reload = new(KeyCode.R, PlayerInputType.OnKeyDown, nameof(Reload));
 
-        public FixedKeybind FirstGun = new(KeyCode.Alpha1, PlayerActionActivationType.OnKeyDown, nameof(FirstGun));
-        public FixedKeybind SecondGun = new(KeyCode.Alpha2, PlayerActionActivationType.OnKeyDown, nameof(SecondGun));
-        public FixedKeybind ThirdGun = new(KeyCode.Alpha3, PlayerActionActivationType.OnKeyDown, nameof(ThirdGun));
+        public FixedKeybind FirstGun = new(KeyCode.Alpha1, PlayerInputType.OnKeyDown, nameof(FirstGun));
+        public FixedKeybind SecondGun = new(KeyCode.Alpha2, PlayerInputType.OnKeyDown, nameof(SecondGun));
+        public FixedKeybind ThirdGun = new(KeyCode.Alpha3, PlayerInputType.OnKeyDown, nameof(ThirdGun));
 
-        public FixedKeybind InitiatePrimaryAbility;
-        public FixedKeybind ReleasePrimaryAbility;
-        public FixedKeybind InitiateSecondaryAbility;
-        public FixedKeybind ReleaseSecondaryAbility;
-        public FixedKeybind InitiateUltimate;
-        public FixedKeybind ReleaseUltimate;
-
+        public GroupKeybind PrimaryAbility = new(KeyCode.None, new Dictionary<string, PlayerInputType>() { { "Initiate", PlayerInputType.OnKeyDown }, { "Release", PlayerInputType.OnKeyUp } }, nameof(PrimaryAbility));
+        public GroupKeybind SecondaryAbility = new(KeyCode.None, new Dictionary<string, PlayerInputType>() { { "Initiate", PlayerInputType.OnKeyDown }, { "Release", PlayerInputType.OnKeyUp } }, nameof(SecondaryAbility)        );
+        public GroupKeybind Ultimate = new(KeyCode.None, new Dictionary<string, PlayerInputType>() { { "Initiate", PlayerInputType.OnKeyDown }, { "Release", PlayerInputType.OnKeyUp } }, nameof(Ultimate));
 
         public FixedKeybind Slash;
         public FixedKeybind Parry;
 
-        public List<Keybind> Keybinds { get; private set; }
+        public List<Keybind> Keybinds { get; private set; } = new();
         public bool DoRenderRebindMenu { get; private set; }
 
         public void Init()
@@ -44,12 +40,9 @@ namespace Inputs
             SecondGun.Init(this);
             ThirdGun.Init(this);
 
-            InitiatePrimaryAbility.Init(this);
-            ReleasePrimaryAbility.Init(this);
-            InitiateSecondaryAbility.Init(this);
-            ReleaseSecondaryAbility.Init(this);
-            InitiateUltimate.Init(this);
-            ReleaseUltimate.Init(this);
+            PrimaryAbility.Init(this);
+            SecondaryAbility.Init(this);
+            Ultimate.Init(this);
 
             Slash.Init(this);
             Parry.Init(this);

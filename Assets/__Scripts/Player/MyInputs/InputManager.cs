@@ -21,5 +21,17 @@ namespace Inputs
             CombatInputs.Init();
             GenericInputs.Init();
         }
+
+        private void Update()
+        {
+            if (GenericInputs.TogglePauseMenu2["Initiate"])
+            {
+                Debug.Log("Initiate");
+            }
+            else if (GenericInputs.TogglePauseMenu2["Stop"])
+            {
+                Debug.Log("Stop");
+            }
+        }
     }
 }

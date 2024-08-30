@@ -6,11 +6,13 @@ using UnityEngine;
 
 namespace Inputs
 {
+    [Serializable]
     public sealed class GenericInputQuery : IInputQuery
     {
-        public FixedKeybind TogglePauseMenu = new(KeyCode.Escape, PlayerActionActivationType.OnKeyDown, nameof(TogglePauseMenu));
+        public FixedKeybind TogglePauseMenu = new(KeyCode.Escape, PlayerInputType.OnKeyDown, nameof(TogglePauseMenu));
+        public GroupKeybind TogglePauseMenu2 = new(KeyCode.Escape, new PlayerInputType[] { PlayerInputType.OnKeyDown , PlayerInputType.OnKeyUp}, new string[] { "Initiate", "Stop"}, nameof(TogglePauseMenu));
 
-        public List<Keybind> Keybinds { get; private set; }
+        public List<Keybind> Keybinds { get; private set; } = new();
 
         public bool DoRenderRebindMenu { get; private set; }
 

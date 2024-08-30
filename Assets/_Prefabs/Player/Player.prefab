@@ -2052,6 +2052,15 @@ MonoBehaviour:
       RelevantKey: 0
       howToActivate: 0
       holdForSeconds: 0
+  GenericInputs:
+    TogglePauseMenu:
+      RelevantKey: 27
+      howToActivate: 0
+      holdForSeconds: 0
+    TogglePauseMenu2:
+      RelevantKey: 127
+      howToActivate: 0
+      holdForSeconds: 0
   cameraHorizontalSenitivity: 3
   cameraVerticalSensitivity: 3
 --- !u!114 &3018800575568115996

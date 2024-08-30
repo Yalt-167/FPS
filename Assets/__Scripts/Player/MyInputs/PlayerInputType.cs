@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Inputs
 {
-    public enum PlayerActionActivationType
+    public enum PlayerInputType
     {
         OnKeyDown,
         OnKeyUp,

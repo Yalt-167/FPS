@@ -10,7 +10,7 @@ namespace Inputs
     [Serializable]
     public sealed class VariableKeybind : Keybind
     {
-        [SerializeField] private List<PlayerActionActivationType> allowedActivationTypes;
+        [SerializeField] private List<PlayerInputType> allowedActivationTypes;
 
 
         private int activationTypeIndex;
@@ -21,7 +21,7 @@ namespace Inputs
         /// </summary>
         /// <param name="relevantKey"></param>
         /// <param name="_allowedActivationTypes"></param>
-        public VariableKeybind(KeyCode relevantKey, List<PlayerActionActivationType> _allowedActivationTypes, string name_)
+        public VariableKeybind(KeyCode relevantKey, List<PlayerInputType> _allowedActivationTypes, string name_)
         {
             RelevantKey = relevantKey;
             allowedActivationTypes = _allowedActivationTypes;
@@ -29,7 +29,7 @@ namespace Inputs
             name = name_;
         }
 
-        public VariableKeybind(KeyCode relevantKey, List<PlayerActionActivationType> _allowedActivationTypes, float _holdForSeconds, string name_)
+        public VariableKeybind(KeyCode relevantKey, List<PlayerInputType> _allowedActivationTypes, float _holdForSeconds, string name_)
         {
             RelevantKey = relevantKey;
             allowedActivationTypes = _allowedActivationTypes;
@@ -45,7 +45,7 @@ namespace Inputs
             activationTypesLength = allowedActivationTypes.Count;
         }
 
-        public void SetActivationType(PlayerActionActivationType newActivationType)
+        public void SetActivationType(PlayerInputType newActivationType)
         {
             howToActivate = newActivationType;
             SetRelevantOutputSettings();

@@ -10,7 +10,7 @@ namespace Inputs
     {
         protected string name;
         [SerializeField] protected KeyCode RelevantKey;
-        [SerializeField] protected PlayerActionActivationType howToActivate;
+        [SerializeField] protected PlayerInputType howToActivate;
 
         protected Func<bool> shouldOutput;
         protected bool active;
@@ -43,23 +43,23 @@ namespace Inputs
         {
             switch (howToActivate)
             {
-                case PlayerActionActivationType.OnKeyDown:
+                case PlayerInputType.OnKeyDown:
                     shouldOutput = CheckKeyDown;
                     break;
 
-                case PlayerActionActivationType.OnKeyUp:
+                case PlayerInputType.OnKeyUp:
                     shouldOutput = CheckKeyUp;
                     break;
 
-                case PlayerActionActivationType.OnKeyHeld:
+                case PlayerInputType.OnKeyHeld:
                     shouldOutput = CheckKeyHeld;
                     break;
 
-                case PlayerActionActivationType.Toggle:
+                case PlayerInputType.Toggle:
                     shouldOutput = CheckToggle;
                     break;
 
-                case PlayerActionActivationType.OnHeldForTime:
+                case PlayerInputType.OnHeldForTime:
                     shouldOutput = CheckKeyHeldForTime;
                     break;
 
@@ -67,6 +67,19 @@ namespace Inputs
                     Debug.Log("sth wrong");
                     break;
             }
+        }
+
+        protected Func<bool> GetRelevantOutputSettingsFromParam(PlayerInputType param)
+        {
+            return param switch
+            {
+                PlayerInputType.OnKeyDown => CheckKeyDown,
+                PlayerInputType.OnKeyUp => CheckKeyUp,
+                PlayerInputType.OnKeyHeld => CheckKeyHeld,
+                PlayerInputType.Toggle => CheckToggle,
+                PlayerInputType.OnHeldForTime => CheckKeyHeldForTime,
+                _ => throw new System.Exception("This activvation type does not exist")
+            };
         }
 
         protected bool CheckKeyDown()

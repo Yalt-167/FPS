@@ -9,14 +9,14 @@ namespace Inputs
     [Serializable]
     public sealed class FixedKeybind : Keybind
     {
-        public FixedKeybind(KeyCode relevantKey, PlayerActionActivationType activationTypes, string name_)
+        public FixedKeybind(KeyCode relevantKey, PlayerInputType activationTypes, string name_)
         {
             RelevantKey = relevantKey;
             howToActivate = activationTypes;
             name = name_;
         }
 
-        public FixedKeybind(KeyCode relevantKey, PlayerActionActivationType activationTypes, float _holdForSeconds, string name_)
+        public FixedKeybind(KeyCode relevantKey, PlayerInputType activationTypes, float _holdForSeconds, string name_)
         {
             RelevantKey = relevantKey;
             howToActivate = activationTypes;
