@@ -42,9 +42,9 @@ namespace Controller
         private MovementInputQuery InputQuery => inputManager.MovementInputs;
         private Rigidbody Rigidbody;
         private FollowRotationCamera followRotationCamera;
-        private int ForwardAxisInput => MyInput.GetAxis(InputQuery.Back, InputQuery.Forward);
-        private int SidewayAxisInput => MyInput.GetAxis(InputQuery.Left, InputQuery.Right);
-        private bool PressingForwardOrStrafeInput => InputQuery.Forward || InputQuery.Left || InputQuery.Right;
+        private int ForwardAxisInput => MyInput.GetAxis(InputQuery.Back["Hold"], InputQuery.Forward["Hold"]);
+        private int SidewayAxisInput => MyInput.GetAxis(InputQuery.Left["Hold"], InputQuery.Right["Hold"]);
+        private bool PressingForwardOrStrafeInput => InputQuery.Forward["Hold"] || InputQuery.Left["Hold"] || InputQuery.Right["Hold"];
         public Vector3 Position => transform.position;
         public Vector3 FeetPosition => transform.position + Vector3.down;
         public float CurrentSpeed => Rigidbody.velocity.Mask(1f, 0f, 1f).magnitude;
