@@ -638,7 +638,7 @@ namespace Controller
 
             ResetYVelocity();
 
-            if (InputQuery.Forward)
+            if (InputQuery.Forward["Hold"])
             {
                 Rigidbody.AddForce(initialJumpSpeedBoost * transform.forward, ForceMode.Impulse);
             }
@@ -727,7 +727,7 @@ namespace Controller
 
             if (!isCollidingDown)
             {
-                var sideToWallRunOn = MyInput.GetAxis(InputQuery.Left && isCollidingLeft, InputQuery.Right && isCollidingRight);
+                var sideToWallRunOn = MyInput.GetAxis(InputQuery.Left["Hold"] && isCollidingLeft, InputQuery.Right["Hold"] && isCollidingRight);
                 if (sideToWallRunOn != 0f)
                 {
                     StartCoroutine(Wallrun(sideToWallRunOn));
@@ -1243,7 +1243,7 @@ namespace Controller
 
         private bool CheckLedgeClimb(out Collider[] ledges)
         {
-            if (!CanLedgeClimb || InputQuery.Back || !InputQuery.Forward && !InputQuery.Jump["Initiate"])
+            if (!CanLedgeClimb || InputQuery.Back["Hold"] || !InputQuery.Forward["Hold"] && !InputQuery.Jump["Initiate"])
             {
                 ledges = new Collider[0];
                 return false;
