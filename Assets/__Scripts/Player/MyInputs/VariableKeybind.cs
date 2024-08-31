@@ -61,10 +61,7 @@ namespace Inputs
         {
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
 
-            GUILayout.Label(name);
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
-            GUILayout.Label(RelevantKey.ToString()); // eventually store that as a memeber variable to avoid unecessary garbage collection
-            GUILayout.EndHorizontal();
+            DisplayCurrentKey();
 
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
             GUILayout.Label(howToActivate.ToString()); // eventually store that as a memeber variable to avoid unecessary garbage collection

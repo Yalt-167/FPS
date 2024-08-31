@@ -9,17 +9,21 @@ namespace Inputs
     [Serializable]
     public sealed class FixedKeybind : Keybind
     {
-        public FixedKeybind(KeyCode relevantKey, PlayerInputType activationTypes, string name_)
+        public FixedKeybind(KeyCode relevantKey, PlayerInputType activationType, string name_)
         {
             RelevantKey = relevantKey;
-            howToActivate = activationTypes;
+            relevantKeyAsStr = relevantKey.ToString();
+            howToActivate = activationType;
+            howToActivateAsStr = activationType.ToString();
             name = name_;
         }
 
-        public FixedKeybind(KeyCode relevantKey, PlayerInputType activationTypes, float _holdForSeconds, string name_)
+        public FixedKeybind(KeyCode relevantKey, PlayerInputType activationType, float _holdForSeconds, string name_)
         {
             RelevantKey = relevantKey;
-            howToActivate = activationTypes;
+            relevantKeyAsStr = relevantKey.ToString();
+            howToActivate = activationType;
+            howToActivateAsStr = activationType.ToString();
             holdForSeconds = _holdForSeconds;
             name = name_;
         }
@@ -30,12 +34,12 @@ namespace Inputs
 
             GUILayout.Label(name);
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
-            GUILayout.Label(RelevantKey.ToString()); // eventually store that as a memeber variable to avoid unecessary garbage collection
+            GUILayout.Label(relevantKeyAsStr);
             GUILayout.EndHorizontal();
 
             GUI.enabled = false;
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
-            GUILayout.Label(howToActivate.ToString()); // eventually store that as a memeber variable to avoid unecessary garbage collection
+            GUILayout.Label(howToActivateAsStr);
             GUILayout.EndHorizontal();
             GUI.enabled = true;
 

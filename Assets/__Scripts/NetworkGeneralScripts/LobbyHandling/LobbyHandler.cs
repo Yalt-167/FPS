@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -1196,7 +1194,6 @@ namespace LobbyHandling
                 {
                     JoinLobbyByID(GUIUtility.systemCopyBuffer, Password);
                 }
-                
             }
 
             GUILayout.EndVertical();
@@ -1302,9 +1299,9 @@ namespace LobbyHandling
 
                     foreach (var lobby in availableLobbies.Results)
                     {
-                        Rect r = EditorGUILayout.BeginVertical(CachedGUIStylesNames.Box);
+                        Rect rect = EditorGUILayout.BeginVertical(CachedGUIStylesNames.Box);
 
-                        if (GUI.Button(r, GUIContent.none))
+                        if (GUI.Button(rect, GUIContent.none))
                         {
                             JoinLobbyByID(lobby.Id, string.IsNullOrEmpty(passwordToJoinListLobby) ? noPassword : passwordToJoinListLobby);
                         }
@@ -1317,9 +1314,9 @@ namespace LobbyHandling
 #if false
                     for (int i = 0; i < 5; i++)
                     {
-                        Rect r = EditorGUILayout.BeginVerticalCachedGUIStylesNames.Box);
+                        Rect rect = EditorGUILayout.BeginVerticalCachedGUIStylesNames.Box);
 
-                        if (GUI.Button(r, GUIContent.none))
+                        if (GUI.Button(rect, GUIContent.none))
                         {
                             Debug.Log($"Clicked: {i}");
                         }

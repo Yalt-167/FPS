@@ -80,10 +80,10 @@ namespace Inputs
             }
         }
 
-        public void RegisterKeybind(Keybind bind)
+        public void RegisterKeybind(Keybind keybind)
         {
-            Keybinds.Add(bind);
-            bind.Init();
+            Keybinds.Add(keybind);
+            keybind.Init();
         }
     }
 }

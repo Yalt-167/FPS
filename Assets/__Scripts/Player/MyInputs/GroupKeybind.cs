@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+
 using UnityEngine;
 
 namespace Inputs
@@ -9,12 +9,11 @@ namespace Inputs
     [Serializable]
     public sealed class GroupKeybind : Keybind
     {
-        private Dictionary<string, Func<bool>> groupEntries;
-        //public GroupKeybind(KeyCode relevantKey, PlayerInputType[] activationTypes, string[] actionNames, string name_)
+        private readonly Dictionary<string, Func<bool>> groupEntries;
         public GroupKeybind(KeyCode relevantKey, Dictionary<string, PlayerInputType> actioNameAndInputType, string name_)
         {
             RelevantKey = relevantKey;
-            //howToActivate = activationTypes;
+            relevantKeyAsStr = relevantKey.ToString();
             name = name_;
             groupEntries = new();
             foreach (KeyValuePair<string, PlayerInputType> kvp in actioNameAndInputType)
@@ -26,7 +25,7 @@ namespace Inputs
         public GroupKeybind(KeyCode relevantKey, Dictionary<string, PlayerInputType> actioNameAndInputType, float _holdForSeconds, string name_)
         {
             RelevantKey = relevantKey;
-            //howToActivate = activationTypes;
+            relevantKeyAsStr = relevantKey.ToString();
             holdForSeconds = _holdForSeconds;
             name = name_;
             groupEntries = new();
@@ -38,7 +37,7 @@ namespace Inputs
 
         public static implicit operator bool(GroupKeybind bind)
         {
-            throw new Exception("Should not use implicit operator syntax with a group Keybind");
+            throw new Exception("Should not use implicit operator syntax with a GroupKeybind");
         }
 
         public bool this[string actionNames]
@@ -62,12 +61,12 @@ namespace Inputs
 
             GUILayout.Label(name);
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
-            GUILayout.Label(RelevantKey.ToString()); // eventually store that as a memeber variable to avoid unecessary garbage collection
+            GUILayout.Label(relevantKeyAsStr);
             GUILayout.EndHorizontal();
 
             GUI.enabled = false;
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
-            GUILayout.Label(howToActivate.ToString()); // eventually store that as a memeber variable to avoid unecessary garbage collection
+            GUILayout.Label(howToActivate.ToString());
             GUILayout.EndHorizontal();
             GUI.enabled = true;
 

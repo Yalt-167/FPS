@@ -13,24 +13,22 @@ namespace Inputs
 
         public void RegisterKeybind(Keybind bind);
 
-#if false
-        public void RegisterKeybind(Keybind bind)
-        {
-            Keybinds.Add(bind);
-        }
-#endif
-
-
         public void Init();
 
         public void OnRenderRebindMenu();
 
 #if false
-public void OnGUI_Internal()
+        public void RegisterKeybind(Keybind keybind)
+        {
+            Keybinds.Add(keybind);
+            keybind.Init();
+        }
+
+        public void OnRenderRebindMenu()
         {
             foreach (var keybind in Keybinds)
             {
-                keybind.OnGUI_Internal();
+                keybind.OnRenderRebindMenu();
             }
         }
 #endif

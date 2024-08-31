@@ -13,7 +13,7 @@ namespace Inputs
         public GenericInputQuery GenericInputs;
         public float cameraHorizontalSenitivity = 3f;
         public float cameraVerticalSensitivity = 3f;
-
+        private bool doRenderMenu;
 
         private void Awake()
         {
@@ -22,7 +22,15 @@ namespace Inputs
             GenericInputs.Init();
         }
 
+        private void Update()
+        {
+            doRenderMenu = GenericInputs.TogglePauseMenu ? !doRenderMenu : doRenderMenu;
 
+            if (doRenderMenu)
+            {
+
+            }
+        }
 
 
     }

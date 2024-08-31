@@ -119,5 +119,13 @@ namespace Inputs
         }
 
         public abstract void OnRenderRebindMenu();
+
+        public virtual void DisplayCurrentKey()
+        {
+            GUILayout.Label(name);
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+            GUILayout.Label(relevantKeyAsStr);
+            GUILayout.EndHorizontal();
+        }
     }
 }
