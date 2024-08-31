@@ -17,7 +17,7 @@ namespace Inputs
 
         public void Init()
         {
-            TogglePauseMenu.Init(this);
+            RegisterKeybind(TogglePauseMenu);
         }
 
         public void OnRenderRebindMenu()
@@ -31,6 +31,7 @@ namespace Inputs
         public void RegisterKeybind(Keybind bind)
         {
             Keybinds.Add(bind);
+            bind.Init();
         }
     }
 }

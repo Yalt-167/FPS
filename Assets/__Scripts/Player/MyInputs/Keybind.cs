@@ -10,18 +10,19 @@ namespace Inputs
     {
         protected string name;
         [SerializeField] protected KeyCode RelevantKey;
+        protected string relevantKeyAsStr;
         [SerializeField] protected PlayerInputType howToActivate;
+        protected string howToActivateAsStr;
 
         protected Func<bool> shouldOutput;
         protected bool active;
         protected float heldSince;
         [SerializeField] protected float holdForSeconds;
 
-        public void Init(IInputQuery inputQuery)
+        public virtual void Init()
         {
             heldSince = float.PositiveInfinity;
             SetRelevantOutputSettings();
-            inputQuery.RegisterKeybind(this);
         }
 
         public virtual void ResetHeldSince()
@@ -32,6 +33,7 @@ namespace Inputs
         public void SetKey(KeyCode newKey)
         {
             RelevantKey = newKey;
+            relevantKeyAsStr = newKey.ToString();
         }
 
         public KeyCode GetKey()
@@ -39,34 +41,24 @@ namespace Inputs
             return RelevantKey;
         }
 
+        public void SetInputType(PlayerInputType howToActivate_)
+        {
+            howToActivate = howToActivate_;
+            howToActivateAsStr = howToActivate_.ToString();
+            SetRelevantOutputSettings();
+        }
+
         protected void SetRelevantOutputSettings()
         {
-            switch (howToActivate)
+            shouldOutput = howToActivate switch
             {
-                case PlayerInputType.OnKeyDown:
-                    shouldOutput = CheckKeyDown;
-                    break;
-
-                case PlayerInputType.OnKeyUp:
-                    shouldOutput = CheckKeyUp;
-                    break;
-
-                case PlayerInputType.OnKeyHeld:
-                    shouldOutput = CheckKeyHeld;
-                    break;
-
-                case PlayerInputType.Toggle:
-                    shouldOutput = CheckToggle;
-                    break;
-
-                case PlayerInputType.OnHeldForTime:
-                    shouldOutput = CheckKeyHeldForTime;
-                    break;
-
-                default:
-                    Debug.Log("sth wrong");
-                    break;
-            }
+                PlayerInputType.OnKeyDown => CheckKeyDown,
+                PlayerInputType.OnKeyUp => CheckKeyUp,
+                PlayerInputType.OnKeyHeld => CheckKeyHeld,
+                PlayerInputType.Toggle => CheckToggle,
+                PlayerInputType.OnHeldForTime => CheckKeyHeldForTime,
+                _ => throw new Exception("This activatioon type does not exist")
+            };
         }
 
         protected Func<bool> GetRelevantOutputSettingsFromParam(PlayerInputType param)
@@ -78,7 +70,7 @@ namespace Inputs
                 PlayerInputType.OnKeyHeld => CheckKeyHeld,
                 PlayerInputType.Toggle => CheckToggle,
                 PlayerInputType.OnHeldForTime => CheckKeyHeldForTime,
-                _ => throw new System.Exception("This activvation type does not exist")
+                _ => throw new Exception("This activvation type does not exist")
             };
         }
 

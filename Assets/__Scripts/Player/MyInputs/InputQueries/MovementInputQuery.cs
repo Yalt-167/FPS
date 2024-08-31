@@ -52,39 +52,24 @@ namespace Inputs
 
         public void Init()
         {
-            //InitiateForward.Init(this);
-            Forward.Init(this);
+            RegisterKeybind(Forward);
+            RegisterKeybind(Back);
+            RegisterKeybind(Right);
+            RegisterKeybind(Left);
 
-            //InitiateBack.Init(this);
-            Back.Init(this);
+            RegisterKeybind(Jump);
 
-            //InitiateRight.Init(this);
-            Right.Init(this);
-            //HoldRightForTime.Init(this);
+            RegisterKeybind(Slide);
 
-            //InitiateLeft.Init(this);
-            Left.Init(this);
-            //HoldLeftForTime.Init(this);
+            RegisterKeybind(HoldCrouch);
 
-            //InitiateJump.Init(this);
-            //HoldJump.Init(this);
-            //InterruptJump.Init(this);
-            Jump.Init(this);
+            RegisterKeybind(Dash);
 
-            //InitiateSlide.Init(this);
-            //HoldSlide.Init(this);
-            Slide.Init(this);
-            HoldCrouch.Init(this);
-            Dash.Init(this);
+            RegisterKeybind(GrapplingHook);
 
-            //InitiateGrapplingHook.Init(this);
-            //HoldGrapplingHook.Init(this);
-            //ReleaseGrapplingHook.Init(this);
-            GrapplingHook.Init(this);
+            RegisterKeybind(SwitchCameraPosition);
 
-            SwitchCameraPosition.Init(this);
-
-            QuickReset.Init(this);
+            RegisterKeybind(QuickReset);
         }
 
         public void OnRenderRebindMenu()
@@ -98,6 +83,7 @@ namespace Inputs
         public void RegisterKeybind(Keybind bind)
         {
             Keybinds.Add(bind);
+            bind.Init();
         }
     }
 }

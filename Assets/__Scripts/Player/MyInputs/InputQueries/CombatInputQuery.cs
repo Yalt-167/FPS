@@ -29,23 +29,23 @@ namespace Inputs
 
         public void Init()
         {
-            Shoot.Init(this);
-            Aim.Init(this);
-            Reload.Init(this);
+            RegisterKeybind(Shoot);
+            RegisterKeybind(Aim);
+            RegisterKeybind(Reload);
 
             //NextWeapon.Init();
             //PreviousWeapon.Init();
 
-            FirstGun.Init(this);
-            SecondGun.Init(this);
-            ThirdGun.Init(this);
+            RegisterKeybind(FirstGun);
+            RegisterKeybind(SecondGun);
+            RegisterKeybind(ThirdGun);
 
-            PrimaryAbility.Init(this);
-            SecondaryAbility.Init(this);
-            Ultimate.Init(this);
+            RegisterKeybind(PrimaryAbility);
+            RegisterKeybind(SecondaryAbility);
+            RegisterKeybind(Ultimate);
 
-            Slash.Init(this);
-            Parry.Init(this);
+            RegisterKeybind(Slash);
+            RegisterKeybind(Parry);
         }
 
         public void OnRenderRebindMenu()
@@ -59,6 +59,7 @@ namespace Inputs
         public void RegisterKeybind(Keybind bind)
         {
             Keybinds.Add(bind);
+            bind.Init();
         }
     }
 }

@@ -38,9 +38,9 @@ namespace Inputs
             name = name_;
         }
 
-        public new void Init(IInputQuery inputQuery)
+        public override void Init()
         {
-            base.Init(inputQuery);
+            base.Init();
             activationTypeIndex = allowedActivationTypes.IndexOf(howToActivate);
             activationTypesLength = allowedActivationTypes.Count;
         }
@@ -69,7 +69,8 @@ namespace Inputs
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
             GUILayout.Label(howToActivate.ToString()); // eventually store that as a memeber variable to avoid unecessary garbage collection
             GUILayout.EndHorizontal();
-            GUI.enabled = true;
+
+            GUILayout.EndHorizontal();
         }
     }
 }
