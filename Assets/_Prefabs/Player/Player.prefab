@@ -1502,7 +1502,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 169908227
+  GlobalObjectIdHash: 2957232829
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1532,6 +1532,7 @@ MonoBehaviour:
     - {fileID: 7053344651727101131}
     - {fileID: 5516743904902779326}
     - {fileID: 3857732353204371700}
+    - {fileID: 3274016814467245242}
     gameObjectsToKill:
     - {fileID: 3467822551731792150}
     - {fileID: 4356166339693058417}
@@ -1904,65 +1905,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MovementInputs:
-    InitiateForward:
-      RelevantKey: 122
-      howToActivate: 0
-      holdForSeconds: 0
     Forward:
       RelevantKey: 122
       howToActivate: 2
-      holdForSeconds: 0
-    InitiateBack:
-      RelevantKey: 115
-      howToActivate: 0
       holdForSeconds: 0
     Back:
       RelevantKey: 115
       howToActivate: 2
       holdForSeconds: 0
-    InitiateRight:
-      RelevantKey: 100
-      howToActivate: 0
-      holdForSeconds: 0
-    HoldRightForTime:
-      RelevantKey: 100
-      howToActivate: 4
-      holdForSeconds: 0
     Right:
       RelevantKey: 100
       howToActivate: 2
-      holdForSeconds: 0
-    InitiateLeft:
-      RelevantKey: 113
-      howToActivate: 0
-      holdForSeconds: 0
-    HoldLeftForTime:
-      RelevantKey: 113
-      howToActivate: 4
       holdForSeconds: 0
     Left:
       RelevantKey: 113
       howToActivate: 2
       holdForSeconds: 0
-    InitiateJump:
+    Jump:
       RelevantKey: 32
       howToActivate: 0
       holdForSeconds: 0
-    HoldJump:
-      RelevantKey: 32
-      howToActivate: 2
-      holdForSeconds: 0
-    InterruptJump:
-      RelevantKey: 32
-      howToActivate: 1
-      holdForSeconds: 0
-    InitiateSlide:
+    Slide:
       RelevantKey: 304
       howToActivate: 0
       holdForSeconds: 0
-    HoldSlide:
-      RelevantKey: 304
-      howToActivate: 2
+    GrapplingHook:
+      RelevantKey: 32
+      howToActivate: 0
       holdForSeconds: 0
     HoldCrouch:
       RelevantKey: 306
@@ -1972,18 +1941,6 @@ MonoBehaviour:
     Dash:
       RelevantKey: 57
       howToActivate: 0
-      holdForSeconds: 0
-    InitiateGrapplingHook:
-      RelevantKey: 120
-      howToActivate: 0
-      holdForSeconds: 0
-    HoldGrapplingHook:
-      RelevantKey: 120
-      howToActivate: 2
-      holdForSeconds: 0
-    ReleaseGrapplingHook:
-      RelevantKey: 120
-      howToActivate: 1
       holdForSeconds: 0
     SwitchCameraPosition:
       RelevantKey: 119
@@ -2020,27 +1977,15 @@ MonoBehaviour:
       RelevantKey: 51
       howToActivate: 0
       holdForSeconds: 0
-    InitiatePrimaryAbility:
+    PrimaryAbility:
       RelevantKey: 0
       howToActivate: 0
       holdForSeconds: 0
-    ReleasePrimaryAbility:
+    SecondaryAbility:
       RelevantKey: 0
       howToActivate: 0
       holdForSeconds: 0
-    InitiateSecondaryAbility:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    ReleaseSecondaryAbility:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    InitiateUltimate:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    ReleaseUltimate:
+    Ultimate:
       RelevantKey: 0
       howToActivate: 0
       holdForSeconds: 0
@@ -2055,10 +2000,6 @@ MonoBehaviour:
   GenericInputs:
     TogglePauseMenu:
       RelevantKey: 27
-      howToActivate: 0
-      holdForSeconds: 0
-    TogglePauseMenu2:
-      RelevantKey: 127
       howToActivate: 0
       holdForSeconds: 0
   cameraHorizontalSenitivity: 3

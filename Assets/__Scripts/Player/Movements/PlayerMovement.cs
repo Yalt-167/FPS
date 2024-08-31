@@ -686,7 +686,7 @@ namespace Controller
                     () => Rigidbody.velocity.y < 0f || forceResetJumping
                 );
 
-            print($"Stopped jumping {Rigidbody.velocity.y < 0f} || {forceResetJumping}");
+            //print($"Stopped jumping {Rigidbody.velocity.y < 0f} || {forceResetJumping}");
 
             forceResetJumping = false;
             IsJumping = false;
