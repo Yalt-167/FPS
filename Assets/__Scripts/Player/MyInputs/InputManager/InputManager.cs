@@ -54,7 +54,7 @@ namespace Inputs
 
             #region General button
 
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(200));
 
             GUI.color = currentRebindMenu == CurrentRebindMenu.General ? Color.grey : Color.white;
 
@@ -71,7 +71,7 @@ namespace Inputs
 
             #region Movement button
 
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(200), GUILayout.Width(200));
 
             GUI.color = currentRebindMenu == CurrentRebindMenu.Movement ? Color.grey : Color.white;
 
@@ -88,7 +88,7 @@ namespace Inputs
 
             #region Combat button
 
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(200));
 
             GUI.color = currentRebindMenu == CurrentRebindMenu.Combat ? Color.grey : Color.white;
 

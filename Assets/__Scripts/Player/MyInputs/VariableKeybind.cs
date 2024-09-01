@@ -49,16 +49,24 @@ namespace Inputs
             activationTypesLength = allowedActivationTypes.Count;
         }
 
-        public void SetActivationType(PlayerInputType newActivationType)
+        public void SetActivationType(PlayerInputType newActivationType) // there would be issues with index so far
         {
             inputType = newActivationType;
+            inputTypeAsStr = inputType.ToString() ;
             SetRelevantOutputSettings();
         }
 
         public void NextActivationType()
         {
-            inputType = allowedActivationTypes[++activationTypeIndex % activationTypesLength];
-            SetRelevantOutputSettings();
+            SetActivationType(allowedActivationTypes[++activationTypeIndex % activationTypesLength]);
+        }
+
+        public override void DisplayInputType()
+        {
+            if (GUILayout.Button(inputTypeAsStr, GUILayout.Width(200)))
+            {
+                NextActivationType();
+            }
         }
 
         public override void OnRenderRebindMenu()

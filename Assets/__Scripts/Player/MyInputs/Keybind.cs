@@ -122,15 +122,18 @@ namespace Inputs
 
         public virtual void DisplayCurrentKey()
         {
-            GUILayout.Label(name);
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
-            GUILayout.Label(relevantKeyAsStr);
+            GUILayout.Label(name, GUILayout.Width(200));
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(200));
+            if (GUILayout.Button(relevantKeyAsStr))
+            {
+
+            }
             GUILayout.EndHorizontal();
         }
 
         public virtual void DisplayInputType()
         {
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(200));
             GUILayout.Label(inputTypeAsStr);
             GUILayout.EndHorizontal();
         }
