@@ -13,6 +13,7 @@ namespace Inputs
         protected string relevantKeyAsStr;
         [SerializeField] protected InputType inputType;
         protected string inputTypeAsStr;
+        protected bool canBeRemapped;
 
         protected Func<bool> shouldOutput;
         protected bool active;
@@ -120,9 +121,17 @@ namespace Inputs
             return bind.shouldOutput();
         }
 
-        public abstract void OnRenderRebindMenu();
+        /// <summary>
+        /// Returns wether one of the bind is being remapped
+        /// </summary>
+        public abstract bool OnRenderRebindMenu();
 
-        private IEnumerator Rebind()
+        private void Rebind()
+        {
+            Utility.CoroutineStarter.Instance.HandleCoroutine(RebindInternal());
+        }
+
+        private IEnumerator RebindInternal()
         {
             currentlyRebinding = true;
 
@@ -132,22 +141,28 @@ namespace Inputs
             {
                 if (Input.GetKeyDown(keycode))
                 {
-                    SetKey(keycode);
+                    SetKey(keycode == KeyCode.Escape ? KeyCode.None : keycode);
                 }
             }
 
             currentlyRebinding = false;
         }
 
-        public virtual void DisplayCurrentKey()
+        /// <summary>
+        /// Returns wether a rebind is ongoing on this bind
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool DisplayCurrentKey()
         {
             GUILayout.Label(name, GUILayout.Width(200));
-            GUI.enabled = !currentlyRebinding;
+            GUI.enabled = canBeRemapped && !currentlyRebinding;
             if (GUILayout.Button(currentlyRebinding ? listeningForInput : relevantKeyAsStr, GUILayout.Width(200)))
             {
-                Utility.CoroutineStarter.Instance.HandleCoroutine(Rebind());
+                Rebind();
             }
             GUI.enabled = true;
+
+            return currentlyRebinding;
         }
 
         public virtual void DisplayInputType()
