@@ -21,10 +21,11 @@ namespace Inputs
         public GroupKeybind SecondaryAbility = new(KeyCode.None, new InputType[] { InputType.OnKeyDown, InputType.OnKeyUp }, nameof(SecondaryAbility));
         public GroupKeybind Ultimate = new(KeyCode.None, new InputType[] { InputType.OnKeyDown, InputType.OnKeyUp }, nameof(Ultimate));
 
-        public FixedKeybind Slash;
-        public FixedKeybind Parry;
+        public FixedKeybind Slash = new (KeyCode.None, InputType.OnKeyDown, nameof(Slash));
+        public FixedKeybind Parry = new(KeyCode.None, InputType.OnKeyDown, nameof(Parry));
 
         public List<Keybind> Keybinds { get; private set; } = new();
+        public bool IsRebindingAKey { get; private set; }
 
         public void Init()
         {

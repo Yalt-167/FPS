@@ -1113,7 +1113,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         if (hitscanBulletEffectSettings.BouncesAmount == 0) { return; }
 
-        var newShotDirection = Utility.ReflectVector(shotInfos.ShotDirection, shotInfos.Hit.normal);
+        var newShotDirection = Utility.Utility.ReflectVector(shotInfos.ShotDirection, shotInfos.Hit.normal);
 
         var bulletTrail = Instantiate(bulletTrailPrefab, shotInfos.Hit.point, Quaternion.identity).GetComponent<BulletTrail>();
         var endPoint = shotInfos.Hit.point + newShotDirection * 100;

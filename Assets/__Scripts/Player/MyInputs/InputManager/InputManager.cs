@@ -17,9 +17,9 @@ namespace Inputs
         public float cameraVerticalSensitivity = 3f;
         private bool doRenderMenu;
         private CurrentRebindMenu currentRebindMenu = CurrentRebindMenu.General;
-        [SerializeField] private float actionNameDisplayWidth;
-        [SerializeField] private float keyNameDisplayWidth;
-        [SerializeField] private float inputTypeDisplayWidth;
+        private static readonly string General = nameof(General);
+        private static readonly string Combat = nameof(Combat);
+        private static readonly string Movement = nameof(Movement);
 
         private void Awake()
         {
@@ -30,7 +30,10 @@ namespace Inputs
 
         private void Update()
         {
-            doRenderMenu = GeneralInputs.TogglePauseMenu ? !doRenderMenu : doRenderMenu;
+            if (! (MovementInputs.IsRebindingAKey || CombatInputs.IsRebindingAKey || GeneralInputs.IsRebindingAKey))
+            {
+                doRenderMenu = GeneralInputs.TogglePauseMenu ? !doRenderMenu : doRenderMenu;
+            }
 
             if (doRenderMenu || !Game.Manager.GameStarted) { PlayerFrame.LocalPlayer.SetMenuInputMode(); }
             else { PlayerFrame.LocalPlayer.SetGameplayInputMode(); }
@@ -58,7 +61,7 @@ namespace Inputs
 
             GUI.color = currentRebindMenu == CurrentRebindMenu.General ? Color.grey : Color.white;
 
-            if (GUILayout.Button("General"))
+            if (GUILayout.Button(General))
             {
                 currentRebindMenu = CurrentRebindMenu.General;
             }
@@ -75,7 +78,7 @@ namespace Inputs
 
             GUI.color = currentRebindMenu == CurrentRebindMenu.Movement ? Color.grey : Color.white;
 
-            if (GUILayout.Button("Movement"))
+            if (GUILayout.Button(Movement))
             {
                 currentRebindMenu = CurrentRebindMenu.Movement;
             }
@@ -92,7 +95,7 @@ namespace Inputs
 
             GUI.color = currentRebindMenu == CurrentRebindMenu.Combat ? Color.grey : Color.white;
 
-            if (GUILayout.Button("Combat"))
+            if (GUILayout.Button(Combat))
             {
                 currentRebindMenu = CurrentRebindMenu.Combat;
             }

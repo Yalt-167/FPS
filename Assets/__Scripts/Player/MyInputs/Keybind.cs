@@ -18,6 +18,8 @@ namespace Inputs
         protected bool active;
         protected float heldSince;
         [SerializeField] protected float holdForSeconds;
+        bool currentlyRebinding;
+        private static readonly string listeningForInput = "Listening for input";
 
         public virtual void Init()
         {
@@ -120,13 +122,32 @@ namespace Inputs
 
         public abstract void OnRenderRebindMenu();
 
+        private IEnumerator Rebind()
+        {
+            currentlyRebinding = true;
+
+            yield return new WaitUntil(() => Input.anyKeyDown);
+
+            foreach (KeyCode keycode in Enum.GetValues(typeof(KeyCode)))
+            {
+                if (Input.GetKeyDown(keycode))
+                {
+                    SetKey(keycode);
+                }
+            }
+
+            currentlyRebinding = false;
+        }
+
         public virtual void DisplayCurrentKey()
         {
             GUILayout.Label(name, GUILayout.Width(200));
-            if (GUILayout.Button(relevantKeyAsStr, GUILayout.Width(200)))
+            GUI.enabled = !currentlyRebinding;
+            if (GUILayout.Button(currentlyRebinding ? listeningForInput : relevantKeyAsStr, GUILayout.Width(200)))
             {
-
+                Utility.CoroutineStarter.Instance.HandleCoroutine(Rebind());
             }
+            GUI.enabled = true;
         }
 
         public virtual void DisplayInputType()

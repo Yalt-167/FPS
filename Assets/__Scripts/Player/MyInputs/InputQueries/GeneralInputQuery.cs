@@ -12,6 +12,7 @@ namespace Inputs
         public FixedKeybind TogglePauseMenu = new(KeyCode.Escape, InputType.OnKeyDown, nameof(TogglePauseMenu));
 
         public List<Keybind> Keybinds { get; private set; } = new();
+        public bool IsRebindingAKey { get; private set; }
 
 
         public void Init()
