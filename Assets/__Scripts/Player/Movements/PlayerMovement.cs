@@ -359,7 +359,6 @@ namespace Controller
         private void Awake()
         {
             inputManager = GetComponent<InputManager>();
-            InputQuery.Init();
 
             Rigidbody = GetComponent<Rigidbody>();
             cameraTransform = transform.GetChild(0);

@@ -61,7 +61,6 @@ public sealed class PlayerCombat : MonoBehaviour
         //cameraTransform = transform.GetChild(0).GetChild(0);
         weaponHandler = GetComponent<WeaponHandler>();
         inputManager = GetComponent<InputManager>();
-        InputQuery.Init();
         UpdateWeapon();
     }
 

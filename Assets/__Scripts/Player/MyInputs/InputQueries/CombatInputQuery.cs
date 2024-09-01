@@ -33,9 +33,6 @@ namespace Inputs
             RegisterKeybind(Aim);
             RegisterKeybind(Reload);
 
-            //NextWeapon.Init();
-            //PreviousWeapon.Init();
-
             RegisterKeybind(FirstGun);
             RegisterKeybind(SecondGun);
             RegisterKeybind(ThirdGun);

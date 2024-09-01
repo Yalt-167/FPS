@@ -10,6 +10,7 @@ namespace Inputs
     public sealed class GeneralInputQuery : IInputQuery
     {
         public FixedKeybind TogglePauseMenu = new(KeyCode.Escape, InputType.OnKeyDown, nameof(TogglePauseMenu));
+        public VariableKeybind ShowScoreboard = new(KeyCode.Tab, new() { InputType.Toggle, InputType.OnKeyHeld }, nameof(ShowScoreboard));
 
         public List<Keybind> Keybinds { get; private set; } = new();
         public bool IsRebindingAKey { get; private set; }
@@ -18,6 +19,7 @@ namespace Inputs
         public void Init()
         {
             RegisterKeybind(TogglePauseMenu);
+            RegisterKeybind(ShowScoreboard);
         }
 
         public void OnRenderRebindMenu()

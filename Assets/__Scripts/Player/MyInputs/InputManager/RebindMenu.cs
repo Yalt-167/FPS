@@ -1,6 +1,6 @@
 namespace Inputs
 {
-    public enum CurrentRebindMenu
+    public enum RebindMenu
     {
         Movement,
         Combat,

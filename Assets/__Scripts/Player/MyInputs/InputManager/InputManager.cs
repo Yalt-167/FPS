@@ -16,7 +16,7 @@ namespace Inputs
         public float cameraHorizontalSenitivity = 3f;
         public float cameraVerticalSensitivity = 3f;
         private bool doRenderMenu;
-        private CurrentRebindMenu currentRebindMenu = CurrentRebindMenu.General;
+        private RebindMenu currentRebindMenu = RebindMenu.General;
         private static readonly string General = nameof(General);
         private static readonly string Combat = nameof(Combat);
         private static readonly string Movement = nameof(Movement);
@@ -30,7 +30,7 @@ namespace Inputs
 
         private void Update()
         {
-            if (! (MovementInputs.IsRebindingAKey || CombatInputs.IsRebindingAKey || GeneralInputs.IsRebindingAKey))
+            if (!(MovementInputs.IsRebindingAKey || CombatInputs.IsRebindingAKey || GeneralInputs.IsRebindingAKey))
             {
                 doRenderMenu = GeneralInputs.TogglePauseMenu ? !doRenderMenu : doRenderMenu;
             }
@@ -59,14 +59,11 @@ namespace Inputs
 
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(200));
 
-            GUI.color = currentRebindMenu == CurrentRebindMenu.General ? Color.grey : Color.white;
+            GUI.enabled = currentRebindMenu != RebindMenu.General;
 
-            if (GUILayout.Button(General))
-            {
-                currentRebindMenu = CurrentRebindMenu.General;
-            }
+            if (GUILayout.Button(General)) { currentRebindMenu = RebindMenu.General; }
 
-            GUI.color = Color.white;
+            GUI.enabled = true;
 
             GUILayout.EndHorizontal();
 
@@ -76,14 +73,11 @@ namespace Inputs
 
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(200), GUILayout.Width(200));
 
-            GUI.color = currentRebindMenu == CurrentRebindMenu.Movement ? Color.grey : Color.white;
+            GUI.enabled = currentRebindMenu != RebindMenu.Movement;
 
-            if (GUILayout.Button(Movement))
-            {
-                currentRebindMenu = CurrentRebindMenu.Movement;
-            }
+            if (GUILayout.Button(Movement)) { currentRebindMenu = RebindMenu.Movement; }
 
-            GUI.color = Color.white;
+            GUI.enabled = true;
 
             GUILayout.EndHorizontal();
 
@@ -93,14 +87,11 @@ namespace Inputs
 
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(200));
 
-            GUI.color = currentRebindMenu == CurrentRebindMenu.Combat ? Color.grey : Color.white;
+            GUI.enabled = currentRebindMenu != RebindMenu.Combat;
 
-            if (GUILayout.Button(Combat))
-            {
-                currentRebindMenu = CurrentRebindMenu.Combat;
-            }
+            if (GUILayout.Button(Combat)) { currentRebindMenu = RebindMenu.Combat; }
 
-            GUI.color = Color.white;
+            GUI.enabled = true;
 
             GUILayout.EndHorizontal();
 
@@ -112,9 +103,9 @@ namespace Inputs
 
             IInputQuery relevantInputQuery = currentRebindMenu switch
             {
-                CurrentRebindMenu.Movement => MovementInputs,
-                CurrentRebindMenu.Combat => CombatInputs,
-                CurrentRebindMenu.General => GeneralInputs,
+                RebindMenu.Movement => MovementInputs,
+                RebindMenu.Combat => CombatInputs,
+                RebindMenu.General => GeneralInputs,
                 _ => null
             };
 
