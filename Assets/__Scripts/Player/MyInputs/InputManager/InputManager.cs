@@ -20,9 +20,14 @@ namespace Inputs
         private static readonly string General = nameof(General);
         private static readonly string Combat = nameof(Combat);
         private static readonly string Movement = nameof(Movement);
+        private static Vector2 scrollPosition;
 
         private void Awake()
         {
+            MovementInputs.Init();
+            MovementInputs.Init();
+            MovementInputs.Init();
+            MovementInputs.Init();
             MovementInputs.Init();
             CombatInputs.Init();
             GeneralInputs.Init();
@@ -109,7 +114,9 @@ namespace Inputs
                 _ => null
             };
 
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             relevantInputQuery?.OnRenderRebindMenu();
+            GUILayout.EndScrollView();
 
             GUILayout.EndVertical();
 
