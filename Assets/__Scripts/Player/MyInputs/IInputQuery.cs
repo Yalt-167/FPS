@@ -28,9 +28,11 @@ namespace Inputs
 
         public void OnRenderRebindMenu()
         {
+            IsRebindingAKey = false;
+
             foreach (var keybind in Keybinds)
             {
-                keybind.OnRenderRebindMenu();
+                IsRebindingAKey |= keybind.OnRenderRebindMenu();
             }
         }
 #endif

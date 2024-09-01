@@ -9,8 +9,8 @@ namespace Inputs
     [Serializable]
     public sealed class GeneralInputQuery : IInputQuery
     {
-        public FixedKeybind TogglePauseMenu = new(KeyCode.Escape, InputType.OnKeyDown, nameof(TogglePauseMenu));
-        public VariableKeybind ShowScoreboard = new(KeyCode.Tab, new() { InputType.Toggle, InputType.OnKeyHeld }, nameof(ShowScoreboard));
+        public FixedKeybind TogglePauseMenu = new(KeyCode.Escape, InputType.OnKeyDown, nameof(TogglePauseMenu), false);
+        public VariableKeybind ShowScoreboard = new(KeyCode.Tab, new List<InputType>() { InputType.Toggle, InputType.OnKeyHeld }, nameof(ShowScoreboard), true);
 
         public List<Keybind> Keybinds { get; private set; } = new();
         public bool IsRebindingAKey { get; private set; }
@@ -24,9 +24,11 @@ namespace Inputs
 
         public void OnRenderRebindMenu()
         {
+            IsRebindingAKey = false;
+
             foreach (var keybind in Keybinds)
             {
-                keybind.OnRenderRebindMenu();
+                IsRebindingAKey |= keybind.OnRenderRebindMenu();
             }
         }
 

@@ -9,20 +9,20 @@ namespace Inputs
     [Serializable]
     public sealed class CombatInputQuery : IInputQuery
     {
-        public FixedKeybind Shoot = new(KeyCode.Mouse0, InputType.OnKeyHeld, nameof(Shoot));
-        public VariableKeybind Aim = new(KeyCode.Mouse1, new() { InputType.OnKeyHeld, InputType.Toggle }, nameof(Aim));
-        public FixedKeybind Reload = new(KeyCode.R, InputType.OnKeyDown, nameof(Reload));
+        public FixedKeybind Shoot = new(KeyCode.Mouse0, InputType.OnKeyHeld, nameof(Shoot), true);
+        public VariableKeybind Aim = new(KeyCode.Mouse1, new List<InputType>() { InputType.OnKeyHeld, InputType.Toggle }, nameof(Aim), true);
+        public FixedKeybind Reload = new(KeyCode.R, InputType.OnKeyDown, nameof(Reload), true);
 
-        public FixedKeybind FirstGun = new(KeyCode.Alpha1, InputType.OnKeyDown, nameof(FirstGun));
-        public FixedKeybind SecondGun = new(KeyCode.Alpha2, InputType.OnKeyDown, nameof(SecondGun));
-        public FixedKeybind ThirdGun = new(KeyCode.Alpha3, InputType.OnKeyDown, nameof(ThirdGun));
+        public FixedKeybind FirstGun = new(KeyCode.Alpha1, InputType.OnKeyDown, nameof(FirstGun), true);
+        public FixedKeybind SecondGun = new(KeyCode.Alpha2, InputType.OnKeyDown, nameof(SecondGun), true);
+        public FixedKeybind ThirdGun = new(KeyCode.Alpha3, InputType.OnKeyDown, nameof(ThirdGun), true);
 
-        public GroupKeybind PrimaryAbility = new(KeyCode.None, new InputType[] { InputType.OnKeyDown, InputType.OnKeyUp }, nameof(PrimaryAbility));
-        public GroupKeybind SecondaryAbility = new(KeyCode.None, new InputType[] { InputType.OnKeyDown, InputType.OnKeyUp }, nameof(SecondaryAbility));
-        public GroupKeybind Ultimate = new(KeyCode.None, new InputType[] { InputType.OnKeyDown, InputType.OnKeyUp }, nameof(Ultimate));
+        public GroupKeybind PrimaryAbility = new(KeyCode.None, new InputType[] { InputType.OnKeyDown, InputType.OnKeyUp }, nameof(PrimaryAbility), true);
+        public GroupKeybind SecondaryAbility = new(KeyCode.None, new InputType[] { InputType.OnKeyDown, InputType.OnKeyUp }, nameof(SecondaryAbility), true);
+        public GroupKeybind Ultimate = new(KeyCode.None, new InputType[] { InputType.OnKeyDown, InputType.OnKeyUp }, nameof(Ultimate), true);
 
-        public FixedKeybind Slash = new (KeyCode.None, InputType.OnKeyDown, nameof(Slash));
-        public FixedKeybind Parry = new(KeyCode.None, InputType.OnKeyDown, nameof(Parry));
+        public FixedKeybind Slash = new(KeyCode.None, InputType.OnKeyDown, nameof(Slash), true);
+        public FixedKeybind Parry = new(KeyCode.None, InputType.OnKeyDown, nameof(Parry), true);
 
         public List<Keybind> Keybinds { get; private set; } = new();
         public bool IsRebindingAKey { get; private set; }
@@ -47,9 +47,11 @@ namespace Inputs
 
         public void OnRenderRebindMenu()
         {
+            IsRebindingAKey = false;
+
             foreach (var keybind in Keybinds)
             {
-                keybind.OnRenderRebindMenu();
+                IsRebindingAKey |= keybind.OnRenderRebindMenu();
             }
         }
 
