@@ -27,6 +27,11 @@ namespace Inputs
         {
             doRenderMenu = GeneralInputs.TogglePauseMenu ? !doRenderMenu : doRenderMenu;
 
+            
+        }
+
+        private void OnGUI()
+        {
             if (doRenderMenu)
             {
                 IInputQuery relevantInputQuery = currentRebindMenu switch
@@ -40,7 +45,5 @@ namespace Inputs
                 relevantInputQuery?.OnRenderRebindMenu();
             }
         }
-
-
     }
 }
