@@ -10,7 +10,8 @@ namespace Inputs
     public sealed class GroupKeybind : Keybind
     {
         private readonly Dictionary<string, Func<bool>> groupEntries;
-        public GroupKeybind(KeyCode relevantKey, InputType[] inputTypes, string name_)
+  
+        public GroupKeybind(KeyCode relevantKey, InputType[] inputTypes, string name_, bool canBeRemapped_, float _holdForSeconds = 0.0f)
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();
@@ -20,19 +21,8 @@ namespace Inputs
             {
                 groupEntries[GroupKeybindRequestKeywords.GetRelevantNameFromInputType(inputType)] = GetRelevantOutputSettingsFromParam(inputType);
             }
-        }
-
-        public GroupKeybind(KeyCode relevantKey, InputType[] inputTypes, float _holdForSeconds, string name_)
-        {
-            RelevantKey = relevantKey;
-            relevantKeyAsStr = relevantKey.ToString();
+            canBeRemapped = canBeRemapped_;
             holdForSeconds = _holdForSeconds;
-            name = name_;
-            groupEntries = new();
-            foreach (InputType inputType in inputTypes)
-            {
-                groupEntries[GroupKeybindRequestKeywords.GetRelevantNameFromInputType(inputType)] = GetRelevantOutputSettingsFromParam(inputType);
-            }
         }
 
         public static implicit operator bool(GroupKeybind bind)
@@ -55,13 +45,15 @@ namespace Inputs
             heldSince = Time.time;
         }
 
-        public override void OnRenderRebindMenu()
+        public override bool OnRenderRebindMenu()
         {
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
 
-            DisplayCurrentKey();
+            var isRemappingAKey = DisplayCurrentKey();
 
             GUILayout.EndHorizontal();
+
+            return isRemappingAKey;
         }
     }
 }

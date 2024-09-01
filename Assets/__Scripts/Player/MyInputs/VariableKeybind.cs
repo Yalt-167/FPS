@@ -20,18 +20,8 @@ namespace Inputs
         /// </summary>
         /// <param name="relevantKey"></param>
         /// <param name="allowedInputTypes_"></param>
-        public VariableKeybind(KeyCode relevantKey, List<InputType> allowedInputTypes_, string name_)
-        {
-            ConstructorCommon(relevantKey, allowedInputTypes_, name_);
-        }
-
-        public VariableKeybind(KeyCode relevantKey, List<InputType> allowedInputTypes_, float _holdForSeconds, string name_)
-        {
-            ConstructorCommon(relevantKey, allowedInputTypes_, name_);
-            holdForSeconds = _holdForSeconds;
-        }
-
-        private void ConstructorCommon(KeyCode relevantKey, List<InputType> allowedInputTypes_, string name_)
+       
+        public VariableKeybind(KeyCode relevantKey, List<InputType> allowedInputTypes_, string name_, bool canBeRemapped_, float _holdForSeconds = 0.0f)
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();
@@ -39,6 +29,8 @@ namespace Inputs
             inputType = allowedInputTypes[0];
             inputTypeAsStr = inputType.ToString();
             name = name_;
+            canBeRemapped = canBeRemapped_;
+            holdForSeconds = _holdForSeconds;
         }
 
         public override void Init()
@@ -68,15 +60,17 @@ namespace Inputs
             }
         }
 
-        public override void OnRenderRebindMenu()
+        public override bool OnRenderRebindMenu()
         {
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
 
-            DisplayCurrentKey();
+            var isRemappingAKey = DisplayCurrentKey();
 
             DisplayInputType();
 
             GUILayout.EndHorizontal();
+
+            return isRemappingAKey;
         }
     }
 }

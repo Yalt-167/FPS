@@ -9,32 +9,26 @@ namespace Inputs
     [Serializable]
     public sealed class FixedKeybind : Keybind
     {
-        public FixedKeybind(KeyCode relevantKey, InputType activationType, string name_)
+        public FixedKeybind(KeyCode relevantKey, InputType inputType_, string name_, bool canBeRemapped_, float _holdForSeconds = 0.0f)
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();
-            inputType = activationType;
-            inputTypeAsStr = activationType.ToString();
+            inputType = inputType_;
+            inputTypeAsStr = inputType_.ToString();
             name = name_;
-        }
-
-        public FixedKeybind(KeyCode relevantKey, InputType activationType, float _holdForSeconds, string name_)
-        {
-            RelevantKey = relevantKey;
-            relevantKeyAsStr = relevantKey.ToString();
-            inputType = activationType;
-            inputTypeAsStr = activationType.ToString();
+            canBeRemapped = canBeRemapped_;
             holdForSeconds = _holdForSeconds;
-            name = name_;
         }
 
-        public override void OnRenderRebindMenu()
+        public override bool OnRenderRebindMenu()
         {
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
 
-            DisplayCurrentKey();
+            var isRemappingAKey = DisplayCurrentKey();
 
             GUILayout.EndHorizontal();
+
+            return isRemappingAKey;
         }
     }
 }
