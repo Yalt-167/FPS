@@ -10,18 +10,17 @@ namespace Inputs
     [Serializable]
     public sealed class VariableKeybind : Keybind
     {
-        [SerializeField] private List<PlayerInputType> allowedActivationTypes;
-
+        [SerializeField] private List<InputType> allowedActivationTypes;
 
         private int activationTypeIndex;
         private int activationTypesLength;
 
         /// <summary>
-        /// First provided activation type is gonna be selected as default
+        /// First provided activation type will be selected as default
         /// </summary>
         /// <param name="relevantKey"></param>
         /// <param name="_allowedActivationTypes"></param>
-        public VariableKeybind(KeyCode relevantKey, List<PlayerInputType> _allowedActivationTypes, string name_)
+        public VariableKeybind(KeyCode relevantKey, List<InputType> _allowedActivationTypes, string name_)
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();
@@ -31,7 +30,7 @@ namespace Inputs
             name = name_;
         }
 
-        public VariableKeybind(KeyCode relevantKey, List<PlayerInputType> _allowedActivationTypes, float _holdForSeconds, string name_)
+        public VariableKeybind(KeyCode relevantKey, List<InputType> _allowedActivationTypes, float _holdForSeconds, string name_)
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();
@@ -49,7 +48,7 @@ namespace Inputs
             activationTypesLength = allowedActivationTypes.Count;
         }
 
-        public void SetActivationType(PlayerInputType newActivationType) // there would be issues with index so far
+        public void SetActivationType(InputType newActivationType) // there would be issues with index so far
         {
             inputType = newActivationType;
             inputTypeAsStr = inputType.ToString() ;

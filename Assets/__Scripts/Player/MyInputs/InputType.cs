@@ -1,11 +1,11 @@
 namespace Inputs
 {
-    public enum PlayerInputType
+    public enum InputType
     {
         OnKeyDown,
         OnKeyUp,
         OnKeyHeld,
+        OnKeyHeldForTime,
         Toggle,
-        OnHeldForTime,
     }
 }

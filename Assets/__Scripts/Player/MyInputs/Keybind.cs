@@ -11,7 +11,7 @@ namespace Inputs
         protected string name;
         [SerializeField] protected KeyCode RelevantKey;
         protected string relevantKeyAsStr;
-        [SerializeField] protected PlayerInputType inputType;
+        [SerializeField] protected InputType inputType;
         protected string inputTypeAsStr;
 
         protected Func<bool> shouldOutput;
@@ -41,7 +41,7 @@ namespace Inputs
             return RelevantKey;
         }
 
-        public void SetInputType(PlayerInputType howToActivate_)
+        public void SetInputType(InputType howToActivate_)
         {
             inputType = howToActivate_;
             inputTypeAsStr = howToActivate_.ToString();
@@ -52,24 +52,24 @@ namespace Inputs
         {
             shouldOutput = inputType switch
             {
-                PlayerInputType.OnKeyDown => CheckKeyDown,
-                PlayerInputType.OnKeyUp => CheckKeyUp,
-                PlayerInputType.OnKeyHeld => CheckKeyHeld,
-                PlayerInputType.Toggle => CheckToggle,
-                PlayerInputType.OnHeldForTime => CheckKeyHeldForTime,
+                InputType.OnKeyDown => CheckKeyDown,
+                InputType.OnKeyUp => CheckKeyUp,
+                InputType.OnKeyHeld => CheckKeyHeld,
+                InputType.Toggle => CheckToggle,
+                InputType.OnKeyHeldForTime => CheckKeyHeldForTime,
                 _ => throw new Exception("This activatioon type does not exist")
             };
         }
 
-        protected Func<bool> GetRelevantOutputSettingsFromParam(PlayerInputType param)
+        protected Func<bool> GetRelevantOutputSettingsFromParam(InputType param)
         {
             return param switch
             {
-                PlayerInputType.OnKeyDown => CheckKeyDown,
-                PlayerInputType.OnKeyUp => CheckKeyUp,
-                PlayerInputType.OnKeyHeld => CheckKeyHeld,
-                PlayerInputType.Toggle => CheckToggle,
-                PlayerInputType.OnHeldForTime => CheckKeyHeldForTime,
+                InputType.OnKeyDown => CheckKeyDown,
+                InputType.OnKeyUp => CheckKeyUp,
+                InputType.OnKeyHeld => CheckKeyHeld,
+                InputType.Toggle => CheckToggle,
+                InputType.OnKeyHeldForTime => CheckKeyHeldForTime,
                 _ => throw new Exception("This activvation type does not exist")
             };
         }
@@ -123,12 +123,10 @@ namespace Inputs
         public virtual void DisplayCurrentKey()
         {
             GUILayout.Label(name, GUILayout.Width(200));
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(200));
-            if (GUILayout.Button(relevantKeyAsStr))
+            if (GUILayout.Button(relevantKeyAsStr, GUILayout.Width(200)))
             {
 
             }
-            GUILayout.EndHorizontal();
         }
 
         public virtual void DisplayInputType()

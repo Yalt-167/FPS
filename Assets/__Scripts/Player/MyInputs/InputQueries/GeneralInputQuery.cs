@@ -9,7 +9,7 @@ namespace Inputs
     [Serializable]
     public sealed class GeneralInputQuery : IInputQuery
     {
-        public FixedKeybind TogglePauseMenu = new(KeyCode.Escape, PlayerInputType.OnKeyDown, nameof(TogglePauseMenu));
+        public FixedKeybind TogglePauseMenu = new(KeyCode.Escape, InputType.OnKeyDown, nameof(TogglePauseMenu));
 
         public List<Keybind> Keybinds { get; private set; } = new();
 

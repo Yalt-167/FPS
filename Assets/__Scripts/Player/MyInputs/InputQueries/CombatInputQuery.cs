@@ -9,17 +9,17 @@ namespace Inputs
     [Serializable]
     public sealed class CombatInputQuery : IInputQuery
     {
-        public FixedKeybind Shoot = new(KeyCode.Mouse0, PlayerInputType.OnKeyHeld, nameof(Shoot));
-        public VariableKeybind Aim = new(KeyCode.Mouse1, new() { PlayerInputType.OnKeyHeld, PlayerInputType.Toggle }, nameof(Aim));
-        public FixedKeybind Reload = new(KeyCode.R, PlayerInputType.OnKeyDown, nameof(Reload));
+        public FixedKeybind Shoot = new(KeyCode.Mouse0, InputType.OnKeyHeld, nameof(Shoot));
+        public VariableKeybind Aim = new(KeyCode.Mouse1, new() { InputType.OnKeyHeld, InputType.Toggle }, nameof(Aim));
+        public FixedKeybind Reload = new(KeyCode.R, InputType.OnKeyDown, nameof(Reload));
 
-        public FixedKeybind FirstGun = new(KeyCode.Alpha1, PlayerInputType.OnKeyDown, nameof(FirstGun));
-        public FixedKeybind SecondGun = new(KeyCode.Alpha2, PlayerInputType.OnKeyDown, nameof(SecondGun));
-        public FixedKeybind ThirdGun = new(KeyCode.Alpha3, PlayerInputType.OnKeyDown, nameof(ThirdGun));
+        public FixedKeybind FirstGun = new(KeyCode.Alpha1, InputType.OnKeyDown, nameof(FirstGun));
+        public FixedKeybind SecondGun = new(KeyCode.Alpha2, InputType.OnKeyDown, nameof(SecondGun));
+        public FixedKeybind ThirdGun = new(KeyCode.Alpha3, InputType.OnKeyDown, nameof(ThirdGun));
 
-        public GroupKeybind PrimaryAbility = new(KeyCode.None, new Dictionary<string, PlayerInputType>() { { "Initiate", PlayerInputType.OnKeyDown }, { "Release", PlayerInputType.OnKeyUp } }, nameof(PrimaryAbility));
-        public GroupKeybind SecondaryAbility = new(KeyCode.None, new Dictionary<string, PlayerInputType>() { { "Initiate", PlayerInputType.OnKeyDown }, { "Release", PlayerInputType.OnKeyUp } }, nameof(SecondaryAbility));
-        public GroupKeybind Ultimate = new(KeyCode.None, new Dictionary<string, PlayerInputType>() { { "Initiate", PlayerInputType.OnKeyDown }, { "Release", PlayerInputType.OnKeyUp } }, nameof(Ultimate));
+        public GroupKeybind PrimaryAbility = new(KeyCode.None, new InputType[] { InputType.OnKeyDown, InputType.OnKeyUp }, nameof(PrimaryAbility));
+        public GroupKeybind SecondaryAbility = new(KeyCode.None, new InputType[] { InputType.OnKeyDown, InputType.OnKeyUp }, nameof(SecondaryAbility));
+        public GroupKeybind Ultimate = new(KeyCode.None, new InputType[] { InputType.OnKeyDown, InputType.OnKeyUp }, nameof(Ultimate));
 
         public FixedKeybind Slash;
         public FixedKeybind Parry;

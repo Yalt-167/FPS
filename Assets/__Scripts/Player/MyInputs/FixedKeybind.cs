@@ -9,7 +9,7 @@ namespace Inputs
     [Serializable]
     public sealed class FixedKeybind : Keybind
     {
-        public FixedKeybind(KeyCode relevantKey, PlayerInputType activationType, string name_)
+        public FixedKeybind(KeyCode relevantKey, InputType activationType, string name_)
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();
@@ -18,7 +18,7 @@ namespace Inputs
             name = name_;
         }
 
-        public FixedKeybind(KeyCode relevantKey, PlayerInputType activationType, float _holdForSeconds, string name_)
+        public FixedKeybind(KeyCode relevantKey, InputType activationType, float _holdForSeconds, string name_)
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();

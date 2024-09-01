@@ -11,13 +11,13 @@ namespace Inputs
     {
         //public FixedKeybind InitiateForward = new(KeyCode.Z, PlayerInputType.OnKeyDown, nameof(InitiateForward));
         //public FixedKeybind Forward = new(KeyCode.Z, PlayerInputType.OnKeyHeld, nameof(Forward));
-        public GroupKeybind Forward = new(KeyCode.Z, new Dictionary<string, PlayerInputType>() { {"Initiate", PlayerInputType.OnKeyDown }, { "Hold", PlayerInputType.OnKeyHeld } }, nameof(Forward));
-        public GroupKeybind Back = new(KeyCode.S, new Dictionary<string, PlayerInputType>() { {"Initiate", PlayerInputType.OnKeyDown }, { "Hold", PlayerInputType.OnKeyHeld } }, nameof(Back));
-        public GroupKeybind Right = new(KeyCode.D, new Dictionary<string, PlayerInputType>() { {"Initiate", PlayerInputType.OnKeyDown }, { "Hold", PlayerInputType.OnKeyHeld }, { "HoldForTime", PlayerInputType.OnHeldForTime } }, nameof(Right));
-        public GroupKeybind Left = new(KeyCode.Q, new Dictionary<string, PlayerInputType>() { {"Initiate", PlayerInputType.OnKeyDown }, { "Hold", PlayerInputType.OnKeyHeld }, { "HoldForTime", PlayerInputType.OnHeldForTime } }, nameof(Left));
-        public GroupKeybind Jump = new(KeyCode.Space, new Dictionary<string, PlayerInputType>() { {"Initiate", PlayerInputType.OnKeyDown }, { "Hold", PlayerInputType.OnKeyHeld }, { "Release", PlayerInputType.OnKeyUp } }, nameof(Jump));
-        public GroupKeybind Slide = new(KeyCode.LeftShift, new Dictionary<string, PlayerInputType>() { {"Initiate", PlayerInputType.OnKeyDown }, { "Hold", PlayerInputType.OnKeyHeld }}, nameof(Slide));
-        public GroupKeybind GrapplingHook = new(KeyCode.Space, new Dictionary<string, PlayerInputType>() { {"Initiate", PlayerInputType.OnKeyDown }, { "Hold", PlayerInputType.OnKeyHeld }, { "Release", PlayerInputType.OnKeyUp } }, nameof(GrapplingHook));
+        public GroupKeybind Forward = new(KeyCode.Z, new InputType[] { InputType.OnKeyDown, InputType.OnKeyHeld }, nameof(Forward));
+        public GroupKeybind Back = new(KeyCode.S, new InputType[] { InputType.OnKeyDown, InputType.OnKeyHeld }, nameof(Back));
+        public GroupKeybind Right = new(KeyCode.D, new InputType[] { InputType.OnKeyDown, InputType.OnKeyHeld, InputType.OnKeyHeldForTime }, nameof(Right));
+        public GroupKeybind Left = new(KeyCode.Q, new InputType[] { InputType.OnKeyDown, InputType.OnKeyHeld, InputType.OnKeyHeldForTime }, nameof(Left));
+        public GroupKeybind Jump = new(KeyCode.Space, new InputType[] { InputType.OnKeyDown, InputType.OnKeyHeld, InputType.OnKeyUp }, nameof(Jump));
+        public GroupKeybind Slide = new(KeyCode.LeftShift, new InputType[] { InputType.OnKeyDown, InputType.OnKeyHeld }, nameof(Slide));
+        public GroupKeybind GrapplingHook = new(KeyCode.Space, new InputType[] { InputType.OnKeyDown, InputType.OnKeyHeld, InputType.OnKeyUp }, nameof(GrapplingHook));
 
         //public FixedKeybind InitiateRight = new(KeyCode.D, PlayerInputType.OnKeyDown, nameof(InitiateRight));
         //public FixedKeybind HoldRightForTime = new(KeyCode.D, PlayerInputType.OnHeldForTime, nameof(HoldRightForTime));
@@ -34,16 +34,16 @@ namespace Inputs
         //public FixedKeybind InitiateSlide = new(KeyCode.LeftShift, PlayerInputType.OnKeyDown, nameof(InitiateSlide));
         //public FixedKeybind HoldSlide = new(KeyCode.LeftShift, PlayerInputType.OnKeyHeld, nameof(HoldSlide));
 
-        public VariableKeybind HoldCrouch = new(KeyCode.LeftControl, new List<PlayerInputType>() { PlayerInputType.OnKeyHeld, PlayerInputType.Toggle }, nameof(HoldCrouch));
+        public VariableKeybind HoldCrouch = new(KeyCode.LeftControl, new List<InputType>() { InputType.OnKeyHeld, InputType.Toggle }, nameof(HoldCrouch));
 
-        public FixedKeybind Dash = new(KeyCode.Alpha9, PlayerInputType.OnKeyDown, nameof(Dash));
+        public FixedKeybind Dash = new(KeyCode.Alpha9, InputType.OnKeyDown, nameof(Dash));
 
         //public FixedKeybind InitiateGrapplingHook = new(KeyCode.X, PlayerInputType.OnKeyDown, nameof(InitiateGrapplingHook));
         //public FixedKeybind HoldGrapplingHook = new(KeyCode.X, PlayerInputType.OnKeyHeld, nameof(HoldGrapplingHook));
         //public FixedKeybind ReleaseGrapplingHook = new(KeyCode.X, PlayerInputType.OnKeyUp, nameof(ReleaseGrapplingHook));
 
-        public FixedKeybind SwitchCameraPosition = new(KeyCode.W, PlayerInputType.OnKeyDown, nameof(SwitchCameraPosition));
-        public VariableKeybind QuickReset = new(KeyCode.X, new List<PlayerInputType>() { PlayerInputType.OnKeyDown, PlayerInputType.OnHeldForTime }, .5f, nameof(QuickReset));
+        public FixedKeybind SwitchCameraPosition = new(KeyCode.W, InputType.OnKeyDown, nameof(SwitchCameraPosition));
+        public VariableKeybind QuickReset = new(KeyCode.X, new List<InputType>() { InputType.OnKeyDown, InputType.OnKeyHeldForTime }, .5f, nameof(QuickReset));
 
 
         public List<Keybind> Keybinds { get; private set; } = new();

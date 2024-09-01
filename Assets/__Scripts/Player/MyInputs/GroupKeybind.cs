@@ -10,28 +10,28 @@ namespace Inputs
     public sealed class GroupKeybind : Keybind
     {
         private readonly Dictionary<string, Func<bool>> groupEntries;
-        public GroupKeybind(KeyCode relevantKey, Dictionary<string, PlayerInputType> actioNameAndInputType, string name_)
+        public GroupKeybind(KeyCode relevantKey, InputType[] inputTypes, string name_)
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();
             name = name_;
             groupEntries = new();
-            foreach (KeyValuePair<string, PlayerInputType> kvp in actioNameAndInputType)
+            foreach (InputType inputType in inputTypes)
             {
-                groupEntries[kvp.Key] = GetRelevantOutputSettingsFromParam(kvp.Value);
+                groupEntries[GroupKeybindRequestKeywords.GetRelevantNameFromInputType(inputType)] = GetRelevantOutputSettingsFromParam(inputType);
             }
         }
 
-        public GroupKeybind(KeyCode relevantKey, Dictionary<string, PlayerInputType> actioNameAndInputType, float _holdForSeconds, string name_)
+        public GroupKeybind(KeyCode relevantKey, InputType[] inputTypes, float _holdForSeconds, string name_)
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();
             holdForSeconds = _holdForSeconds;
             name = name_;
             groupEntries = new();
-            foreach (KeyValuePair<string, PlayerInputType> kvp in actioNameAndInputType)
+            foreach (InputType inputType in inputTypes)
             {
-                groupEntries[kvp.Key] = GetRelevantOutputSettingsFromParam(kvp.Value);
+                groupEntries[GroupKeybindRequestKeywords.GetRelevantNameFromInputType(inputType)] = GetRelevantOutputSettingsFromParam(inputType);
             }
         }
 

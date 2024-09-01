@@ -42,9 +42,9 @@ namespace Controller
         private MovementInputQuery InputQuery => inputManager.MovementInputs;
         private Rigidbody Rigidbody;
         private FollowRotationCamera followRotationCamera;
-        private int ForwardAxisInput => MyInput.GetAxis(InputQuery.Back["Hold"], InputQuery.Forward["Hold"]);
-        private int SidewayAxisInput => MyInput.GetAxis(InputQuery.Left["Hold"], InputQuery.Right["Hold"]);
-        private bool PressingForwardOrStrafeInput => InputQuery.Forward["Hold"] || InputQuery.Left["Hold"] || InputQuery.Right["Hold"];
+        private int ForwardAxisInput => MyInput.GetAxis(InputQuery.Back[GroupKeybindRequestKeywords.Hold], InputQuery.Forward[GroupKeybindRequestKeywords.Hold]);
+        private int SidewayAxisInput => MyInput.GetAxis(InputQuery.Left[GroupKeybindRequestKeywords.Hold], InputQuery.Right[GroupKeybindRequestKeywords.Hold]);
+        private bool PressingForwardOrStrafeInput => InputQuery.Forward[GroupKeybindRequestKeywords.Hold] || InputQuery.Left[GroupKeybindRequestKeywords.Hold] || InputQuery.Right[GroupKeybindRequestKeywords.Hold];
         public Vector3 Position => transform.position;
         public Vector3 FeetPosition => transform.position + Vector3.down;
         public float CurrentSpeed => Rigidbody.velocity.Mask(1f, 0f, 1f).magnitude;
@@ -169,7 +169,7 @@ namespace Controller
         private bool CanUseCoyote => coyoteUsable && !isCollidingDown && timeLeftGround + coyoteTimeThreshold > Time.time;
         private bool HasBufferedJump => isCollidingDown && lastJumpPressed + jumpBuffer > Time.time;
 
-        private bool ShouldLongJump => DashUsable && InputQuery.Dash && InputQuery.Forward["Hold"];
+        private bool ShouldLongJump => DashUsable && InputQuery.Dash && InputQuery.Forward[GroupKeybindRequestKeywords.Hold];
         private bool forceResetJumping;
         #endregion
 
@@ -391,10 +391,10 @@ namespace Controller
             // this is true for each key with an exoected long lasting effects namely:
             // HoldForTime -> may miss the frame where stopped holding if it was nt checked this frame
             // Toggle -> may misss the frame where toggled it if it was nt checked this frame
-            _ = InputQuery.Left["HoldForTime"];
-            _ = InputQuery.Right["HoldForTime"];
+            _ = InputQuery.Left[GroupKeybindRequestKeywords.HoldForTime];
+            _ = InputQuery.Right[GroupKeybindRequestKeywords.HoldForTime];
             _ = InputQuery.QuickReset;
-            _ = InputQuery.Slide["Hold"];
+            _ = InputQuery.Slide[GroupKeybindRequestKeywords.Hold];
             _ = InputQuery.HoldCrouch;
 
             currentMovementMethod();
@@ -606,7 +606,7 @@ namespace Controller
         {
             if (IsJumping) { return (false, false); }
 
-            if (InputQuery.Jump["Initiate"])
+            if (InputQuery.Jump[GroupKeybindRequestKeywords.Initiate])
             {
                 lastJumpPressed = Time.time; // for jump buffer
 
@@ -619,7 +619,7 @@ namespace Controller
             else if (HasBufferedJump)
             {
                 //Jump(inputQuery.HoldJump);
-                return (true, InputQuery.Jump["Hold"]);
+                return (true, InputQuery.Jump[GroupKeybindRequestKeywords.Hold]);
             }
 
             return (false, false);
@@ -638,7 +638,7 @@ namespace Controller
 
             ResetYVelocity();
 
-            if (InputQuery.Forward["Hold"])
+            if (InputQuery.Forward[GroupKeybindRequestKeywords.Hold])
             {
                 Rigidbody.AddForce(initialJumpSpeedBoost * transform.forward, ForceMode.Impulse);
             }
@@ -719,7 +719,7 @@ namespace Controller
                 return;
             }
 
-            if (InputQuery.Slide["Initiate"] && CurrentSpeed != 0f) // HoldSlide or InitiateSlide ? -> run some tests
+            if (InputQuery.Slide[GroupKeybindRequestKeywords.Initiate] && CurrentSpeed != 0f) // HoldSlide or InitiateSlide ? -> run some tests
             {
                 StartCoroutine(Slide()); // add some kind of coyote threshold where the velocity is conserved even tho the player walked a bit (which should kill his momentum)
                 return;
@@ -727,7 +727,7 @@ namespace Controller
 
             if (!isCollidingDown)
             {
-                var sideToWallRunOn = MyInput.GetAxis(InputQuery.Left["Hold"] && isCollidingLeft, InputQuery.Right["Hold"] && isCollidingRight);
+                var sideToWallRunOn = MyInput.GetAxis(InputQuery.Left[GroupKeybindRequestKeywords.Hold] && isCollidingLeft, InputQuery.Right[GroupKeybindRequestKeywords.Hold] && isCollidingRight);
                 if (sideToWallRunOn != 0f)
                 {
                     StartCoroutine(Wallrun(sideToWallRunOn));
@@ -1038,9 +1038,9 @@ namespace Controller
 
             var shouldAwardVelocityBoostForFalling = !isCollidingDown;
 
-            yield return new WaitUntil(() => isCollidingDown || !InputQuery.Slide["Hold"]); // await the landing to initiate the slide
+            yield return new WaitUntil(() => isCollidingDown || !InputQuery.Slide[GroupKeybindRequestKeywords.Hold]); // await the landing to initiate the slide
 
-            if (!InputQuery.Slide["Hold"]) { yield break; } // if changed his mind
+            if (!InputQuery.Slide[GroupKeybindRequestKeywords.Hold]) { yield break; } // if changed his mind
 
             SetMovementMode(MovementMode.Slide);
             transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
@@ -1083,7 +1083,7 @@ namespace Controller
 
                         return
                             Rigidbody.velocity.magnitude < slideCancelThreshold ||
-                            !InputQuery.Slide["Hold"] ||
+                            !InputQuery.Slide[GroupKeybindRequestKeywords.Hold] ||
                             triedJumping
                             ;
                     }
@@ -1091,7 +1091,7 @@ namespace Controller
 
             if (triedJumping)
             {
-                Jump(wouldVeBeenFullJump, dashed && InputQuery.Forward["Hold"]);
+                Jump(wouldVeBeenFullJump, dashed && InputQuery.Forward[GroupKeybindRequestKeywords.Hold]);
                 CommonSlideExit(MovementMode.Run);
                 yield break;
             }
@@ -1169,7 +1169,7 @@ namespace Controller
                         //Rigidbody.velocity = dashVelocity * cameraTransform.forward; // perhaps do sth less brutal with gradual velocity loss
                         Rigidbody.velocity = DashVelocity * dir; // perhaps do sth less brutal with gradual velocity loss
 
-                        if (InputQuery.Slide["Initiate"] && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
+                        if (InputQuery.Slide[GroupKeybindRequestKeywords.Initiate] && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
                         {
                             slid = true;
                             return true;
@@ -1188,7 +1188,7 @@ namespace Controller
 
             if (!isCollidingDown)
             {
-                var shouldWallrunLeftRight = MyInput.GetAxis(InputQuery.Left["Hold"] && isCollidingLeft, InputQuery.Right["Hold"] && isCollidingRight);
+                var shouldWallrunLeftRight = MyInput.GetAxis(InputQuery.Left[GroupKeybindRequestKeywords.Hold] && isCollidingLeft, InputQuery.Right[GroupKeybindRequestKeywords.Hold] && isCollidingRight);
                 if (shouldWallrunLeftRight != 0f)
                 {
                     CommonDashExit(MovementMode.Wallrun);
@@ -1243,7 +1243,7 @@ namespace Controller
 
         private bool CheckLedgeClimb(out Collider[] ledges)
         {
-            if (!CanLedgeClimb || InputQuery.Back["Hold"] || !InputQuery.Forward["Hold"] && !InputQuery.Jump["Initiate"])
+            if (!CanLedgeClimb || InputQuery.Back[GroupKeybindRequestKeywords.Hold] || !InputQuery.Forward[GroupKeybindRequestKeywords.Hold] && !InputQuery.Jump[GroupKeybindRequestKeywords.Initiate])
             {
                 ledges = new Collider[0];
                 return false;
@@ -1310,7 +1310,7 @@ namespace Controller
 
         private IEnumerator Wallrun(int side)
         {
-            if (!InputQuery.Forward["Hold"] || InputQuery.Back["Hold"] || !CanWallRunAfterDash) { yield break; }
+            if (!InputQuery.Forward[GroupKeybindRequestKeywords.Hold] || InputQuery.Back[GroupKeybindRequestKeywords.Hold] || !CanWallRunAfterDash) { yield break; }
 
             SetMovementMode(MovementMode.Wallrun);
             ResetYVelocity();
@@ -1336,10 +1336,10 @@ namespace Controller
                     Rigidbody.AddForce(wallRunForceCoefficient * WallRunSpeed * Time.deltaTime * directionAlongWall, ForceMode.Force);
                     Rigidbody.velocity = Vector3.ClampMagnitude(Rigidbody.velocity.Mask(1f, 0f, 1f), WallRunSpeed);
 
-                    if (InputQuery.Jump["Initiate"])
+                    if (InputQuery.Jump[GroupKeybindRequestKeywords.Initiate])
                     {
                         CommonWallRunExit(MovementMode.Run, onRight);
-                        WallJump(!onRight, onRight ? InputQuery.Left["Hold"] : InputQuery.Right["Hold"]);
+                        WallJump(!onRight, onRight ? InputQuery.Left[GroupKeybindRequestKeywords.Hold] : InputQuery.Right[GroupKeybindRequestKeywords.Hold]);
                         leftEarly = true;
                         return true;
                     }
@@ -1361,7 +1361,7 @@ namespace Controller
                         return true;
                     }
 
-                    if (InputQuery.Slide["Initiate"])
+                    if (InputQuery.Slide[GroupKeybindRequestKeywords.Initiate])
                     {
                         CommonWallRunExit(MovementMode.Slide, onRight);
                         StartCoroutine(Slide());
@@ -1372,9 +1372,9 @@ namespace Controller
                     if (!isCollidingOnAnySide) { return true; } // out of the final return bc didn t work for reasons that are beyond me
 
                     return
-                        InputQuery.Back["Hold"] ||
-                        !InputQuery.Forward["Hold"] ||
-                        onRight ? InputQuery.Left["HoldForTime"] : InputQuery.Right["HoldForTime"]
+                        InputQuery.Back[GroupKeybindRequestKeywords.Hold] ||
+                        !InputQuery.Forward[GroupKeybindRequestKeywords.Hold] ||
+                        onRight ? InputQuery.Left[GroupKeybindRequestKeywords.HoldForTime] : InputQuery.Right[GroupKeybindRequestKeywords.HoldForTime]
                         ;
                 }
             );
@@ -1508,7 +1508,7 @@ namespace Controller
         }
 
         //private float TargetRunCameraTiltAngle => MyInput.GetAxis(inputQuery.Right, inputQuery.Left) * maxRunCameraTiltAngle;
-        private float TargetRunCameraTiltAngle => MyInput.GetAxis(InputQuery.Right["Hold"] && !isCollidingRight, InputQuery.Left["Hold"] & !isCollidingLeft) * maxRunCameraTiltAngle;
+        private float TargetRunCameraTiltAngle => MyInput.GetAxis(InputQuery.Right[GroupKeybindRequestKeywords.Hold] && !isCollidingRight, InputQuery.Left[GroupKeybindRequestKeywords.Hold] & !isCollidingLeft) * maxRunCameraTiltAngle;
         //
         //private float TargetRunCameraTiltAngle => Rigidbody != null ? CurrentStrafeSpeed / Mathf.Abs(CurrentStrafeSpeed) * maxRunCameraTiltAngle : 0f;
         // as dir in {-1, 0, 1} dir * maxRunCameraTiltAngle in {-maxRunCameraTiltAngle, 0 (regulateCameraTilt), maxRunCameraTiltAngle}
