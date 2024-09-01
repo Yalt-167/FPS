@@ -48,8 +48,6 @@ namespace Inputs
 
         public List<Keybind> Keybinds { get; private set; } = new();
 
-        public bool DoRenderRebindMenu { get; private set; }
-
         public void Init()
         {
             RegisterKeybind(Forward);

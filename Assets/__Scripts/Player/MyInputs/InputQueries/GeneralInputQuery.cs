@@ -7,13 +7,12 @@ using UnityEngine;
 namespace Inputs
 {
     [Serializable]
-    public sealed class GenericInputQuery : IInputQuery
+    public sealed class GeneralInputQuery : IInputQuery
     {
         public FixedKeybind TogglePauseMenu = new(KeyCode.Escape, PlayerInputType.OnKeyDown, nameof(TogglePauseMenu));
 
         public List<Keybind> Keybinds { get; private set; } = new();
 
-        public bool DoRenderRebindMenu { get; private set; }
 
         public void Init()
         {

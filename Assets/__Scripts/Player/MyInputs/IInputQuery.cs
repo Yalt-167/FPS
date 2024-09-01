@@ -9,7 +9,6 @@ namespace Inputs
     public interface IInputQuery
     {
         public List<Keybind> Keybinds { get; }
-        public bool DoRenderRebindMenu { get; }
 
         public void RegisterKeybind(Keybind bind);
 

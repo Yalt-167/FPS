@@ -10,25 +10,34 @@ namespace Inputs
     {
         public MovementInputQuery MovementInputs;
         public CombatInputQuery CombatInputs;
-        public GenericInputQuery GenericInputs;
+        public GeneralInputQuery GeneralInputs;
         public float cameraHorizontalSenitivity = 3f;
         public float cameraVerticalSensitivity = 3f;
         private bool doRenderMenu;
+        private CurrentRebindMenu currentRebindMenu = CurrentRebindMenu.General;
 
         private void Awake()
         {
             MovementInputs.Init();
             CombatInputs.Init();
-            GenericInputs.Init();
+            GeneralInputs.Init();
         }
 
         private void Update()
         {
-            doRenderMenu = GenericInputs.TogglePauseMenu ? !doRenderMenu : doRenderMenu;
+            doRenderMenu = GeneralInputs.TogglePauseMenu ? !doRenderMenu : doRenderMenu;
 
             if (doRenderMenu)
             {
+                IInputQuery relevantInputQuery = currentRebindMenu switch
+                {
+                    CurrentRebindMenu.Movement => MovementInputs,
+                    CurrentRebindMenu.Combat => CombatInputs,
+                    CurrentRebindMenu.General => GeneralInputs,
+                    _ => null
+                };
 
+                relevantInputQuery?.OnRenderRebindMenu();
             }
         }
 
