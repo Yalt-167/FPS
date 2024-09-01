@@ -1,8 +1,10 @@
+using GameManagement;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Inputs
 {
@@ -27,11 +29,64 @@ namespace Inputs
         {
             doRenderMenu = GeneralInputs.TogglePauseMenu ? !doRenderMenu : doRenderMenu;
 
-            
+            if (doRenderMenu) { PlayerFrame.LocalPlayer.SetMenuInputMode(); }
+            else { PlayerFrame.LocalPlayer.SetGameplayInputMode(); }
         }
 
         private void OnGUI()
         {
+            GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.BeginVertical(GUILayout.Height(Screen.height));
+
+            GUILayout.BeginVertical(CachedGUIStylesNames.Box);
+
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+
+            GUI.color = currentRebindMenu == CurrentRebindMenu.General ? Color.grey : Color.white;
+
+            if (GUILayout.Button("General"))
+            {
+                currentRebindMenu = CurrentRebindMenu.General;
+            }
+
+            GUI.color = Color.white;
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+
+            GUI.color = currentRebindMenu == CurrentRebindMenu.Movement ? Color.grey : Color.white;
+
+            if (GUILayout.Button("Movement"))
+            {
+                currentRebindMenu = CurrentRebindMenu.Movement;
+            }
+
+            GUI.color = Color.white;
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+
+            GUI.color = currentRebindMenu == CurrentRebindMenu.Combat ? Color.grey : Color.white;
+
+            if (GUILayout.Button("Combat"))
+            {
+                currentRebindMenu = CurrentRebindMenu.Combat;
+            }
+
+            GUI.color = Color.white;
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndHorizontal();
+
+
             if (doRenderMenu)
             {
                 IInputQuery relevantInputQuery = currentRebindMenu switch
@@ -44,6 +99,14 @@ namespace Inputs
 
                 relevantInputQuery?.OnRenderRebindMenu();
             }
+
+            GUILayout.EndVertical();
+
+            GUILayout.EndVertical();
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.EndHorizontal();
         }
     }
 }
