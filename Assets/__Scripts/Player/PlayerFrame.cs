@@ -309,17 +309,15 @@ namespace GameManagement
         public void SetMenuInputMode()
         {
             ToggleGameControls(towardOn: false);
-            ToggleCamera(towardOn: false);
             ToggleCursor(towardOn: true);
-            LobbyHandler.Instance.ToggleMenuCamera(towardOn: true);
+            //ToggleCamera(towardOn: false);
         }
 
         public void SetGameplayInputMode()
         {
             ToggleCursor(towardOn: false);
             ToggleGameControls(towardOn: true);
-            LobbyHandler.Instance.ToggleMenuCamera(towardOn: false);
-            ToggleCamera(towardOn: true);
+            //ToggleCamera(towardOn: true);
         }
 
         public void ToggleCamera(bool towardOn)

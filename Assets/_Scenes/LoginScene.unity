@@ -4278,6 +4278,10 @@ PrefabInstance:
         type: 3}
       insertIndex: 3
       addedObject: {fileID: 1669727596}
+    - targetCorrespondingSourceObject: {fileID: 3441316065125041964, guid: b378211f2dd648b45a09e6208c6e12e3,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1669727601}
   m_SourcePrefab: {fileID: 100100000, guid: b378211f2dd648b45a09e6208c6e12e3, type: 3}
 --- !u!21 &1569720111
 Material:
@@ -4572,6 +4576,18 @@ MonoBehaviour:
     PacketDelayMS: 0
     PacketJitterMS: 0
     PacketDropRate: 0
+--- !u!114 &1669727601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1669727591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5037f19ee415b0499f9428fcf95b183, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1699853538
 PrefabInstance:
   m_ObjectHideFlags: 0
