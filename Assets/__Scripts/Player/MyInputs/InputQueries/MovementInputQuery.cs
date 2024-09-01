@@ -29,9 +29,9 @@ namespace Inputs
         public void Init()
         {
             RegisterKeybind(Forward);
+            RegisterKeybind(Left);
             RegisterKeybind(Back);
             RegisterKeybind(Right);
-            RegisterKeybind(Left);
 
             RegisterKeybind(Jump);
 

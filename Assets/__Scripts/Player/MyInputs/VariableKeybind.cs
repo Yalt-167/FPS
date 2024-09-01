@@ -10,7 +10,7 @@ namespace Inputs
     [Serializable]
     public sealed class VariableKeybind : Keybind
     {
-        [SerializeField] private List<InputType> allowedActivationTypes;
+        [SerializeField] private List<InputType> allowedInputTypes;
 
         private int activationTypeIndex;
         private int activationTypesLength;
@@ -19,33 +19,33 @@ namespace Inputs
         /// First provided activation type will be selected as default
         /// </summary>
         /// <param name="relevantKey"></param>
-        /// <param name="_allowedActivationTypes"></param>
-        public VariableKeybind(KeyCode relevantKey, List<InputType> _allowedActivationTypes, string name_)
+        /// <param name="allowedInputTypes_"></param>
+        public VariableKeybind(KeyCode relevantKey, List<InputType> allowedInputTypes_, string name_)
         {
-            RelevantKey = relevantKey;
-            relevantKeyAsStr = relevantKey.ToString();
-            allowedActivationTypes = _allowedActivationTypes;
-            inputType = allowedActivationTypes[0];
-            inputTypeAsStr = inputType.ToString();
-            name = name_;
+            ConstructorCommon(relevantKey, allowedInputTypes_, name_);
         }
 
-        public VariableKeybind(KeyCode relevantKey, List<InputType> _allowedActivationTypes, float _holdForSeconds, string name_)
+        public VariableKeybind(KeyCode relevantKey, List<InputType> allowedInputTypes_, float _holdForSeconds, string name_)
+        {
+            ConstructorCommon(relevantKey, allowedInputTypes_, name_);
+            holdForSeconds = _holdForSeconds;
+        }
+
+        private void ConstructorCommon(KeyCode relevantKey, List<InputType> allowedInputTypes_, string name_)
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();
-            allowedActivationTypes = _allowedActivationTypes;
-            inputType = allowedActivationTypes[0];
+            allowedInputTypes = allowedInputTypes_;
+            inputType = allowedInputTypes[0];
             inputTypeAsStr = inputType.ToString();
-            holdForSeconds = _holdForSeconds;
             name = name_;
         }
 
         public override void Init()
         {
             base.Init();
-            activationTypeIndex = allowedActivationTypes.IndexOf(inputType);
-            activationTypesLength = allowedActivationTypes.Count;
+            activationTypeIndex = allowedInputTypes.IndexOf(inputType);
+            activationTypesLength = allowedInputTypes.Count;
         }
 
         public void SetActivationType(InputType newActivationType) // there would be issues with index so far
@@ -57,7 +57,7 @@ namespace Inputs
 
         public void NextActivationType()
         {
-            SetActivationType(allowedActivationTypes[++activationTypeIndex % activationTypesLength]);
+            SetActivationType(allowedInputTypes[++activationTypeIndex % activationTypesLength]);
         }
 
         public override void DisplayInputType()
