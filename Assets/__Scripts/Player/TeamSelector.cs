@@ -117,6 +117,7 @@ public sealed class TeamSelector : NetworkBehaviour
             if (GUILayout.Button(TeamSelectorGUILabels.StartGame))
             {
                 ToggleTeamSelectionScreenServerRpc(towardOn__: false);
+                Game.StaticStartGame();
             }
 
             GUILayout.FlexibleSpace();

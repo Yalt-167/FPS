@@ -111,7 +111,7 @@ namespace GameManagement
 
         #region Game Start
 
-        private bool gameStarted;
+        public bool GameStarted { get; private set; }
 
         [MenuItem("Developer/StartGame")]
         public static void StaticStartGame()
@@ -122,7 +122,7 @@ namespace GameManagement
         [Rpc(SendTo.Server)]
         private void StartGameServerRpc()
         {
-            if (!gameStarted)
+            if (!GameStarted)
             {
                 StartGameClientRpc();
             }
@@ -131,7 +131,7 @@ namespace GameManagement
         [Rpc(SendTo.ClientsAndHost)]
         private void StartGameClientRpc()
         {
-            gameStarted = true;
+            GameStarted = true;
 
             Debug.Log("Game was started");
 

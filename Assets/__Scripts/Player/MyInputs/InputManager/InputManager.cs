@@ -29,12 +29,14 @@ namespace Inputs
         {
             doRenderMenu = GeneralInputs.TogglePauseMenu ? !doRenderMenu : doRenderMenu;
 
-            if (doRenderMenu) { PlayerFrame.LocalPlayer.SetMenuInputMode(); }
+            if (doRenderMenu || !Game.Manager.GameStarted) { PlayerFrame.LocalPlayer.SetMenuInputMode(); }
             else { PlayerFrame.LocalPlayer.SetGameplayInputMode(); }
         }
 
         private void OnGUI()
         {
+            if (!doRenderMenu) { return; }
+
             GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
 
             GUILayout.FlexibleSpace();
@@ -85,20 +87,16 @@ namespace Inputs
             GUILayout.EndHorizontal();
 
             GUILayout.EndHorizontal();
-
-
-            if (doRenderMenu)
+            
+            IInputQuery relevantInputQuery = currentRebindMenu switch
             {
-                IInputQuery relevantInputQuery = currentRebindMenu switch
-                {
-                    CurrentRebindMenu.Movement => MovementInputs,
-                    CurrentRebindMenu.Combat => CombatInputs,
-                    CurrentRebindMenu.General => GeneralInputs,
-                    _ => null
-                };
+                CurrentRebindMenu.Movement => MovementInputs,
+                CurrentRebindMenu.Combat => CombatInputs,
+                CurrentRebindMenu.General => GeneralInputs,
+                _ => null
+            };
 
-                relevantInputQuery?.OnRenderRebindMenu();
-            }
+            relevantInputQuery?.OnRenderRebindMenu();
 
             GUILayout.EndVertical();
 
