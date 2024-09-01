@@ -31,7 +31,7 @@ namespace LobbyHandling
         private static readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
         private float heartbeatTimer;
 
-        private static readonly float lobbyUpdateRate = 5f; // how often the lobby updates (in seconds)
+        private static readonly float lobbyUpdateRate = 2.5f; // how often the lobby updates (in seconds)
         private float lobbyUpdateTimer;
 
         private static readonly string noPassword = "        ";
@@ -219,6 +219,8 @@ namespace LobbyHandling
         public async void HandleLobbyUpdate() // polling rate not linear ? when some guy presses tab -> query else no need?
         {
             if (hostLobby == null) { return; }
+
+            if (Game.Manager.GameStarted) { return; }
 
             lobbyUpdateTimer += Time.deltaTime;
             if (lobbyUpdateTimer >= lobbyUpdateRate)
