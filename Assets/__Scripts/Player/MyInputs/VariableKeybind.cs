@@ -24,16 +24,20 @@ namespace Inputs
         public VariableKeybind(KeyCode relevantKey, List<PlayerInputType> _allowedActivationTypes, string name_)
         {
             RelevantKey = relevantKey;
+            relevantKeyAsStr = relevantKey.ToString();
             allowedActivationTypes = _allowedActivationTypes;
-            howToActivate = allowedActivationTypes[0];
+            inputType = allowedActivationTypes[0];
+            inputTypeAsStr = inputType.ToString();
             name = name_;
         }
 
         public VariableKeybind(KeyCode relevantKey, List<PlayerInputType> _allowedActivationTypes, float _holdForSeconds, string name_)
         {
             RelevantKey = relevantKey;
+            relevantKeyAsStr = relevantKey.ToString();
             allowedActivationTypes = _allowedActivationTypes;
-            howToActivate = allowedActivationTypes[0];
+            inputType = allowedActivationTypes[0];
+            inputTypeAsStr = inputType.ToString();
             holdForSeconds = _holdForSeconds;
             name = name_;
         }
@@ -41,19 +45,19 @@ namespace Inputs
         public override void Init()
         {
             base.Init();
-            activationTypeIndex = allowedActivationTypes.IndexOf(howToActivate);
+            activationTypeIndex = allowedActivationTypes.IndexOf(inputType);
             activationTypesLength = allowedActivationTypes.Count;
         }
 
         public void SetActivationType(PlayerInputType newActivationType)
         {
-            howToActivate = newActivationType;
+            inputType = newActivationType;
             SetRelevantOutputSettings();
         }
 
         public void NextActivationType()
         {
-            howToActivate = allowedActivationTypes[++activationTypeIndex % activationTypesLength];
+            inputType = allowedActivationTypes[++activationTypeIndex % activationTypesLength];
             SetRelevantOutputSettings();
         }
 
@@ -63,9 +67,7 @@ namespace Inputs
 
             DisplayCurrentKey();
 
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
-            GUILayout.Label(howToActivate.ToString()); // eventually store that as a memeber variable to avoid unecessary garbage collection
-            GUILayout.EndHorizontal();
+            DisplayInputType();
 
             GUILayout.EndHorizontal();
         }

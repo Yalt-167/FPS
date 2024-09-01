@@ -11,8 +11,8 @@ namespace Inputs
         protected string name;
         [SerializeField] protected KeyCode RelevantKey;
         protected string relevantKeyAsStr;
-        [SerializeField] protected PlayerInputType howToActivate;
-        protected string howToActivateAsStr;
+        [SerializeField] protected PlayerInputType inputType;
+        protected string inputTypeAsStr;
 
         protected Func<bool> shouldOutput;
         protected bool active;
@@ -43,14 +43,14 @@ namespace Inputs
 
         public void SetInputType(PlayerInputType howToActivate_)
         {
-            howToActivate = howToActivate_;
-            howToActivateAsStr = howToActivate_.ToString();
+            inputType = howToActivate_;
+            inputTypeAsStr = howToActivate_.ToString();
             SetRelevantOutputSettings();
         }
 
         protected void SetRelevantOutputSettings()
         {
-            shouldOutput = howToActivate switch
+            shouldOutput = inputType switch
             {
                 PlayerInputType.OnKeyDown => CheckKeyDown,
                 PlayerInputType.OnKeyUp => CheckKeyUp,
@@ -125,6 +125,13 @@ namespace Inputs
             GUILayout.Label(name);
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
             GUILayout.Label(relevantKeyAsStr);
+            GUILayout.EndHorizontal();
+        }
+
+        public virtual void DisplayInputType()
+        {
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+            GUILayout.Label(inputTypeAsStr);
             GUILayout.EndHorizontal();
         }
     }

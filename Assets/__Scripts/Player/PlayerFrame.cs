@@ -10,6 +10,7 @@ using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using Unity.Services.Authentication;
 
 using Controller;
+using LobbyHandling;
 
 
 namespace GameManagement
@@ -310,12 +311,14 @@ namespace GameManagement
             ToggleGameControls(towardOn: false);
             ToggleCamera(towardOn: false);
             ToggleCursor(towardOn: true);
+            LobbyHandler.Instance.ToggleMenuCamera(towardOn: true);
         }
 
         public void SetGameplayInputMode()
         {
             ToggleCursor(towardOn: false);
             ToggleGameControls(towardOn: true);
+            LobbyHandler.Instance.ToggleMenuCamera(towardOn: false);
             ToggleCamera(towardOn: true);
         }
 

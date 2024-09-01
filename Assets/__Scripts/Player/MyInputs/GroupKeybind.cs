@@ -59,16 +59,7 @@ namespace Inputs
         {
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
 
-            GUILayout.Label(name);
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
-            GUILayout.Label(relevantKeyAsStr);
-            GUILayout.EndHorizontal();
-
-            GUI.enabled = false;
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
-            GUILayout.Label(howToActivate.ToString());
-            GUILayout.EndHorizontal();
-            GUI.enabled = true;
+            DisplayCurrentKey();
 
             GUILayout.EndHorizontal();
         }

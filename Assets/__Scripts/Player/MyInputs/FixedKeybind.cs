@@ -13,8 +13,8 @@ namespace Inputs
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();
-            howToActivate = activationType;
-            howToActivateAsStr = activationType.ToString();
+            inputType = activationType;
+            inputTypeAsStr = activationType.ToString();
             name = name_;
         }
 
@@ -22,8 +22,8 @@ namespace Inputs
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();
-            howToActivate = activationType;
-            howToActivateAsStr = activationType.ToString();
+            inputType = activationType;
+            inputTypeAsStr = activationType.ToString();
             holdForSeconds = _holdForSeconds;
             name = name_;
         }
@@ -32,16 +32,7 @@ namespace Inputs
         {
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
 
-            GUILayout.Label(name);
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
-            GUILayout.Label(relevantKeyAsStr);
-            GUILayout.EndHorizontal();
-
-            GUI.enabled = false;
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
-            GUILayout.Label(howToActivateAsStr);
-            GUILayout.EndHorizontal();
-            GUI.enabled = true;
+            DisplayCurrentKey();
 
             GUILayout.EndHorizontal();
         }

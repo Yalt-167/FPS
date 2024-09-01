@@ -17,6 +17,9 @@ namespace Inputs
         public float cameraVerticalSensitivity = 3f;
         private bool doRenderMenu;
         private CurrentRebindMenu currentRebindMenu = CurrentRebindMenu.General;
+        [SerializeField] private float actionNameDisplayWidth;
+        [SerializeField] private float keyNameDisplayWidth;
+        [SerializeField] private float inputTypeDisplayWidth;
 
         private void Awake()
         {
@@ -45,7 +48,11 @@ namespace Inputs
 
             GUILayout.BeginVertical(CachedGUIStylesNames.Box);
 
+            #region Rebind menus selection tabs
+
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+
+            #region General button
 
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
 
@@ -60,6 +67,10 @@ namespace Inputs
 
             GUILayout.EndHorizontal();
 
+            #endregion
+
+            #region Movement button
+
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
 
             GUI.color = currentRebindMenu == CurrentRebindMenu.Movement ? Color.grey : Color.white;
@@ -72,6 +83,10 @@ namespace Inputs
             GUI.color = Color.white;
 
             GUILayout.EndHorizontal();
+
+            #endregion
+
+            #region Combat button
 
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
 
@@ -86,8 +101,12 @@ namespace Inputs
 
             GUILayout.EndHorizontal();
 
+            #endregion
+
             GUILayout.EndHorizontal();
-            
+
+            #endregion
+
             IInputQuery relevantInputQuery = currentRebindMenu switch
             {
                 CurrentRebindMenu.Movement => MovementInputs,
