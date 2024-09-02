@@ -6,23 +6,22 @@ using UnityEngine;
 
 using GameManagement;
 using SaveAndLoad;
+using Menus;
 
 namespace Inputs
 {
     [Serializable]
-    public sealed class InputManager : MonoBehaviour, IHaveSomethingToSave
+    public sealed class InputManager : MonoBehaviour, IHaveSomethingToSave, IGameSettingsMenuMember
     {
+
         [HideInInspector] public InputManagerSaveablePart BindsAndValues;
+
+        #region SaveAndLoad
+
         public IAmSomethingToSave DataToSave => BindsAndValues;
         public string SaveFilePath { get; } = "keybinds";
 
-        private bool doRenderMenu;
-        private RebindMenu currentRebindMenu = RebindMenu.General;
-        private static readonly string General = nameof(General);
-        private static readonly string Combat = nameof(Combat);
-        private static readonly string Movement = nameof(Movement);
-        private static Vector2 scrollPosition;
-
+        #endregion
 
         #region Ease of access
 
@@ -34,6 +33,23 @@ namespace Inputs
 
         #endregion
 
+        #region Miscellaneaous
+
+        private RebindMenu currentRebindMenu = RebindMenu.General;
+        private static readonly string General = nameof(General);
+        private static readonly string Combat = nameof(Combat);
+        private static readonly string Movement = nameof(Movement);
+        private static Vector2 scrollPosition;
+
+        #endregion
+
+        #region Menu
+
+        private GameSettingsMenu gameSettingsMenu;
+        public string MenuName { get; } = "Inputs";
+
+        #endregion
+
         public void Awake()
         {
             _ = Load();
@@ -41,17 +57,21 @@ namespace Inputs
             MovementInputs.Init();
             CombatInputs.Init();
             GeneralInputs.Init();
+
+            gameSettingsMenu = GetComponent<GameSettingsMenu>();
+            gameSettingsMenu.Subscribe(this);
         }
 
         private void Update()
         {
             if (Game.Manager.GameStarted && !(MovementInputs.IsRebindingAKey || CombatInputs.IsRebindingAKey || GeneralInputs.IsRebindingAKey))
             {
-                doRenderMenu = GeneralInputs.TogglePauseMenu ? !doRenderMenu : doRenderMenu;
+                if (GeneralInputs.TogglePauseMenu)
+                {
+                    Debug.Log("Toggled");
+                    gameSettingsMenu.ToggleMenu();
+                }
             }
-
-            if (doRenderMenu || !Game.Manager.GameStarted) { PlayerFrame.LocalPlayer.SetMenuInputMode(); }
-            else { PlayerFrame.LocalPlayer.SetGameplayInputMode(); }
 
             if (Input.GetKeyDown(KeyCode.M))
             {
@@ -59,10 +79,8 @@ namespace Inputs
             }
         }
 
-        private void OnGUI()
+        public void OnRenderMenu()
         {
-            if (!doRenderMenu) { return; }
-
             GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
 
             GUILayout.FlexibleSpace();
@@ -144,7 +162,6 @@ namespace Inputs
 
         public void Save()
         {
-            Debug.Log($"InputManager: My data was saved (at least attempted to)");
             SaveAndLoad.SaveAndLoad.Save(DataToSave, SaveFilePath);
         }
 
