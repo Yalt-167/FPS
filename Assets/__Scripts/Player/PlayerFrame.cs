@@ -10,7 +10,7 @@ using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using Unity.Services.Authentication;
 
 using Controller;
-using LobbyHandling;
+using SaveAndLoad;
 
 
 namespace GameManagement
@@ -67,6 +67,14 @@ namespace GameManagement
 
         public override void OnNetworkDespawn()
         {
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                if (transform.GetChild(i).TryGetComponent<IHaveSomethingToSave>(out var heHasSomethingToSave))
+                {
+                    heHasSomethingToSave.Save();
+                }
+            }
+
             base.OnNetworkDespawn();
         }
 
@@ -310,14 +318,12 @@ namespace GameManagement
         {
             ToggleGameControls(towardOn: false);
             ToggleCursor(towardOn: true);
-            //ToggleCamera(towardOn: false);
         }
 
         public void SetGameplayInputMode()
         {
             ToggleCursor(towardOn: false);
             ToggleGameControls(towardOn: true);
-            //ToggleCamera(towardOn: true);
         }
 
         public void ToggleCamera(bool towardOn)

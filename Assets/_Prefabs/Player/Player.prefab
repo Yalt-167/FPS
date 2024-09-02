@@ -1502,7 +1502,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2957232829
+  GlobalObjectIdHash: 169908227
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1533,6 +1533,7 @@ MonoBehaviour:
     - {fileID: 5516743904902779326}
     - {fileID: 3857732353204371700}
     - {fileID: 3274016814467245242}
+    - {fileID: 3018800575568115996}
     gameObjectsToKill:
     - {fileID: 3467822551731792150}
     - {fileID: 4356166339693058417}
@@ -1904,106 +1905,112 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ee0a4aca436e4c458c62e769296a3dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MovementInputs:
-    Forward:
-      RelevantKey: 122
-      howToActivate: 2
-      holdForSeconds: 0
-    Back:
-      RelevantKey: 115
-      howToActivate: 2
-      holdForSeconds: 0
-    Right:
-      RelevantKey: 100
-      howToActivate: 2
-      holdForSeconds: 0
-    Left:
-      RelevantKey: 113
-      howToActivate: 2
-      holdForSeconds: 0
-    Jump:
-      RelevantKey: 32
-      howToActivate: 0
-      holdForSeconds: 0
-    Slide:
-      RelevantKey: 304
-      howToActivate: 0
-      holdForSeconds: 0
-    GrapplingHook:
-      RelevantKey: 32
-      howToActivate: 0
-      holdForSeconds: 0
-    HoldCrouch:
-      RelevantKey: 306
-      howToActivate: 2
-      holdForSeconds: 0
-      allowedActivationTypes: 0200000003000000
-    Dash:
-      RelevantKey: 57
-      howToActivate: 0
-      holdForSeconds: 0
-    SwitchCameraPosition:
-      RelevantKey: 119
-      howToActivate: 0
-      holdForSeconds: 0
-    QuickReset:
-      RelevantKey: 120
-      howToActivate: 0
-      holdForSeconds: 0.5
-      allowedActivationTypes: 0000000004000000
-  CombatInputs:
-    Shoot:
-      RelevantKey: 323
-      howToActivate: 2
-      holdForSeconds: 0
-    Aim:
-      RelevantKey: 324
-      howToActivate: 2
-      holdForSeconds: 0
-      allowedActivationTypes: 0200000003000000
-    Reload:
-      RelevantKey: 114
-      howToActivate: 0
-      holdForSeconds: 0
-    FirstGun:
-      RelevantKey: 49
-      howToActivate: 0
-      holdForSeconds: 0
-    SecondGun:
-      RelevantKey: 50
-      howToActivate: 0
-      holdForSeconds: 0
-    ThirdGun:
-      RelevantKey: 51
-      howToActivate: 0
-      holdForSeconds: 0
-    PrimaryAbility:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    SecondaryAbility:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    Ultimate:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    Slash:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-    Parry:
-      RelevantKey: 0
-      howToActivate: 0
-      holdForSeconds: 0
-  GenericInputs:
-    TogglePauseMenu:
-      RelevantKey: 27
-      howToActivate: 0
-      holdForSeconds: 0
-  cameraHorizontalSenitivity: 3
-  cameraVerticalSensitivity: 3
+  BindsAndValues:
+    MovementInputs:
+      Forward:
+        RelevantKey: 122
+        inputType: 0
+        holdForSeconds: 0
+      Back:
+        RelevantKey: 115
+        inputType: 0
+        holdForSeconds: 0
+      Right:
+        RelevantKey: 100
+        inputType: 0
+        holdForSeconds: 0.5
+      Left:
+        RelevantKey: 113
+        inputType: 0
+        holdForSeconds: 0.5
+      Jump:
+        RelevantKey: 32
+        inputType: 0
+        holdForSeconds: 0
+      Dash:
+        RelevantKey: 57
+        inputType: 0
+        holdForSeconds: 0
+      Slide:
+        RelevantKey: 304
+        inputType: 0
+        holdForSeconds: 0
+      GrapplingHook:
+        RelevantKey: 32
+        inputType: 0
+        holdForSeconds: 0
+      HoldCrouch:
+        RelevantKey: 306
+        inputType: 2
+        holdForSeconds: 0
+        allowedInputTypes: 0200000004000000
+      SwitchCameraPosition:
+        RelevantKey: 119
+        inputType: 0
+        holdForSeconds: 0
+      QuickReset:
+        RelevantKey: 120
+        inputType: 0
+        holdForSeconds: 0.5
+        allowedInputTypes: 0000000003000000
+    CombatInputs:
+      Shoot:
+        RelevantKey: 323
+        inputType: 2
+        holdForSeconds: 0
+      Aim:
+        RelevantKey: 324
+        inputType: 2
+        holdForSeconds: 0
+        allowedInputTypes: 0200000004000000
+      Reload:
+        RelevantKey: 114
+        inputType: 0
+        holdForSeconds: 0
+      FirstGun:
+        RelevantKey: 49
+        inputType: 0
+        holdForSeconds: 0
+      SecondGun:
+        RelevantKey: 50
+        inputType: 0
+        holdForSeconds: 0
+      ThirdGun:
+        RelevantKey: 51
+        inputType: 0
+        holdForSeconds: 0
+      PrimaryAbility:
+        RelevantKey: 0
+        inputType: 0
+        holdForSeconds: 0
+      SecondaryAbility:
+        RelevantKey: 0
+        inputType: 0
+        holdForSeconds: 0
+      Ultimate:
+        RelevantKey: 0
+        inputType: 0
+        holdForSeconds: 0
+      Slash:
+        RelevantKey: 0
+        inputType: 0
+        holdForSeconds: 0
+      Parry:
+        RelevantKey: 0
+        inputType: 0
+        holdForSeconds: 0
+    GeneralInputs:
+      TogglePauseMenu:
+        RelevantKey: 27
+        inputType: 0
+        holdForSeconds: 0
+      ShowScoreboard:
+        RelevantKey: 9
+        inputType: 4
+        holdForSeconds: 0
+        allowedInputTypes: 0400000002000000
+    CameraHorizontalSensitivity: 0
+    CameraVerticalSensitivity: 0
 --- !u!114 &3018800575568115996
 MonoBehaviour:
   m_ObjectHideFlags: 0

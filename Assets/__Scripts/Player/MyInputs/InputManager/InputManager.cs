@@ -12,7 +12,7 @@ namespace Inputs
     [Serializable]
     public sealed class InputManager : MonoBehaviour, IHaveSomethingToSave
     {
-        public InputManagerSaveablePart BindsAndValues;
+        [HideInInspector] public InputManagerSaveablePart BindsAndValues;
         public IAmSomethingToSave DataToSave => BindsAndValues;
         public string SaveFilePath { get; } = "keybinds";
 
@@ -24,13 +24,15 @@ namespace Inputs
         private static Vector2 scrollPosition;
 
 
+        #region Ease of access
 
-        public MovementInputQuery MovementInputs => BindsAndValues.MovementInputs ;
+        public MovementInputQuery MovementInputs => BindsAndValues.MovementInputs;
         public CombatInputQuery CombatInputs => BindsAndValues.CombatInputs;
         public GeneralInputQuery GeneralInputs => BindsAndValues.GeneralInputs;
         public float CameraHorizontalSensitivity => BindsAndValues.CameraHorizontalSensitivity;
         public float CameraVerticalSensitivity => BindsAndValues.CameraVerticalSensitivity;
 
+        #endregion
 
         public void Awake()
         {
@@ -142,6 +144,7 @@ namespace Inputs
 
         public void Save()
         {
+            Debug.Log($"InputManager: My data was saved (at least attempted to)");
             SaveAndLoad.SaveAndLoad.Save(DataToSave, SaveFilePath);
         }
 
