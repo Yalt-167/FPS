@@ -67,9 +67,10 @@ namespace GameManagement
 
         public override void OnNetworkDespawn()
         {
-            for (int i = 0; i < transform.childCount; i++)
+            var monoBehaviours = GetComponents<MonoBehaviour>();
+            foreach (var monoBehaviour in monoBehaviours)
             {
-                if (transform.GetChild(i).TryGetComponent<IHaveSomethingToSave>(out var heHasSomethingToSave))
+                if (monoBehaviour is IHaveSomethingToSave heHasSomethingToSave)
                 {
                     heHasSomethingToSave.Save();
                 }
