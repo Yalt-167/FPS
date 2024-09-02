@@ -1,3 +1,6 @@
+#define LOG_LOBBY_EVENTS
+
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -242,7 +245,9 @@ namespace LobbyHandling
 
             hostLobby = await LobbyService.Instance.GetLobbyAsync(hostLobby.Id);
 
+#if LOG_LOBBY_EVENTS
             Debug.Log("Lobby was updated");
+#endif
         }
 
         #endregion
@@ -340,8 +345,10 @@ namespace LobbyHandling
                 return;
             }
 
+#if LOG_LOBBY_EVENTS
             Debug.Log($"Successfully created a new lobby");
             DisplayHostLobbyData();
+#endif
             FillInLobbyDataFields();
             CopyLobbyID();
         }
@@ -388,9 +395,10 @@ namespace LobbyHandling
                 Debug.Log($"Couldn t edit lobby: Reason: {exception.Message}");
                 return;
             }
-
+#if LOG_LOBBY_EVENTS
             Debug.Log($"Successfully edited lobby data");
             DisplayHostLobbyData();
+#endif
         }
 
         public async void DeleteLobby(string lobbyID)
@@ -417,7 +425,9 @@ namespace LobbyHandling
                 return;
             }
 
+#if LOG_LOBBY_EVENTS
             Debug.Log("Lobby was successfully deleted");
+#endif
 
             hostLobby = null;
         }
@@ -434,7 +444,9 @@ namespace LobbyHandling
                 return;
             }
 
+#if LOG_LOBBY_EVENTS
             Debug.Log($"Succesfully joined lobby: {hostLobby.Name}");
+#endif
 
             JoinRelay(hostLobby.Data[LobbyData.RelayJoinCode].Value);
         }
@@ -463,7 +475,9 @@ namespace LobbyHandling
                 return;
             }
 
+#if LOG_LOBBY_EVENTS
             Debug.Log($"Succesfully joined lobby: {hostLobby.Name}");
+#endif
 
             JoinRelay(hostLobby.Data[LobbyData.RelayJoinCode].Value);
         }
@@ -491,7 +505,9 @@ namespace LobbyHandling
                 return;
             }
 
+#if LOG_LOBBY_EVENTS
             Debug.Log($"Succesfully joined lobby: {hostLobby.Name}");
+#endif
 
             JoinRelay(hostLobby.Data[LobbyData.RelayJoinCode].Value);
         }
@@ -522,6 +538,10 @@ namespace LobbyHandling
                 Debug.Log(exception.Message);
                 return;
             }
+
+//#if LOG_LOBBY_EVENTS // only relevant if was self quitting
+//            Debug.Log("Successfully quit lobby");
+//#endif
         }
 
         public async void CloseLobbyAcess()
@@ -554,8 +574,9 @@ namespace LobbyHandling
                 return;
             }
 
-
+#if LOG_LOBBY_EVENTS
             Debug.Log("Successfully closed the lobby");
+#endif
         }
 
         public async void KickPlayer(string playerID)
@@ -567,6 +588,7 @@ namespace LobbyHandling
             }
 
             await QuitLobbyAsync(playerID); // still has hostLobby set but IDk how to address that as of RN
+            // try accessing a member field -> if cannot -> not in lobby -> remove hostLobby
         }
 
         public async void SetHost(string newHostPlayerID)
@@ -592,7 +614,9 @@ namespace LobbyHandling
                 return;
             }
 
+#if LOG_LOBBY_EVENTS
             Debug.Log($"Successfully set new host");
+#endif
         }
 
 #nullable enable
@@ -897,7 +921,9 @@ namespace LobbyHandling
             if (hostLobby == null) { return; }
 
             GUIUtility.systemCopyBuffer = hostLobby.Id;
+#if LOG_LOBBY_EVENTS
             Debug.Log("Lobby ID was copied to your clipboard");
+#endif
         }
 
         public void CopyLobbyCode()
@@ -905,7 +931,9 @@ namespace LobbyHandling
             if (hostLobby == null) { return; }
 
             GUIUtility.systemCopyBuffer = hostLobby.LobbyCode;
+#if LOG_LOBBY_EVENTS
             Debug.Log("Lobby code was copied to your clipboard");
+#endif
         }
 
         public bool IsInLobby()
