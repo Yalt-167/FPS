@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -31,14 +29,15 @@ namespace SaveAndLoad
                 return null;
             }
 
+            Debug.Log($"A save file was found for path: {path}");
             object data;
             using (FileStream file = new(path, FileMode.Open))
             {
                 data = new BinaryFormatter().Deserialize(file);
             }
-
+            Debug.Log("Save file was read successfully");
             return data;
 
         }
     }
-} // C:/Users/antoi/AppData/LocalLow/DefaultCompany/ProjectOlympus/keybinds.data
+} // C:/Users/antoi/AppData/LocalLow/DefaultCompany/ProjectOlympus/{name}.data

@@ -14,6 +14,8 @@ namespace Inputs
     {
         public InputManagerSaveablePart BindsAndValues;
         public IAmSomethingToSave DataToSave => BindsAndValues;
+        public string SaveFilePath { get; } = "keybinds";
+
         private bool doRenderMenu;
         private RebindMenu currentRebindMenu = RebindMenu.General;
         private static readonly string General = nameof(General);
@@ -21,7 +23,6 @@ namespace Inputs
         private static readonly string Movement = nameof(Movement);
         private static Vector2 scrollPosition;
 
-        public string SaveFilePath { get; } = "keybinds";
 
 
         public MovementInputQuery MovementInputs => BindsAndValues.MovementInputs ;
@@ -36,10 +37,6 @@ namespace Inputs
             _ = Load();
 
             MovementInputs.Init();
-            //MovementInputs.Init();
-            //MovementInputs.Init();
-            //MovementInputs.Init();
-            //MovementInputs.Init();
             CombatInputs.Init();
             GeneralInputs.Init();
         }
