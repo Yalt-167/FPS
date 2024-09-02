@@ -1,4 +1,4 @@
-#define LOG_LOBBY_EVENTS
+//#define LOG_LOBBY_EVENTS
 
 
 using System;
@@ -704,8 +704,6 @@ namespace LobbyHandling
             relayUnityTransport = unityTransports[relayUnityTransportIndex];
 
             localUnityTransport = unityTransports[localUnityTransportIndex];
-
-
         }
 
         public void SelectRelayUnityTransport()
@@ -764,7 +762,9 @@ namespace LobbyHandling
                 relayAllocation.ConnectionData
             );
 
+#if LOG_LOBBY_EVENTS
             Debug.Log("Successfully created relay");
+#endif
 
             bool success =
 #if HEADLESS_ARCHITECTURE_SERVER
@@ -774,7 +774,9 @@ namespace LobbyHandling
 #endif
                 ;
 
+#if LOG_LOBBY_EVENTS
             Debug.Log(success ? "Server was successfully started" : "Failed to start server");
+#endif
             return success;
         }
 
@@ -804,7 +806,9 @@ namespace LobbyHandling
 
             NetworkManager.Singleton.StartClient();
 
+#if LOG_LOBBY_EVENTS
             Debug.Log("Successfully joined relay");
+#endif
         }
 
         public async void ListRegions()
