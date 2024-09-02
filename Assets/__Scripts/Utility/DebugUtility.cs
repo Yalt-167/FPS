@@ -11,7 +11,25 @@ public static class DebugUtility
 {
     public static void LogMethodCall()
     {
-        Debug.Log($"[Log Calls]: {new StackTrace().GetFrame(1).GetMethod().Name}");
+        Debug.Log($"[DebugUtility::Log Calls]: {new StackTrace().GetFrame(1).GetMethod().Name}");
+    }
+
+    public static void LogMethodCallStack()
+    {
+
+        var stackTrace = new StackTrace(skipFrames: 1);
+    //Debug.Log($"[DebugUtility::Log Call Stack]: ");
+
+        var stringBuilder = new StringBuilder();
+
+        var upperBound = 5 > stackTrace.FrameCount ? stackTrace.FrameCount : 5;
+        for (int i = 0; i < upperBound; i++)
+        {
+            StackFrame frame = stackTrace.GetFrame(i);
+            var method = frame.GetMethod();
+
+            Debug.Log($"[DebugUtility::Log Call Stack Frame {i}]: {method.DeclaringType.FullName}::{method.Name} in {frame.GetFileName()} at line {frame.GetFileLineNumber()}");
+        }
     }
 
     public static void PrintIterable(IEnumerable iterable)
