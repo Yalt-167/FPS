@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Inputs
 {
+    [Serializable]
     public abstract class Keybind
     {
         protected string name;

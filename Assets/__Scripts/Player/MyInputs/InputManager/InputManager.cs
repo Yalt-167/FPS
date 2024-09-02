@@ -1,20 +1,19 @@
-using GameManagement;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine;
-using UnityEngine.UI;
+
+using GameManagement;
+using SaveAndLoad;
 
 namespace Inputs
 {
-    public sealed class InputManager : MonoBehaviour
+    [Serializable]
+    public sealed class InputManager : MonoBehaviour, IHaveSomethingToSave
     {
-        public MovementInputQuery MovementInputs;
-        public CombatInputQuery CombatInputs;
-        public GeneralInputQuery GeneralInputs;
-        public float cameraHorizontalSenitivity = 3f;
-        public float cameraVerticalSensitivity = 3f;
+        public InputManagerSaveablePart BindsAndValues;
+        public IAmSomethingToSave DataToSave => BindsAndValues;
         private bool doRenderMenu;
         private RebindMenu currentRebindMenu = RebindMenu.General;
         private static readonly string General = nameof(General);
@@ -22,26 +21,43 @@ namespace Inputs
         private static readonly string Movement = nameof(Movement);
         private static Vector2 scrollPosition;
 
-        private void Awake()
+        public string SaveFilePath { get; } = "keybinds";
+
+
+        public MovementInputQuery MovementInputs => BindsAndValues.MovementInputs ;
+        public CombatInputQuery CombatInputs => BindsAndValues.CombatInputs;
+        public GeneralInputQuery GeneralInputs => BindsAndValues.GeneralInputs;
+        public float CameraHorizontalSensitivity => BindsAndValues.CameraHorizontalSensitivity;
+        public float CameraVerticalSensitivity => BindsAndValues.CameraVerticalSensitivity;
+
+
+        public void Awake()
         {
+            _ = Load();
+
             MovementInputs.Init();
-            MovementInputs.Init();
-            MovementInputs.Init();
-            MovementInputs.Init();
-            MovementInputs.Init();
+            //MovementInputs.Init();
+            //MovementInputs.Init();
+            //MovementInputs.Init();
+            //MovementInputs.Init();
             CombatInputs.Init();
             GeneralInputs.Init();
         }
 
         private void Update()
         {
-            if (!(MovementInputs.IsRebindingAKey || CombatInputs.IsRebindingAKey || GeneralInputs.IsRebindingAKey))
+            if (Game.Manager.GameStarted && !(MovementInputs.IsRebindingAKey || CombatInputs.IsRebindingAKey || GeneralInputs.IsRebindingAKey))
             {
                 doRenderMenu = GeneralInputs.TogglePauseMenu ? !doRenderMenu : doRenderMenu;
             }
 
             if (doRenderMenu || !Game.Manager.GameStarted) { PlayerFrame.LocalPlayer.SetMenuInputMode(); }
             else { PlayerFrame.LocalPlayer.SetGameplayInputMode(); }
+
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                Save();
+            }
         }
 
         private void OnGUI()
@@ -126,5 +142,26 @@ namespace Inputs
 
             GUILayout.EndHorizontal();
         }
+
+        public void Save()
+        {
+            SaveAndLoad.SaveAndLoad.Save(DataToSave, SaveFilePath);
+        }
+
+        public bool Load()
+        {
+            InputManagerSaveablePart? loadedInstance = (InputManagerSaveablePart?)SaveAndLoad.SaveAndLoad.Load(SaveFilePath);
+
+            var success = loadedInstance != null;
+
+            BindsAndValues = (InputManagerSaveablePart) (success ? loadedInstance: new InputManagerSaveablePart().SetDefault());
+
+            return success;
+        }
+
+        //private void OnDisable()
+        //{
+        //    Save();
+        //}
     }
 }

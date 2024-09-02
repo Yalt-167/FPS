@@ -21,8 +21,8 @@ namespace Controller
         private float cameraRollAngle;
 
         private InputManager inputManager;
-        private float SensitivityX => inputManager.cameraHorizontalSenitivity;
-        private float SensitivityY => inputManager.cameraVerticalSensitivity;
+        private float SensitivityX => inputManager.CameraHorizontalSensitivity;
+        private float SensitivityY => inputManager.CameraVerticalSensitivity;
 
         private void Awake()
         {
