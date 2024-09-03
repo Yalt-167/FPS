@@ -15,6 +15,5 @@ namespace Menus
             public static readonly int KeybindDisplayWidth = 200;
             public static readonly int InputTypeDisplayWidth = 200;
         }
-
     }
 }

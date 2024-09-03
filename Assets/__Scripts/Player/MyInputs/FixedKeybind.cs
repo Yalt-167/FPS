@@ -13,8 +13,10 @@ namespace Inputs
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();
+
             inputType = inputType_;
             inputTypeAsStr = inputType_.ToString();
+
             name = name_;
             canBeRemapped = canBeRemapped_;
             holdForSeconds = _holdForSeconds;

@@ -11,10 +11,10 @@ namespace Inputs
     [Serializable]
     public sealed class VariableKeybind : Keybind
     {
-        [SerializeField] private List<InputType> allowedInputTypes;
+        private readonly List<InputType> allowedInputTypes;
 
-        private int activationTypeIndex;
-        private int activationTypesLength;
+        private int currentInputTypeIndex;
+        private int amountOfInputTypesAllowed;
 
         /// <summary>
         /// First provided activation type will be selected as default
@@ -26,31 +26,24 @@ namespace Inputs
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();
+
             allowedInputTypes = allowedInputTypes_;
             inputType = allowedInputTypes[0];
             inputTypeAsStr = inputType.ToString();
+
             name = name_;
             canBeRemapped = canBeRemapped_;
             holdForSeconds = _holdForSeconds;
-        }
 
-        public override void Init()
-        {
-            base.Init();
-            activationTypeIndex = allowedInputTypes.IndexOf(inputType);
-            activationTypesLength = allowedInputTypes.Count;
-        }
-
-        public void SetActivationType(InputType newActivationType) // there would be issues with index so far
-        {
-            inputType = newActivationType;
-            inputTypeAsStr = inputType.ToString() ;
-            SetRelevantOutputSettings();
+            currentInputTypeIndex = 0;
+            amountOfInputTypesAllowed = allowedInputTypes.Count;
         }
 
         public void NextActivationType()
         {
-            SetActivationType(allowedInputTypes[++activationTypeIndex % activationTypesLength]);
+            inputType = allowedInputTypes[++currentInputTypeIndex % amountOfInputTypesAllowed];
+            inputTypeAsStr = inputType.ToString();
+            SetRelevantOutputSettings();
         }
 
         public override void DisplayInputType()

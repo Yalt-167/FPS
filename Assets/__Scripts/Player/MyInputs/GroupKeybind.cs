@@ -15,12 +15,14 @@ namespace Inputs
         {
             RelevantKey = relevantKey;
             relevantKeyAsStr = relevantKey.ToString();
-            name = name_;
+
             groupEntries = new();
             foreach (InputType inputType in inputTypes)
             {
                 groupEntries[inputType] = GetRelevantOutputSettingsFromParam(inputType);
             }
+
+            name = name_;
             canBeRemapped = canBeRemapped_;
             holdForSeconds = _holdForSeconds;
         }
@@ -38,11 +40,6 @@ namespace Inputs
 
                 return groupEntries[actionName]();
             }
-        }
-
-        public override void ResetHeldSince()
-        {
-            heldSince = Time.time;
         }
 
         public override bool OnRenderRebindMenu()

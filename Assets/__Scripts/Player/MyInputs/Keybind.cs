@@ -21,8 +21,8 @@ namespace Inputs
         protected bool active;
         protected float heldSince;
         [SerializeField] protected float holdForSeconds;
-        bool currentlyRebinding;
-        private static readonly string listeningForInput = "Listening for input";
+        protected bool currentlyRebinding;
+        protected static readonly string listeningForInput = "Listening for input";
 
         public virtual void Init()
         {
@@ -30,7 +30,7 @@ namespace Inputs
             SetRelevantOutputSettings();
         }
 
-        public virtual void ResetHeldSince()
+        public void ResetHeldSince()
         {
             heldSince = Time.time;
         }

@@ -7,15 +7,12 @@ using UnityEngine;
 using GameManagement;
 using SaveAndLoad;
 using Menus;
-using Inputs;
-using System.Diagnostics;
 
 namespace Inputs
 {
     [Serializable]
     public sealed class InputManager : MonoBehaviour, IHaveSomethingToSave, IGameSettingsMenuMember
     {
-
         [HideInInspector] public InputManagerSaveablePart BindsAndValues;
 
         #region SaveAndLoad
@@ -23,7 +20,6 @@ namespace Inputs
         public IAmSomethingToSave DataToSave => BindsAndValues;
         public string SaveFilePath { get; } = "Keybinds";
         public bool Loaded { get; private set; }
-
 
         #endregion
 
