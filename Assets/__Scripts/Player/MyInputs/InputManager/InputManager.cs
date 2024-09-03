@@ -62,10 +62,6 @@ namespace Inputs
         {
             yield return new WaitUntil(() => Loaded);
 
-            MovementInputs.Init();
-            CombatInputs.Init();
-            GeneralInputs.Init();
-
             gameSettingsMenu = GetComponent<GameSettingsMenu>();
             gameSettingsMenu.Subscribe(this);
         }
@@ -174,6 +170,13 @@ namespace Inputs
             var success = loadedInstance != null;
 
             BindsAndValues = (InputManagerSaveablePart) (success ? loadedInstance: new InputManagerSaveablePart().SetDefault());
+
+            if (!success)
+            {
+                BindsAndValues.MovementInputs.Init();
+                BindsAndValues.CombatInputs.Init();
+                BindsAndValues.GeneralInputs.Init();
+            }
 
             Loaded = true;
 
