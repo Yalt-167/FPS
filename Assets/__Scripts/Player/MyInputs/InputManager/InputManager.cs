@@ -110,7 +110,10 @@ namespace Inputs
                 var relevantRebindMenuEnumMember = (RebindMenus)tabIndex;
                 GUI.enabled = currentRebindMenu != relevantRebindMenuEnumMember;
 
-                if (GUILayout.Button(MapCurrentRebindMenuToString(relevantRebindMenuEnumMember))) { currentRebindMenu = relevantRebindMenuEnumMember; }
+                if (GUILayout.Button(MapCurrentRebindMenuToString(relevantRebindMenuEnumMember)))
+                {
+                    currentRebindMenu = relevantRebindMenuEnumMember;
+                }
 
                 GUI.enabled = true;
 

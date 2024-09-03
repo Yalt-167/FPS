@@ -30,6 +30,7 @@ namespace LobbyHandling
         public int SpaceBetweenButtons = 12;
 
         private Lobby hostLobby;
+        private bool isCreatingLobby;
 
         private static readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
         private float heartbeatTimer;
@@ -42,6 +43,7 @@ namespace LobbyHandling
 
         public string ProfileName;
         private bool isSignedIn;
+        private bool isSigningIn;
         private Player localPlayer;
         private Camera menuCamera;
 
@@ -140,6 +142,8 @@ namespace LobbyHandling
 
         public async void SignIn()
         {
+            isSigningIn = true;
+
             AuthenticationService.Instance.SwitchProfile(ProfileName);
 
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
@@ -277,6 +281,7 @@ namespace LobbyHandling
                 return;
             }
 
+            isCreatingLobby = true;
             var relaySuccessfullyCreated = await CreateRelayAsync(
 #if HEADLESS_ARCHITECTURE_SERVER
             lobbyCapacity // is server so don t count as a player
@@ -342,9 +347,11 @@ namespace LobbyHandling
             catch (LobbyServiceException exception)
             {
                 Debug.Log($"Couldn t create a lobby. Reason: {exception.Message}");
+                isCreatingLobby = false;
                 return;
             }
 
+            isCreatingLobby = false;
 #if LOG_LOBBY_EVENTS
             Debug.Log($"Successfully created a new lobby");
             DisplayHostLobbyData();
@@ -1053,7 +1060,7 @@ namespace LobbyHandling
 
             DrawLobbySettings();
 
-            if (GUILayout.Button(LobbyGUILabels.CreateLobby))
+            if ((GUILayout.Button(LobbyGUILabels.CreateLobby) || !isCreatingLobby && Input.GetKeyDown(KeyCode.Return)) && isSignedIn)
             {
                 CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password, mapsDropDown.Current, gameModesDropDown.Current); 
             }
@@ -1279,7 +1286,7 @@ namespace LobbyHandling
 
                 if (IsLobbyHost())
                 {
-                    if (GUILayout.Button(LobbyGUILabels.CloseLobbyAndStartTeamSelection))
+                    if (GUILayout.Button(LobbyGUILabels.CloseLobbyAndStartTeamSelection) || Input.GetKeyDown(KeyCode.Return))
                     {
                         CloseLobbyAcess();
                         Game.Manager.ToggleLobbyMenuServerRpc(towardOn: false);
@@ -1543,7 +1550,7 @@ namespace LobbyHandling
 
                 GUILayout.BeginHorizontal(); // H-VH
 
-                if (GUILayout.Button(LobbyGUILabels.SignInButtonText))
+                if (GUILayout.Button(LobbyGUILabels.SignInButtonText) || Input.GetKeyDown(KeyCode.Return) && !isSigningIn)
                 {
                     SignIn();
                 }

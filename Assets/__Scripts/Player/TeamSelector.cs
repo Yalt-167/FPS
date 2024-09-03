@@ -54,6 +54,21 @@ public sealed class TeamSelector : NetworkBehaviour
         }
     }
 
+    private bool AllPlayersAreInATeam()
+    {
+        var playersInTeams = 0;
+        for (int teamIndex = 0; teamIndex < teamsCount; teamIndex++)
+        {
+            for (int teamSlotIndex = 0; teamSlotIndex < GameNetworkManager.Manager.PlayerCount; teamSlotIndex++)
+            {
+                if (string.IsNullOrEmpty(teams[teamIndex][teamSlotIndex])) { break; }
+                
+                playersInTeams++;
+            }
+        }
+
+        return playersInTeams == GameNetworkManager.Manager.PlayerCount;
+    }
     private void CreateTeamMenu(int teamNumber)
     {
         GUILayout.BeginVertical(CachedGUIStylesNames.Box); // V
@@ -62,7 +77,7 @@ public sealed class TeamSelector : NetworkBehaviour
 
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(teamSelectionMenuWidth)); // VH
 
-                if (GUILayout.Button(TeamSelectorGUILabels.JoinTeam))
+                if (GUILayout.Button(TeamSelectorGUILabels.JoinTeam) || Input.GetKeyDown((KeyCode)(teamNumber + (int)KeyCode.Alpha0)) || Input.GetKeyDown((KeyCode)(teamNumber + (int)KeyCode.Keypad0)))
                 {
                     OnTeamSelected((ushort)teamNumber);
                 }
@@ -114,7 +129,7 @@ public sealed class TeamSelector : NetworkBehaviour
 
             GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button(TeamSelectorGUILabels.StartGame))
+            if (AllPlayersAreInATeam() && (GUILayout.Button(TeamSelectorGUILabels.StartGame) || Input.GetKeyDown(KeyCode.Return)))
             {
                 ToggleTeamSelectionScreenServerRpc(towardOn__: false);
                 Game.StaticStartGame();
