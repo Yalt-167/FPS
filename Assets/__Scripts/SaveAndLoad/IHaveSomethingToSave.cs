@@ -10,11 +10,7 @@ namespace SaveAndLoad
     {
         public void Save();
 
-        /// <summary>
-        /// Returns wether a save file was found
-        /// </summary>
-        /// <returns></returns>
-        public bool Load();
+        public void Load();
         public bool Loaded { get; }
 
         public IEnumerator InitWhenLoaded();

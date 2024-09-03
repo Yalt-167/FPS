@@ -163,7 +163,7 @@ namespace Inputs
             SaveAndLoad.SaveAndLoad.Save(DataToSave, SaveFilePath);
         }
 
-        public bool Load()
+        public void Load()
         {
             InputManagerSaveablePart? loadedInstance = (InputManagerSaveablePart?)SaveAndLoad.SaveAndLoad.Load(SaveFilePath);
 
@@ -179,8 +179,6 @@ namespace Inputs
             }
 
             Loaded = true;
-
-            return success;
         }
     }
 }

@@ -1,6 +1,7 @@
-using UnityEngine;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+
+using UnityEngine;
 
 namespace SaveAndLoad
 {
@@ -46,11 +47,13 @@ namespace SaveAndLoad
         public static object LoadDebugged(string name)
         {
             string path = $"{Application.persistentDataPath}/{name}.data";
+
             Debug.Log($"Trying to load from path: {path}");
 
             if (!File.Exists(path))
             {
                 Debug.Log($"No save file found for path: {path}");
+
                 return null;
             }
 
