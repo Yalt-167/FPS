@@ -21,7 +21,7 @@ namespace Inputs
         #region SaveAndLoad
 
         public IAmSomethingToSave DataToSave => BindsAndValues;
-        public string SaveFilePath { get; } = "keybinds";
+        public string SaveFilePath { get; } = "Keybinds";
         public bool Loaded { get; private set; }
 
 
@@ -39,20 +39,20 @@ namespace Inputs
 
         #region Miscellaneaous
 
-        private RebindMenu currentRebindMenu = RebindMenu.General;
-        private static readonly int tabsCount = Enum.GetValues(typeof(RebindMenu)).Length;
+        private RebindMenus currentRebindMenu = RebindMenus.General;
+        private static readonly int tabsCount = Enum.GetValues(typeof(RebindMenus)).Length;
         private static readonly string General = nameof(General);
         private static readonly string Combat = nameof(Combat);
         private static readonly string Movement = nameof(Movement);
 
-        private static string MapCurrentRebindMenuToString(RebindMenu rebindMenu)
+        private static string MapCurrentRebindMenuToString(RebindMenus rebindMenu)
         {
             return rebindMenu switch
             {
-                RebindMenu.General => General,
-                RebindMenu.Combat => Combat,
-                RebindMenu.Movement => Movement,
-                _ => throw new Exception($"This rebind({rebindMenu}) menu does not exist")
+                RebindMenus.General => General,
+                RebindMenus.Combat => Combat,
+                RebindMenus.Movement => Movement,
+                _ => throw new Exception($"This rebind menu ({rebindMenu}) does not exist")
             };
         }
 
@@ -111,7 +111,7 @@ namespace Inputs
             {
                 GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(MenuData.SubMenuTabWidth));
 
-                var relevantRebindMenuEnumMember = (RebindMenu)tabIndex;
+                var relevantRebindMenuEnumMember = (RebindMenus)tabIndex;
                 GUI.enabled = currentRebindMenu != relevantRebindMenuEnumMember;
 
                 if (GUILayout.Button(MapCurrentRebindMenuToString(relevantRebindMenuEnumMember))) { currentRebindMenu = relevantRebindMenuEnumMember; }
@@ -127,9 +127,9 @@ namespace Inputs
 
             IInputQuery relevantInputQuery = currentRebindMenu switch
             {
-                RebindMenu.Movement => MovementInputs,
-                RebindMenu.Combat => CombatInputs,
-                RebindMenu.General => GeneralInputs,
+                RebindMenus.Movement => MovementInputs,
+                RebindMenus.Combat => CombatInputs,
+                RebindMenus.General => GeneralInputs,
                 _ => null
             };
 
@@ -168,70 +168,5 @@ namespace Inputs
 
             Loaded = true;
         }
-    }
-}
-
-
-public static class idk
-{
-    public static void test()
-    {
-        //var tabCount = Enum.GetValues(typeof(RebindMenu)).Length;
-        //for (int tabIndex = 0; tabIndex < tabCount; tabIndex++)
-        //{
-        //    GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(MenuData.SubMenuTabWidth));
-
-        //    GUI.enabled = currentRebindMenu != (RebindMenu)tabIndex;
-
-        //    if (GUILayout.Button(((RebindMenu)tabIndex).ToString())) { currentRebindMenu = (RebindMenu)tabIndex; }
-
-        //    GUI.enabled = true;
-
-        //    GUILayout.EndHorizontal();
-        //}
-
-
-
-        //#region General button
-
-        //GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(MenuData.SubMenuTabWidth));
-
-        //GUI.enabled = currentRebindMenu != RebindMenu.General;
-
-        //if (GUILayout.Button(General)) { currentRebindMenu = RebindMenu.General; }
-
-        //GUI.enabled = true;
-
-        //GUILayout.EndHorizontal();
-
-        //#endregion // do that with a loop XD
-
-        //#region Movement button
-
-        //GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(MenuData.SubMenuTabWidth));
-
-        //GUI.enabled = currentRebindMenu != RebindMenu.Movement;
-
-        //if (GUILayout.Button(Movement)) { currentRebindMenu = RebindMenu.Movement; }
-
-        //GUI.enabled = true;
-
-        //GUILayout.EndHorizontal();
-
-        //#endregion
-
-        //#region Combat button
-
-        //GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(MenuData.SubMenuTabWidth));
-
-        //GUI.enabled = currentRebindMenu != RebindMenu.Combat;
-
-        //if (GUILayout.Button(Combat)) { currentRebindMenu = RebindMenu.Combat; }
-
-        //GUI.enabled = true;
-
-        //GUILayout.EndHorizontal();
-
-        //#endregion
     }
 }

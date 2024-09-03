@@ -28,8 +28,6 @@ namespace Inputs
 
         public void Init()
         {
-            DebugUtility.LogMethodCall();
-
             RegisterKeybind(Forward);
             RegisterKeybind(Left);
             RegisterKeybind(Back);

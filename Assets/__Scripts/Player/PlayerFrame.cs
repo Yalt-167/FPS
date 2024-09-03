@@ -34,10 +34,7 @@ namespace GameManagement
             {
                 EnablePlayerServerRpc(AuthenticationService.Instance.Profile);
 
-                if (IsOwner)
-                {
-                    CallOnPlayerScriptsRecursively<IHaveSomethingToSave>("Load");
-                }
+                CallOnPlayerScriptsRecursively<IHaveSomethingToSave>("Load");
             }
             else
             {
