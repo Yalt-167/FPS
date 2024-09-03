@@ -9,7 +9,7 @@ namespace Inputs
     [Serializable]
     public sealed class GroupKeybind : Keybind
     {
-        private readonly Dictionary<string, Func<bool>> groupEntries;
+        private readonly Dictionary<InputType, Func<bool>> groupEntries;
   
         public GroupKeybind(KeyCode relevantKey, InputType[] inputTypes, string name_, bool canBeRemapped_, float _holdForSeconds = 0.0f)
         {
@@ -19,7 +19,7 @@ namespace Inputs
             groupEntries = new();
             foreach (InputType inputType in inputTypes)
             {
-                groupEntries[GroupKeybindRequestKeywords.GetRelevantNameFromInputType(inputType)] = GetRelevantOutputSettingsFromParam(inputType);
+                groupEntries[inputType] = GetRelevantOutputSettingsFromParam(inputType);
             }
             canBeRemapped = canBeRemapped_;
             holdForSeconds = _holdForSeconds;
@@ -30,13 +30,13 @@ namespace Inputs
             throw new Exception("Should not use implicit operator syntax with a GroupKeybind");
         }
 
-        public bool this[string actionNames]
+        public bool this[InputType actionName]
         {
             get
             {
-                if (!groupEntries.ContainsKey(actionNames)) { throw new Exception("Should not use imlplicit operator syntax with a group Keybind"); }
+                if (!groupEntries.ContainsKey(actionName)) { throw new Exception("This group keybind does not support this input type"); }
 
-                return groupEntries[actionNames]();
+                return groupEntries[actionName]();
             }
         }
 
