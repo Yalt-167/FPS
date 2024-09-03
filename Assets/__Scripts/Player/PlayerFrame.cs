@@ -11,6 +11,7 @@ using Unity.Services.Authentication;
 
 using Controller;
 using SaveAndLoad;
+using System.Reflection;
 
 
 namespace GameManagement
@@ -28,11 +29,14 @@ namespace GameManagement
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-
             if (IsOwner)
             {
                 EnablePlayerServerRpc(AuthenticationService.Instance.Profile);
-                //LobbyHandler.Instance.SetPlayerFrame(this);
+
+                if (IsOwner)
+                {
+                    CallOnPlayerScriptsRecursively<IHaveSomethingToSave>("Load");
+                }
             }
             else
             {
@@ -67,15 +71,11 @@ namespace GameManagement
 
         public override void OnNetworkDespawn()
         {
-            var monoBehaviours = GetComponents<MonoBehaviour>();
-            foreach (var monoBehaviour in monoBehaviours)
+            if (IsOwner)
             {
-                if (monoBehaviour is IHaveSomethingToSave heHasSomethingToSave)
-                {
-                    heHasSomethingToSave.Save();
-                }
+                CallOnPlayerScriptsRecursively<IHaveSomethingToSave>("Save");
             }
-
+            
             base.OnNetworkDespawn();
         }
 
@@ -196,6 +196,65 @@ namespace GameManagement
             }
 
             return null;
+        }
+
+        private void CallOnPlayerScriptsRecursively<T>(string methodName, Transform transform_ = null)
+        {
+            transform_ = transform_ ?? transform;
+
+            MethodInfo methodInfo = typeof(T).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
+
+            foreach (var monoBehaviour in transform_.GetComponents<MonoBehaviour>())
+            {
+                if (monoBehaviour is T monoBehaviourAsT)
+                {
+                    methodInfo.Invoke(monoBehaviourAsT, new object[] { });
+                }
+            }
+
+            for (int childIndex = 0; childIndex < transform_.childCount; childIndex++)
+            {
+                CallOnPlayerScriptsRecursively<T>(methodName, transform_.GetChild(childIndex));
+            }
+        }
+
+        private void CallOnPlayerScriptsRecursively<T>(string methodName, object[] params_, Transform transform_ = null)
+        {
+            transform_ = transform_ ?? transform;
+
+            MethodInfo methodInfo = typeof(T).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
+
+            foreach (var monoBehaviour in transform_.GetComponents<MonoBehaviour>())
+            {
+                if (monoBehaviour is T monoBehaviourAsT)
+                {
+                    methodInfo.Invoke(monoBehaviourAsT, params_);
+                }
+            }
+
+            for (int childIndex = 0; childIndex < transform_.childCount; childIndex++)
+            {
+                CallOnPlayerScriptsRecursively<T>(methodName, params_, transform_.GetChild(childIndex));
+            }
+        }
+
+        private void TryCallOnPlayerMonoBehavioursRecursively(string methodName, object[] parameters, Transform transform_ = null)
+        {
+            transform_ = transform_ ?? transform;
+
+            foreach (var monoBehaviour in transform_.GetComponents<MonoBehaviour>())
+            {
+                MethodInfo methodInfo = monoBehaviour.GetType().GetMethod(methodName);
+
+                if (methodInfo == null) { continue; }
+
+                methodInfo.Invoke(monoBehaviour, parameters);
+            }
+
+            for (int childIndex = 0; childIndex < transform_.childCount; childIndex++)
+            {
+                TryCallOnPlayerMonoBehavioursRecursively(methodName, parameters, transform_.GetChild(childIndex));
+            }
         }
 
         #endregion
