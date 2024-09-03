@@ -20,6 +20,8 @@ namespace Inputs
 
         public IAmSomethingToSave DataToSave => BindsAndValues;
         public string SaveFilePath { get; } = "keybinds";
+        public bool Loaded { get; private set; }
+
 
         #endregion
 
@@ -52,7 +54,12 @@ namespace Inputs
 
         public void Awake()
         {
-            _ = Load();
+            StartCoroutine(InitWhenLoaded());
+        }
+
+        public IEnumerator InitWhenLoaded()
+        {
+            yield return new WaitUntil(() => Loaded);
 
             MovementInputs.Init();
             CombatInputs.Init();
@@ -68,14 +75,8 @@ namespace Inputs
             {
                 if (GeneralInputs.TogglePauseMenu)
                 {
-                    Debug.Log("Toggled");
                     gameSettingsMenu.ToggleMenu();
                 }
-            }
-
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                Save();
             }
         }
 
@@ -173,12 +174,9 @@ namespace Inputs
 
             BindsAndValues = (InputManagerSaveablePart) (success ? loadedInstance: new InputManagerSaveablePart().SetDefault());
 
+            Loaded = true;
+
             return success;
         }
-
-        //private void OnDisable()
-        //{
-        //    Save();
-        //}
     }
 }

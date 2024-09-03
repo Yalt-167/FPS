@@ -15,6 +15,9 @@ namespace SaveAndLoad
         /// </summary>
         /// <returns></returns>
         public bool Load();
+        public bool Loaded { get; }
+
+        public IEnumerator InitWhenLoaded();
 
         public IAmSomethingToSave DataToSave { get; }
 
