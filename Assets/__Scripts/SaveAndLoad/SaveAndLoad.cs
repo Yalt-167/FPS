@@ -9,6 +9,16 @@ namespace SaveAndLoad
         public static void Save(object data, string name)
         {
             string path = $"{Application.persistentDataPath}/{name}.data";
+
+            using (FileStream file = new(path, FileMode.Create))
+            {
+                new BinaryFormatter().Serialize(file, data);
+            }
+        }
+
+        public static void SaveDebugged(object data, string name)
+        {
+            string path = $"{Application.persistentDataPath}/{name}.data";
             Debug.Log($"Saving to path: {path}");
 
             using (FileStream file = new(path, FileMode.Create))
@@ -21,6 +31,21 @@ namespace SaveAndLoad
         public static object Load(string name)
         {
             string path = $"{Application.persistentDataPath}/{name}.data";
+
+            if (!File.Exists(path)) { return null; }
+
+            object data;
+            using (FileStream file = new(path, FileMode.Open))
+            {
+                data = new BinaryFormatter().Deserialize(file);
+            }
+
+            return data;
+        }
+
+        public static object LoadDebugged(string name)
+        {
+            string path = $"{Application.persistentDataPath}/{name}.data";
             Debug.Log($"Trying to load from path: {path}");
 
             if (!File.Exists(path))
@@ -30,14 +55,16 @@ namespace SaveAndLoad
             }
 
             Debug.Log($"A save file was found for path: {path}");
+
             object data;
             using (FileStream file = new(path, FileMode.Open))
             {
                 data = new BinaryFormatter().Deserialize(file);
             }
-            Debug.Log("Save file was read successfully");
-            return data;
 
+            Debug.Log("Save file was read successfully");
+
+            return data;
         }
     }
 } // C:/Users/antoi/AppData/LocalLow/DefaultCompany/ProjectOlympus/{name}.data
