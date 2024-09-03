@@ -17,24 +17,26 @@ namespace Menus
 
         private int currentMenuIndex;
 
-        public int Subscribe(IGameSettingsMenuMember menu)
+        public void Subscribe(IGameSettingsMenuMember menu)
         {
             menus.Add(menu);
 
             maxMenuTabs = maxMenuTabs < menu.MenuTabsCount ? menu.MenuTabsCount : maxMenuTabs;
-
-            return menus.Count - 1;
         }
 
         public void ToggleMenu()
         {
             doRenderMenu = !doRenderMenu;
 
-            if (doRenderMenu || !Game.Manager.GameStarted) { PlayerFrame.LocalPlayer.SetMenuInputMode(); }
-            else { PlayerFrame.LocalPlayer.SetGameplayInputMode(); }
+            if (doRenderMenu || !Game.Manager.GameStarted)
+            {
+                PlayerFrame.LocalPlayer.SetMenuInputMode();
+            }
+            else
+            {
+                PlayerFrame.LocalPlayer.SetGameplayInputMode();
+            }
         }
-
-
 
         private void OnGUI()
         {
@@ -49,10 +51,11 @@ namespace Menus
 
             GUILayout.FlexibleSpace();
 
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(maxMenuTabs * 200));
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(maxMenuTabs * MenuData.SubMenuTabWidth));
+
             for (int i = 0; i < menus.Count; i++)
             {
-                GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(200));
+                GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.ExpandWidth(true));
 
                 GUI.enabled = currentMenuIndex != i;
 
@@ -68,6 +71,7 @@ namespace Menus
             GUILayout.FlexibleSpace();
 
             GUILayout.EndHorizontal();
+
             #endregion
 
             menus[currentMenuIndex].OnRenderMenu();

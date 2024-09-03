@@ -1,4 +1,5 @@
 using Inputs;
+using Menus;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -54,7 +55,7 @@ namespace Inputs
 
         public override void DisplayInputType()
         {
-            if (GUILayout.Button(inputTypeAsStr, GUILayout.Width(200)))
+            if (GUILayout.Button(inputTypeAsStr, GUILayout.Width(MenuData.RemapInput.InputTypeDisplayWidth)))
             {
                 NextActivationType();
             }

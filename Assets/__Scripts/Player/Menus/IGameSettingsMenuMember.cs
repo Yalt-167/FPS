@@ -13,6 +13,5 @@ namespace Menus
         public int MenuTabsCount { get; }
 
         public void OnRenderMenu();
-
     }
 }

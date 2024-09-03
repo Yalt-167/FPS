@@ -1,3 +1,4 @@
+using Menus;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -155,9 +156,9 @@ namespace Inputs
         /// <returns></returns>
         public virtual bool DisplayCurrentKey()
         {
-            GUILayout.Label(name, GUILayout.Width(200));
+            GUILayout.Label(name, GUILayout.Width(MenuData.RemapInput.ActionNameDisplayWidth));
             GUI.enabled = canBeRemapped && !currentlyRebinding;
-            if (GUILayout.Button(currentlyRebinding ? listeningForInput : relevantKeyAsStr, GUILayout.Width(200)))
+            if (GUILayout.Button(currentlyRebinding ? listeningForInput : relevantKeyAsStr, GUILayout.Width(MenuData.RemapInput.KeybindDisplayWidth)))
             {
                 Rebind();
             }
@@ -168,7 +169,7 @@ namespace Inputs
 
         public virtual void DisplayInputType()
         {
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(200));
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(MenuData.RemapInput.InputTypeDisplayWidth));
             GUILayout.Label(inputTypeAsStr);
             GUILayout.EndHorizontal();
         }
