@@ -29,6 +29,7 @@ namespace GameManagement
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+
             if (IsOwner)
             {
                 EnablePlayerServerRpc(AuthenticationService.Instance.Profile);

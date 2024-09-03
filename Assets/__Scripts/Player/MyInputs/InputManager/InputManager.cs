@@ -49,6 +49,7 @@ namespace Inputs
 
         private GameSettingsMenu gameSettingsMenu;
         public string MenuName { get; } = "Inputs";
+        public int MenuTabsCount { get; } = 3;
 
         #endregion
 
@@ -148,7 +149,7 @@ namespace Inputs
                 _ => null
             };
 
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Height(Screen.height - 100));
             relevantInputQuery?.OnRenderRebindMenu();
             GUILayout.EndScrollView();
 
