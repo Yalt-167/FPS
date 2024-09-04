@@ -112,6 +112,7 @@ namespace GameManagement
         #region Game Start
 
         public bool GameStarted { get; private set; }
+        public static event Action OnGameStarted;
 
         [MenuItem("Developer/StartGame")]
         public static void StaticStartGame()
@@ -132,6 +133,7 @@ namespace GameManagement
         private void StartGameClientRpc()
         {
             GameStarted = true;
+            OnGameStarted.Invoke();
 
             Debug.Log("Game was started");
 
