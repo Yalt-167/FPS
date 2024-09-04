@@ -23,6 +23,7 @@ namespace GameManagement
     public sealed class PlayerFrame : NetworkBehaviour
     {
         public static PlayerFrame LocalPlayer { get; private set; }
+        public int ScoreboardIndex;
 
         #region Spawn Logic
 

@@ -87,6 +87,9 @@ namespace Inputs
                     gameSettingsMenu.ToggleMenu();
                 }
             }
+
+
+
         }
 
         public void OnRenderMenu()
@@ -166,6 +169,46 @@ namespace Inputs
             }
 
             Loaded = true;
+        }
+    }
+}
+
+
+namespace Menus
+{
+    public sealed class Scoreboard : MonoBehaviour
+    {
+        private List<PlayerScoreboardInfos> players = new();
+        private void Awake()
+        {
+            Game.OnGameStarted += Init;
+        }
+
+        private void OnDisable()
+        {
+            Game.OnGameStarted -= Init;
+        }
+
+        private void Init()
+        {
+            foreach (var playerFrame in GameNetworkManager.Manager.Players)
+            {
+                CreateEntry(playerFrame);
+            }
+        }
+
+        private void CreateEntry(PlayerFrame playerFrame)
+        {
+            players.Add(new PlayerScoreboardInfos(playerFrame.Name.ToString()));
+        }
+    }
+
+    public struct PlayerScoreboardInfos
+    {
+        public string Name;
+        public PlayerScoreboardInfos(string playerName)
+        {
+            Name = playerName;
         }
     }
 }

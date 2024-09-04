@@ -339,7 +339,6 @@ namespace GameManagement
             teamSelector.ToggleTeamSelectionScreenServerRpc(towardOn__: true);
         }
 
-
         #endregion
     }
 
