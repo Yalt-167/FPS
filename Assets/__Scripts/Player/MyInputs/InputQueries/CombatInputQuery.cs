@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Inputs
 {
     [Serializable]
-    public sealed class CombatInputQuery : IInputQuery
+    public sealed class CombatInputQuery : InputQuery
     {
         public FixedKeybind Shoot = new(KeyCode.Mouse0, InputType.OnKeyHeld, nameof(Shoot), true);
         public VariableKeybind Aim = new(KeyCode.Mouse1, new List<InputType>() { InputType.OnKeyHeld, InputType.Toggle }, nameof(Aim), true);
@@ -24,10 +24,7 @@ namespace Inputs
         public FixedKeybind Slash = new(KeyCode.None, InputType.OnKeyDown, nameof(Slash), true);
         public FixedKeybind Parry = new(KeyCode.None, InputType.OnKeyDown, nameof(Parry), true);
 
-        public List<Keybind> Keybinds { get; private set; } = new();
-        public bool IsRebindingAKey { get; private set; }
-
-        public void Init()
+        public override void Init()
         {
             RegisterKeybind(Shoot);
             RegisterKeybind(Aim);
@@ -43,22 +40,6 @@ namespace Inputs
 
             RegisterKeybind(Slash);
             RegisterKeybind(Parry);
-        }
-
-        public void OnRenderRebindMenu()
-        {
-            IsRebindingAKey = false;
-
-            foreach (var keybind in Keybinds)
-            {
-                IsRebindingAKey |= keybind.OnRenderRebindMenu();
-            }
-        }
-
-        public void RegisterKeybind(Keybind keybind)
-        {
-            Keybinds.Add(keybind);
-            keybind.Init();
         }
     }
 }

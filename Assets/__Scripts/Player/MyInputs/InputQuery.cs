@@ -6,23 +6,17 @@ using UnityEngine;
 
 namespace Inputs
 {
-    public interface IInputQuery
+    [Serializable]
+    public abstract class InputQuery
     {
-        public List<Keybind> Keybinds { get; }
-        public bool IsRebindingAKey { get; }
+        protected List<Keybind> keybinds = new();
+        public bool IsRebindingAKey { get; protected set; }
+        public bool InputDisabled { get; protected set; }
+        public abstract void Init();
 
-        public void RegisterKeybind(Keybind bind);
-
-        public void Init();
-
-        public void OnRenderRebindMenu();
-
-
-
-#if false
         public void RegisterKeybind(Keybind keybind)
         {
-            Keybinds.Add(keybind);
+            keybinds.Add(keybind);
             keybind.Init();
         }
 
@@ -30,11 +24,10 @@ namespace Inputs
         {
             IsRebindingAKey = false;
 
-            foreach (var keybind in Keybinds)
+            foreach (var keybind in keybinds)
             {
                 IsRebindingAKey |= keybind.OnRenderRebindMenu();
             }
         }
-#endif
     }
 }

@@ -131,7 +131,7 @@ namespace Inputs
 
             #endregion
 
-            IInputQuery relevantInputQuery = currentRebindMenu switch
+            InputQuery relevantInputQuery = currentRebindMenu switch
             {
                 RebindMenus.Movement => MovementInputs,
                 RebindMenus.Combat => CombatInputs,

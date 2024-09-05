@@ -29,6 +29,7 @@ namespace Inputs
         protected bool currentlyRebinding;
         protected static readonly string listeningForInput = "Listening for input";
 
+
         public virtual void Init()
         {
             heldSince = float.PositiveInfinity;
@@ -150,6 +151,7 @@ namespace Inputs
                 if (Input.GetKeyDown(keycode))
                 {
                     SetKey(keycode == KeyCode.Escape ? KeyCode.None : keycode);
+                    break;
                 }
             }
 

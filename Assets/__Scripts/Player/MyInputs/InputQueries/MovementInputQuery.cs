@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Inputs
 {
     [Serializable]
-    public sealed class MovementInputQuery : IInputQuery
+    public sealed class MovementInputQuery : InputQuery
     {
         public GroupKeybind Forward = new(KeyCode.Z, new InputType[] { InputType.OnKeyDown, InputType.OnKeyHeld }, nameof(Forward), true);
         public GroupKeybind Back = new(KeyCode.S, new InputType[] { InputType.OnKeyDown, InputType.OnKeyHeld }, nameof(Back), true);
@@ -23,10 +23,7 @@ namespace Inputs
         public FixedKeybind SwitchCameraPosition = new(KeyCode.W, InputType.OnKeyDown, nameof(SwitchCameraPosition), true);
         public VariableKeybind QuickReset = new(KeyCode.X, new List<InputType>() { InputType.OnKeyDown, InputType.OnKeyHeldForTime }, nameof(QuickReset), true, .5f);
 
-        public List<Keybind> Keybinds { get; private set; } = new();
-        public bool IsRebindingAKey { get; private set; }
-
-        public void Init()
+        public override void Init()
         {
             RegisterKeybind(Forward);
             RegisterKeybind(Left);
@@ -46,22 +43,6 @@ namespace Inputs
             RegisterKeybind(SwitchCameraPosition);
 
             RegisterKeybind(QuickReset);
-        }
-
-        public void OnRenderRebindMenu()
-        {
-            IsRebindingAKey = false;
-
-            foreach (var keybind in Keybinds)
-            {
-                IsRebindingAKey |= keybind.OnRenderRebindMenu();
-            }
-        }
-
-        public void RegisterKeybind(Keybind keybind)
-        {
-            Keybinds.Add(keybind);
-            keybind.Init();
         }
     }
 }
