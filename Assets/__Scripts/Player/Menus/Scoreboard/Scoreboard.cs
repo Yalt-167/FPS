@@ -3,6 +3,7 @@ using Menus;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ namespace Menus
         public static Scoreboard Instance { get; private set; }
 
         private PlayerScoreboardInfos[] playersInfos;
-        private Color[] teamColors = new Color[2] {Color.red, Color.blue };
+        private readonly Color[] teamColors = new Color[2] {Color.red, Color.blue };
 
         private bool doRender;
 
@@ -30,7 +31,7 @@ namespace Menus
             }
         }
 
-        private ScoreboardSortMode sortMode = ScoreboardSortMode.Teams;
+        private ScoreboardSortMode sortMode = ScoreboardSortMode.Kills;
 
         private void Awake()
         {
@@ -81,6 +82,8 @@ namespace Menus
                 AddKill(killerIndex);
                 AddDeath(victimIndex);
             }
+
+            SortPlayers();
         }
 
         private void CreateFakeEntries(string[] entries)
@@ -103,6 +106,14 @@ namespace Menus
                     SortPlayersPerKills();
                     break;
 
+                case ScoreboardSortMode.Ratio:
+                    SortPlayersPerRatio();
+                    break;
+
+                case ScoreboardSortMode.Points:
+                    //SortPlayersPerPoints();
+                    break;
+
                 default:
                     throw new Exception($"This scoreboard sort mode: {sortMode} doesn t exist");
             }
@@ -115,6 +126,16 @@ namespace Menus
             foreach (var player in playersInfos)
             {
                 InsertAsSortedPerKills(player, teams[player.Team - 1]);
+            }
+
+            var (localPlayerTeam, opponentTeam) = PlayerFrame.LocalPlayer.TeamNumber == 1 ? (0, 1) : (1, 0);
+
+            var localPlayerTeamCount = teams[localPlayerTeam].Count;
+            var opponentTeamCount = teams[opponentTeam].Count;
+            var total = localPlayerTeamCount + opponentTeamCount;
+            for (int i = 0; i < total; i++)
+            {
+                playersInfos[i] = i < localPlayerTeamCount ? teams[0][i] : teams[1][i - localPlayerTeamCount];
             }
         }
 
@@ -134,11 +155,23 @@ namespace Menus
                     return;
                 }
             }
+
+            list.Add(playerInfos);
         }
 
         private void SortPlayersPerKills()
         {
-            Array.Sort(playersInfos, new PlayerScoreboardInfoComparer());
+            Array.Sort(playersInfos, new PlayerScoreboardInfoPerKillsComparer());
+        }
+
+        private void SortPlayersPerRatio()
+        {
+            Array.Sort(playersInfos, new PlayerScoreboardInfoPerRatioComparer());
+        }
+
+        private void SortPlayersPerPoints()
+        {
+            throw new NotImplementedException();
         }
 
         public void AddKill(int tryharderIndex)
@@ -212,10 +245,18 @@ namespace Menus
 }
 // so far when the Gravity relies on PlayerMovement which is deactivated when a menu is opened
 
-public sealed class PlayerScoreboardInfoComparer : IComparer<PlayerScoreboardInfos>
+public sealed class PlayerScoreboardInfoPerKillsComparer : IComparer<PlayerScoreboardInfos>
 {
     public int Compare(PlayerScoreboardInfos x, PlayerScoreboardInfos y)
     {
-        return x.Kills.CompareTo(y.Kills);
+        return y.Kills.CompareTo(x.Kills);
+    }
+}
+
+public sealed class PlayerScoreboardInfoPerRatioComparer : IComparer<PlayerScoreboardInfos>
+{
+    public int Compare(PlayerScoreboardInfos x, PlayerScoreboardInfos y)
+    {
+        return (y.Kills - y.Deaths).CompareTo(x.Kills - x.Deaths);
     }
 }

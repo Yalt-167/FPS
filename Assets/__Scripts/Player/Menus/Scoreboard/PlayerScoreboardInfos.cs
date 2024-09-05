@@ -23,5 +23,10 @@ namespace Menus
             Deaths = 0;
             Assists = 0;
         }
+
+        public override string ToString()
+        {
+            return Name; 
+        }
     }
 }
