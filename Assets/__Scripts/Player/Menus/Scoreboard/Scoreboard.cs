@@ -1,17 +1,36 @@
 using GameManagement;
+using Menus;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Menus
 {
     public sealed class Scoreboard : MonoBehaviour
     {
-        private PlayerScoreboardInfos[] playersInfos;
         public static Scoreboard Instance { get; private set; }
 
+        private PlayerScoreboardInfos[] playersInfos;
+        private Color[] teamColors = new Color[2] {Color.red, Color.blue };
+
         private bool doRender;
+
+        private ScoreboardSortMode SortMode
+        {
+            get
+            {
+                return sortMode;
+            }
+            set
+            {
+                sortMode = value;
+                SortPlayers();
+            }
+        }
+
+        private ScoreboardSortMode sortMode = ScoreboardSortMode.Teams;
 
         private void Awake()
         {
@@ -26,7 +45,9 @@ namespace Menus
         private void Init()
         {
             Instance = this;
-            var simulatedEntries = new string[] { "Diegocardi", "Syn", "Kry", "Asyd"};
+
+            var simulatedEntries = new string[] { "Diegocardi", "Syn", "Kry", "Asyl"};
+
             playersInfos = new PlayerScoreboardInfos[GameNetworkManager.Manager.PlayerCount + simulatedEntries.Length];
 
             for (int index = 0; index < GameNetworkManager.Manager.PlayerCount; index++)
@@ -37,14 +58,87 @@ namespace Menus
             }
 
             CreateFakeEntries(simulatedEntries);
+
+            for (int i = 0; i < 100; i++)
+            {
+                var killerIndex = UnityEngine.Random.Range(0, playersInfos.Length);
+
+                int victimIndex;
+                do
+                {
+                    victimIndex = UnityEngine.Random.Range(0, playersInfos.Length);
+                } while (victimIndex == killerIndex);
+
+                if (UnityEngine.Random.Range(0, 2) == 1)
+                {
+                    int assistIndex;
+                    do
+                    {
+                        assistIndex = UnityEngine.Random.Range(0, playersInfos.Length);
+                    } while (victimIndex == killerIndex || victimIndex == assistIndex);
+                    AddAssist(assistIndex);
+                }
+                AddKill(killerIndex);
+                AddDeath(victimIndex);
+            }
         }
 
         private void CreateFakeEntries(string[] entries)
         {
             for (int index = 0; index < entries.Length; index++)
             {
-                playersInfos[GameNetworkManager.Manager.PlayerCount + index] = new PlayerScoreboardInfos(index % 2 + 1, entries[index]);
+                playersInfos[GameNetworkManager.Manager.PlayerCount + index] = new PlayerScoreboardInfos((GameNetworkManager.Manager.PlayerCount + index) % 2 + 1, entries[index]);
             }
+        }
+
+        private void SortPlayers()
+        {
+            switch (sortMode)
+            {
+                case ScoreboardSortMode.Teams:
+                    SortPlayersPerTeams();
+                    break;
+
+                case ScoreboardSortMode.Kills:
+                    SortPlayersPerKills();
+                    break;
+
+                default:
+                    throw new Exception($"This scoreboard sort mode: {sortMode} doesn t exist");
+            }
+        }
+
+        private void SortPlayersPerTeams()
+        {
+            var teams = new List<PlayerScoreboardInfos>[2] { new List<PlayerScoreboardInfos>(), new List<PlayerScoreboardInfos>() };
+
+            foreach (var player in playersInfos)
+            {
+                InsertAsSortedPerKills(player, teams[player.Team - 1]);
+            }
+        }
+
+        private void InsertAsSortedPerKills(PlayerScoreboardInfos playerInfos, List<PlayerScoreboardInfos> list)
+        {
+            if (list.Count == 0)
+            {
+                list.Add(playerInfos);
+                return;
+            }
+
+            for(int i = 0; i < list.Count; i++)
+            {
+                if (playerInfos.Kills > list[i].Kills)
+                {
+                    list.Insert(i, playerInfos);
+                    return;
+                }
+            }
+        }
+
+        private void SortPlayersPerKills()
+        {
+            Array.Sort(playersInfos, new PlayerScoreboardInfoComparer());
         }
 
         public void AddKill(int tryharderIndex)
@@ -59,7 +153,7 @@ namespace Menus
 
         public void AddAssist(int KSedIndividual)
         {
-            playersInfos[KSedIndividual].Deaths++;
+            playersInfos[KSedIndividual].Assists++;
         }
 
         public void SetDoRender(bool doRender_)
@@ -92,9 +186,7 @@ namespace Menus
         }
 
         private void DrawScoreboardHeader()
-        {
-            GUI.color = Color.black;
-            
+        {            
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
 
             GUILayout.Label("Players", GUILayout.Width(200));
@@ -102,12 +194,11 @@ namespace Menus
             GUILayout.Label("K/D/A", GUILayout.Width(200));
 
             GUILayout.EndHorizontal();
-
-            GUI.color = Color.white;
         }
 
         private void DrawPlayerSection(PlayerScoreboardInfos playerInfos)
         {
+            GUI.color = teamColors[playerInfos.Team - 1];
             GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
 
             GUILayout.Label(playerInfos.Name, GUILayout.Width(200));
@@ -115,7 +206,16 @@ namespace Menus
             GUILayout.Label($"{playerInfos.Kills}/{playerInfos.Deaths}/{playerInfos.Assists}", GUILayout.Width(200));
 
             GUILayout.EndHorizontal();
+            GUI.color = Color.white;
         }
     }
 }
 // so far when the Gravity relies on PlayerMovement which is deactivated when a menu is opened
+
+public sealed class PlayerScoreboardInfoComparer : IComparer<PlayerScoreboardInfos>
+{
+    public int Compare(PlayerScoreboardInfos x, PlayerScoreboardInfos y)
+    {
+        return x.Kills.CompareTo(y.Kills);
+    }
+}
