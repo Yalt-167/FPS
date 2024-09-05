@@ -12,7 +12,7 @@ namespace Menus
     {
         private readonly List<IGameSettingsMenuMember> menus = new();
         private bool doRenderMenu;
-
+        public bool DoRenderMenu => doRenderMenu;
         private int maxMenuTabs;
 
         private int currentMenuIndex;

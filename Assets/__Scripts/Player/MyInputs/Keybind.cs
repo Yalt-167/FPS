@@ -17,10 +17,13 @@ namespace Inputs
         protected string inputTypeAsStr;
         protected bool canBeRemapped;
 
-        protected Func<bool> shouldOutput;
+        private Func<bool> shouldOutput;
+
         protected bool active;
+
         protected float heldSince;
         [SerializeField] protected float holdForSeconds;
+
         protected bool currentlyRebinding;
         protected static readonly string listeningForInput = "Listening for input";
 
@@ -55,15 +58,7 @@ namespace Inputs
 
         protected void SetRelevantOutputSettings()
         {
-            shouldOutput = inputType switch
-            {
-                InputType.OnKeyDown => CheckKeyDown,
-                InputType.OnKeyUp => CheckKeyUp,
-                InputType.OnKeyHeld => CheckKeyHeld,
-                InputType.Toggle => CheckToggle,
-                InputType.OnKeyHeldForTime => CheckKeyHeldForTime,
-                _ => throw new Exception("This activatioon type does not exist")
-            };
+            shouldOutput = GetRelevantOutputSettingsFromParam(inputType);
         }
 
         protected Func<bool> GetRelevantOutputSettingsFromParam(InputType param)
@@ -94,6 +89,10 @@ namespace Inputs
             return Input.GetKey(RelevantKey);
         }
 
+        // <summary>
+        /// This method must be called every frame because it relies on CheckKeyDown() and could miss the relevant frame<br/>
+        /// </summary>
+        /// <returns></returns>
         protected bool CheckKeyHeldForTime()
         {
             if (CheckKeyDown())
@@ -108,14 +107,19 @@ namespace Inputs
             return Time.time - heldSince > holdForSeconds;
         }
 
+        /// <summary>
+        /// This method must be called every frame because it relies on CheckKeyDown() and could miss the relevant frame<br/>
+        /// WARNING: remember to cache the value each frame and do not recall it else the toggle will cancel itself
+        /// </summary>
+        /// <returns></returns>
         protected bool CheckToggle()
         {
-            if (CheckKeyDown())
-            {
-                active = !active;
-            }
+            return active = CheckKeyDown() ? !active : active;
+        }
 
-            return active;
+        public void ForceToggle(bool towardOn)
+        {
+            active = towardOn;
         }
 
         public static implicit operator bool(Keybind bind)

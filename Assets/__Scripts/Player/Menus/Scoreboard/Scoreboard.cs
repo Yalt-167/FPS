@@ -27,6 +27,9 @@ namespace Menus
         private void Init()
         {
             Instance = this;
+
+            players = new PlayerScoreboardInfos[GameNetworkManager.Manager.PlayerCount];
+
             for (int index = 0; index < GameNetworkManager.Manager.PlayerCount; index++)
             {
                 ref PlayerFrame playerFrame = ref GameNetworkManager.Manager.Players[index];
@@ -48,6 +51,22 @@ namespace Menus
         public void AddAssist(int KSedIndividual)
         {
             players[KSedIndividual].Deaths++;
+        }
+
+        public void SetDoRender(bool doRender_)
+        {
+            doRender = doRender_;
+        }
+
+        private void OnGUI()
+        {
+            if (!doRender) { return; }
+
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
+
+            GUILayout.Label("W content");
+
+            GUILayout.EndHorizontal();
         }
     }
 }
