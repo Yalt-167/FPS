@@ -11,11 +11,12 @@ namespace Inputs
     public abstract class Keybind
     {
         protected string name;
+
         [SerializeField] protected KeyCode RelevantKey;
         protected string relevantKeyAsStr;
+
         [SerializeField] protected InputType inputType;
         protected string inputTypeAsStr;
-        protected bool canBeRemapped;
 
         private Func<bool> shouldOutput;
 
@@ -24,6 +25,7 @@ namespace Inputs
         protected float heldSince;
         [SerializeField] protected float holdForSeconds;
 
+        protected bool canBeRemapped;
         protected bool currentlyRebinding;
         protected static readonly string listeningForInput = "Listening for input";
 
