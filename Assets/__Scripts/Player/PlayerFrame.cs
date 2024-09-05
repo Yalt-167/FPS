@@ -363,7 +363,7 @@ namespace GameManagement
             }
 
             Combat.enabled = towardOn;
-            Movement.enabled = towardOn;
+            Movement.SetControls(towardOn);
         }
 
         public void ToggleCursor(bool towardOn)
