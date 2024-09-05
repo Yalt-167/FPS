@@ -57,7 +57,6 @@ namespace GameManagement
 
         public PlayerFrame[] Players => players;
         private PlayerFrame[] players;
-        //public int PlayerCount => NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count - (gameManagerInstance == null ? 0 : 1) - (teamSelectorInstance == null ? 0 : 1);
         public int PlayerCount => Players.Length;
 
         public void DisconnectPlayer(ushort playerID)

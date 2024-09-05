@@ -133,7 +133,7 @@ namespace GameManagement
         private void StartGameClientRpc()
         {
             GameStarted = true;
-            OnGameStarted.Invoke();
+            OnGameStarted?.Invoke();
 
             Debug.Log("Game was started");
 
@@ -163,6 +163,8 @@ namespace GameManagement
         }
 
 
+        #region Lobby Menu
+
         [Rpc(SendTo.Server)]
         public void ToggleLobbyMenuServerRpc(bool towardOn)
         {
@@ -177,6 +179,10 @@ namespace GameManagement
 
         #endregion
 
+        #endregion
+
+        #region Map Loading
+
         [Rpc(SendTo.Server)]
         public void LoadMapServerRpc(string map)
         {
@@ -189,6 +195,7 @@ namespace GameManagement
             SceneLoader.Instance.LoadSceneAsync(map, additive: false);
         }
 
+        #endregion
 
         #region Debug
 

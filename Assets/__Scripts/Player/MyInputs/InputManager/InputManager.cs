@@ -33,7 +33,7 @@ namespace Inputs
 
         #endregion
 
-        #region Miscellaneaous
+        #region Rebind Menu
 
         private RebindMenus currentRebindMenu = RebindMenus.General;
         private static readonly int tabsCount = Enum.GetValues(typeof(RebindMenus)).Length;
@@ -65,6 +65,8 @@ namespace Inputs
 
         #endregion
 
+        private bool showScoreboardActive;
+
         public void Awake()
         {
             StartCoroutine(InitWhenLoaded());
@@ -80,16 +82,18 @@ namespace Inputs
 
         private void Update()
         {
-            if (Game.Manager.GameStarted && !(MovementInputs.IsRebindingAKey || CombatInputs.IsRebindingAKey || GeneralInputs.IsRebindingAKey))
+            if (!Game.Manager.GameStarted) { return; }
+
+            showScoreboardActive = GeneralInputs.ShowScoreboard;
+
+            if (MovementInputs.IsRebindingAKey || CombatInputs.IsRebindingAKey || GeneralInputs.IsRebindingAKey) { return; }
+
+            if (GeneralInputs.TogglePauseMenu)
             {
-                if (GeneralInputs.TogglePauseMenu)
-                {
-                    gameSettingsMenu.ToggleMenu();
-                }
+                gameSettingsMenu.ToggleMenu();
             }
 
-
-
+            Scoreboard.Instance.SetDoRender(!gameSettingsMenu.DoRenderMenu && showScoreboardActive);
         }
 
         public void OnRenderMenu()

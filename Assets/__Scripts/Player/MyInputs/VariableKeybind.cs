@@ -14,7 +14,7 @@ namespace Inputs
         private readonly List<InputType> allowedInputTypes;
 
         private int currentInputTypeIndex;
-        private int amountOfInputTypesAllowed;
+        private readonly int amountOfInputTypesAllowed;
 
         /// <summary>
         /// First provided activation type will be selected as default

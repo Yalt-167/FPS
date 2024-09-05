@@ -1413,6 +1413,7 @@ GameObject:
   - component: {fileID: 5314762285684912620}
   - component: {fileID: 3274016814467245242}
   - component: {fileID: 3018800575568115996}
+  - component: {fileID: 1547610708643055703}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1523,6 +1524,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76b8400fd8a83f64988129bb2e605760, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ScoreboardIndex: 0
   handleOnRemotePlayer:
     componentsToKill:
     - {fileID: 3391045545914725488}
@@ -1534,6 +1536,7 @@ MonoBehaviour:
     - {fileID: 3857732353204371700}
     - {fileID: 3274016814467245242}
     - {fileID: 3018800575568115996}
+    - {fileID: 1547610708643055703}
     gameObjectsToKill:
     - {fileID: 3467822551731792150}
     - {fileID: 4356166339693058417}
@@ -1943,7 +1946,6 @@ MonoBehaviour:
         RelevantKey: 306
         inputType: 2
         holdForSeconds: 0
-        allowedInputTypes: 0200000004000000
       SwitchCameraPosition:
         RelevantKey: 119
         inputType: 0
@@ -1952,7 +1954,6 @@ MonoBehaviour:
         RelevantKey: 120
         inputType: 0
         holdForSeconds: 0.5
-        allowedInputTypes: 0000000003000000
     CombatInputs:
       Shoot:
         RelevantKey: 323
@@ -1962,7 +1963,6 @@ MonoBehaviour:
         RelevantKey: 324
         inputType: 2
         holdForSeconds: 0
-        allowedInputTypes: 0200000004000000
       Reload:
         RelevantKey: 114
         inputType: 0
@@ -2008,7 +2008,6 @@ MonoBehaviour:
         RelevantKey: 9
         inputType: 4
         holdForSeconds: 0
-        allowedInputTypes: 0400000002000000
     CameraHorizontalSensitivity: 0
     CameraVerticalSensitivity: 0
 --- !u!114 &3018800575568115996
@@ -2021,6 +2020,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c88f6f1e8c9865d4b9a014d1ed9b8200, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1547610708643055703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5705630700605972737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f661af135bf7c0e42b4fd891386b663a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &5814794369634734712
