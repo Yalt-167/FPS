@@ -1,3 +1,4 @@
+using Inputs;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -68,6 +69,22 @@ namespace SaveAndLoad
             Debug.Log("Save file was read successfully");
 
             return data;
+        }
+
+        public static void ClearSave(string name)
+        {
+            string path = $"{Application.persistentDataPath}/{name}.data";
+
+            if (!File.Exists(path)) { return; }
+
+            File.Delete(path);
+        }
+
+
+        [UnityEditor.MenuItem("SaveFiles/Remove keybinds")]
+        public static void DeleteKeybindSaveFile()
+        {
+            ClearSave("Keybinds");
         }
     }
 } // C:/Users/antoi/AppData/LocalLow/DefaultCompany/ProjectOlympus/{name}.data
