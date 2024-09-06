@@ -118,7 +118,7 @@ Camera:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 311958405594091015}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
@@ -169,7 +169,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 311958405594091015}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!114 &1212207979648881112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1645,7 +1645,6 @@ MonoBehaviour:
   doDebugCollidingDown: 0
   doDebugCollidingUp: 0
   doDebugCollidinAnySide: 0
-  currentMovementMode: 0
   validatedActionBufferDuration: 0
   timeToReachMaxSprintSpeed: 0.5
   airFriction: 0.1
@@ -2007,6 +2006,10 @@ MonoBehaviour:
       ShowScoreboard:
         RelevantKey: 9
         inputType: 4
+        holdForSeconds: 0
+      CycleScoreboardSortMode:
+        RelevantKey: 313
+        inputType: 0
         holdForSeconds: 0
     CameraHorizontalSensitivity: 0
     CameraVerticalSensitivity: 0
