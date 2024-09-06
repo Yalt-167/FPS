@@ -47,7 +47,6 @@ namespace LobbyHandling
         private Player localPlayer;
         private Camera menuCamera;
 
-
         #region Lobby list
 
 #nullable enable
@@ -1060,7 +1059,7 @@ namespace LobbyHandling
 
             DrawLobbySettings();
 
-            if ((GUILayout.Button(LobbyGUILabels.CreateLobby) || !isCreatingLobby && Input.GetKeyDown(KeyCode.Return)) && isSignedIn)
+            if (!isCreatingLobby && (GUILayout.Button(LobbyGUILabels.CreateLobby) || Input.GetKeyDown(KeyCode.Return)) && isSignedIn)
             {
                 CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password, mapsDropDown.Current, gameModesDropDown.Current); 
             }
