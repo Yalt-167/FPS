@@ -43,6 +43,7 @@ namespace GameManagement
             }
 
             ManageFiles(IsOwner);
+            TryCallOnPlayerMonoBehavioursRecursively(IsOwner ? "InitLocalPlayer" : "InitRemotePlayer", new object[] { });
         }
 
         [Rpc(SendTo.Server)]
@@ -217,7 +218,7 @@ namespace GameManagement
             }
         }
 
-        private void CallOnPlayerScriptsRecursively<T>(string methodName, object[] params_, Transform transform_ = null)
+        private void CallOnPlayerScriptsRecursively<T>(string methodName, object[] parameters, Transform transform_ = null)
         {
             transform_ = transform_ ?? transform;
 
@@ -227,13 +228,13 @@ namespace GameManagement
             {
                 if (monoBehaviour is T monoBehaviourAsT)
                 {
-                    methodInfo.Invoke(monoBehaviourAsT, params_);
+                    methodInfo.Invoke(monoBehaviourAsT, parameters);
                 }
             }
 
             for (int childIndex = 0; childIndex < transform_.childCount; childIndex++)
             {
-                CallOnPlayerScriptsRecursively<T>(methodName, params_, transform_.GetChild(childIndex));
+                CallOnPlayerScriptsRecursively<T>(methodName, parameters, transform_.GetChild(childIndex));
             }
         }
 
