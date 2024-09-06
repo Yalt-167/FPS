@@ -11,11 +11,13 @@ namespace Inputs
     {
         public FixedKeybind TogglePauseMenu = new(KeyCode.Escape, InputType.OnKeyDown, nameof(TogglePauseMenu), false);
         public VariableKeybind ShowScoreboard = new(KeyCode.Tab, new List<InputType>() { InputType.Toggle, InputType.OnKeyHeld }, nameof(ShowScoreboard), true);
+        public FixedKeybind CycleScoreboardSortMode = new(KeyCode.AltGr, InputType.OnKeyDown, nameof(CycleScoreboardSortMode), true);
 
         public override void Init()
         {
             RegisterKeybind(TogglePauseMenu);
             RegisterKeybind(ShowScoreboard);
+            RegisterKeybind(CycleScoreboardSortMode);
         }
     }
 }

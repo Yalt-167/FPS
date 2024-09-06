@@ -1,9 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-
-using UnityEngine;
-
 namespace Menus
 {
     public struct PlayerScoreboardInfos
@@ -24,7 +18,7 @@ namespace Menus
             Assists = 0;
         }
 
-        public override string ToString()
+        public readonly override string ToString()
         {
             return Name; 
         }

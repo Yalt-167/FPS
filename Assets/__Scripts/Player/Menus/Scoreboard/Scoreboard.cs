@@ -1,20 +1,23 @@
-using GameManagement;
-using Menus;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
+
 using UnityEngine;
+
+using GameManagement;
+using Inputs;
+
 
 namespace Menus
 {
     public sealed class Scoreboard : MonoBehaviour
     {
         public static Scoreboard Instance { get; private set; }
+        private InputManager inputManager;
 
+        private GeneralInputQuery InputQuery => inputManager.GeneralInputs;
         private PlayerScoreboardInfos[] playersInfos;
-        private readonly Color[] teamColors = new Color[2] {Color.red, Color.blue };
+        private readonly Color[] teamColors = new Color[2] {Color.red, Color.green };
 
         private bool doRender;
 
@@ -32,15 +35,25 @@ namespace Menus
         }
 
         private ScoreboardSortMode sortMode = ScoreboardSortMode.Kills;
+        private static readonly int sortModesCount = Enum.GetValues(typeof(ScoreboardSortMode)).Length;
 
         private void Awake()
         {
+            inputManager = GetComponent<InputManager>();
             Game.OnGameStarted += Init;
         }
 
         private void OnDisable()
         {
             Game.OnGameStarted -= Init;
+        }
+
+        private void Update()
+        {
+            if (InputQuery.CycleScoreboardSortMode)
+            {
+                CycleSortMode();
+            }
         }
 
         private void Init()
@@ -96,7 +109,7 @@ namespace Menus
 
         private void SortPlayers()
         {
-            switch (sortMode)
+            switch (SortMode)
             {
                 case ScoreboardSortMode.Teams:
                     SortPlayersPerTeams();
@@ -115,7 +128,7 @@ namespace Menus
                     break;
 
                 default:
-                    throw new Exception($"This scoreboard sort mode: {sortMode} doesn t exist");
+                    throw new Exception($"This scoreboard sort mode: {SortMode} doesn t exist");
             }
         }
 
@@ -131,8 +144,7 @@ namespace Menus
             var (localPlayerTeam, opponentTeam) = PlayerFrame.LocalPlayer.TeamNumber == 1 ? (0, 1) : (1, 0);
 
             var localPlayerTeamCount = teams[localPlayerTeam].Count;
-            var opponentTeamCount = teams[opponentTeam].Count;
-            var total = localPlayerTeamCount + opponentTeamCount;
+            var total = localPlayerTeamCount + teams[opponentTeam].Count;
             for (int i = 0; i < total; i++)
             {
                 playersInfos[i] = i < localPlayerTeamCount ? teams[0][i] : teams[1][i - localPlayerTeamCount];
@@ -172,6 +184,11 @@ namespace Menus
         private void SortPlayersPerPoints()
         {
             throw new NotImplementedException();
+        }
+
+        private void CycleSortMode()
+        {
+            SortMode = (ScoreboardSortMode)(((int)sortMode + 1) % sortModesCount);
         }
 
         public void AddKill(int tryharderIndex)
@@ -241,22 +258,5 @@ namespace Menus
             GUILayout.EndHorizontal();
             GUI.color = Color.white;
         }
-    }
-}
-// so far when the Gravity relies on PlayerMovement which is deactivated when a menu is opened
-
-public sealed class PlayerScoreboardInfoPerKillsComparer : IComparer<PlayerScoreboardInfos>
-{
-    public int Compare(PlayerScoreboardInfos x, PlayerScoreboardInfos y)
-    {
-        return y.Kills.CompareTo(x.Kills);
-    }
-}
-
-public sealed class PlayerScoreboardInfoPerRatioComparer : IComparer<PlayerScoreboardInfos>
-{
-    public int Compare(PlayerScoreboardInfos x, PlayerScoreboardInfos y)
-    {
-        return (y.Kills - y.Deaths).CompareTo(x.Kills - x.Deaths);
     }
 }
