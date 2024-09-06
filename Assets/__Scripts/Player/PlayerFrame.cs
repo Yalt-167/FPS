@@ -1,3 +1,5 @@
+#define DEV_BUILD
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,7 +26,9 @@ namespace GameManagement
     {
         public static PlayerFrame LocalPlayer { get; private set; }
         public int ScoreboardIndex;
-
+#if DEV_BUILD
+        private static readonly string defaultProfileName = "default";
+#endif
         #region Spawn Logic
 
         public override void OnNetworkSpawn()
@@ -33,7 +37,12 @@ namespace GameManagement
 
             if (IsOwner)
             {
-                EnablePlayerServerRpc(AuthenticationService.Instance.Profile);
+                EnablePlayerServerRpc(
+#if DEV_BUILD
+                    AuthenticationService.Instance.Profile == defaultProfileName ? LobbyHandling.LobbyHandler.Instance.ProfileName :
+#endif
+                    AuthenticationService.Instance.Profile
+                    );
 
                 CallOnPlayerScriptsRecursively<IHaveSomethingToSave>("Load", new object[] { });
             }

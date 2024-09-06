@@ -1,5 +1,5 @@
 //#define LOG_LOBBY_EVENTS
-
+#define DEV_BUILD
 
 using System;
 using System.Collections;
@@ -31,6 +31,7 @@ namespace LobbyHandling
 
         private Lobby hostLobby;
         private bool isCreatingLobby;
+        private bool startedALocalTestingSession;
 
         private static readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
         private float heartbeatTimer;
@@ -692,6 +693,14 @@ namespace LobbyHandling
             TargetLobbyID = hostLobby.Id;
         }
 
+        private void LaunchTeamSelectionMenu()
+        {
+            Game.Manager.ToggleLobbyMenuServerRpc(towardOn: false);
+            Game.Manager.CreatePlayerListServerRpc();
+            GameNetworkManager.Manager.SpawnTeamSelectionMenu(2, 6); // as it s a network spawn its automatically propagated to all clients
+            Game.Manager.LoadMapServerRpc(mapsDropDown.Current);
+        }
+
         #endregion
 
         #region Relay Handling
@@ -1149,31 +1158,39 @@ namespace LobbyHandling
             GUILayout.EndHorizontal();
         }
 
+#if DEV_BUILD
         private void LocalTestingMenu()
         {
             GUILayout.BeginVertical(CachedGUIStylesNames.Box);
 
             GUILayout.Label(LobbyGUILabels.LocalTesting, titleLabelStyle);
 
-            if (GUILayout.Button(LobbyGUILabels.StartALocalSession))
+            if (startedALocalTestingSession)
             {
-                SelectLocalUnityTransport();
-                GameNetworkManager.Singleton.StartHost();
-                ToggleMenuCamera(towardOn: false);
-                ToggleLobbyMenu(towardOn: false);
+                if (GUILayout.Button("Launch team selection menu"))
+                {
+                    LaunchTeamSelectionMenu();
+                }
             }
-
-            if (GUILayout.Button(LobbyGUILabels.JoinALocalSession))
+            else
             {
-                SelectLocalUnityTransport();
-                GameNetworkManager.Singleton.StartClient();
-                ToggleMenuCamera(towardOn: false);
-                ToggleLobbyMenu(towardOn: false);
+                if (GUILayout.Button(LobbyGUILabels.StartALocalSession))
+                {
+                    SelectLocalUnityTransport();
+                    GameNetworkManager.Singleton.StartHost();
+                    startedALocalTestingSession = true;
+                }
+
+                if (GUILayout.Button(LobbyGUILabels.JoinALocalSession))
+                {
+                    SelectLocalUnityTransport();
+                    GameNetworkManager.Singleton.StartClient();
+                }
             }
 
             GUILayout.EndVertical();
         }
-
+#endif
         private void JoinLobbyMenu()
         {
             GUI.enabled = isSignedIn;
@@ -1288,10 +1305,7 @@ namespace LobbyHandling
                     if (GUILayout.Button(LobbyGUILabels.CloseLobbyAndStartTeamSelection) || Input.GetKeyDown(KeyCode.Return))
                     {
                         CloseLobbyAcess();
-                        Game.Manager.ToggleLobbyMenuServerRpc(towardOn: false);
-                        Game.Manager.CreatePlayerListServerRpc();
-                        GameNetworkManager.Manager.SpawnTeamSelectionMenu(2, 6); // as it s a nertwork spawn it automatically propagates to all clients
-                        Game.Manager.LoadMapServerRpc(mapsDropDown.Current);
+                        LaunchTeamSelectionMenu();
                     }
                 }
                 else
@@ -1605,11 +1619,12 @@ namespace LobbyHandling
 
                         JoinLobbyMenu();
 
-                        GUILayout.Space(SpaceBetweenButtons);
+#if DEV_BUILD
+                GUILayout.Space(SpaceBetweenButtons);
 
                         LocalTestingMenu();
-
-                    GUILayout.EndVertical();
+#endif
+                GUILayout.EndVertical();
 
                 GUILayout.FlexibleSpace();
 
