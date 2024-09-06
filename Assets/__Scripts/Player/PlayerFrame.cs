@@ -35,7 +35,7 @@ namespace GameManagement
             {
                 EnablePlayerServerRpc(AuthenticationService.Instance.Profile);
 
-                CallOnPlayerScriptsRecursively<IHaveSomethingToSave>("Load");
+                CallOnPlayerScriptsRecursively<IHaveSomethingToSave>("Load", new object[] { });
             }
             else
             {
@@ -43,6 +43,7 @@ namespace GameManagement
             }
 
             ManageFiles(IsOwner);
+
             TryCallOnPlayerMonoBehavioursRecursively(IsOwner ? "InitLocalPlayer" : "InitRemotePlayer", new object[] { });
         }
 
@@ -73,7 +74,7 @@ namespace GameManagement
         {
             if (IsOwner)
             {
-                CallOnPlayerScriptsRecursively<IHaveSomethingToSave>("Save");
+                CallOnPlayerScriptsRecursively<IHaveSomethingToSave>("Save", new object[] { });
             }
             
             base.OnNetworkDespawn();
@@ -196,26 +197,6 @@ namespace GameManagement
             }
 
             return null;
-        }
-
-        private void CallOnPlayerScriptsRecursively<T>(string methodName, Transform transform_ = null)
-        {
-            transform_ = transform_ ?? transform;
-
-            MethodInfo methodInfo = typeof(T).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
-
-            foreach (var monoBehaviour in transform_.GetComponents<MonoBehaviour>())
-            {
-                if (monoBehaviour is T monoBehaviourAsT)
-                {
-                    methodInfo.Invoke(monoBehaviourAsT, new object[] { });
-                }
-            }
-
-            for (int childIndex = 0; childIndex < transform_.childCount; childIndex++)
-            {
-                CallOnPlayerScriptsRecursively<T>(methodName, transform_.GetChild(childIndex));
-            }
         }
 
         private void CallOnPlayerScriptsRecursively<T>(string methodName, object[] parameters, Transform transform_ = null)
