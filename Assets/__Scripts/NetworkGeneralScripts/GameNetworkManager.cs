@@ -230,7 +230,7 @@ namespace GameManagement
         var stringBuilder = new StringBuilder();
         stringBuilder.Append("[ ");
 #endif
-            ushort idx = 0;
+            var idx = 0;
             foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
             {
 #if DEBUG_MULTIPLAYER

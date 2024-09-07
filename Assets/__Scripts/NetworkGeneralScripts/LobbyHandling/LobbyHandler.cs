@@ -1070,7 +1070,8 @@ namespace LobbyHandling
 
             DrawLobbySettings();
 
-            if (!isCreatingLobby && (GUILayout.Button(LobbyGUILabels.CreateLobby) || Input.GetKeyDown(KeyCode.Return)) && isSignedIn)
+            GUI.enabled = isSignedIn && !isCreatingLobby;
+            if ((GUILayout.Button(isCreatingLobby ? "Creating your lobby" : LobbyGUILabels.CreateLobby) || Input.GetKeyDown(KeyCode.Return)) && isSignedIn)
             {
                 CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password, mapsDropDown.Current, gameModesDropDown.Current); 
             }
@@ -1106,7 +1107,11 @@ namespace LobbyHandling
                 DeleteLobby(hostLobby.Id);
             }
 
+            GUILayout.EndVertical();
+
             GUILayout.Space(SpaceBetweenButtons * 2);
+
+            GUILayout.BeginVertical(CachedGUIStylesNames.Box);
 
             GUILayout.Label(LobbyGUILabels.ShareYourLobbyToAFriend, titleLabelStyle);
             if (GUILayout.Button(LobbyGUILabels.CopyLobbyID))
@@ -1568,11 +1573,12 @@ namespace LobbyHandling
 
                 GUILayout.BeginHorizontal(); // H-VH
 
-                if (GUILayout.Button(LobbyGUILabels.SignInButtonText) || Input.GetKeyDown(KeyCode.Return) && !isSigningIn)
+                GUI.enabled = !isSigningIn;
+                if (GUILayout.Button(isSigningIn ? LobbyGUILabels.SigningIn : LobbyGUILabels.SignInButtonText) || Input.GetKeyDown(KeyCode.Return))
                 {
                     SignIn();
                 }
-
+                GUI.enabled = true;
                 GUILayout.EndHorizontal(); // H-V
 
                 GUILayout.EndVertical(); // H-
@@ -1620,15 +1626,19 @@ namespace LobbyHandling
 
                         CreateLobbyMenu();
 
-                        GUILayout.Space(SpaceBetweenButtons);
+                        if (!isCreatingLobby)
+                        {
+                                GUILayout.Space(SpaceBetweenButtons);
 
-                        JoinLobbyMenu();
+                                JoinLobbyMenu();
 
 #if DEV_BUILD
-                GUILayout.Space(SpaceBetweenButtons);
+                                GUILayout.Space(SpaceBetweenButtons);
 
-                        LocalTestingMenu();
+                                LocalTestingMenu();
 #endif
+                        }
+
                 GUILayout.EndVertical();
 
                 GUILayout.FlexibleSpace();
@@ -1656,9 +1666,10 @@ namespace LobbyHandling
 
         public static class LobbyGUILabels
         {
-            public static readonly string SignInButtonText = "     Sign In (required to use any lobby feature)     ";
+            public static readonly string SignInButtonText = "Sign In (required to use any lobby feature)";
             public static readonly string CreateYourLobby = "Create your lobby";
             public static readonly string RequiresSignIn = "(Requires sign in)";
+            public static readonly string SigningIn = "(Requires sign in)";
             public static readonly string CreateLobby = "Create lobby";
             public static readonly string EditYourLobby = "Edit your lobby";
             public static readonly string EditLobby = "Edit lobby";
