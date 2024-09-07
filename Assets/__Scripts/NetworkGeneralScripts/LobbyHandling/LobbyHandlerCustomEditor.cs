@@ -49,7 +49,7 @@ namespace LobbyHandling
                 }
                 else
                 {
-                    targetScript.EditLobby(targetScript.TargetLobbyID, targetScript.LobbyName, targetScript.LobbyCapacity, targetScript.PrivateLobby, targetScript.Password);
+                    targetScript.EditLobby(targetScript.TargetLobbyID, targetScript.LobbyName, targetScript.LobbyCapacity, targetScript.PrivateLobby, targetScript.Password, string.Empty, string.Empty);
                 }
             }
 

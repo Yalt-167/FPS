@@ -362,7 +362,7 @@ namespace LobbyHandling
             CopyLobbyID();
         }
 
-        public async void EditLobby(string lobbyID, string lobbyName, int lobbyCapacity, bool privateLobby, string password)
+        public async void EditLobby(string lobbyID, string lobbyName, int lobbyCapacity, bool privateLobby, string password, string map, string gamemode)
         {
             if (string.IsNullOrEmpty(lobbyID))
             {
@@ -388,12 +388,28 @@ namespace LobbyHandling
                 Name = lobbyName,
                 MaxPlayers = lobbyCapacity,
                 IsPrivate = privateLobby,
-                Password = emptyPassword ? noPassword : password
+                Password = emptyPassword ? noPassword : password,
 
-                //Data = new Dictionary<string, DataObject>() // idk how to represent that as param so far
-                //{
+                Data = new Dictionary<string, DataObject>() // idk how to represent that as param so far
+                {
+                    {
+                        LobbyData.GameMode,
+                        new DataObject(
+                            visibility: DataObject.VisibilityOptions.Public,
+                            value: gamemode,
+                            index: FiltersValues.GameMode
+                        )
+                    },
 
-                //}
+                    {
+                        LobbyData.Map,
+                        new DataObject(
+                            visibility: DataObject.VisibilityOptions.Public,
+                            value: map,
+                            index: FiltersValues.Map
+                        )
+                    },
+                }
             };
             try
             {
@@ -1090,7 +1106,7 @@ namespace LobbyHandling
 
             if (GUILayout.Button(LobbyGUILabels.EditLobby))
             {
-                EditLobby(hostLobby.Id, LobbyName, LobbyCapacity, PrivateLobby, Password);
+                EditLobby(hostLobby.Id, LobbyName, LobbyCapacity, PrivateLobby, Password, mapsDropDown.Current, gameModesDropDown.Current);
             }
 
             GUILayout.Space(SpaceBetweenButtons);
