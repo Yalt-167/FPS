@@ -160,7 +160,7 @@ namespace LobbyHandling
             GUILayout.Label("Relay");
             if (GUILayout.Button("List regions"))
             {
-                targetScript.ListRegions();
+                //targetScript.ListRegions();
             }
 
             GUILayout.Space(spaceBetweenButtons);

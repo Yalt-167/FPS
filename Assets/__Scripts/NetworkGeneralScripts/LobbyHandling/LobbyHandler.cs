@@ -844,7 +844,7 @@ namespace LobbyHandling
 #endif
         }
 
-        public async void ListRegions()
+        private async void ListRegionsData()
         {
             List<Region> regions;
             try
@@ -860,7 +860,6 @@ namespace LobbyHandling
             foreach (var region in regions)
             {
                 Debug.Log(region.Description);
-                //Debug.Log(region.)
             }
         }
 
