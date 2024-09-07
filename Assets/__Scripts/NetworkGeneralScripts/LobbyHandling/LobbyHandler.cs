@@ -31,8 +31,10 @@ namespace LobbyHandling
 
         private Lobby hostLobby;
         private bool isCreatingLobby;
+#if DEV_BUILD
         private bool startedALocalTestingSession;
-
+        private bool inALocalTestingSession;
+#endif
         private static readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
         private float heartbeatTimer;
 
@@ -974,7 +976,7 @@ namespace LobbyHandling
             return hostLobby.HostId == playerID;
         }
 
-#nullable enable 
+#nullable enable
         public Player? GetLobbyHost()
         {
             if (hostLobby == null) { return null; }
@@ -1172,19 +1174,22 @@ namespace LobbyHandling
                     LaunchTeamSelectionMenu();
                 }
             }
+            else if (inALocalTestingSession)
+            {
+                GUILayout.Label("You are hopefully in :)");
+            }
             else
             {
                 if (GUILayout.Button(LobbyGUILabels.StartALocalSession))
                 {
                     SelectLocalUnityTransport();
-                    GameNetworkManager.Singleton.StartHost();
-                    startedALocalTestingSession = true;
+                    startedALocalTestingSession = GameNetworkManager.Singleton.StartHost();
                 }
 
                 if (GUILayout.Button(LobbyGUILabels.JoinALocalSession))
                 {
                     SelectLocalUnityTransport();
-                    GameNetworkManager.Singleton.StartClient();
+                    inALocalTestingSession = GameNetworkManager.Singleton.StartClient();
                 }
             }
 
