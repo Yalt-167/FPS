@@ -15,11 +15,51 @@ namespace Inputs
     {
         [HideInInspector] public InputManagerSaveablePart BindsAndValues;
 
+
         #region SaveAndLoad
 
+        #region Deprecated save
         public IAmSomethingToSave DataToSave => BindsAndValues;
+
+
+
+        #endregion
+        public int AmountOfThingsToSave { get; } = 1;
+        public SaveDataInfo[] SaveDataInfos { get; private set; };
         public string SaveFilePath { get; } = "Keybinds";
         public bool Loaded { get; private set; }
+
+        public IEnumerator InitWhenLoaded()
+        {
+            yield return new WaitUntil(() => Loaded);
+
+            gameSettingsMenu = GetComponent<GameSettingsMenu>();
+            gameSettingsMenu.Subscribe(this);
+
+        }
+
+        public void Save()
+        {
+            SaveAndLoad.SaveAndLoad.Save(DataToSave, SaveFilePath);
+        }
+
+        public void Load()
+        {
+            InputManagerSaveablePart? loadedInstance = (InputManagerSaveablePart?)SaveAndLoad.SaveAndLoad.Load(SaveFilePath);
+
+            var success = loadedInstance != null;
+
+            BindsAndValues = (InputManagerSaveablePart)(success ? loadedInstance : new InputManagerSaveablePart().SetDefault());
+
+            //if (!success)
+            //{
+            //    BindsAndValues.MovementInputs.Init();
+            //    BindsAndValues.CombatInputs.Init();
+            //    BindsAndValues.GeneralInputs.Init();
+            //}
+
+            Loaded = true;
+        }
 
         #endregion
 
@@ -69,15 +109,12 @@ namespace Inputs
 
         public void Awake()
         {
+            SaveDataInfos = new SaveDataInfo[1]
+            {
+                new SaveDataInfo(BindsAndValues, BindsAndValues.GetType(), "Keybinds"),
+            };
+
             StartCoroutine(InitWhenLoaded());
-        }
-
-        public IEnumerator InitWhenLoaded()
-        {
-            yield return new WaitUntil(() => Loaded);
-
-            gameSettingsMenu = GetComponent<GameSettingsMenu>();
-            gameSettingsMenu.Subscribe(this);
         }
 
         private void Update()
@@ -150,29 +187,6 @@ namespace Inputs
             GUILayout.FlexibleSpace();
 
             GUILayout.EndHorizontal();
-        }
-
-        public void Save()
-        {
-            SaveAndLoad.SaveAndLoad.Save(DataToSave, SaveFilePath);
-        }
-
-        public void Load()
-        {
-            InputManagerSaveablePart? loadedInstance = (InputManagerSaveablePart?)SaveAndLoad.SaveAndLoad.Load(SaveFilePath);
-
-            var success = loadedInstance != null;
-
-            BindsAndValues = (InputManagerSaveablePart) (success ? loadedInstance: new InputManagerSaveablePart().SetDefault());
-
-            if (!success)
-            {
-                BindsAndValues.MovementInputs.Init();
-                BindsAndValues.CombatInputs.Init();
-                BindsAndValues.GeneralInputs.Init();
-            }
-
-            Loaded = true;
         }
     }
 }
