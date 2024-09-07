@@ -783,6 +783,7 @@ namespace LobbyHandling
             catch (RelayServiceException exception)
             {
                 Debug.Log(exception.Message);
+                NetworkManager.Singleton.LogLevel = LogLevel.Developer;
                 return false;
             }
 
@@ -810,6 +811,7 @@ namespace LobbyHandling
 #if LOG_LOBBY_EVENTS
             Debug.Log(success ? "Server was successfully started" : "Failed to start server");
 #endif
+
             return success;
         }
 
