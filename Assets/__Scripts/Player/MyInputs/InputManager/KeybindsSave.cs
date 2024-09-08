@@ -5,7 +5,7 @@ using System;
 namespace SaveAndLoad
 {
     [Serializable]
-    public struct InputManagerSaveablePart : IAmSomethingToSave
+    public struct KeybindsSave : IAmSomethingToSave
     {
         public MovementInputQuery MovementInputs;
         public CombatInputQuery CombatInputs;
@@ -15,14 +15,22 @@ namespace SaveAndLoad
 
         public IAmSomethingToSave SetDefault()
         {
+            UnityEngine.Debug.Log("SetDefault");
             MovementInputs = new();
-            MovementInputs.Init();
             CombatInputs = new();
-            CombatInputs.Init();
             GeneralInputs = new();
-            GeneralInputs.Init();
             CameraHorizontalSensitivity = 3f;
             CameraVerticalSensitivity = 3f;
+
+            return this;
+        }
+
+        public readonly IAmSomethingToSave Init()
+        {
+            UnityEngine.Debug.Log(CameraHorizontalSensitivity);
+            MovementInputs.Init();
+            CombatInputs.Init();
+            GeneralInputs.Init();
 
             return this;
         }
