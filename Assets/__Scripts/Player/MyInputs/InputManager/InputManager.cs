@@ -7,15 +7,25 @@ using UnityEngine;
 using GameManagement;
 using SaveAndLoad;
 using Menus;
+using MyCollections;
 
 namespace Inputs
 {
     [Serializable]
     public sealed class InputManager : MonoBehaviour, IHaveSomethingToSave, IGameSettingsMenuMember
     {
-        [HideInInspector] public InputManagerSaveablePart BindsAndValues;
-
-
+        private KeybindsSave BindsAndValues
+        {
+            get
+            {
+                return (KeybindsSave)DataToSave[0];
+            }
+            set
+            {
+                DataToSave[0] = value;
+            }
+        }
+        
         #region SaveAndLoad
 
         public IAmSomethingToSave[] DataToSave { get; private set; }
@@ -40,9 +50,9 @@ namespace Inputs
 
         public void Load()
         {
-            InputManagerSaveablePart? loadedInstance = (InputManagerSaveablePart?)SaveAndLoad.SaveAndLoad.Load(SaveFilePaths[0]);
+            KeybindsSave? loadedInstance = (KeybindsSave?)SaveAndLoad.SaveAndLoad.Load(SaveFilePaths[0]);
 
-            BindsAndValues = (InputManagerSaveablePart)(loadedInstance != null ? loadedInstance : new InputManagerSaveablePart().SetDefault());
+            BindsAndValues = (KeybindsSave)(loadedInstance != null ? loadedInstance : new KeybindsSave().SetDefault().Init());
 
             Loaded = true;
         }
@@ -87,7 +97,7 @@ namespace Inputs
 
         private GameSettingsMenu gameSettingsMenu;
         public string MenuName { get; } = "Inputs";
-        public int MenuTabsCount { get; } = 3;
+        public int MenuColumnsCount { get; } = 3;
 
         #endregion
 
@@ -95,7 +105,7 @@ namespace Inputs
 
         public void Awake()
         {
-            DataToSave = new IAmSomethingToSave[1] { BindsAndValues };
+            DataToSave = new IAmSomethingToSave[1] { new KeybindsSave() };
             SaveFilePaths = new string[1] { "Keybinds" };
 
             StartCoroutine(InitWhenLoaded());
@@ -133,7 +143,7 @@ namespace Inputs
 
             for (int tabIndex = 0; tabIndex < tabsCount; tabIndex++)
             {
-                GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(MenuData.SubMenuTabWidth));
+                GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(200));
 
                 var relevantRebindMenuEnumMember = (RebindMenus)tabIndex;
                 GUI.enabled = currentRebindMenu != relevantRebindMenuEnumMember;
@@ -160,7 +170,7 @@ namespace Inputs
                 _ => null
             };
 
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Height(Screen.height - 100));
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Height(MenuData.GameSettingsMenuScrollableRegionHeight));
             relevantInputQuery?.OnRenderRebindMenu();
             GUILayout.EndScrollView();
 

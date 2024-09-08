@@ -8,7 +8,9 @@ namespace Menus
 {
     public static class MenuData
     {
-        public static readonly int SubMenuTabWidth = 200;
+
+        public static readonly int GameSettingsMenuWidth = 600;
+        public static int GameSettingsMenuScrollableRegionHeight => Screen.height - 100;
         public static class RemapInput
         {
             public static readonly int ActionNameDisplayWidth = 200;
