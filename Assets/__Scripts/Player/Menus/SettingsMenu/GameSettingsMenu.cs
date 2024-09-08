@@ -55,11 +55,11 @@ namespace Menus
 
             for (int i = 0; i < menus.Count; i++)
             {
-                GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.ExpandWidth(true));
+                GUILayout.BeginHorizontal(CachedGUIStylesNames.Box);
 
                 GUI.enabled = currentMenuIndex != i;
 
-                if (GUILayout.Button(menus[i].MenuName)) { currentMenuIndex = i; }
+                if (GUILayout.Button(menus[i].MenuName, GUILayout.Width(MenuData.GameSettingsMenuWidth / menus.Count))) { currentMenuIndex = i; }
 
                 GUI.enabled = true;
 
