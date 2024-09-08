@@ -14,18 +14,21 @@ namespace Menus
 
         public bool Loaded { get; private set; } 
 
-        public IAmSomethingToSave DataToSave => throw new NotImplementedException();
-
-        public string SaveFilePath { get; } = "Preferences";
+        public IAmSomethingToSave[] DataToSave { get; private set; }
+        public string[] SaveFilePaths { get; private set; }
+        public int AmountOfThingsToSave { get; } = 1;
+        private Vector2 scrollPosition = Vector2.zero;
 
         public void Save()
         {
-            throw new NotImplementedException();
+            
         }
 
         public void Load()
         {
-            throw new NotImplementedException();
+            
+
+            Loaded = true;
         }
 
         public IEnumerator InitWhenLoaded()
@@ -37,22 +40,36 @@ namespace Menus
 
         #endregion
 
+        #region Game Settings Menu related
 
         public string MenuName { get; } = "Preferences";
 
-        public int MenuTabsCount { get; } = 1;
+        public int MenuColumnsCount { get; } = 1;
 
-        private readonly List<IPreferenceMenuMember> preferenceMenuEntries;
+        private GameSettingsMenu gameSettingsMenu;
+
+        #endregion
+
+        private readonly List<IPreferenceMenuMember> preferenceMenuEntries = new();
 
         public void Awake()
         {
+            DataToSave = new IAmSomethingToSave[] { };
+            SaveFilePaths = new string[] { };
+
             StartCoroutine(InitWhenLoaded());
         }
 
 
         private void Init()
         {
-            
+            gameSettingsMenu = GetComponent<GameSettingsMenu>();
+            gameSettingsMenu.Subscribe(this);
+        }
+
+        public void Subscribe(IPreferenceMenuMember member)
+        {
+            preferenceMenuEntries.Add(member);
         }
 
         public void OnRenderMenu()
@@ -65,10 +82,12 @@ namespace Menus
 
             GUILayout.BeginVertical(CachedGUIStylesNames.Box);
 
-
-
-
-
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Height(MenuData.GameSettingsMenuScrollableRegionHeight));
+            foreach (var entry in preferenceMenuEntries)
+            {
+                entry.OnRenderMenu();
+            }
+            GUILayout.EndScrollView();
 
             GUILayout.EndVertical();
 
