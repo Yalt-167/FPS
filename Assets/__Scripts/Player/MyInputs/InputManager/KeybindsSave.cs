@@ -1,10 +1,8 @@
 using Inputs;
-using SaveAndLoad;
-using System;
 
 namespace SaveAndLoad
 {
-    [Serializable]
+    [System.Serializable]
     public struct KeybindsSave : IAmSomethingToSave
     {
         public MovementInputQuery MovementInputs;
@@ -15,7 +13,6 @@ namespace SaveAndLoad
 
         public IAmSomethingToSave SetDefault()
         {
-            UnityEngine.Debug.Log("SetDefault");
             MovementInputs = new();
             CombatInputs = new();
             GeneralInputs = new();
@@ -25,7 +22,7 @@ namespace SaveAndLoad
             return this;
         }
 
-        public readonly IAmSomethingToSave Init()
+        public IAmSomethingToSave Init()
         {
             UnityEngine.Debug.Log(CameraHorizontalSensitivity);
             MovementInputs.Init();

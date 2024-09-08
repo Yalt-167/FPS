@@ -8,6 +8,8 @@ namespace Menus
 {
     public interface IGameSettingsMenuMember
     {
+        public GameSettingsMenu GameSettingsMenu { get; }
+
         public string MenuName { get; }
 
         public int MenuColumnsCount { get; }

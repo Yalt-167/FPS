@@ -38,8 +38,8 @@ namespace Inputs
         {
             yield return new WaitUntil(() => Loaded);
 
-            gameSettingsMenu = GetComponent<GameSettingsMenu>();
-            gameSettingsMenu.Subscribe(this);
+            GameSettingsMenu = GetComponent<GameSettingsMenu>();
+            GameSettingsMenu.Subscribe(this);
 
         }
 
@@ -95,7 +95,7 @@ namespace Inputs
 
         #region Menu
 
-        private GameSettingsMenu gameSettingsMenu;
+        public GameSettingsMenu GameSettingsMenu {  get; private set; }
         public string MenuName { get; } = "Inputs";
         public int MenuColumnsCount { get; } = 3;
 
@@ -121,10 +121,10 @@ namespace Inputs
 
             if (GeneralInputs.TogglePauseMenu)
             {
-                gameSettingsMenu.ToggleMenu();
+                GameSettingsMenu.ToggleMenu();
             }
 
-            Scoreboard.Instance.SetDoRender(!gameSettingsMenu.DoRenderMenu && showScoreboardActive);
+            Scoreboard.Instance.SetDoRender(!GameSettingsMenu.DoRenderMenu && showScoreboardActive);
         }
 
         public void OnRenderMenu()
