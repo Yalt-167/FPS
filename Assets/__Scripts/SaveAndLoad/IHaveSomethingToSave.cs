@@ -1,4 +1,3 @@
-using Menus;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +8,8 @@ namespace SaveAndLoad
 {
     public interface IHaveSomethingToSave
     {
-        public SaveDataInfo[] SaveDataInfos { get; }
+        public IAmSomethingToSave[] DataToSave { get; }
+        public string[] SaveFilePaths { get; }
         public int AmountOfThingsToSave { get; }
 
         public bool Loaded { get; }
@@ -18,21 +18,22 @@ namespace SaveAndLoad
         public void Load();
         public IEnumerator InitWhenLoaded();
 
-#if !false
+#if false
+
+        public IAmSomethingToSave[] DataToSave { get; private set;}
+        public string[] SaveFilePaths { get; private set; }
+        public bool Loaded { get; private set; }
+
+
         public void Awake()
         {
-            Utility.CoroutineStarter.Instance.StartCoroutine(InitWhenLoaded());
+            DataToSave = new IAmSomethingToSave[] { Data1, Data2, ...};
+            SaveFilePaths = new string[] { "Data1Path", "Data2Path", ... };
+
+            Utility.CoroutineStarter.Instance. // if not in monobehaviour
+            StartCoroutine(InitWhenLoaded());
         }
 
-        public SaveDataInfo[] SaveDataInfos { get; } = new SaveDataInfo[]
-        {
-            new SaveDataInfo(Data1, typeof(Data1), "Data1Path"),
-            new SaveDataInfo(Data2, typeof(Data2), "Data2Path"),
-            new SaveDataInfo(..., typeof(...), "..."),
-        };
-
-        public bool Loaded { get; private set; }
-        public int AmountOfThingsToSave { get; }
         public IEnumerator InitWhenLoaded()
         {
             yield return new WaitUntil(() => Loaded);
@@ -40,36 +41,26 @@ namespace SaveAndLoad
             // your Init logic
         }
 
+
+        
+
         public void Save()
         {
             for (int dataIndex = 0; dataIndex < AmountOfThingsToSave; dataIndex++)
             {
-                SaveAndLoad.SaveAndLoad.Save(DataToSave[dataIndex].DataToSave, DataToSave[dataIndex].SaveFilePath);
+                SaveAndLoad.SaveAndLoad.Save(DataToSave[dataIndex], SaveFilePath[dataIndex]);
             }
         }
 
         public void Load()
         {
-            for (int dataIndex = 0; dataIndex < AmountOfThingsToSave; dataIndex++)
-            {
-                DataToSave[dataIndex].Datatype ? loadedInstance = (DataToSave[dataIndex].Datatype ?)SaveAndLoad.SaveAndLoad.Load(DataToSave[dataIndex].SaveFilePath);
-                
-            }
+        // repeat those two steps for each iteration 
+            YourDataStruct1? loadedInstance = (YourDataStruct1?)SaveAndLoad.SaveAndLoad.Load(SaveFilePath);
 
-            var success = loadedInstance != null;
-
-            BindsAndValues = (DataToSave[dataIndex].Datatype)(success ? loadedInstance : new DataToSave[dataIndex].Datatype().SetDefault());
-
-            if (!success)
-            {
-                BindsAndValues.MovementInputs.Init();
-                BindsAndValues.CombatInputs.Init();
-                BindsAndValues.GeneralInputs.Init();
-            }
+            yourActualVariable = (YourDataStruct1)(loadedInstance != null ? loadedInstance : new YourDataStruct1().SetDefault());
 
             Loaded = true;
         }
-
 #endif
     }
 }

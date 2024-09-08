@@ -18,15 +18,10 @@ namespace Inputs
 
         #region SaveAndLoad
 
-        #region Deprecated save
-        public IAmSomethingToSave DataToSave => BindsAndValues;
+        public IAmSomethingToSave[] DataToSave { get; private set; }
+        public string[] SaveFilePaths { get; private set; }
 
-
-
-        #endregion
         public int AmountOfThingsToSave { get; } = 1;
-        public SaveDataInfo[] SaveDataInfos { get; private set; };
-        public string SaveFilePath { get; } = "Keybinds";
         public bool Loaded { get; private set; }
 
         public IEnumerator InitWhenLoaded()
@@ -40,23 +35,14 @@ namespace Inputs
 
         public void Save()
         {
-            SaveAndLoad.SaveAndLoad.Save(DataToSave, SaveFilePath);
+            SaveAndLoad.SaveAndLoad.Save(DataToSave[0], SaveFilePaths[0]);
         }
 
         public void Load()
         {
-            InputManagerSaveablePart? loadedInstance = (InputManagerSaveablePart?)SaveAndLoad.SaveAndLoad.Load(SaveFilePath);
+            InputManagerSaveablePart? loadedInstance = (InputManagerSaveablePart?)SaveAndLoad.SaveAndLoad.Load(SaveFilePaths[0]);
 
-            var success = loadedInstance != null;
-
-            BindsAndValues = (InputManagerSaveablePart)(success ? loadedInstance : new InputManagerSaveablePart().SetDefault());
-
-            //if (!success)
-            //{
-            //    BindsAndValues.MovementInputs.Init();
-            //    BindsAndValues.CombatInputs.Init();
-            //    BindsAndValues.GeneralInputs.Init();
-            //}
+            BindsAndValues = (InputManagerSaveablePart)(loadedInstance != null ? loadedInstance : new InputManagerSaveablePart().SetDefault());
 
             Loaded = true;
         }
@@ -109,10 +95,8 @@ namespace Inputs
 
         public void Awake()
         {
-            SaveDataInfos = new SaveDataInfo[1]
-            {
-                new SaveDataInfo(BindsAndValues, BindsAndValues.GetType(), "Keybinds"),
-            };
+            DataToSave = new IAmSomethingToSave[1] { BindsAndValues };
+            SaveFilePaths = new string[1] { "Keybinds" };
 
             StartCoroutine(InitWhenLoaded());
         }
