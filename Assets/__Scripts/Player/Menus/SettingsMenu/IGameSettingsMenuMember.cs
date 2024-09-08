@@ -10,7 +10,7 @@ namespace Menus
     {
         public string MenuName { get; }
 
-        public int MenuTabsCount { get; }
+        public int MenuColumnsCount { get; }
 
         public void OnRenderMenu();
     }

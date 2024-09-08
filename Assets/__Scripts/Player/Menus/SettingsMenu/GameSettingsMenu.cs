@@ -13,7 +13,7 @@ namespace Menus
         private readonly List<IGameSettingsMenuMember> menus = new();
         private bool doRenderMenu;
         public bool DoRenderMenu => doRenderMenu;
-        private int maxMenuTabs;
+        private int maxMenuColumns;
 
         private int currentMenuIndex;
 
@@ -21,7 +21,7 @@ namespace Menus
         {
             menus.Add(menu);
 
-            maxMenuTabs = maxMenuTabs < menu.MenuTabsCount ? menu.MenuTabsCount : maxMenuTabs;
+            maxMenuColumns = maxMenuColumns < menu.MenuColumnsCount ? menu.MenuColumnsCount : maxMenuColumns;
         }
 
         public void ToggleMenu()
@@ -51,7 +51,7 @@ namespace Menus
 
             GUILayout.FlexibleSpace();
 
-            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(maxMenuTabs * MenuData.SubMenuTabWidth));
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(MenuData.GameSettingsMenuWidth));
 
             for (int i = 0; i < menus.Count; i++)
             {
