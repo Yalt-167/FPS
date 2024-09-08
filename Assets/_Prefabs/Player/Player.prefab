@@ -1414,6 +1414,8 @@ GameObject:
   - component: {fileID: 3274016814467245242}
   - component: {fileID: 3018800575568115996}
   - component: {fileID: 1547610708643055703}
+  - component: {fileID: 2461466814386011735}
+  - component: {fileID: 7891554514326042408}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1537,6 +1539,8 @@ MonoBehaviour:
     - {fileID: 3274016814467245242}
     - {fileID: 3018800575568115996}
     - {fileID: 1547610708643055703}
+    - {fileID: 2461466814386011735}
+    - {fileID: 7891554514326042408}
     gameObjectsToKill:
     - {fileID: 3467822551731792150}
     - {fileID: 4356166339693058417}
@@ -1907,112 +1911,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ee0a4aca436e4c458c62e769296a3dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BindsAndValues:
-    MovementInputs:
-      Forward:
-        RelevantKey: 122
-        inputType: 0
-        holdForSeconds: 0
-      Back:
-        RelevantKey: 115
-        inputType: 0
-        holdForSeconds: 0
-      Right:
-        RelevantKey: 100
-        inputType: 0
-        holdForSeconds: 0.5
-      Left:
-        RelevantKey: 113
-        inputType: 0
-        holdForSeconds: 0.5
-      Jump:
-        RelevantKey: 32
-        inputType: 0
-        holdForSeconds: 0
-      Dash:
-        RelevantKey: 57
-        inputType: 0
-        holdForSeconds: 0
-      Slide:
-        RelevantKey: 304
-        inputType: 0
-        holdForSeconds: 0
-      GrapplingHook:
-        RelevantKey: 32
-        inputType: 0
-        holdForSeconds: 0
-      HoldCrouch:
-        RelevantKey: 306
-        inputType: 2
-        holdForSeconds: 0
-      SwitchCameraPosition:
-        RelevantKey: 119
-        inputType: 0
-        holdForSeconds: 0
-      QuickReset:
-        RelevantKey: 120
-        inputType: 0
-        holdForSeconds: 0.5
-    CombatInputs:
-      Shoot:
-        RelevantKey: 323
-        inputType: 2
-        holdForSeconds: 0
-      Aim:
-        RelevantKey: 324
-        inputType: 2
-        holdForSeconds: 0
-      Reload:
-        RelevantKey: 114
-        inputType: 0
-        holdForSeconds: 0
-      FirstGun:
-        RelevantKey: 49
-        inputType: 0
-        holdForSeconds: 0
-      SecondGun:
-        RelevantKey: 50
-        inputType: 0
-        holdForSeconds: 0
-      ThirdGun:
-        RelevantKey: 51
-        inputType: 0
-        holdForSeconds: 0
-      PrimaryAbility:
-        RelevantKey: 0
-        inputType: 0
-        holdForSeconds: 0
-      SecondaryAbility:
-        RelevantKey: 0
-        inputType: 0
-        holdForSeconds: 0
-      Ultimate:
-        RelevantKey: 0
-        inputType: 0
-        holdForSeconds: 0
-      Slash:
-        RelevantKey: 0
-        inputType: 0
-        holdForSeconds: 0
-      Parry:
-        RelevantKey: 0
-        inputType: 0
-        holdForSeconds: 0
-    GeneralInputs:
-      TogglePauseMenu:
-        RelevantKey: 27
-        inputType: 0
-        holdForSeconds: 0
-      ShowScoreboard:
-        RelevantKey: 9
-        inputType: 4
-        holdForSeconds: 0
-      CycleScoreboardSortMode:
-        RelevantKey: 313
-        inputType: 0
-        holdForSeconds: 0
-    CameraHorizontalSensitivity: 0
-    CameraVerticalSensitivity: 0
 --- !u!114 &3018800575568115996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2035,6 +1933,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f661af135bf7c0e42b4fd891386b663a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2461466814386011735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5705630700605972737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e33bc6b1f3ddc045a39c419323ea6b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7891554514326042408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5705630700605972737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5df6c80d4c7f0774eb0f5159da10a390, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &5814794369634734712

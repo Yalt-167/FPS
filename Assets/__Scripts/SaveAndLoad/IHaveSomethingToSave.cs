@@ -4,11 +4,12 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
+using MyCollections;
 namespace SaveAndLoad
 {
     public interface IHaveSomethingToSave
     {
-        public IAmSomethingToSave[] DataToSave { get; }
+        public IAmSomethingToSave[] DataToSave { get; } 
         public string[] SaveFilePaths { get; }
         public int AmountOfThingsToSave { get; }
 
