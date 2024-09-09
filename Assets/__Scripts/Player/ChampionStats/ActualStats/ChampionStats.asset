@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MovementStats:
     SpeedStats:
-      RunningSpeed: 13
+      RunningSpeed: 18
       StrafingSpeedCoefficient: 0.75
-      BackwardSpeed: 5
-      WallRunningSpeed: 13
+      BackwardSpeed: 13
+      WallRunningSpeed: 20
     JumpStats:
       JumpForce: 1080
       SideWallJumpForce: 0

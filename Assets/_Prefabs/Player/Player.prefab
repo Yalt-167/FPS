@@ -1505,7 +1505,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 169908227
+  GlobalObjectIdHash: 2957232829
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1694,7 +1694,7 @@ MonoBehaviour:
   maxRunCameraTiltSpeed: 1
   runCameraTiltRegulationSpeed: 5
   slideTiltOnRight: 1
-  maxSlideCameraTiltAngle: 10
+  maxSlideCameraTiltAngle: 5
   slideCameraTiltSpeed: 1
   slideCameraTiltRegulationSpeed: 5
   dashCameraTiltCurve:

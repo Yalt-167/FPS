@@ -394,6 +394,7 @@ namespace Controller
             _ = InputQuery.Right[InputType.OnKeyHeldForTime];
             _ = InputQuery.QuickReset;
             _ = InputQuery.Slide[InputType.OnKeyHeld];
+            _ = InputQuery.Jump[InputType.OnKeyHeld];
             _ = InputQuery.HoldCrouch;
 
             currentMovementMethod();
@@ -686,11 +687,15 @@ namespace Controller
         private IEnumerator ResetJumping()
         {
             yield return new WaitUntil(
-                    () => Rigidbody.velocity.y < 0f || forceResetJumping
+                    () => Rigidbody.velocity.y <= 0f || forceResetJumping || InputQuery.Jump[InputType.OnKeyUp]
                 );
 
             //print($"Stopped jumping {Rigidbody.velocity.y < 0f} || {forceResetJumping}");
-
+            if (InputQuery.Jump[InputType.OnKeyUp])
+            {
+                Rigidbody.velocity = Rigidbody.velocity.Mask(1f, 0f, 1f);
+                Debug.Log("Set to 0");
+            }
             forceResetJumping = false;
             IsJumping = false;
         }
@@ -869,8 +874,7 @@ namespace Controller
                     break;
 
                 case Direction.ForwardRight:
-                    hasSthToStepOn = frontStepCheck.AddCast(groundLayers, ref colliders);
-                    hasSthToStepOn |= rightStepCheck.AddCast(groundLayers, ref colliders);
+                    hasSthToStepOn = frontStepCheck.AddCast(groundLayers, ref colliders) || rightStepCheck.AddCast(groundLayers, ref colliders);
                     break;
 
                 case Direction.Right:
@@ -878,8 +882,7 @@ namespace Controller
                     break;
 
                 case Direction.BackwardRight:
-                    hasSthToStepOn = backStepCheck.AddCast(groundLayers, ref colliders);
-                    hasSthToStepOn |= rightStepCheck.AddCast(groundLayers, ref colliders);
+                    hasSthToStepOn = backStepCheck.AddCast(groundLayers, ref colliders) || rightStepCheck.AddCast(groundLayers, ref colliders);
                     break;
 
                 case Direction.Backward:
@@ -887,8 +890,7 @@ namespace Controller
                     break;
 
                 case Direction.BackwardLeft:
-                    hasSthToStepOn = backStepCheck.AddCast(groundLayers, ref colliders);
-                    hasSthToStepOn |= leftStepCheck.AddCast(groundLayers, ref colliders);
+                    hasSthToStepOn = backStepCheck.AddCast(groundLayers, ref colliders) || leftStepCheck.AddCast(groundLayers, ref colliders);
                     break;
 
                 case Direction.Left:
@@ -896,8 +898,7 @@ namespace Controller
                     break;
 
                 case Direction.ForwardLeft:
-                    hasSthToStepOn = frontStepCheck.AddCast(groundLayers, ref colliders);
-                    hasSthToStepOn |= leftStepCheck.AddCast(groundLayers, ref colliders);
+                    hasSthToStepOn = frontStepCheck.AddCast(groundLayers, ref colliders) || leftStepCheck.AddCast(groundLayers, ref colliders);
                     break;
 
                 case Direction.None:
