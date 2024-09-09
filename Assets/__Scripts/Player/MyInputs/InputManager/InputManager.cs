@@ -37,10 +37,6 @@ namespace Inputs
         public IEnumerator InitWhenLoaded()
         {
             yield return new WaitUntil(() => Loaded);
-
-            GameSettingsMenu = GetComponent<GameSettingsMenu>();
-            GameSettingsMenu.Subscribe(this);
-
         }
 
         public void Save()
@@ -107,6 +103,9 @@ namespace Inputs
         {
             DataToSave = new IAmSomethingToSave[1] { new KeybindsSave() };
             SaveFilePaths = new string[1] { "Keybinds" };
+
+            GameSettingsMenu = GetComponent<GameSettingsMenu>();
+            GameSettingsMenu.Subscribe(this);
 
             StartCoroutine(InitWhenLoaded());
         }
