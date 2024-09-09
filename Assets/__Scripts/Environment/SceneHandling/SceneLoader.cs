@@ -18,6 +18,11 @@ namespace SceneHandling
             Instance = this;
         }
 
+        private void Start()
+        {
+            LoadSceneAsync("_Scenes/DebugOverlay", true);
+        }
+
         public  void LoadSceneAsync(string scene, bool additive)
         {
             if (SceneMissing(scene)) { return; }
