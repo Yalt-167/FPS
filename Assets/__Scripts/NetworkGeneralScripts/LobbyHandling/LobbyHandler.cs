@@ -1591,7 +1591,7 @@ namespace LobbyHandling
                 GUILayout.BeginHorizontal(); // H-VH
 
                 GUI.enabled = !isSigningIn;
-                if (GUILayout.Button(isSigningIn ? LobbyGUILabels.SigningIn : LobbyGUILabels.SignInButtonText) || Input.GetKeyDown(KeyCode.Return))
+                if (GUILayout.Button(isSigningIn ? LobbyGUILabels.SigningIn : LobbyGUILabels.SignInButtonText) || Input.GetKeyDown(KeyCode.Return) && !isSigningIn)
                 {
                     SignIn();
                 }
