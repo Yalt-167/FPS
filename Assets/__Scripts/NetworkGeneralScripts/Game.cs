@@ -192,7 +192,7 @@ namespace GameManagement
         [Rpc(SendTo.ClientsAndHost)]
         private void LoadMapClientRpc(string map)
         {
-            SceneLoader.Instance.LoadSceneAsync(map, additive: false);
+            SceneLoader.Instance.LoadScene(map, additive: false);
         }
 
         #endregion

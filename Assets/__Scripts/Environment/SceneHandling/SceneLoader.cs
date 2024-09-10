@@ -1,3 +1,5 @@
+#define DEV_BUILD
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,28 +16,44 @@ namespace SceneHandling
         private readonly List<string> loadedScenes = new();
         private readonly List<int> loadedScenesIndexes = new();
 
+        #region GUI variables
+
+        public string SceneName;
+        public bool Additive;
+
+        #endregion
+
         private void Awake()
         {
             Instance = this;
+#if DEV_BUILD
+            LoadScene("_Scenes/DebugOverlay", true);
+#endif
         }
 
-        private void Start()
+        public static void DebugLoadedScenes()
         {
-            //LoadSceneAsync("_Scenes/DebugOverlay", true);
-            LoadSceneAsync(2, true);
+            var sceneCount = SceneManager.sceneCount;
+            Debug.Log(sceneCount);
+            for (int sceneIndex = 0; sceneIndex < sceneCount; sceneIndex++)
+            {
+                var scene = SceneManager.GetSceneAt(sceneIndex);
+                Debug.Log(scene.name);
+                Debug.Log(scene.path);
+            }
         }
 
-        public  void LoadSceneAsync(string scene, bool additive)
+        public void LoadScene(string scenePath, bool additive)
         {
-            if (SceneMissing(scene)) { return; }
+            //if (SceneInvalid(scenePath)) { return; }
 
-            if (loadedScenes.Contains(scene)) { return; }
+            if (loadedScenes.Contains(scenePath)) { return; }
 
-            StartCoroutine(LoadSceneAsyncInternal(scene, additive));
+            StartCoroutine(LoadSceneAsyncInternal(scenePath, additive));
         }
-        public void LoadSceneAsync(int sceneIndex, bool additive)
+        public void LoadScene(int sceneIndex, bool additive)
         {
-            if (SceneMissing(sceneIndex)) { return; }
+            //if (SceneMissing(sceneIndex)) { return; }
 
             if (loadedScenesIndexes.Contains(sceneIndex)) { return; }
 
@@ -65,7 +83,7 @@ namespace SceneHandling
             loadedScenesIndexes.Add(sceneIndex);
         }
 
-        public void UnloadSceneAsync(string scene)
+        public void UnloadScene(string scene)
         {
             if (!loadedScenes.Contains(scene)) { return; }
 
@@ -82,33 +100,6 @@ namespace SceneHandling
             }
 
             loadedScenes.Remove(scene);
-        }
-
-        private bool SceneMissing(string scene)
-        {
-            if (SceneManager.GetSceneByName(scene).IsValid())
-            {
-                return false;
-            }
-            else
-            {
-                Debug.Log($"Tried loading the scene: {scene} however it doesn t exist or isn t registered");
-                return true;
-            }
-        }
-        private bool SceneMissing(int sceneIndex)
-        {
-            var scene = SceneManager.GetSceneByBuildIndex(sceneIndex);
-            if (scene.IsValid())
-            {
-                Debug.Log(scene.path);
-                return false;
-            }
-            else
-            {
-                Debug.Log($"Tried loading the scene: {sceneIndex} however it doesn t exist or isn t registered");
-                return true;
-            }
         }
     }
 }
