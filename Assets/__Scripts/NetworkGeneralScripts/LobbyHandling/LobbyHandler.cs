@@ -716,7 +716,7 @@ namespace LobbyHandling
             Game.Manager.ToggleLobbyMenuServerRpc(towardOn: false);
             Game.Manager.CreatePlayerListServerRpc();
             GameNetworkManager.Manager.SpawnTeamSelectionMenu(2, 6); // as it s a network spawn its automatically propagated to all clients
-            Game.Manager.LoadMapServerRpc(mapsDropDown.Current);
+            Game.Manager.LoadMapServerRpc($"_Scenes/{gameModesDropDown.Current}/{mapsDropDown.Current}");
         }
 
         #endregion
