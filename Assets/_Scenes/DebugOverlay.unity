@@ -152,6 +152,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4fb35fbc3f5271498397e54974987f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  active: 0
+  debugRect: {x: 150, y: 150, z: 250, w: 250}
 --- !u!4 &1489308845
 Transform:
   m_ObjectHideFlags: 0
