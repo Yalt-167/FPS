@@ -50,25 +50,8 @@ public static class Extensions
         );
     }
 
-    /// <summary>
-    /// Make sure to ASSIGN it to the vector you want<br/>
-    /// otherwise it will NOT take effect due to Vector3 being a struct (value type)
-    /// </summary>
-    /// <param name="currentVector"></param>
-    /// <param name="x"></param>
-    /// <returns></returns>
-    public static Vector3 MultiplyX(this Vector3 currentVector, float x)
+    public static Rect ToRect(this Vector4 currentVector)
     {
-        return new(currentVector.x * x, currentVector.y, currentVector.z);
-    }
-
-    public static Vector3 MultiplyY(this Vector3 currentVector, float y)
-    {
-        return new(currentVector.x, currentVector.y * y, currentVector.z);
-    }
-
-    public static Vector3 MultiplyZ(this Vector3 currentVector, float z)
-    {
-        return new Vector3(currentVector.x, currentVector.y, currentVector.z * z);
+        return new Rect(currentVector.x, currentVector.y, currentVector.z, currentVector.w);
     }
 }
