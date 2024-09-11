@@ -8,14 +8,12 @@ using UnityEngine;
 namespace MyDebug
 {
     [DefaultExecutionOrder(int.MaxValue)]
-    public sealed class OnScreenInfoDisplay : MonoBehaviour
+    public sealed class DebugOSD : MonoBehaviour
     {
-        public static OnScreenInfoDisplay Instance { get; private set; }
+        public static DebugOSD Instance { get; private set; }
 
         [SerializeField] private bool active;
-        [SerializeField] private Vector4 debugRect;
-        [SerializeField] private int indentWidth;
-        [SerializeField] private int verticalMarging;
+        private Vector4 debugRect = new Vector4(5, 5, 500, 500);
         private readonly Dictionary<string, string> debuggerEntries = new Dictionary<string, string>();
 
 
@@ -29,41 +27,47 @@ namespace MyDebug
             active = Input.GetKeyDown(KeyCode.F3) ? !active : active;
         }
 
-        private void LateUpdate()
-        {
-            debuggerEntries.Clear();
-        }
-
-
         private void OnGUI()
         {
             if (!active) { return; }
 
             GUI.BeginGroup(debugRect.ToRect());
             GUILayout.BeginVertical(GUI.skin.box);
-            GUILayout.Space(indentWidth);
-            GUILayout.Label("W Content");
-            GUILayout.Space(indentWidth);
-            GUILayout.Label("W Content");
-            foreach (KeyValuePair<string, string> entry in debuggerEntries)
+
+            if (debuggerEntries.Count == 0)
             {
-                GUILayout.Label($"{entry.Key}: {entry.Value}");
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("No tracked value RN");
+                GUILayout.EndHorizontal();
+            }
+            else
+            {
+                foreach (KeyValuePair<string, string> entry in debuggerEntries)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label($"{entry.Key}: {entry.Value}");
+                    GUILayout.EndHorizontal();
+                }
             }
 
             GUILayout.EndVertical();
             GUI.EndGroup();
         }
 
-        public static void Debug(string key, string value)
+        public static void Queue(object key, object value)
         {
+            Debug.Log(Instance);
+
             if (Instance == null) { return; }
 
-            Instance.DebugInternal(key, value);
+            Instance.QueueInternal(key.ToString(), value.ToString());
         }
 
-        public void DebugInternal(string key, string value)
+        public void QueueInternal(string key, string value)
         {
             if (!active) { return; }
+
+            Debug.Log("Queued");
 
             debuggerEntries[key] = value;
         }

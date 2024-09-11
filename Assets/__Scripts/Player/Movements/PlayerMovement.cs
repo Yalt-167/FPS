@@ -407,6 +407,8 @@ namespace Controller
             GlobalVelocityDebug = new(Rigidbody.velocity);
             CollisionDebug = new(isCollidingUp, isCollidingDown, isCollidingRight, isCollidingLeft, isCollidingOnAnySide);
 
+            MyDebug.DebugOSD.Queue("Velocity", Rigidbody.velocity);
+
             HandleWhenAtBottomOfMap();
         }
 
