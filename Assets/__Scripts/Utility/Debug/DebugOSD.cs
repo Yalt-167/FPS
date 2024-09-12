@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+
 namespace MyDebug
 {
     [DefaultExecutionOrder(int.MaxValue)]
@@ -12,8 +13,8 @@ namespace MyDebug
     {
         public static DebugOSD Instance { get; private set; }
 
-        [SerializeField] private bool active;
-        private Vector4 debugRect = new Vector4(5, 5, 500, 500);
+        private bool active;
+        private Vector4 debugBounds = new Vector4(5, 5, 500, 500);
         private readonly Dictionary<string, string> debuggerEntries = new Dictionary<string, string>();
 
 
@@ -31,45 +32,83 @@ namespace MyDebug
         {
             if (!active) { return; }
 
-            GUI.BeginGroup(debugRect.ToRect());
+            GUI.BeginGroup(debugBounds.ToRect());
             GUILayout.BeginVertical(GUI.skin.box);
 
-            if (debuggerEntries.Count == 0)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("No tracked value RN");
-                GUILayout.EndHorizontal();
-            }
-            else
-            {
-                foreach (KeyValuePair<string, string> entry in debuggerEntries)
-                {
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label($"{entry.Key}: {entry.Value}");
-                    GUILayout.EndHorizontal();
-                }
-            }
+            _ = debuggerEntries.Count == 0 ? DebugEmpty() : DebugNotEmpty();
 
             GUILayout.EndVertical();
             GUI.EndGroup();
         }
 
-        public static void Queue(object key, object value)
+        private object DebugEmpty()
         {
-            Debug.Log(Instance);
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("No tracked value RN");
+            GUILayout.EndHorizontal();
 
-            if (Instance == null) { return; }
-
-            Instance.QueueInternal(key.ToString(), value.ToString());
+            return null;
         }
 
-        public void QueueInternal(string key, string value)
+        private object DebugNotEmpty()
+        {
+            foreach (KeyValuePair<string, string> entry in debuggerEntries)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label($"{entry.Key}: {entry.Value}");
+                GUILayout.EndHorizontal();
+            }
+
+            return null;
+        }
+
+        public static void Display(object key, object value)
+        {
+            if (Instance == null) { return; }
+
+            Instance.DisplayInternal(key.ToString(), value.ToString());
+        }
+
+        public void DisplayInternal(string key, string value)
         {
             if (!active) { return; }
 
-            Debug.Log("Queued");
-
             debuggerEntries[key] = value;
         }
+
+        public static void DisplayForTime(object key, object value, float durationInSeconds)
+        {
+            if (Instance == null) { return; }
+
+            Instance.DisplayForTimeInternal(key.ToString(), value.ToString(), durationInSeconds);
+        }
+
+        public static void DisplayForTime(object key, object value, DisplayDurationTypesInMS duration)
+        {
+            if (Instance == null) { return; }
+
+            Instance.DisplayForTimeInternal(key.ToString(), value.ToString(), (int)duration / 1000);
+        }
+
+        public void DisplayForTimeInternal(string key, string value, float durationInSeconds)
+        {
+            if (!active) { return; }
+
+            debuggerEntries[key] = value;
+            StartCoroutine(QueueDataDeletion(key, durationInSeconds));
+        }
+
+        private IEnumerator QueueDataDeletion(string dataKey, float duration)
+        {
+            yield return new WaitForSeconds(duration);
+
+            debuggerEntries.Remove(dataKey);
+        }
+        public enum DisplayDurationTypesInMS
+        {
+            Brief = 1200,
+            Long = 2400
+        }
     }
+
 }
