@@ -1280,6 +1280,7 @@ namespace Controller
         private IEnumerator ClimbLedge(Vector3 ledgePosition) // on slanted ground the lower ledge climb check can collide and not the upper so fix that (test buffing the upper cast width)
         {
             SetMovementMode(MovementMode.LedgeClimb);
+            forceResetJumping = true;
             Rigidbody.velocity = Vector3.zero;
 
             var elapsedTime = 0f;
@@ -1326,6 +1327,7 @@ namespace Controller
             if (!HasControls || !InputQuery.Forward[InputType.OnKeyHeld] || InputQuery.Back[InputType.OnKeyHeld] || !CanWallRunAfterDash) { yield break; }
 
             SetMovementMode(MovementMode.Wallrun);
+            forceResetJumping = true; // the ResetYVelocty() call beneath should do it too but better safe than sorry
             ResetYVelocity();
 
             onRight = side > 0;
@@ -1757,7 +1759,7 @@ namespace Controller
 
 
         #endregion
-
+        
         private void OnDrawGizmosSelected()
         {
             if (doDebugCollidingDown)
