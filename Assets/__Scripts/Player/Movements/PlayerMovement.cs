@@ -1192,7 +1192,7 @@ namespace Controller
 
             if (slid)
             {
-                CommonDashExit();
+                CommonDashExit(MovementMode.Slide);
                 StartCoroutine(Slide());
                 yield break;
             }
@@ -1217,20 +1217,13 @@ namespace Controller
 
         private void CommonDashExit(MovementMode newMovementMode)
         {
-            followRotationCamera.enabled = true;
-            timeDashEnded = Time.time;
-            ResetYVelocity();
-            SetMovementMode(newMovementMode);
-            StartCoroutine(StartDashCooldown());
-        }
-
-        private void CommonDashExit()
-        {
             IsDashing = false;
 
             followRotationCamera.enabled = true;
             timeDashEnded = Time.time;
             ResetYVelocity();
+
+            SetMovementMode(newMovementMode);
             StartCoroutine(StartDashCooldown());
         }
 
