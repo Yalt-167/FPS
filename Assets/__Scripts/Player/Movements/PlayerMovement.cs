@@ -13,7 +13,6 @@ using Inputs;
 
 namespace Controller
 {
-
     [DefaultExecutionOrder(-7)]
     public sealed class PlayerMovement : MonoBehaviour
         //, IPlayerFrameMember
@@ -42,9 +41,9 @@ namespace Controller
         private MovementInputQuery InputQuery => inputManager.MovementInputs;
         private Rigidbody Rigidbody;
         private FollowRotationCamera followRotationCamera;
-        private int ForwardAxisInput => hasControls ? MyInput.GetAxis(InputQuery.Back[InputType.OnKeyHeld], InputQuery.Forward[InputType.OnKeyHeld]) : 0;
-        private int SidewayAxisInput => hasControls ? MyInput.GetAxis(InputQuery.Left[InputType.OnKeyHeld], InputQuery.Right[InputType.OnKeyHeld]) : 0;
-        private bool PressingForwardOrStrafeInput => hasControls && InputQuery.Forward[InputType.OnKeyHeld] || InputQuery.Left[InputType.OnKeyHeld] || InputQuery.Right[InputType.OnKeyHeld];
+        private int ForwardAxisInput => HasControls ? MyInput.GetAxis(InputQuery.Back[InputType.OnKeyHeld], InputQuery.Forward[InputType.OnKeyHeld]) : 0;
+        private int SidewayAxisInput => HasControls ? MyInput.GetAxis(InputQuery.Left[InputType.OnKeyHeld], InputQuery.Right[InputType.OnKeyHeld]) : 0;
+        private bool PressingForwardOrStrafeInput => HasControls && (InputQuery.Forward[InputType.OnKeyHeld] || InputQuery.Left[InputType.OnKeyHeld] || InputQuery.Right[InputType.OnKeyHeld]);
         public Vector3 Position => transform.position;
         public Vector3 FeetPosition => transform.position + Vector3.down;
         public float CurrentSpeed => Rigidbody.velocity.Mask(1f, 0f, 1f).magnitude;
@@ -53,13 +52,13 @@ namespace Controller
         public float CurrentVerticalSpeed => Rigidbody.velocity.y;
 
         private MovementMode currentMovementMode;
-        private bool hasControls = true;
+        private bool HasControls { get; set; } = true;
 
         #region State
 
         private bool IsJumping { get; set; }
         private bool IsRunning => currentMovementMode == MovementMode.Run;
-        private bool IsSprinting => hasControls && !InputQuery.HoldCrouch && PressingForwardOrStrafeInput;
+        private bool IsSprinting => !InputQuery.HoldCrouch && PressingForwardOrStrafeInput;
         private bool IsCrouching { get; set; }
         private bool IsSliding => currentMovementMode == MovementMode.Slide;
         private bool IsDashing => currentMovementMode == MovementMode.Dash;
@@ -86,10 +85,9 @@ namespace Controller
         [SerializeField] private float timeToReachMaxSprintSpeed;
         private float targetSpeed;
         [SerializeField] private float airFriction;
-        private float CroouchingSpeed => RunningSpeed * .25f;
+        private float CrouchingSpeed => RunningSpeed * .25f;
         private float RunningSpeed => PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.SpeedStats.RunningSpeed ?? 8f;
-        private float SpeedDifferenceBetweenWalkingAndSprinting => RunningSpeed - CroouchingSpeed;
-        //private float StrafingSpeed => PlayerFrame?.ChampionStats.MovementStats.SpeedStats.StrafingSpeed ?? 7f;
+        private float SpeedDifferenceBetweenWalkingAndSprinting => RunningSpeed - CrouchingSpeed;
         private float StrafingSpeedCoefficient => PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.SpeedStats.StrafingSpeedCoefficient ?? .75f;
         private float BackwardSpeed => PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.SpeedStats.BackwardSpeed ?? 5f;
         private float WallRunSpeed => PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.SpeedStats.WallRunningSpeed ?? 9f;
@@ -157,7 +155,6 @@ namespace Controller
         [SerializeField] private float initialJumpSpeedBoost;
         private float JumpForce => PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.JumpStats.JumpForce ?? 1080f;
         private float timeLeftGround;
-        [SerializeField] private Vector3 longJumpForce;
 
         [SerializeField] private float terminalVelocity = -75f;
 
@@ -166,11 +163,13 @@ namespace Controller
         private bool coyoteUsable;
 
         private float lastJumpPressed = float.NegativeInfinity;
-        private bool CanUseCoyote => coyoteUsable && !isCollidingDown && timeLeftGround + coyoteTimeThreshold > Time.time;
+        private bool CanUseCoyote => !IsJumping && coyoteUsable && !isCollidingDown && timeLeftGround + coyoteTimeThreshold > Time.time;
         private bool HasBufferedJump => isCollidingDown && lastJumpPressed + jumpBuffer > Time.time;
 
-        private bool ShouldLongJump => hasControls && DashUsable && InputQuery.Dash && InputQuery.Forward[InputType.OnKeyHeld];
+        private bool ShouldLongJump => HasControls && DashUsable && InputQuery.Dash && InputQuery.Forward[InputType.OnKeyHeld];
         private bool forceResetJumping;
+
+
         #endregion
 
         #region Dash Setup
@@ -389,7 +388,7 @@ namespace Controller
             // (otherwise the CheckKeyHeld() might never be called and the key might just be seen as pressed forever;
             // this is true for each key with an exoected long lasting effects namely:
             // HoldForTime -> may miss the frame where stopped holding if it was nt checked this frame
-            // Toggle -> may misss the frame where toggled it if it was nt checked this frame
+            // Toggle -> may miss the frame where toggled it if it was nt checked this frame
             _ = InputQuery.Left[InputType.OnKeyHeldForTime];
             _ = InputQuery.Right[InputType.OnKeyHeldForTime];
             _ = InputQuery.QuickReset;
@@ -401,13 +400,14 @@ namespace Controller
             currentCameraHandlingMethod();
             TryReplenishDash();
 
-            if (hasControls && InputQuery.SwitchCameraPosition) { SwitchCameraPosition(); }
+            if (HasControls && InputQuery.SwitchCameraPosition) { SwitchCameraPosition(); }
 
             LocalVelocityDebug = new(transform.InverseTransformDirection(Rigidbody.velocity));
             GlobalVelocityDebug = new(Rigidbody.velocity);
             CollisionDebug = new(isCollidingUp, isCollidingDown, isCollidingRight, isCollidingLeft, isCollidingOnAnySide);
 
-            MyDebug.DebugOSD.Queue("Velocity", Rigidbody.velocity);
+            MyDebug.DebugOSD.Display("Velocity", Rigidbody.velocity);
+            MyDebug.DebugOSD.Display("MovementMode", currentMovementMode);
 
             HandleWhenAtBottomOfMap();
         }
@@ -487,7 +487,7 @@ namespace Controller
 
         public void SetControls(bool towardOn)
         {
-            hasControls = towardOn;
+            HasControls = towardOn;
         }
 
         #region Action Buffering 
@@ -612,11 +612,11 @@ namespace Controller
         {
             if (IsJumping) { return (false, false); }
 
-            if (hasControls && InputQuery.Jump[InputType.OnKeyDown])
+            if (HasControls && InputQuery.Jump[InputType.OnKeyDown])
             {
                 lastJumpPressed = Time.time; // for jump buffer
 
-                if (CanUseCoyote && coyoteThresholdAllowed || isCollidingDown)
+                if (isCollidingDown || CanUseCoyote && coyoteThresholdAllowed)
                 {
                     //Jump(true);
                     return (true, true);
@@ -625,7 +625,7 @@ namespace Controller
             else if (HasBufferedJump)
             {
                 //Jump(inputQuery.HoldJump);
-                return (true, hasControls && InputQuery.Jump[InputType.OnKeyHeld]);
+                return (true, HasControls && InputQuery.Jump[InputType.OnKeyHeld]);
             }
 
             return (false, false);
@@ -644,26 +644,18 @@ namespace Controller
 
             ResetYVelocity();
 
-            if (hasControls && InputQuery.Forward[InputType.OnKeyHeld])
+            if (HasControls && InputQuery.Forward[InputType.OnKeyHeld])
             {
                 Rigidbody.AddForce(initialJumpSpeedBoost * transform.forward, ForceMode.Impulse);
             }
         }
 
-        private void Jump(bool fullJump, bool longJump)
+        private void Jump(bool fullJump)
         {
             CommonJumpStart();
 
-            if (longJump)
-            {
-                Rigidbody.AddForce(longJumpForce, ForceMode.Impulse);
-            }
-            else
-            {
-                Rigidbody.AddForce((fullJump ? JumpForce : JumpForce / 2) * Vector3.up, ForceMode.Impulse);
-            }
-
-
+            Rigidbody.AddForce((fullJump ? JumpForce : JumpForce / 2) * Vector3.up, ForceMode.Impulse);
+            
             StartCoroutine(ResetJumping());
         }
 
@@ -671,7 +663,7 @@ namespace Controller
         {
             var jumpActionParam = (JumpActionParam)param;
 
-            Jump(jumpActionParam.FullJump, jumpActionParam.LongJump);
+            //Jump(jumpActionParam.FullJump, jumpActionParam.LongJump);
         }
 
         private void WallJump(bool towardRight, bool awayFromWall)
@@ -688,16 +680,18 @@ namespace Controller
 
         private IEnumerator ResetJumping()
         {
+            yield return new WaitForFixedUpdate();
+
             yield return new WaitUntil(
-                    () => Rigidbody.velocity.y <= 0f || forceResetJumping || InputQuery.Jump[InputType.OnKeyUp]
+                    () =>  Rigidbody.velocity.y <= 0f || forceResetJumping || InputQuery.Jump[InputType.OnKeyUp]
                 );
 
-            //print($"Stopped jumping {Rigidbody.velocity.y < 0f} || {forceResetJumping}");
+            //Debug.Log($"Stopped jumping {Rigidbody.velocity.y <= 0f} || {forceResetJumping} || {InputQuery.Jump[InputType.OnKeyUp]}");
             if (InputQuery.Jump[InputType.OnKeyUp])
             {
-                Rigidbody.velocity = Rigidbody.velocity.Mask(1f, 0f, 1f);
-                Debug.Log("Set to 0");
+                Rigidbody.velocity = Rigidbody.velocity.Mask(1f, .5f, 1f);
             }
+
             forceResetJumping = false;
             IsJumping = false;
         }
@@ -719,17 +713,17 @@ namespace Controller
             var (shouldJump, shouldBeFullJump) = ShouldJump(true);
             if (shouldJump)
             {
-                Jump(shouldBeFullJump, ShouldLongJump);
+                Jump(shouldBeFullJump);
                 return;
             }
 
-            if (hasControls && DashUsable && InputQuery.Dash)
+            if (HasControls && DashUsable && InputQuery.Dash)
             {
                 StartCoroutine(Dash());
                 return;
             }
 
-            if (hasControls && InputQuery.Slide[InputType.OnKeyDown] && CurrentSpeed != 0f) // HoldSlide or InitiateSlide ? -> run some tests
+            if (HasControls && InputQuery.Slide[InputType.OnKeyDown] && CurrentSpeed != 0f) // HoldSlide or InitiateSlide ? -> run some tests
             {
                 StartCoroutine(Slide()); // add some kind of coyote threshold where the velocity is conserved even tho the player walked a bit (which should kill his momentum)
                 return;
@@ -737,7 +731,7 @@ namespace Controller
 
             if (!isCollidingDown)
             {
-                var sideToWallRunOn = hasControls ? MyInput.GetAxis(InputQuery.Left[InputType.OnKeyHeld] && isCollidingLeft, InputQuery.Right[InputType.OnKeyHeld] && isCollidingRight) : 0;
+                var sideToWallRunOn = HasControls ? MyInput.GetAxis(InputQuery.Left[InputType.OnKeyHeld] && isCollidingLeft, InputQuery.Right[InputType.OnKeyHeld] && isCollidingRight) : 0;
                 if (sideToWallRunOn != 0f)
                 {
                     StartCoroutine(Wallrun(sideToWallRunOn));
@@ -751,12 +745,12 @@ namespace Controller
                 return;
             }
 
-            HandleCrouch(hasControls && InputQuery.HoldCrouch && isCollidingDown);
+            HandleCrouch(HasControls && InputQuery.HoldCrouch && isCollidingDown);
         }
 
         private void Run()
         {
-            var wantedMoveVec = hasControls ? new Vector2(SidewayAxisInput, ForwardAxisInput).normalized : Vector2.zero;
+            var wantedMoveVec = HasControls ? new Vector2(SidewayAxisInput, ForwardAxisInput).normalized : Vector2.zero;
 
             var targetSpeed = CalculateTargetSpeed(wantedMoveVec) - (isCollidingDown ? 0f : .5f);
 
@@ -807,7 +801,7 @@ namespace Controller
                     float t = Mathf.Clamp01(timeElapsedSinceStartedSprinting / timeToReachMaxSprintSpeed); // if failing timeToReachMaxSprintSpeed probably reset to 0 in the inspector
                     float currentSpeedRatio = Interpolation.ExponentialLerp(t);
 
-                    Rigidbody.velocity = Vector3.Slerp(direction * CroouchingSpeed, targetSpeed * direction, currentSpeedRatio);
+                    Rigidbody.velocity = Vector3.Slerp(direction * CrouchingSpeed, targetSpeed * direction, currentSpeedRatio);
                 }
                 else
                 {
@@ -843,7 +837,7 @@ namespace Controller
                                 IsSprinting ?
                                     RunningSpeed
                                     :
-                                    CroouchingSpeed;
+                                    CrouchingSpeed;
                 }
             }
             else
@@ -855,7 +849,7 @@ namespace Controller
                         IsSprinting ?
                             RunningSpeed
                             :
-                            CroouchingSpeed
+                            CrouchingSpeed
                         );
             }
             //return wantedMoveVec.x == 0f ? wantedMoveVec.y == 0f ? 0f : wantedMoveVec.y < 0f ? BackwardSpeed : RunningSpeed : wantedMoveVec.y < 0f ? BackwardSpeed : StrafingSpeed;
@@ -1043,9 +1037,9 @@ namespace Controller
 
             var shouldAwardVelocityBoostForFalling = !isCollidingDown;
 
-            yield return new WaitUntil(() => isCollidingDown || !InputQuery.Slide[InputType.OnKeyHeld] || !hasControls); // await the landing to initiate the slide
+            yield return new WaitUntil(() => isCollidingDown || !InputQuery.Slide[InputType.OnKeyHeld] || !HasControls); // await the landing to initiate the slide
 
-            if (!InputQuery.Slide[InputType.OnKeyHeld] || !hasControls) { yield break; } // if changed his mind
+            if (!InputQuery.Slide[InputType.OnKeyHeld] || !HasControls) { yield break; } // if changed his mind
 
             SetMovementMode(MovementMode.Slide);
             transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
@@ -1078,7 +1072,7 @@ namespace Controller
 
                         ApplySlowdown(benefitedFromDashMomentum && CurrentSpeed > RunningSpeed ? slideSlowdownForceWhenHasDashMomentum : slideSlowdownForce);
 
-                        if (hasControls && DashUsable && InputQuery.Dash)
+                        if (HasControls && DashUsable && InputQuery.Dash)
                         {
                             dashed = true;
                             return true;
@@ -1089,7 +1083,7 @@ namespace Controller
                         return
                             Rigidbody.velocity.magnitude < slideCancelThreshold ||
                             !InputQuery.Slide[InputType.OnKeyHeld] ||
-                            !hasControls ||
+                            !HasControls ||
                             triedJumping
                             ;
                     }
@@ -1097,7 +1091,7 @@ namespace Controller
 
             if (triedJumping)
             {
-                Jump(wouldVeBeenFullJump, dashed && InputQuery.Forward[InputType.OnKeyHeld]);
+                Jump(wouldVeBeenFullJump);
                 CommonSlideExit(MovementMode.Run);
                 yield break;
             }
@@ -1175,7 +1169,7 @@ namespace Controller
                         //Rigidbody.velocity = dashVelocity * cameraTransform.forward; // perhaps do sth less brutal with gradual velocity loss
                         Rigidbody.velocity = DashVelocity * dir; // perhaps do sth less brutal with gradual velocity loss
 
-                        if (hasControls && InputQuery.Slide[InputType.OnKeyDown] && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
+                        if (HasControls && InputQuery.Slide[InputType.OnKeyDown] && isCollidingDown) // if slide during the dash then the boost is applied // here it s most likely in the dash (at most 1 frame off so take it as a lil gift :) )
                         {
                             slid = true;
                             return true;
@@ -1194,7 +1188,7 @@ namespace Controller
 
             if (!isCollidingDown)
             {
-                var shouldWallrunLeftRight = hasControls ? MyInput.GetAxis(InputQuery.Left[InputType.OnKeyHeld] && isCollidingLeft, InputQuery.Right[InputType.OnKeyHeld] && isCollidingRight) : 0;
+                var shouldWallrunLeftRight = HasControls ? MyInput.GetAxis(InputQuery.Left[InputType.OnKeyHeld] && isCollidingLeft, InputQuery.Right[InputType.OnKeyHeld] && isCollidingRight) : 0;
                 if (shouldWallrunLeftRight != 0f)
                 {
                     CommonDashExit(MovementMode.Wallrun);
@@ -1249,7 +1243,7 @@ namespace Controller
 
         private bool CheckLedgeClimb(out Collider[] ledges)
         {
-            if (!hasControls || !CanLedgeClimb || InputQuery.Back[InputType.OnKeyHeld] || !InputQuery.Forward[InputType.OnKeyHeld] && !InputQuery.Jump[InputType.OnKeyDown])
+            if (!HasControls || !CanLedgeClimb || InputQuery.Back[InputType.OnKeyHeld] || !InputQuery.Forward[InputType.OnKeyHeld] && !InputQuery.Jump[InputType.OnKeyDown])
             {
                 ledges = new Collider[0];
                 return false;
@@ -1316,7 +1310,7 @@ namespace Controller
 
         private IEnumerator Wallrun(int side)
         {
-            if (!hasControls || !InputQuery.Forward[InputType.OnKeyHeld] || InputQuery.Back[InputType.OnKeyHeld] || !CanWallRunAfterDash) { yield break; }
+            if (!HasControls || !InputQuery.Forward[InputType.OnKeyHeld] || InputQuery.Back[InputType.OnKeyHeld] || !CanWallRunAfterDash) { yield break; }
 
             SetMovementMode(MovementMode.Wallrun);
             ResetYVelocity();
@@ -1331,6 +1325,7 @@ namespace Controller
 
             var leftEarly = false;
             var directionAlongWall = (transform.forward - Vector3.Dot(transform.forward, forceDirection) * forceDirection).normalized;
+            //var directionAlongWall = Vector3.Dot(transform.forward, forceDirection);
             yield return new WaitUntil(
                 () =>
                 {
@@ -1339,10 +1334,11 @@ namespace Controller
                         StartCoroutine(SetCameraTilt(onRight, false));
                     }
 
-                    Rigidbody.AddForce(wallRunForceCoefficient * WallRunSpeed * Time.deltaTime * directionAlongWall, ForceMode.Force);
-                    Rigidbody.velocity = Vector3.ClampMagnitude(Rigidbody.velocity.Mask(1f, 0f, 1f), WallRunSpeed);
+                    //Rigidbody.AddForce(wallRunForceCoefficient * WallRunSpeed * Time.deltaTime * directionAlongWall, ForceMode.Force);
+                    //Rigidbody.velocity = Vector3.ClampMagnitude(Rigidbody.velocity.Mask(1f, 0f, 1f), WallRunSpeed);
+                    Rigidbody.velocity = directionAlongWall * WallRunSpeed;
 
-                    if (hasControls && InputQuery.Jump[InputType.OnKeyDown])
+                    if (HasControls && InputQuery.Jump[InputType.OnKeyDown])
                     {
                         CommonWallRunExit(MovementMode.Run, onRight);
                         WallJump(!onRight, onRight ? InputQuery.Left[InputType.OnKeyHeld] : InputQuery.Right[InputType.OnKeyHeld]);
@@ -1350,7 +1346,7 @@ namespace Controller
                         return true;
                     }
 
-                    if (hasControls && dashReady && InputQuery.Dash)
+                    if (HasControls && dashReady && InputQuery.Dash)
                     {
                         CommonWallRunExit(MovementMode.Dash, onRight);
                         StartCoroutine(Dash());
@@ -1367,7 +1363,7 @@ namespace Controller
                         return true;
                     }
 
-                    if (hasControls && InputQuery.Slide[InputType.OnKeyDown])
+                    if (HasControls && InputQuery.Slide[InputType.OnKeyDown])
                     {
                         CommonWallRunExit(MovementMode.Slide, onRight);
                         StartCoroutine(Slide());
@@ -1377,10 +1373,11 @@ namespace Controller
 
                     if (!isCollidingOnAnySide) { return true; } // out of the final return bc didn t work for reasons that are beyond me
 
+                    if (!InputQuery.Forward[InputType.OnKeyHeld]) { return true; } // same
+
                     return
-                        !hasControls ||
+                        !HasControls ||
                         InputQuery.Back[InputType.OnKeyHeld] ||
-                        !InputQuery.Forward[InputType.OnKeyHeld] ||
                         onRight ? InputQuery.Left[InputType.OnKeyHeldForTime] : InputQuery.Right[InputType.OnKeyHeldForTime]
                         ;
                 }
@@ -1515,7 +1512,7 @@ namespace Controller
         }
 
         //private float TargetRunCameraTiltAngle => MyInput.GetAxis(inputQuery.Right, inputQuery.Left) * maxRunCameraTiltAngle;
-        private float TargetRunCameraTiltAngle => (hasControls ? MyInput.GetAxis(InputQuery.Right[InputType.OnKeyHeld] && !isCollidingRight, InputQuery.Left[InputType.OnKeyHeld] & !isCollidingLeft) : 0) * maxRunCameraTiltAngle;
+        private float TargetRunCameraTiltAngle => (HasControls ? MyInput.GetAxis(InputQuery.Right[InputType.OnKeyHeld] && !isCollidingRight, InputQuery.Left[InputType.OnKeyHeld] & !isCollidingLeft) : 0) * maxRunCameraTiltAngle;
         //
         //private float TargetRunCameraTiltAngle => Rigidbody != null ? CurrentStrafeSpeed / Mathf.Abs(CurrentStrafeSpeed) * maxRunCameraTiltAngle : 0f;
         // as dir in {-1, 0, 1} dir * maxRunCameraTiltAngle in {-maxRunCameraTiltAngle, 0 (regulateCameraTilt), maxRunCameraTiltAngle}
@@ -1922,8 +1919,6 @@ public struct CollisionDebug
 // add a feature where the spread is les significant whe crouching
 // fix the camera when jumping while sliding and still holding the slide key
 
-// dash && jump simultaneously -> long jump (longer but lower) (only forward)
-
 // make the double dash thingy
 
 // make a validatedActionBuffer for keystrokes combo
@@ -1931,4 +1926,7 @@ public struct CollisionDebug
 //  ? make the slide give a boost anyway just wait till totally on ground to give it
 
 
-// make a lerping implementation of crouch/slide colllider adjustment
+// make a lerping implementation of crouch/slide collider adjustment
+
+
+// sliding while wall running cause it to wander to infinity
