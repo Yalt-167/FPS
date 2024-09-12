@@ -57,14 +57,14 @@ namespace Controller
         #region State
 
         private bool IsJumping { get; set; }
-        private bool IsRunning => currentMovementMode == MovementMode.Run;
+        private bool IsRunning { get; set; }
         private bool IsSprinting => !InputQuery.HoldCrouch && PressingForwardOrStrafeInput;
         private bool IsCrouching { get; set; }
         private bool IsSliding { get; set; }
-        private bool IsDashing => currentMovementMode == MovementMode.Dash;
-        private bool IsWallrunning => currentMovementMode == MovementMode.Wallrun;
-        private bool IsLedgeClimbing => currentMovementMode == MovementMode.LedgeClimb;
-        private bool IsGrappling => currentMovementMode == MovementMode.Grappling;
+        private bool IsDashing { get; set; }
+        private bool IsWallrunning { get; set; }
+        private bool IsLedgeClimbing { get; set; }
+        private bool IsGrappling { get; set; }
 
         #endregion
 
@@ -1157,6 +1157,8 @@ namespace Controller
         {
             if (IsDashing) { yield break; }
 
+            IsDashing = true;
+
             dashSide = SidewayAxisInput;
             SetMovementMode(MovementMode.Dash);
             dashReady = false;
@@ -1224,6 +1226,8 @@ namespace Controller
 
         private void CommonDashExit()
         {
+            IsDashing = false;
+
             followRotationCamera.enabled = true;
             timeDashEnded = Time.time;
             ResetYVelocity();
