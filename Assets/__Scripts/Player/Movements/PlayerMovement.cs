@@ -60,7 +60,7 @@ namespace Controller
         private bool IsRunning => currentMovementMode == MovementMode.Run;
         private bool IsSprinting => !InputQuery.HoldCrouch && PressingForwardOrStrafeInput;
         private bool IsCrouching { get; set; }
-        private bool IsSliding => currentMovementMode == MovementMode.Slide;
+        private bool IsSliding { get; set; }
         private bool IsDashing => currentMovementMode == MovementMode.Dash;
         private bool IsWallrunning => currentMovementMode == MovementMode.Wallrun;
         private bool IsLedgeClimbing => currentMovementMode == MovementMode.LedgeClimb;
@@ -1035,6 +1035,8 @@ namespace Controller
         {
             if (IsSliding) { yield break; } // if somehow the player managed to get there when already sliding
 
+            IsSliding = true;
+
             var shouldAwardVelocityBoostForFalling = !isCollidingDown;
 
             yield return new WaitUntil(() => isCollidingDown || !InputQuery.Slide[InputType.OnKeyHeld] || !HasControls); // await the landing to initiate the slide
@@ -1123,8 +1125,11 @@ namespace Controller
 
         private void CommonSlideExit()
         {
+            IsSliding = false;
+
             transform.position += Vector3.up * .5f;
             transform.localScale = transform.localScale.Mask(1f, 2f, 1f);
+
             timeStoppedSlide = Time.time;
         }
 
