@@ -1324,21 +1324,22 @@ namespace Controller
             InputQuery.Right.ResetHeldSince(); // same but other side :)
 
             var leftEarly = false;
-            var directionAlongWall = (transform.forward - Vector3.Dot(transform.forward, forceDirection) * forceDirection).normalized;
+            var directionAlongWall = (transform.forward + Vector3.Dot(transform.forward, forceDirection) * forceDirection).normalized;
+
             //var directionAlongWall = Vector3.Dot(transform.forward, forceDirection);
             yield return new WaitUntil(
                 () =>
                 {
+                    if (!HasControls) { return true; }
+
                     if (!startedTiltingCamera && ShouldStartTiltingCamera)
                     {
                         StartCoroutine(SetCameraTilt(onRight, false));
                     }
 
-                    //Rigidbody.AddForce(wallRunForceCoefficient * WallRunSpeed * Time.deltaTime * directionAlongWall, ForceMode.Force);
-                    //Rigidbody.velocity = Vector3.ClampMagnitude(Rigidbody.velocity.Mask(1f, 0f, 1f), WallRunSpeed);
                     Rigidbody.velocity = directionAlongWall * WallRunSpeed;
 
-                    if (HasControls && InputQuery.Jump[InputType.OnKeyDown])
+                    if (InputQuery.Jump[InputType.OnKeyDown])
                     {
                         CommonWallRunExit(MovementMode.Run, onRight);
                         WallJump(!onRight, onRight ? InputQuery.Left[InputType.OnKeyHeld] : InputQuery.Right[InputType.OnKeyHeld]);
@@ -1346,7 +1347,7 @@ namespace Controller
                         return true;
                     }
 
-                    if (HasControls && dashReady && InputQuery.Dash)
+                    if (dashReady && InputQuery.Dash)
                     {
                         CommonWallRunExit(MovementMode.Dash, onRight);
                         StartCoroutine(Dash());
@@ -1363,7 +1364,7 @@ namespace Controller
                         return true;
                     }
 
-                    if (HasControls && InputQuery.Slide[InputType.OnKeyDown])
+                    if (InputQuery.Slide[InputType.OnKeyDown])
                     {
                         CommonWallRunExit(MovementMode.Slide, onRight);
                         StartCoroutine(Slide());
@@ -1376,7 +1377,6 @@ namespace Controller
                     if (!InputQuery.Forward[InputType.OnKeyHeld]) { return true; } // same
 
                     return
-                        !HasControls ||
                         InputQuery.Back[InputType.OnKeyHeld] ||
                         onRight ? InputQuery.Left[InputType.OnKeyHeldForTime] : InputQuery.Right[InputType.OnKeyHeldForTime]
                         ;
@@ -1404,10 +1404,7 @@ namespace Controller
             var elapsedTime = 0f;
             while (elapsedTime < wallRunCameraTiltDuration)
             {
-                CurrentWallRunCameraTilt = isReset ?
-                    Mathf.Lerp(startingPoint, 0f, elapsedTime / wallRunCameraTiltDuration)
-                    :
-                    Mathf.Lerp(startingPoint, onRightWall ? maxWallRunCameraTilt : -maxWallRunCameraTilt, elapsedTime / wallRunCameraTiltDuration);
+                CurrentWallRunCameraTilt = Mathf.Lerp(startingPoint, isReset ? 0f : (onRightWall ? maxWallRunCameraTilt : -maxWallRunCameraTilt), elapsedTime / wallRunCameraTiltDuration);
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
