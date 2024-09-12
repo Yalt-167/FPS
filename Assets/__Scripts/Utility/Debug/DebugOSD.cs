@@ -62,13 +62,48 @@ namespace MyDebug
             return null;
         }
 
+
+        public static void ToggleDisplay(object key, object value, bool towardOn)
+        {
+            if (Instance == null) { return; }
+
+            Instance.ToggleDisplayInternal(key.ToString(), value.ToString(), towardOn);
+        }
+
+        private void ToggleDisplayInternal(string key, string value, bool towardOn)
+        {
+            if (towardOn)
+            {
+                Display(key, value);
+            }
+            else
+            {
+                KillDisplay(key);
+            }
+        }
+
+
+        public static void KillDisplay(object key)
+        {
+            if (Instance == null) { return; }
+
+            Instance.KillDisplayInternal(key.ToString());
+        }
+
+        private void KillDisplayInternal(string key)
+        {
+            if (!debuggerEntries.ContainsKey(key)) { return; }
+
+            debuggerEntries.Remove(key);
+        }
+
         public static void Display(object key, object value)
         {
             if (Instance == null) { return; }
 
             Instance.DisplayInternal(key.ToString(), value.ToString());
         }
-
+        
         public void DisplayInternal(string key, string value)
         {
             if (!active) { return; }
@@ -104,10 +139,23 @@ namespace MyDebug
 
             debuggerEntries.Remove(dataKey);
         }
+
         public enum DisplayDurationTypesInMS
         {
             Brief = 1200,
             Long = 2400
+        }
+
+        public struct DebuggerOSDEntry
+        {
+            public string Data;
+            public bool HasLifetime;
+
+            public DebuggerOSDEntry(string data, bool hasLifetime)
+            {
+                Data = data;
+                HasLifetime = hasLifetime;
+            }
         }
     }
 
