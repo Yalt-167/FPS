@@ -1039,9 +1039,12 @@ namespace Controller
 
             yield return new WaitUntil(() => isCollidingDown || !InputQuery.Slide[InputType.OnKeyHeld] || !HasControls); // await the landing to initiate the slide
 
-            if (!InputQuery.Slide[InputType.OnKeyHeld] || !HasControls) { yield break; } // if changed his mind
+            if (!InputQuery.Slide[InputType.OnKeyHeld]) { yield break; } // if changed his mind
+
+            if (!HasControls) { yield break; } // is in a menu or sth
 
             SetMovementMode(MovementMode.Slide);
+
             transform.localScale = transform.localScale.Mask(1f, .5f, 1f);
             transform.position -= Vector3.up * .5f;
 
@@ -1064,6 +1067,8 @@ namespace Controller
             yield return new WaitUntil(
                 () =>
                     {
+                        if (!HasControls) { return true; };
+
                         if (isCollidingDown)
                         {
                             // like some extra gravity so the player can slide along steeper slopes
@@ -1072,7 +1077,7 @@ namespace Controller
 
                         ApplySlowdown(benefitedFromDashMomentum && CurrentSpeed > RunningSpeed ? slideSlowdownForceWhenHasDashMomentum : slideSlowdownForce);
 
-                        if (HasControls && DashUsable && InputQuery.Dash)
+                        if (DashUsable && InputQuery.Dash)
                         {
                             dashed = true;
                             return true;
@@ -1083,7 +1088,6 @@ namespace Controller
                         return
                             Rigidbody.velocity.magnitude < slideCancelThreshold ||
                             !InputQuery.Slide[InputType.OnKeyHeld] ||
-                            !HasControls ||
                             triedJumping
                             ;
                     }
