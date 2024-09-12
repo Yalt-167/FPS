@@ -13,7 +13,6 @@ using Unity.Netcode;
 using UnityEditor;
 
 using Random = UnityEngine.Random;
-using static DebugUtility;
 
 namespace GameManagement
 {
