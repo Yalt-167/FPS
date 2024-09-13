@@ -225,3 +225,15 @@ namespace GameManagement
         #endregion
     }
 }
+
+// abstract class GameRule that handles the game flow
+
+// every gamemode has it s own derived class that handles the flow of the game
+
+// necessarily has
+// EntryPoint => OnStart()
+// fetch the spawnpoints and important things to the map
+// -> DataStructure for each map then prolly a SO
+
+
+// EndPoint => OnEnd()
