@@ -21,6 +21,15 @@ namespace GameManagement
     {
         public static Game Manager;
 
+        #region References
+
+        public static PlayerFrame[] Players => Manager.players;
+        public static int PlayerCount { get; private set; }
+
+        #endregion
+
+
+
         #region Unity Handled
 
         private void Awake()
@@ -73,11 +82,11 @@ namespace GameManagement
 
         #region Game Start
 
-        public bool GameStarted { get; private set; }
+        public static bool Started { get; private set; }
         public static event Action OnGameStarted;
 
         [MenuItem("Developer/StartGame")]
-        public static void StaticStartGame()
+        public static void StartGame()
         {
             Manager.StartGameServerRpc();
         }
@@ -85,7 +94,7 @@ namespace GameManagement
         [Rpc(SendTo.Server)]
         private void StartGameServerRpc()
         {
-            if (!GameStarted)
+            if (!Started)
             {
                 StartGameClientRpc();
             }
@@ -94,7 +103,7 @@ namespace GameManagement
         [Rpc(SendTo.ClientsAndHost)]
         private void StartGameClientRpc()
         {
-            GameStarted = true;
+            Started = true;
             OnGameStarted?.Invoke();
 
             Debug.Log("Game was started");
@@ -121,7 +130,7 @@ namespace GameManagement
         [Rpc(SendTo.ClientsAndHost)]
         private void CreatePlayerListClientRpc()
         {
-            GameNetworkManager.Manager.InitPlayerList();
+            InitPlayerList();
         }
 
 
@@ -140,6 +149,128 @@ namespace GameManagement
         }
 
         #endregion
+
+        #endregion
+
+        #region Player List
+
+        private PlayerFrame[] players;
+        public static void OnClientConnected(ulong clientID)
+        {
+            PlayerCount++;
+        }
+
+        public static void OnClientDisconnected(ulong clientID)
+        {
+            PlayerCount--;
+        }
+
+
+        /// <summary>
+        /// <paramref name="whichComponentID"/> basically refers to which component ID was passed in the method.<br/>
+        /// For instance if we have is the weaponHandlerand passed its ID we should also pass the relevant enum member 
+        /// </summary>
+        /// <param name="componentID"></param>
+        /// <param name="whichComponentID"></param>
+        public static PlayerFrame RetrievePlayerFromComponentID(ulong componentID, NetworkedComponent whichComponentID)
+        {
+            return whichComponentID switch
+            {
+                NetworkedComponent.NetworkObject => Manager.players.First(predicate: (each) => each.NetworkObject.NetworkObjectId == componentID),
+
+                NetworkedComponent.ClientNetworkTransform => Manager.players.First(predicate: (each) => each.ClientNetworkTransform.NetworkObjectId == componentID),
+
+                //NetworkedComponent.HandlePlayerNetworkBehaviour => Manager.players.First(each => each.BehaviourHandler.NetworkObjectId == componentID),
+
+                NetworkedComponent.WeaponHandler => Manager.players.First(predicate: (each) => each.WeaponHandler.NetworkObjectId == componentID),
+
+                NetworkedComponent.PlayerHealthNetworked => Manager.players.First(predicate: (each) => each.Health.NetworkObjectId == componentID),
+
+                _ => throw new Exception($"This component provided ({whichComponentID}) does not match anything"),
+            };
+
+        }
+
+        public static IEnumerable<PlayerFrame> GetPlayersOfTeam(ushort teamID)
+        {
+            foreach (var player in Manager.players)
+            {
+                if (player.TeamNumber == teamID)
+                {
+                    yield return player;
+                }
+            }
+        }
+
+#nullable enable
+        public static PlayerFrame? GetPlayerFromName(string name)
+        {
+            foreach (var player in Manager.players)
+            {
+                if (player.Name == name)
+                {
+                    return player;
+                }
+            }
+
+            return null;
+        }
+#nullable disable
+
+        #region Debug Player List
+
+        [MenuItem("Developer/DebugPlayerList")]
+        public static void StaticDebugPlayerList()
+        {
+            Manager.DebugPlayerList();
+        }
+
+        private void DebugPlayerList()
+        {
+            if (players == null) { Debug.Log("No player list RN"); return; }
+
+            var stringBuilder = new StringBuilder();
+
+            _ = stringBuilder.Append("[ ");
+            var isFirst = true;
+            foreach (var player in players)
+            {
+                _ = stringBuilder.Append(isFirst ? $"{player.GetInfos()}" : $", {player.GetInfos()}");
+                isFirst = false;
+            }
+            _ = stringBuilder.Append(" ]");
+
+            Debug.Log(stringBuilder.ToString());
+        }
+
+        #endregion
+
+        public static void InitPlayerList()
+        {
+            Manager.players = new PlayerFrame[PlayerCount];
+            //Manager.players = new PlayerFrame[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count - 1]; // - 1 for the manager
+
+#if DEBUG_MULTIPLAYER
+        var stringBuilder = new StringBuilder();
+        _ = stringBuilder.Append("[ ");
+#endif
+            var idx = 0;
+            foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
+            {
+#if DEBUG_MULTIPLAYER
+            _ = stringBuilder.Append($"{{{element.Key}, {element.Value}}} ");
+
+#endif
+                if (element.Value.TryGetComponent<PlayerFrame>(out var playerFrameComponent))
+                {
+                    Manager.players[idx++] = playerFrameComponent;
+                }
+            }
+#if DEBUG_MULTIPLAYER
+        _ = stringBuilder.Append("]");
+        print(stringBuilder.ToString());
+#endif
+        }
 
         #endregion
 

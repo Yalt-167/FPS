@@ -12,14 +12,12 @@ using Unity.Netcode;
 
 using UnityEditor;
 
-using Random = UnityEngine.Random;
-
 namespace GameManagement
 {
     [DefaultExecutionOrder(-99)]
     public sealed class GameNetworkManager : NetworkManager
     {
-        public static GameNetworkManager Manager;
+        public static GameNetworkManager Manager { get; private set; }
         [SerializeField] private GameObject gameManagerPrefab;
         private GameObject gameManagerInstance;
 
@@ -31,8 +29,13 @@ namespace GameManagement
         private void Awake()
         {
             Manager = this;
+
             OnServerStarted += CreateManagerInstance;
             OnServerStopped += KillManagerInstance;
+
+            OnClientConnectedCallback += Game.OnClientConnected;
+            OnClientDisconnectCallback += Game.OnClientDisconnected;
+
         }
 
         #endregion
@@ -51,122 +54,6 @@ namespace GameManagement
         }
 
         #endregion
-
-        #region Player List
-
-        public PlayerFrame[] Players => players;
-        private PlayerFrame[] players;
-        public int PlayerCount => Players.Length;
-
-        public void DisconnectPlayer(ushort playerID)
-        {
-            players[playerID].IsOnline = false;
-        }
-
-        public void ReconnectPlayer(ushort playerID)
-        {
-            players[playerID].IsOnline = true;
-        }
-
-        /// <summary>
-        /// <paramref name="whichComponentID"/> basically refers to which component ID was passed in the method.<br/>
-        /// For instance if we have is the weaponHandlerand passed its ID we should also pass the relevant enum member 
-        /// </summary>
-        /// <param name="componentID"></param>
-        /// <param name="whichComponentID"></param>
-        public PlayerFrame RetrievePlayerFromComponentID(ulong componentID, NetworkedComponent whichComponentID)
-        {
-            return whichComponentID switch
-            {
-                NetworkedComponent.NetworkObject => players.First(predicate: (each) => each.NetworkObject.NetworkObjectId == componentID),
-
-                NetworkedComponent.ClientNetworkTransform => players.First(predicate: (each) => each.ClientNetworkTransform.NetworkObjectId == componentID),
-
-                //NetworkedComponent.HandlePlayerNetworkBehaviour => players.First(each => each.BehaviourHandler.NetworkObjectId == componentID),
-
-                NetworkedComponent.WeaponHandler => players.First(predicate: (each) => each.WeaponHandler.NetworkObjectId == componentID),
-
-                NetworkedComponent.PlayerHealthNetworked => players.First(predicate: (each) => each.Health.NetworkObjectId == componentID),
-
-                _ => throw new Exception($"This component provided ({whichComponentID}) does not match anything"),
-            };
-
-        }
-
-        public PlayerFrame RetrievePlayerFromIndex(int index)
-        {
-            return players[index];
-        }
-
-        public IEnumerable<PlayerFrame> GetPlayers()
-        {
-            foreach (var player in players)
-            {
-                yield return player;
-            }
-        }
-
-        public IEnumerable<PlayerFrame> GetPlayersOfTeam(ushort teamID)
-        {
-            foreach (var player in players)
-            {
-                if (player.TeamNumber == teamID)
-                {
-                    yield return player;
-                }
-            }
-        }
-
-        public bool PlayerWithNameExist(string name)
-        {
-            return GetPlayerFromName(name) != null;
-        }
-
-#nullable enable
-        public PlayerFrame? GetPlayerFromName(string name)
-        {
-            foreach (var player in players)
-            {
-                if (player.Name == name)
-                {
-                    return player;
-                }
-            }
-
-            return null;
-        }
-#nullable disable
-
-        [MenuItem("Developer/DebugPlayerList")]
-        public static void StaticDebugPlayerList()
-        {
-            Manager.DebugPlayerList();
-        }
-
-        private void DebugPlayerList()
-        {
-            if (players == null) { Debug.Log("No player list RN");  return; }
-
-            var stringBuilder = new StringBuilder();
-
-            _ = stringBuilder.Append("[ ");
-            var isFirst = true;
-            foreach (var player in players)
-            {
-                _ = stringBuilder.Append(isFirst ? $"{player.GetInfos()}" : $", {player.GetInfos()}");
-                isFirst = false;
-            }
-            _ = stringBuilder.Append(" ]");
-
-            Debug.Log(stringBuilder.ToString());
-        }
-
-        public void InitPlayerList()
-        {
-            players = GetNetworkedPlayers();
-        }
-
-#endregion
 
         #region Network Objects Spawning
 
@@ -218,35 +105,6 @@ namespace GameManagement
 
         #endregion
 
-
-        private PlayerFrame[] GetNetworkedPlayers()
-        {
-
-            PlayerFrame[] players_ = new PlayerFrame[NetworkManager.Singleton.SpawnManager.SpawnedObjects.Count - 1]; // - 1 for the manager
-            //NetworkedPlayer[] players_ = new NetworkedPlayer[NetworkManager.Singleton.ConnectedClientsList.Count]; // not allowed to call on clients
-
-#if DEBUG_MULTIPLAYER
-        var stringBuilder = new StringBuilder();
-        stringBuilder.Append("[ ");
-#endif
-            var idx = 0;
-            foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
-            {
-#if DEBUG_MULTIPLAYER
-            stringBuilder.Append($"{{{element.Key}, {element.Value}}} ");
-#endif
-                if (element.Value.TryGetComponent<PlayerFrame>(out var playerFrameComponent))
-                {
-                    players_[idx++] = playerFrameComponent;
-                }
-            }
-#if DEBUG_MULTIPLAYER
-        stringBuilder.Append("]");
-        print(stringBuilder.ToString());
-#endif
-            return players_;
-        }
-
         #region Respawn Logic
 
         private readonly Dictionary<ushort, List<SpawnPoint>> spawnPoints = new();
@@ -278,7 +136,7 @@ namespace GameManagement
 
             if (activeRelevantSpawnPoints.Count == 0) { return NoSpawnpointAvailableForThisTeam(teamID); }
 
-            return activeRelevantSpawnPoints[Random.Range(0, activeRelevantSpawnPoints.Count - 1)].SpawnPosition;
+            return activeRelevantSpawnPoints[UnityEngine.Random.Range(0, activeRelevantSpawnPoints.Count - 1)].SpawnPosition;
         }
 
         private Vector3 NoSpawnpointAvailableForThisTeam(ushort teamID)
