@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-namespace Utility
+namespace MyUtility
 {
     public sealed class CoroutineStarter : MonoBehaviour
     {
