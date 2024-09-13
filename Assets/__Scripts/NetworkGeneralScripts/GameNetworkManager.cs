@@ -149,14 +149,14 @@ namespace GameManagement
 
             var stringBuilder = new StringBuilder();
 
-            stringBuilder.Append("[ ");
+            _ = stringBuilder.Append("[ ");
             var isFirst = true;
             foreach (var player in players)
             {
-                stringBuilder.Append(isFirst ? $"{player.GetInfos()}" : $", {player.GetInfos()}");
+                _ = stringBuilder.Append(isFirst ? $"{player.GetInfos()}" : $", {player.GetInfos()}");
                 isFirst = false;
             }
-            stringBuilder.Append(" ]");
+            _ = stringBuilder.Append(" ]");
 
             Debug.Log(stringBuilder.ToString());
         }

@@ -30,44 +30,6 @@ namespace GameManagement
 
         #endregion
 
-        #region Player Combat List
-
-        private readonly List<WeaponHandler> networkedWeaponHandlers = new();
-
-        public void AddNetworkedWeaponHandler(WeaponHandler networkedWeaponHandler)
-        {
-            networkedWeaponHandlers.Add(networkedWeaponHandler);
-        }
-
-        public void DiscardNetworkedWeaponHandler(WeaponHandler networkedWeaponHandler)
-        {
-            networkedWeaponHandlers.Remove(networkedWeaponHandler);
-        }
-
-        public WeaponHandler GetNetworkedWeaponHandlerFromNetworkObjectID(ulong playerObjectID) // ? make it so they are sorted ? -> slower upon adding it but faster to select it still
-        {
-            foreach (var networkedWeaponHandler in networkedWeaponHandlers)
-            {
-                if (networkedWeaponHandler.NetworkObjectId == playerObjectID)
-                {
-                    return networkedWeaponHandler;
-                }
-            }
-
-            return null;
-        }
-
-        public IEnumerable<WeaponHandler> GetNetworkedWeaponHandlers()
-        {
-            foreach (var networkHandler in networkedWeaponHandlers)
-            {
-                yield return networkHandler;
-            }
-        }
-
-
-        #endregion
-
         #region Respawn Logic
 
         private readonly Dictionary<ushort, List<SpawnPoint>> spawnPoints = new();
