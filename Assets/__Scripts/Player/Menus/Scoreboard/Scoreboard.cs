@@ -62,13 +62,13 @@ namespace Menus
 
             var simulatedEntries = new string[] { "Diegocardi", "Syn", "Kry", "Asyl"};
 
-            playersInfos = new PlayerScoreboardInfos[GameNetworkManager.Manager.PlayerCount + simulatedEntries.Length];
+            playersInfos = new PlayerScoreboardInfos[Game.PlayerCount + simulatedEntries.Length];
 
-            for (int index = 0; index < GameNetworkManager.Manager.PlayerCount; index++)
+            for (int index = 0; index < Game.PlayerCount; index++)
             {
-                ref PlayerFrame playerFrame = ref GameNetworkManager.Manager.Players[index];
+                ref PlayerFrame playerFrame = ref Game.Players[index];
                 playerFrame.ScoreboardIndex = index;
-                playersInfos[index] = new PlayerScoreboardInfos(playerFrame.TeamNumber, playerFrame.Name.ToString());
+                playersInfos[index] = new PlayerScoreboardInfos(playerFrame.TeamNumber, playerFrame.Name);
             }
 
             CreateFakeEntries(simulatedEntries);
@@ -76,12 +76,14 @@ namespace Menus
             for (int i = 0; i < 100; i++)
             {
                 var killerIndex = UnityEngine.Random.Range(0, playersInfos.Length);
+                AddKill(killerIndex);
 
                 int victimIndex;
                 do
                 {
                     victimIndex = UnityEngine.Random.Range(0, playersInfos.Length);
                 } while (victimIndex == killerIndex);
+                AddDeath(victimIndex);
 
                 if (UnityEngine.Random.Range(0, 2) == 1)
                 {
@@ -92,8 +94,6 @@ namespace Menus
                     } while (victimIndex == killerIndex || victimIndex == assistIndex);
                     AddAssist(assistIndex);
                 }
-                AddKill(killerIndex);
-                AddDeath(victimIndex);
             }
 
             SortPlayers();
@@ -103,7 +103,7 @@ namespace Menus
         {
             for (int index = 0; index < entries.Length; index++)
             {
-                playersInfos[GameNetworkManager.Manager.PlayerCount + index] = new PlayerScoreboardInfos((GameNetworkManager.Manager.PlayerCount + index) % 2 + 1, entries[index]);
+                playersInfos[Game.PlayerCount + index] = new PlayerScoreboardInfos((Game.PlayerCount + index) % 2 + 1, entries[index]);
             }
         }
 

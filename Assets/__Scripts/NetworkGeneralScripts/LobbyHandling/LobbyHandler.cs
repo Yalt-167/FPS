@@ -229,7 +229,7 @@ namespace LobbyHandling
         {
             if (hostLobby == null) { return; }
 
-            if (Game.Manager.GameStarted) { return; }
+            if (Game.Started) { return; }
 
             lobbyUpdateTimer += Time.deltaTime;
             if (lobbyUpdateTimer >= lobbyUpdateRate)

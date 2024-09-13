@@ -138,8 +138,7 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
     {
         if (IsOwner) { return; }
 
-        //GameNetworkManager.Manager.GetNetworkedWeaponHandlerFromNetworkObjectID(attackerNetworkID)?.SpawnDamageLog(targetType, damageDealt);
-        GameNetworkManager.Manager.RetrievePlayerFromComponentID(attackerNetworkID, NetworkedComponent.WeaponHandler).WeaponHandler.SpawnDamageLog(targetType, damageDealt);
+        Game.RetrievePlayerFromComponentID(attackerNetworkID, NetworkedComponent.WeaponHandler).WeaponHandler.SpawnDamageLog(targetType, damageDealt);
     }
 
 
@@ -155,7 +154,7 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
 
         return (TargetType)(bodyPart switch
         {
-            BodyParts.HEAD =>  (int)TargetType.HEAD,
+            BodyParts.HEAD => (int)TargetType.HEAD,
             BodyParts.BODY => (int)TargetType.BODY,
             BodyParts.LEGS => (int)TargetType.LEGS,
             _ => throw new NotImplementedException(),
@@ -173,6 +172,6 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
     {
         respawning = false;
         ResetHealth();
-        transform.position = GameNetworkManager.Manager.GetSpawnPosition(TeamNumber);
+        transform.position = GameNetworkManager.Manager.GetSpawnPosition(TeamNumber); // could be a different position on each client 
     }
 }

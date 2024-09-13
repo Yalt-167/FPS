@@ -59,7 +59,7 @@ public sealed class TeamSelector : NetworkBehaviour
         var playersInTeams = 0;
         for (int teamIndex = 0; teamIndex < teamsCount; teamIndex++)
         {
-            for (int teamSlotIndex = 0; teamSlotIndex < GameNetworkManager.Manager.PlayerCount; teamSlotIndex++)
+            for (int teamSlotIndex = 0; teamSlotIndex < Game.PlayerCount; teamSlotIndex++)
             {
                 if (string.IsNullOrEmpty(teams[teamIndex][teamSlotIndex])) { break; }
                 
@@ -67,7 +67,7 @@ public sealed class TeamSelector : NetworkBehaviour
             }
         }
 
-        return playersInTeams == GameNetworkManager.Manager.PlayerCount;
+        return playersInTeams == Game.PlayerCount;
     }
     private void CreateTeamMenu(int teamNumber)
     {
@@ -132,7 +132,7 @@ public sealed class TeamSelector : NetworkBehaviour
             if (AllPlayersAreInATeam() && (GUILayout.Button(TeamSelectorGUILabels.StartGame) || Input.GetKeyDown(KeyCode.Return)))
             {
                 ToggleTeamSelectionScreenServerRpc(towardOn__: false);
-                Game.StaticStartGame();
+                Game.StartGame();
             }
 
             GUILayout.FlexibleSpace();
@@ -145,7 +145,7 @@ public sealed class TeamSelector : NetworkBehaviour
 
     private void OnTeamSelected(ushort teamNumber)
     {
-        AddPlayerToTeamServerRpc(PlayerFrame.LocalPlayer.Name.ToString(), teamNumber);
+        AddPlayerToTeamServerRpc(PlayerFrame.LocalPlayer.Name, teamNumber);
     }
 
     [Rpc(SendTo.Server)]
@@ -176,7 +176,7 @@ public sealed class TeamSelector : NetworkBehaviour
 
         teamsIndex[teamIndex]++;
 
-        GameNetworkManager.Manager.GetPlayerFromName(player).SetTeam((ushort)(teamIndex + 1));
+        Game.GetPlayerFromName(player).SetTeam((ushort)(teamIndex + 1));
     }
 
     private void RemovePlayerFromTeamList(int teamIndex, string nameToRemove)

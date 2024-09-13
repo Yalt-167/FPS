@@ -28,7 +28,7 @@ namespace Menus
         {
             doRenderMenu = !doRenderMenu;
 
-            if (doRenderMenu || !Game.Manager.GameStarted)
+            if (doRenderMenu || !Game.Started)
             {
                 PlayerFrame.LocalPlayer.SetMenuInputMode();
             }

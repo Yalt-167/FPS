@@ -112,7 +112,7 @@ namespace Inputs
 
         private void Update()
         {
-            if (!Game.Manager.GameStarted) { return; }
+            if (!Game.Started) { return; }
 
             showScoreboardActive = GeneralInputs.ShowScoreboard;
 

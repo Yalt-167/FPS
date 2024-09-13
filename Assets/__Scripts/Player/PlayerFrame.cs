@@ -251,16 +251,16 @@ namespace GameManagement
 
         [field: Space(12)]
         [field: SerializeField] public ChampionStats ChampionStats { get; set; }
-        [HideInInspector] public PlayerCombat Combat;
-        [HideInInspector] public PlayerMovement Movement;
-        [HideInInspector] public ClientNetworkTransform ClientNetworkTransform;
-        [HideInInspector] public WeaponHandler WeaponHandler;
-        [HideInInspector] public PlayerHealthNetworked Health;
-        [HideInInspector] private Camera playerCamera;
-        [HideInInspector] private FollowRotationCamera followRotationCamera;
-        [HideInInspector] private Transform rootTransformHUD;
+        public PlayerCombat Combat { get; private set; }
+        public PlayerMovement Movement {get; private set;}
+        public ClientNetworkTransform ClientNetworkTransform {get; private set;}
+        public WeaponHandler WeaponHandler {get; private set;}
+        public PlayerHealthNetworked Health {get; private set;}
+        private Camera playerCamera;
+        private FollowRotationCamera followRotationCamera;
+        private Transform rootTransformHUD;
 
-        public FixedString64Bytes Name => playerName.Value;
+        public string Name => playerName.Value.ToString();
         private readonly NetworkVariable<FixedString64Bytes> playerName = new(writePerm: NetworkVariableWritePermission.Owner, readPerm: NetworkVariableReadPermission.Everyone);
 
 
