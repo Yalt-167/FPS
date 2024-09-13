@@ -237,3 +237,6 @@ namespace GameManagement
 
 
 // EndPoint => OnEnd()
+
+// loadMap takes in a SO representing the map
+// the SO has the scene in its member along with useful data about the map
