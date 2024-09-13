@@ -47,6 +47,31 @@ namespace Controller
             yRotation += Input.GetAxis(MouseXAxis) * SensitivityX;
             playerTransform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
         }
+
+
+        private void OnGUI()
+        {
+            //DrawLine(new Vector2(Screen.width / 2, 0), new Vector2(Screen.width / 2, Screen.height), Color.red, 1.0f);
+
+            //DrawLine(new Vector2(0, Screen.height / 2), new Vector2(Screen.width, Screen.height / 2), Color.red, 1.0f);
+        }
+
+        void DrawLine(Vector2 pointA, Vector2 pointB, Color color, float width)
+        {
+            var originalGUIColor = GUI.color;
+            var originalGUIMatrix = GUI.matrix;
+
+            var angle = Mathf.Atan2(pointB.y - pointA.y, pointB.x - pointA.x) * 180f / Mathf.PI;
+            var distance = Vector2.Distance(pointA, pointB);
+
+            GUI.color = color;
+
+            GUIUtility.RotateAroundPivot(angle, pointA);
+            GUI.DrawTexture(new Rect(pointA.x, pointA.y, distance, width), Texture2D.whiteTexture);
+
+            GUI.matrix = originalGUIMatrix;
+            GUI.color = originalGUIColor;
+        }
     }
 }
 //using UnityEngine;
