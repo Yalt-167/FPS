@@ -27,11 +27,7 @@ namespace Controller
 
         public VelocityDebug GlobalVelocityDebug;
         public VelocityDebug LocalVelocityDebug;
-        public CollisionDebug CollisionDebug;
-
-        [SerializeField] private bool doDebugCollidingDown;
-        [SerializeField] private bool doDebugCollidingUp;
-        [SerializeField] private bool doDebugCollidinAnySide;
+        [SerializeField] private CollisionDebug DoDebugCollisions;
 
         #endregion
 
@@ -404,10 +400,16 @@ namespace Controller
 
             LocalVelocityDebug = new(transform.InverseTransformDirection(Rigidbody.velocity));
             GlobalVelocityDebug = new(Rigidbody.velocity);
-            CollisionDebug = new(isCollidingUp, isCollidingDown, isCollidingRight, isCollidingLeft, isCollidingOnAnySide);
 
             MyDebug.DebugOSD.Display("Velocity", Rigidbody.velocity);
             MyDebug.DebugOSD.Display("MovementMode", currentMovementMode);
+
+            MyDebug.DebugOSD.ToggleDisplay("CollidingUp", isCollidingUp, DoDebugCollisions.Up);
+            MyDebug.DebugOSD.ToggleDisplay("CollidingDown", isCollidingDown, DoDebugCollisions.Down);
+            MyDebug.DebugOSD.ToggleDisplay("CollidingLeft", isCollidingLeft, DoDebugCollisions.Left);
+            MyDebug.DebugOSD.ToggleDisplay("CollidingRight", isCollidingRight, DoDebugCollisions.Right);
+            MyDebug.DebugOSD.ToggleDisplay("CollidingAnySide", isCollidingOnAnySide, DoDebugCollisions.Side);
+
 
             HandleWhenAtBottomOfMap();
         }
@@ -1755,34 +1757,34 @@ namespace Controller
         
         private void OnDrawGizmosSelected()
         {
-            if (doDebugCollidingDown)
-            {
-                Gizmos.color = isCollidingDown ? Color.red : Color.green;
-                Gizmos.DrawWireSphere(
-                    transform.position + ceilingCheckOffset,
-                    groundCeilingCheckRadius
-                    );
+            //if (doDebugCollidingDown)
+            //{
+            //    Gizmos.color = isCollidingDown ? Color.red : Color.green;
+            //    Gizmos.DrawWireSphere(
+            //        transform.position + ceilingCheckOffset,
+            //        groundCeilingCheckRadius
+            //        );
 
-            }
+            //}
 
-            if (doDebugCollidingUp)
-            {
-                Gizmos.color = isCollidingUp ? Color.red : Color.green;
-                Gizmos.DrawWireSphere(
-                    transform.position + groundCheckOffset,
-                    groundCeilingCheckRadius
-                    );
-            }
+            //if (doDebugCollidingUp)
+            //{
+            //    Gizmos.color = isCollidingUp ? Color.red : Color.green;
+            //    Gizmos.DrawWireSphere(
+            //        transform.position + groundCheckOffset,
+            //        groundCeilingCheckRadius
+            //        );
+            //}
 
 
-            if (doDebugCollidinAnySide)
-            {
-                Gizmos.color = isCollidingOnAnySide ? Color.red : Color.green;
-                Gizmos.DrawWireCube(
-                    transform.position,
-                    bodyCheckSize
-                    );
-            }
+            //if (doDebugCollidinAnySide)
+            //{
+            //    Gizmos.color = isCollidingOnAnySide ? Color.red : Color.green;
+            //    Gizmos.DrawWireCube(
+            //        transform.position,
+            //        bodyCheckSize
+            //        );
+            //}
         }
     }
 }

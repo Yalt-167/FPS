@@ -104,7 +104,7 @@ public sealed class PlayerCombat : MonoBehaviour
         if (scrollWheelInput != 0f)
         {
             UpdateWeaponWithIndex(
-                Utility.Utility.ModuloThatWorksWithNegatives(scrollWheelInput > 0f ? ++currentWeaponIndex : --currentWeaponIndex, allowedWeaponsCount)
+                MyUtility.Utility.ModuloThatWorksWithNegatives(scrollWheelInput > 0f ? ++currentWeaponIndex : --currentWeaponIndex, allowedWeaponsCount)
             );
         }
     }
