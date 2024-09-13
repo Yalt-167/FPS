@@ -5,7 +5,6 @@ using UnityEngine;
 
 public sealed class HandleGunAngle : MonoBehaviour
 {
-
     [SerializeField] private LayerMask shootableLayers;
     private Transform cameraTransform;
     private Transform barrelEnd;

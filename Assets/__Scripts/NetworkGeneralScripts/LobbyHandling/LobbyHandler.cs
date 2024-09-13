@@ -1737,6 +1737,3 @@ namespace LobbyHandling
     }
 }
 
-// if not in lobby -> create + join + local + LOBBYLIST
-// if in lobby -> (host ? edit + share : quit) + LOBBYDATA
-

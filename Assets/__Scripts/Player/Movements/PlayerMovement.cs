@@ -215,6 +215,7 @@ namespace Controller
         [SerializeField] private float upwardWallJumpForce = 1080f;
         [SerializeField] private float sideWallJumpForceAwayFromWall;
         [SerializeField] private float upwardWallJumpForceAwayFromWall = 900f;
+        [SerializeField] private float wallRunRayCastLength = .3f;
         private bool onRight;
         private float timeInterruptedWallrunWithDash = float.NegativeInfinity;
         [SerializeField] private float wallRunForceCoefficient;
@@ -1328,13 +1329,19 @@ namespace Controller
             onRight = side > 0;
             var forceDirection = onRight ? transform.right : -transform.right;
 
+            _ = Physics.Raycast(transform.position, forceDirection, out var hit, wallRunRayCastLength, groundLayers, QueryTriggerInteraction.Ignore);
+
+            var directionAlongWall = Vector3.Cross(hit.normal, Vector3.up).normalized;
+
+            directionAlongWall = onRight ? -directionAlongWall :  directionAlongWall;
+
             timeStartedWallRunning = Time.time;
             var startedTiltingCamera = false;
             InputQuery.Left.ResetHeldSince(); // avoid insta quitting the wallrun due to this triggering while you held it to jump
             InputQuery.Right.ResetHeldSince(); // same but other side :)
 
             var leftEarly = false;
-            var directionAlongWall = (transform.forward + Vector3.Dot(transform.forward, forceDirection) * forceDirection).normalized;
+            //var directionAlongWall = (transform.forward + Vector3.Dot(transform.forward, forceDirection) * forceDirection).normalized;
 
             //var directionAlongWall = Vector3.Dot(transform.forward, forceDirection);
             yield return new WaitUntil(
