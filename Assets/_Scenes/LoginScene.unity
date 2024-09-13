@@ -206,6 +206,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (39)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -372,6 +377,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (90\xB0) (3)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -658,6 +668,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (35)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -749,6 +764,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (36)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -842,6 +862,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (45)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -933,6 +958,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (30)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1050,6 +1080,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (41)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1265,6 +1300,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ground (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1388,6 +1428,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ground (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1479,6 +1524,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (90\xB0) (4)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1793,6 +1843,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ground (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1884,6 +1939,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (44)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1977,6 +2037,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (40)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2069,6 +2134,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (31)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2160,6 +2230,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (22)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2277,6 +2352,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (23)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2444,6 +2524,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (20)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2824,6 +2909,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (27)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2965,6 +3055,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Ground (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3108,6 +3203,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (90\xB0) (2)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3199,6 +3299,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (34)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3316,6 +3421,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (32)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3459,6 +3569,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (18)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3550,6 +3665,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (26)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3693,6 +3813,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (46)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3784,6 +3909,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Ground (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3877,6 +4007,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (43)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3968,6 +4103,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (90\xB0) (5)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4061,6 +4201,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (42)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4152,6 +4297,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (17)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4481,6 +4631,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (19)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4598,6 +4753,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (21)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4714,6 +4874,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Floor
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4838,6 +5003,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (25)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4955,6 +5125,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (37)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5046,6 +5221,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (28)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5207,6 +5387,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (90\xB0) (6)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5418,6 +5603,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (24)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5534,6 +5724,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (33)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5764,6 +5959,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (38)"
       objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5855,6 +6055,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "SlopeTester (85\xB0) (29)"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7185242841514170918, guid: b0dc9c6db818cb24abd593caf7f527ef,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

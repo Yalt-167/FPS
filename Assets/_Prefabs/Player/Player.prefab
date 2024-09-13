@@ -1505,7 +1505,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2957232829
+  GlobalObjectIdHash: 169908227
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1640,15 +1640,12 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
-  CollisionDebug:
+  DoDebugCollisions:
     Up: 0
     Down: 0
     Right: 0
     Left: 0
     Side: 0
-  doDebugCollidingDown: 0
-  doDebugCollidingUp: 0
-  doDebugCollidinAnySide: 0
   validatedActionBufferDuration: 0
   timeToReachMaxSprintSpeed: 0.5
   airFriction: 0.1
@@ -1663,7 +1660,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   initialJumpSpeedBoost: 60
-  longJumpForce: {x: 0, y: 0, z: 0}
   terminalVelocity: -75
   afterDashMomentumConservationWindowDuration: 0.1
   slideCancelThreshold: 0.3
