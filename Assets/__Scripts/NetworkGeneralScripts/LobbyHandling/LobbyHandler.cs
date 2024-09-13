@@ -1091,7 +1091,7 @@ namespace LobbyHandling
             DrawLobbySettings();
 
             GUI.enabled = isSignedIn && !isCreatingLobby;
-            if ((GUILayout.Button(isCreatingLobby ? "Creating your lobby" : LobbyGUILabels.CreateLobby) || Input.GetKeyDown(KeyCode.Return)) && isSignedIn)
+            if ((GUILayout.Button(isCreatingLobby ? "Creating your lobby" : LobbyGUILabels.CreateLobby) || !isCreatingLobby && Input.GetKeyDown(KeyCode.Return)) && isSignedIn)
             {
                 CreateLobby(LobbyName, LobbyCapacity, PrivateLobby, Password, mapsDropDown.Current, gameModesDropDown.Current); 
             }
