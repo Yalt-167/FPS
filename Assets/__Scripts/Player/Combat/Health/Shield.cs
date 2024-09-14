@@ -1,6 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting.FullSerializer;
+
 using UnityEngine;
 
 public sealed class Shield
@@ -20,7 +21,8 @@ public sealed class Shield
             lastHealthyShieldCellIndex = (ushort)Mathf.Clamp(value, 0, shieldCellAmount - 1);
         }
     }
-    private bool FullShield => shieldCells[shieldCellAmount - 1].Shield == shieldCellHealth;
+    private bool IsFullShield => shieldCells[shieldCellAmount - 1].Shield == shieldCellHealth;
+    public bool HasShield => shieldCells[0].Shield > 0;
     public Shield(ushort shieldCellAmount_, ushort shieldCellHealth_)
     {
         shieldCellAmount = shieldCellAmount_;
@@ -37,10 +39,10 @@ public sealed class Shield
 
     public ushort TakeDamage(ushort damage)
     {
-        while (damage > 0 && this)
+        while (damage > 0 && HasShield)
         {
             damage = shieldCells[LastHealthyShieldCellIndex].TakeDamage(damage);
-            if (damage > 0) LastHealthyShieldCellIndex--;
+            if (damage > 0) { LastHealthyShieldCellIndex--; }
         }
         return damage;
     }
@@ -48,33 +50,28 @@ public sealed class Shield
 
     public void Heal(ushort healProficiency, bool canReviveCell)
     {
-        while (healProficiency > 0 && !FullShield)
+        while (healProficiency > 0 && !IsFullShield)
         {
             healProficiency = shieldCells[LastHealthyShieldCellIndex].Heal(healProficiency, canReviveCell);
-            if (healProficiency > 0) LastHealthyShieldCellIndex++;
+            if (healProficiency > 0) { LastHealthyShieldCellIndex++; }
         }
     }
 
-    public IEnumerable<TupleIndexValue> AsSliderValues()
+    public IEnumerable<IndexValueTuple<float>> AsSliderValues()
     {
         for (int i = 0; i < shieldCellAmount; i++)
         {
             yield return new(i, shieldCells[i].AsSliderValue());
         }
     }
-    
-    public static implicit operator bool(Shield shield)
-    {
-        return shield.shieldCells[0].Shield > 0;
-    }
 }
 
-public struct TupleIndexValue
+public struct IndexValueTuple<T>
 {
     public int Index;
-    public float Value;
+    public T Value;
 
-    public TupleIndexValue(int  index, float value)
+    public IndexValueTuple(int  index, T value)
     {
         Index = index;
         Value = value;

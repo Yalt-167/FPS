@@ -16,10 +16,10 @@ public sealed class TeamSelector : NetworkBehaviour
 {
     public static TeamSelector Instance { get; private set; }
     private string[][] teams;
-    [SerializeField] private ushort teamsCount;
-    [SerializeField] private ushort maxTeamSize;
-    [SerializeField] private int teamSelectionMenuWidth;
-    [SerializeField] private int teamSelectionMenuPlayerRegionHeightPerExpectedPlayer;
+    private ushort teamsCount;
+    private ushort maxTeamSize;
+    private readonly int teamSelectionMenuWidth = 250;
+    private readonly int teamSelectionMenuPlayerRegionHeightPerExpectedPlayer = 50;
     private int[] teamsIndex;
 
     private bool teamSelectorMenuActive;
@@ -220,8 +220,8 @@ public sealed class TeamSelector : NetworkBehaviour
     {
         ToggleSelectionScreenMenu(towardOn: towardOn_);
 
-        PlayerFrame.LocalPlayer.ToggleCursor(towardOn: towardOn_);
 
+        PlayerFrame.LocalPlayer.ToggleCursor(towardOn: towardOn_);
         PlayerFrame.LocalPlayer.ToggleGameControls(towardOn: !towardOn_);
         PlayerFrame.LocalPlayer.ToggleCamera(towardOn: !towardOn_);
         PlayerFrame.LocalPlayer.ToggleHUD(towardOn: !towardOn_);

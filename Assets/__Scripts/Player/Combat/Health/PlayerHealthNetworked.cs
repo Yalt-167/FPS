@@ -85,13 +85,13 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
         // send the info about wether shielded here (bool)Shield
         if (IsOwner)
         {
-            SendDamageLogInfosServerRpc(MapBodyPartToTargetType(bodyPartShot, Shield), damage, attackerNetworkID);
+            SendDamageLogInfosServerRpc(MapBodyPartToTargetType(bodyPartShot, Shield.HasShield), damage, attackerNetworkID);
         }
 
         if (damage <= 0) { return; }
 
 
-        if (!ignoreShield && Shield)
+        if (!ignoreShield && Shield.HasShield)
         {
             damage = Shield.TakeDamage(damage);
         }
@@ -164,14 +164,14 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
     [Rpc(SendTo.Server)]
     private void RequestRespawnServerRpc()
     {
-        RespawnClientRpc();
+        RespawnClientRpc(GameNetworkManager.Manager.GetSpawnPosition(TeamNumber));
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void RespawnClientRpc()
+    private void RespawnClientRpc(Vector3 spawnPosition)
     {
         respawning = false;
         ResetHealth();
-        transform.position = GameNetworkManager.Manager.GetSpawnPosition(TeamNumber); // could be a different position on each client 
+        transform.position = spawnPosition;
     }
 }
