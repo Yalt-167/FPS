@@ -30,7 +30,7 @@ public sealed class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlash
         };
     }
 
-    public void ReactShot(DamageDealt damage, Vector3 _, Vector3 __, ulong attackerNetworkID, ushort attackerTeamNumber, bool ___)
+    public void ReactShot(DamageDealt damage, Vector3 _, Vector3 __, ulong attackerNetworkObjectID, ushort attackerTeamNumber, bool ___)
     {
         //if (!IsOwner) { return; }
 
@@ -40,27 +40,27 @@ public sealed class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlash
             return;
         }
 
-        DamageTargetServerRpc(GetEffectiveDamage(damage), bodyPart, attackerNetworkID);
+        DamageTargetServerRpc(GetEffectiveDamage(damage), bodyPart, attackerNetworkObjectID);
     }
 
-    public void ReactExplosion(ushort damage, Vector3 _, ulong attackerNetworkID, bool __)
+    public void ReactExplosion(ushort damage, Vector3 _, ulong attackerNetworkObjectID, bool __)
     {
-        DamageTargetServerRpc(damage, bodyPart, attackerNetworkID);
+        DamageTargetServerRpc(damage, bodyPart, attackerNetworkObjectID);
     }
 
-    public void ReactSlash(ushort damage, Vector3 _, ulong attackerNetworkID)
+    public void ReactSlash(ushort damage, Vector3 _, ulong attackerNetworkObjectID)
     {
         if (OnImmunityAfterHit) { return; }
 
-        DamageTargetServerRpc(damage, bodyPart, attackerNetworkID);
+        DamageTargetServerRpc(damage, bodyPart, attackerNetworkObjectID);
 
         StartCoroutine(StartImmunityAfterSlashColdown());
     }
 
     [Rpc(SendTo.Server)]
-    private void DamageTargetServerRpc(ushort damage, BodyParts bodyPart, ulong attackerNetworkID)
+    private void DamageTargetServerRpc(ushort damage, BodyParts bodyPart, ulong attackerNetworkObjectID)
     {
-        playerHealth.TakeDamageClientRpc(damage, bodyPart, false, attackerNetworkID);
+        playerHealth.TakeDamageClientRpc(damage, bodyPart, false, attackerNetworkObjectID);
     }
 
     public IEnumerator StartImmunityAfterSlashColdown()

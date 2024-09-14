@@ -80,12 +80,12 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    public void TakeDamageClientRpc(ushort damage, BodyParts bodyPartShot, bool ignoreShield, ulong attackerNetworkID) // add shield only modifier
+    public void TakeDamageClientRpc(ushort damage, BodyParts bodyPartShot, bool ignoreShield, ulong attackerNetworkObjectID) // add shield only modifier
     {
         // send the info about wether shielded here (bool)Shield
         if (IsOwner)
         {
-            SendDamageLogInfosServerRpc(MapBodyPartToTargetType(bodyPartShot, Shield.HasShield), damage, attackerNetworkID);
+            SendDamageLogInfosServerRpc(MapBodyPartToTargetType(bodyPartShot, Shield.HasShield), damage, attackerNetworkObjectID);
         }
 
         if (damage <= 0) { return; }
@@ -128,17 +128,17 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server)]
-    public void SendDamageLogInfosServerRpc(TargetType targetType, ushort damage, ulong attackerNetworkID)
+    public void SendDamageLogInfosServerRpc(TargetType targetType, ushort damage, ulong attackerNetworkObjectID)
     {
-        DisplayDamageLogsClientRPC(targetType, damage, attackerNetworkID);
+        DisplayDamageLogsClientRpc(targetType, damage, attackerNetworkObjectID);
     }
 
     [Rpc(SendTo.ClientsAndHost)] // called on all client on this INSTANCE of this script
-    public void DisplayDamageLogsClientRPC(TargetType targetType, ushort damageDealt, ulong attackerNetworkID)
+    public void DisplayDamageLogsClientRpc(TargetType targetType, ushort damageDealt, ulong attackerNetworkObjectID)
     {
         if (IsOwner) { return; }
 
-        Game.RetrievePlayerFromComponentID(attackerNetworkID, NetworkedComponent.WeaponHandler).WeaponHandler.SpawnDamageLog(targetType, damageDealt);
+        Game.RetrievePlayerFromNetworkObjectID(attackerNetworkObjectID).WeaponHandler.SpawnDamageLog(targetType, damageDealt);
     }
 
 

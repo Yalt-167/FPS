@@ -1505,7 +1505,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2957232829
+  GlobalObjectIdHash: 169908227
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1560,11 +1560,6 @@ MonoBehaviour:
     gameObjectsToDisable: []
   <ChampionStats>k__BackingField: {fileID: 11400000, guid: bf6485afb90a6d040a4e890132e56a37,
     type: 2}
-  Combat: {fileID: 0}
-  Movement: {fileID: 0}
-  ClientNetworkTransform: {fileID: 0}
-  WeaponHandler: {fileID: 0}
-  Health: {fileID: 0}
   PlayerIndex: 0
   IsOnline: 0
 --- !u!54 &5516743904902779326

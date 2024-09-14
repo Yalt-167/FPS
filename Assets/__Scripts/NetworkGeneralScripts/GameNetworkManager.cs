@@ -197,15 +197,6 @@ namespace GameManagement
 
         #endregion
     }
-
-    public enum NetworkedComponent : byte
-    {
-        NetworkObject,
-        ClientNetworkTransform,
-        //HandlePlayerNetworkBehaviour,
-        WeaponHandler,
-        PlayerHealthNetworked
-    }
 }
 
 

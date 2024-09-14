@@ -9,7 +9,7 @@ namespace Projectiles
     {
         public Vector3 Position => transform.position;
         public Vector3 Direction => transform.forward;
-        public ulong Owner => attackerNetworkID;
+        public ulong Owner => attackerNetworkObjectID;
         public bool CanBreakThings => canBreakThings;
 
         [SerializeField] protected float lifetime;
@@ -17,7 +17,7 @@ namespace Projectiles
         protected float speed;
         protected float bulletDrop;
         protected DamageDealt damage;
-        protected ulong attackerNetworkID;
+        protected ulong attackerNetworkObjectID;
         protected bool canBreakThings;
         protected LayerMask layersToHit;
         protected bool active;
@@ -26,7 +26,7 @@ namespace Projectiles
         protected ushort shooterTeamNumber;
 
         public virtual void Init(
-            DamageDealt damage_, float speed_, float bulletDrop_, ulong attackerNetworkID_, bool canBreakThings_, LayerMask layersToHit_,
+            DamageDealt damage_, float speed_, float bulletDrop_, ulong attackerNetworkObjectID_, bool canBreakThings_, LayerMask layersToHit_,
             ProjectileOnHitWallBehaviour onHitWallBehaviour_,
             ProjectileOnHitPlayerBehaviour onHitPlayerBehaviour_,
             ushort shooterTeamNumber_
@@ -37,7 +37,7 @@ namespace Projectiles
             layersToHit = layersToHit_;
             bulletDrop = bulletDrop_;
             speed = speed_;
-            attackerNetworkID = attackerNetworkID_;
+            attackerNetworkObjectID = attackerNetworkObjectID_;
             canBreakThings = canBreakThings_;
 
             onHitWallBehaviour = onHitWallBehaviour_;
@@ -53,7 +53,7 @@ namespace Projectiles
             var col = collision.collider;
             if (col.TryGetComponent<IShootable>(out var shootableComponent))
             {
-                shootableComponent.ReactShot(damage, transform.forward, Vector3.zero, attackerNetworkID, shooterTeamNumber, canBreakThings);
+                shootableComponent.ReactShot(damage, transform.forward, Vector3.zero, attackerNetworkObjectID, shooterTeamNumber, canBreakThings);
                 onHitPlayerBehaviour.OnHitPlayer(this, shootableComponent);
                 active = false;
             }

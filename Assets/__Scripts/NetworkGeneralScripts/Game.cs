@@ -37,11 +37,6 @@ namespace GameManagement
             Manager = this;
         }
 
-        private void Update()
-        {
-            //MyDebug.DebugOSD.Display("PlayerCount", PlayerCount);
-        }
-
         #endregion
 
         #region Respawn Logic
@@ -175,25 +170,11 @@ namespace GameManagement
         /// <paramref name="whichComponentID"/> basically refers to which component ID was passed in the method.<br/>
         /// For instance if we have is the weaponHandlerand passed its ID we should also pass the relevant enum member 
         /// </summary>
-        /// <param name="componentID"></param>
+        /// <param name="objectNetworkID"></param>
         /// <param name="whichComponentID"></param>
-        public static PlayerFrame RetrievePlayerFromComponentID(ulong componentID, NetworkedComponent whichComponentID)
+        public static PlayerFrame RetrievePlayerFromNetworkObjectID(ulong objectNetworkID)
         {
-            return whichComponentID switch
-            {
-                NetworkedComponent.NetworkObject => Manager.players.First(predicate: (each) => each.NetworkObject.NetworkObjectId == componentID),
-
-                NetworkedComponent.ClientNetworkTransform => Manager.players.First(predicate: (each) => each.ClientNetworkTransform.NetworkObjectId == componentID),
-
-                //NetworkedComponent.HandlePlayerNetworkBehaviour => Manager.players.First(each => each.BehaviourHandler.NetworkObjectId == componentID),
-
-                NetworkedComponent.WeaponHandler => Manager.players.First(predicate: (each) => each.WeaponHandler.NetworkObjectId == componentID),
-
-                NetworkedComponent.PlayerHealthNetworked => Manager.players.First(predicate: (each) => each.Health.NetworkObjectId == componentID),
-
-                _ => throw new Exception($"This component provided ({whichComponentID}) does not match anything"),
-            };
-
+            return Manager.players.First(predicate: (each) => each.NetworkObjectId == objectNetworkID);
         }
 
         public static IEnumerable<PlayerFrame> GetPlayersOfTeam(ushort teamID)
