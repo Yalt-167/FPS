@@ -1,3 +1,5 @@
+#define DEV_BUILD
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -69,6 +71,7 @@ public sealed class TeamSelector : NetworkBehaviour
 
         return playersInTeams == Game.PlayerCount;
     }
+
     private void CreateTeamMenu(int teamNumber)
     {
         GUILayout.BeginVertical(CachedGUIStylesNames.Box); // V
@@ -123,7 +126,11 @@ public sealed class TeamSelector : NetworkBehaviour
 
         GUILayout.FlexibleSpace();
 
-        if (LobbyHandling.LobbyHandler.Instance.IsLobbyHost())
+        if (LobbyHandling.LobbyHandler.Instance.IsLobbyHost()
+#if DEV_BUILD
+||  LobbyHandling.LobbyHandler.Instance.UsingLocalTestingSession
+#endif
+            )
         {
             GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
 

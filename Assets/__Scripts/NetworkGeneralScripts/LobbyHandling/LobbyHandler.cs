@@ -34,6 +34,7 @@ namespace LobbyHandling
 #if DEV_BUILD
         private bool startedALocalTestingSession;
         private bool inALocalTestingSession;
+        public bool UsingLocalTestingSession => startedALocalTestingSession;
 #endif
         private static readonly float heartbeat = 15f; // what pings the lobby for it to stay active when not interacted with (in seconds)
         private float heartbeatTimer;

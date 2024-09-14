@@ -37,6 +37,11 @@ namespace GameManagement
             Manager = this;
         }
 
+        private void Update()
+        {
+            //MyDebug.DebugOSD.Display("PlayerCount", PlayerCount);
+        }
+
         #endregion
 
         #region Respawn Logic
