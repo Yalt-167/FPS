@@ -319,3 +319,17 @@ namespace GameManagement
 
 // loadMap takes in a SO representing the map
 // the SO has the scene in its member along with useful data about the map
+
+
+
+public abstract class GameRule
+{
+    public abstract void OnStart();
+
+    public virtual void GatherSpawnPoints()
+    {
+
+    }
+
+    public abstract void OnEnd();
+}
