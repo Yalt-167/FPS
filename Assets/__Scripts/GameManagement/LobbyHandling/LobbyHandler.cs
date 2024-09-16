@@ -714,12 +714,13 @@ namespace LobbyHandling
 
         private void LaunchTeamSelectionMenu()
         {
-            Game.Manager.ToggleLobbyMenuServerRpc(towardOn: false);
-            Game.Manager.CreatePlayerListServerRpc();
-            GameNetworkManager.Manager.SpawnTeamSelectionMenu(2, 6); // as it s a network spawn its automatically propagated to all clients
+            Game.ToggleLobbyMenu(towardOn: false);
+            GameNetworkManager.SpawnTeamSelectionMenu(2, 6);
+            Game.CreatePlayerList();
+            Game.Setup();
             if (gameModesDropDown.Current != GameModes.ToBeVoted && mapsDropDown.Current != Maps.ToBeVoted)
             {
-                Game.Manager.LoadMapServerRpc($"_Scenes/{gameModesDropDown.Current}/{mapsDropDown.Current}");
+                Game.LoadLevel(gameModesDropDown.Current, mapsDropDown.Current);
             }
         }
 

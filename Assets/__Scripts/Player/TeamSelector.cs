@@ -16,7 +16,7 @@ public sealed class TeamSelector : NetworkBehaviour
 {
     public static TeamSelector Instance { get; private set; }
     private string[][] teams;
-    private ushort teamsCount;
+    public ushort TeamsCount { get; private set; }
     private ushort maxTeamSize;
     private readonly int teamSelectionMenuWidth = 250;
     private readonly int teamSelectionMenuPlayerRegionHeightPerExpectedPlayer = 50;
@@ -38,7 +38,7 @@ public sealed class TeamSelector : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void SetDataClientRpc(ushort teamsCount_, ushort teamsSize_)
     {
-        teamsCount = teamsCount_;
+        TeamsCount = teamsCount_;
         maxTeamSize = teamsSize_;
 
         UpdateData();
@@ -47,9 +47,9 @@ public sealed class TeamSelector : NetworkBehaviour
     private void UpdateData()
     {
         teamSelectorMenuActive = true;
-        teams = new string[teamsCount][];
-        teamsIndex = new int[teamsCount];
-        for (int i = 0; i < teamsCount; i++)
+        teams = new string[TeamsCount][];
+        teamsIndex = new int[TeamsCount];
+        for (int i = 0; i < TeamsCount; i++)
         {
             teams[i] = new string[maxTeamSize];
             teamsIndex[i] = 0;
@@ -59,7 +59,7 @@ public sealed class TeamSelector : NetworkBehaviour
     private bool AllPlayersAreInATeam()
     {
         var playersInTeams = 0;
-        for (int teamIndex = 0; teamIndex < teamsCount; teamIndex++)
+        for (int teamIndex = 0; teamIndex < TeamsCount; teamIndex++)
         {
             for (int teamSlotIndex = 0; teamSlotIndex < Game.PlayerCount; teamSlotIndex++)
             {
@@ -111,7 +111,7 @@ public sealed class TeamSelector : NetworkBehaviour
 
         GUILayout.FlexibleSpace();
 
-        for (int i = 0; i < teamsCount; i++)
+        for (int i = 0; i < TeamsCount; i++)
         {
             GUILayout.BeginVertical(CachedGUIStylesNames.Box);
 
