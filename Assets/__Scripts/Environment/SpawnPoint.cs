@@ -12,12 +12,12 @@ public sealed class SpawnPoint : MonoBehaviour
 
     private void Awake()
     {
-        GameNetworkManager.Manager.AddRespawnPoint(this);
+        Game.Manager.AddRespawnPoint(this);
         SpawnPosition = transform.position + Vector3.up;
     }
 
     private void OnDisable()
     {
-        GameNetworkManager.Manager.DiscardRespawnPoint(this);
+        Game.Manager.DiscardRespawnPoint(this);
     }
 }

@@ -164,7 +164,7 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
     [Rpc(SendTo.Server)]
     private void RequestRespawnServerRpc()
     {
-        RespawnClientRpc(GameNetworkManager.Manager.GetSpawnPosition(TeamNumber));
+        RespawnClientRpc(Game.Manager.GetSpawnPosition(TeamNumber));
     }
 
     [Rpc(SendTo.ClientsAndHost)]

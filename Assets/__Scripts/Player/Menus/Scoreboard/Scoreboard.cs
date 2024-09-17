@@ -40,12 +40,12 @@ namespace Menus
         private void Awake()
         {
             inputManager = GetComponent<InputManager>();
-            Game.OnGameStarted += Init;
+            Game.OnGeneralGameStarted += Init;
         }
 
         private void OnDisable()
         {
-            Game.OnGameStarted -= Init;
+            Game.OnGeneralGameStarted -= Init;
         }
 
         private void Update()
