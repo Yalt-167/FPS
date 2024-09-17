@@ -23,7 +23,7 @@ namespace GameManagement
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        public virtual void OnGameStartClientRpc()
+        protected virtual void OnGameStartClientRpc()
         {
             OnGameStartedClientSide?.Invoke();
         }
@@ -44,7 +44,7 @@ namespace GameManagement
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        public virtual void OnGameUpdateClientRpc()
+        protected virtual void OnGameUpdateClientRpc()
         {
             OnGameUpdatedClientSide?.Invoke();
         }
@@ -65,7 +65,7 @@ namespace GameManagement
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        public virtual void OnGameEndClientRpc()
+        protected virtual void OnGameEndClientRpc()
         {
             OnGameEndedClientSide?.Invoke();
         } 

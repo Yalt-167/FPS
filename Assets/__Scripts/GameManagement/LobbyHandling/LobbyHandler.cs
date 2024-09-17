@@ -16,6 +16,7 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using Unity.Services.Relay.Models;
 using Unity.Services.Relay;
+
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 
@@ -721,6 +722,10 @@ namespace LobbyHandling
             if (gameModesDropDown.Current != GameModes.ToBeVoted && mapsDropDown.Current != Maps.ToBeVoted)
             {
                 Game.LoadLevel(gameModesDropDown.Current, mapsDropDown.Current);
+            }
+            else
+            {
+                Game.LoadLevel(GameModes.TeamFight, Maps.TeamFight.TeamFightMap1);
             }
         }
 
