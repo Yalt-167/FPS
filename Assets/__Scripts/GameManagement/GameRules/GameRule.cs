@@ -9,22 +9,67 @@ namespace GameManagement
 {
     public abstract class GameRule : NetworkBehaviour
     {
-        public event Action OnGameStarted;
-        public virtual void OnGameStart()
+        #region Game Start Handling
+
+        public event Action OnGameStartedServerSide;
+        public event Action OnGameStartedClientSide;
+
+        [Rpc(SendTo.Server)]
+        public virtual void OnGameStartServerRpc()
         {
-            OnGameStarted?.Invoke();
+            OnGameStartedServerSide?.Invoke();
+
+            OnGameStartClientRpc();
         }
 
-        public event Action OnGameUpdated;
-        public virtual void OnGameUpdate()
+        [Rpc(SendTo.ClientsAndHost)]
+        public virtual void OnGameStartClientRpc()
         {
-            OnGameUpdated?.Invoke();
+            OnGameStartedClientSide?.Invoke();
         }
 
-        public event Action OnGameEnded;
-        public virtual void OnGameEnd()
+        #endregion
+
+        #region Game Update Handling
+
+        public event Action OnGameUpdatedServerSide;
+        public event Action OnGameUpdatedClientSide;
+
+        [Rpc(SendTo.Server)]
+        public virtual void OnGameUpdateServerRpc()
         {
-            OnGameEnded?.Invoke();
+            OnGameUpdatedServerSide?.Invoke();
+
+            OnGameUpdateClientRpc();
         }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        public virtual void OnGameUpdateClientRpc()
+        {
+            OnGameUpdatedClientSide?.Invoke();
+        }
+
+        #endregion
+
+        #region Game End Handling
+
+        public event Action OnGameEndedServerSide;
+        public event Action OnGameEndedClientSide;
+
+        [Rpc(SendTo.Server)]
+        public virtual void OnGameEndServerRpc()
+        {
+            OnGameEndedServerSide?.Invoke();
+
+            OnGameEndClientRpc();
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        public virtual void OnGameEndClientRpc()
+        {
+            OnGameEndedClientSide?.Invoke();
+        } 
+
+        #endregion
     }
 }

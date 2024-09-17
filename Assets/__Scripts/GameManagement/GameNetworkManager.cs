@@ -18,11 +18,16 @@ namespace GameManagement
     public sealed class GameNetworkManager : NetworkManager
     {
         public static GameNetworkManager Manager { get; private set; }
+
         [SerializeField] private GameObject gameManagerPrefab;
         private GameObject gameManagerInstance;
 
         [SerializeField] private GameObject teamSelectorPrefab;
         private GameObject teamSelectorInstance;
+        public TeamSelector TeamSelectionScreen { get; private set; }
+
+        [SerializeField] private GameObject gameRuleManagerPrefab;
+        public GameObject GameRuleManagerInstance { get; private set; }
 
         #region Unity Handled
 
@@ -32,6 +37,10 @@ namespace GameManagement
 
             OnServerStarted += CreateManagerInstance;
             OnServerStopped += KillManagerInstance;
+
+            OnServerStarted += CreateGameRuleManagerInstance;
+            OnServerStopped += KillGameRuleManagerInstance;
+
 
             OnClientConnectedCallback += Game.OnClientConnected;
             OnClientDisconnectCallback += Game.OnClientDisconnected;
@@ -48,9 +57,21 @@ namespace GameManagement
             gameManagerInstance.GetComponent<NetworkObject>().Spawn();
         }
 
-        private void KillManagerInstance(bool param)
+        private void KillManagerInstance(bool _)
         {
             Destroy(gameManagerInstance);
+        }
+
+
+        private void CreateGameRuleManagerInstance()
+        {
+            GameRuleManagerInstance = Instantiate(gameRuleManagerPrefab);
+            GameRuleManagerInstance.GetComponent<NetworkObject>().Spawn();
+        }
+
+        private void KillGameRuleManagerInstance(bool _)
+        {
+            Destroy(GameRuleManagerInstance);
         }
 
         #endregion
@@ -105,52 +126,6 @@ namespace GameManagement
 
         #endregion
 
-        #region Respawn Logic
-
-        private readonly List<List<SpawnPoint>> spawnPoints = new();
-
-        public void InitiateSpawnPoints()
-        {
-            var teamsCount = teamSelectorInstance.GetComponent<TeamSelector>().TeamsCount;
-            for (int i = 0; i < teamsCount; i++)
-            {
-                spawnPoints[i] = new List<SpawnPoint>();
-            }
-        }
-
-        public void AddRespawnPoint(SpawnPoint spawnPoint)
-        {
-            spawnPoints[spawnPoint.TeamNumber - 1].Add(spawnPoint);
-        }
-
-
-        public void DiscardRespawnPoint(SpawnPoint spawnPoint)
-        {
-            spawnPoints[spawnPoint.TeamNumber - 1].Remove(spawnPoint);
-        }
-
-        public Vector3 GetSpawnPosition(ushort teamNumber)
-        {
-            var teamID = teamNumber - 1;
-            var relevantSpawnPoints = spawnPoints[teamID];
-
-            if (relevantSpawnPoints.Count == 0) { return NoSpawnpointAvailableForThisTeam(teamID); }
-
-            var activeRelevantSpawnPoints = (List<SpawnPoint>)relevantSpawnPoints.Where(predicate: (spawnPoint) => spawnPoint.Active);
-
-            if (activeRelevantSpawnPoints.Count == 0) { return NoSpawnpointAvailableForThisTeam(teamID); }
-
-            return activeRelevantSpawnPoints[UnityEngine.Random.Range(0, activeRelevantSpawnPoints.Count)].SpawnPosition;
-        }
-
-        private Vector3 NoSpawnpointAvailableForThisTeam(int teamID)
-        {
-            print($"There s no checkpoint available for this player with team ID: {teamID}");
-            return Vector3.zero;
-        }
-
-        #endregion
-
         #region Debug
 
         //[SerializeField] private bool debugBottomPlane;
@@ -178,7 +153,7 @@ namespace GameManagement
 
         #endregion
 
-        #region Team Selectioon Menu
+        #region Team Selection Menu
 
         public static void SpawnTeamSelectionMenu(ushort teamsCount, ushort teamsSize)
         {
@@ -193,9 +168,9 @@ namespace GameManagement
                 teamSelectorInstance.GetComponent<NetworkObject>().Spawn();
             }
 
-            var teamSelector = teamSelectorInstance.GetComponent<TeamSelector>();
-            teamSelector.SetDataServerRpc(teamsCount, teamsSize);
-            teamSelector.ToggleTeamSelectionScreenServerRpc(towardOn__: true);
+            TeamSelectionScreen = teamSelectorInstance.GetComponent<TeamSelector>();
+            TeamSelectionScreen.SetDataServerRpc(teamsCount, teamsSize);
+            TeamSelectionScreen.ToggleTeamSelectionScreenServerRpc(towardOn__: true);
         }
 
         #endregion

@@ -1,8 +1,7 @@
 //#define DEBUG_MULTIPLAYER
 #define LOG_METHOD_CALLS
 
-using LobbyHandling;
-using SceneHandling;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,18 +9,21 @@ using System.Linq;
 using System.Text;
 
 using Unity.Netcode;
+
 using UnityEditor;
 using UnityEngine;
 
-using Random = UnityEngine.Random;
+using LobbyHandling;
+using SceneHandling;
 
 namespace GameManagement
 {
     public sealed class Game : NetworkBehaviour
     {
         public static Game Manager;
+        private static GameRule currentGameRule;
 
-        #region References
+        #region Public References
 
         public static PlayerFrame[] Players => Manager.players;
         public static int PlayerCount { get; private set; }
@@ -35,44 +37,59 @@ namespace GameManagement
             Manager = this;
         }
 
+        private void Update()
+        {
+            if (!IsServer) { return; }
+
+            if (!Started) { return; }
+
+            currentGameRule.OnGameUpdateServerRpc();
+        }
+
         #endregion
 
         #region Respawn Logic
 
-        private readonly Dictionary<ushort, List<SpawnPoint>> spawnPoints = new();
+        private readonly List<List<SpawnPoint>> spawnPoints = new();
+
+        public void InitiateSpawnPoints()
+        {
+            var teamsCount = GameNetworkManager.Manager.TeamSelectionScreen.TeamsCount;
+            for (int i = 0; i < teamsCount; i++)
+            {
+                spawnPoints[i] = new List<SpawnPoint>();
+            }
+        }
 
         public void AddRespawnPoint(SpawnPoint spawnPoint)
         {
-            if (!spawnPoints.ContainsKey(spawnPoint.TeamNumber))
-            {
-                spawnPoints.Add(spawnPoint.TeamNumber, new());
-            }
+            if (spawnPoints.Count == 0) { InitiateSpawnPoints(); }
 
-            spawnPoints[spawnPoint.TeamNumber].Add(spawnPoint);
+            spawnPoints[spawnPoint.TeamNumber - 1].Add(spawnPoint);
         }
 
         public void DiscardRespawnPoint(SpawnPoint spawnPoint)
         {
-            spawnPoints[spawnPoint.TeamNumber].Remove(spawnPoint);
+            spawnPoints[spawnPoint.TeamNumber - 1].Remove(spawnPoint);
         }
 
-        public Vector3 GetSpawnPosition(ushort teamID)
+        public Vector3 GetSpawnPosition(ushort teamNumber)
         {
-            var spawnPointExists = spawnPoints.TryGetValue(teamID, out var relevantSpawnPoints);
+            var teamID = teamNumber - 1;
+            var relevantSpawnPoints = spawnPoints[teamID];
 
-            if (!spawnPointExists) { return NoSpawnpointAvailableForThisTeam(teamID); }
+            if (relevantSpawnPoints.Count == 0) { return NoSpawnpointAvailableForThisTeam(teamID); }
 
-            // filtering the active ones
             var activeRelevantSpawnPoints = (List<SpawnPoint>)relevantSpawnPoints.Where(predicate: (spawnPoint) => spawnPoint.Active);
 
             if (activeRelevantSpawnPoints.Count == 0) { return NoSpawnpointAvailableForThisTeam(teamID); }
 
-            return activeRelevantSpawnPoints[Random.Range(0, activeRelevantSpawnPoints.Count - 1)].SpawnPosition;
+            return activeRelevantSpawnPoints[UnityEngine.Random.Range(0, activeRelevantSpawnPoints.Count)].SpawnPosition;
         }
 
-        private Vector3 NoSpawnpointAvailableForThisTeam(ushort teamID)
+        private Vector3 NoSpawnpointAvailableForThisTeam(int teamID)
         {
-            Debug.Log($"There s no checkpoint available for this player with team ID: {teamID}");
+            print($"There s no checkpoint available for this player with team ID: {teamID}");
             return Vector3.zero;
         }
 
@@ -81,7 +98,7 @@ namespace GameManagement
         #region Game Start
 
         public static bool Started { get; private set; }
-        public static event Action OnGameStarted;
+        public static event Action OnGeneralGameStarted;
 
         public static void Setup()
         {
@@ -104,6 +121,7 @@ namespace GameManagement
         [Rpc(SendTo.Server)]
         private void StartGameServerRpc()
         {
+            currentGameRule.OnGameStartServerRpc();
             StartGameClientRpc();
         }
 
@@ -111,7 +129,7 @@ namespace GameManagement
         private void StartGameClientRpc()
         {
             Started = true;
-            OnGameStarted?.Invoke();
+            OnGeneralGameStarted?.Invoke();
 
             Debug.Log("Game was started");
 
@@ -294,15 +312,27 @@ namespace GameManagement
         [Rpc(SendTo.ClientsAndHost)]
         private void LoadGameRuleClientRpc(string gameMode)
         {
-            
+            var relevantGameRuleType = gameMode switch
+            {
+                nameof(GameModes.TeamFight) => typeof(TeamFightGameRule),
+                nameof(GameModes.DeathMatch) => null,
+                nameof(GameModes.CaptureTheFlag) => null,
+                nameof(GameModes.HardPoint) => null,
+                nameof(GameModes.Escort) => null,
+                nameof(GameModes.Arena) => null,
+                nameof(GameModes.Breakthrough) => null,
+                _ => throw new Exception($"This gamemode ({gameMode}) does not exist")
+            };
+
+            currentGameRule = (GameRule)GameNetworkManager.Manager.GameRuleManagerInstance.GetComponent(relevantGameRuleType);
         }
 
 
         [Rpc(SendTo.Server)]
-        private void LoadMapServerRpc(string map)
+        private void LoadMapServerRpc(string map) // handle the map meta data with an SO
         {
             LoadMapClientRpc(map);
-        }
+        } 
 
         [Rpc(SendTo.ClientsAndHost)]
         private void LoadMapClientRpc(string map)
