@@ -20,14 +20,11 @@ namespace GameManagement
         public static GameNetworkManager Manager { get; private set; }
 
         [SerializeField] private GameObject gameManagerPrefab;
-        private GameObject gameManagerInstance;
+        public GameObject GameManagerInstance { get; private set; }
 
         [SerializeField] private GameObject teamSelectorPrefab;
         private GameObject teamSelectorInstance;
         public TeamSelector TeamSelectionScreen { get; private set; }
-
-        [SerializeField] private GameObject gameRuleManagerPrefab;
-        public GameObject GameRuleManagerInstance { get; private set; }
 
         #region Unity Handled
 
@@ -37,10 +34,6 @@ namespace GameManagement
 
             OnServerStarted += CreateManagerInstance;
             OnServerStopped += KillManagerInstance;
-
-            OnServerStarted += CreateGameRuleManagerInstance;
-            OnServerStopped += KillGameRuleManagerInstance;
-
 
             OnClientConnectedCallback += Game.OnClientConnected;
             OnClientDisconnectCallback += Game.OnClientDisconnected;
@@ -53,26 +46,15 @@ namespace GameManagement
 
         private void CreateManagerInstance()
         {
-            gameManagerInstance = Instantiate(gameManagerPrefab);
-            gameManagerInstance.GetComponent<NetworkObject>().Spawn();
+            GameManagerInstance = Instantiate(gameManagerPrefab);
+            GameManagerInstance.GetComponent<NetworkObject>().Spawn();
         }
 
         private void KillManagerInstance(bool _)
         {
-            Destroy(gameManagerInstance);
+            Destroy(GameManagerInstance);
         }
 
-
-        private void CreateGameRuleManagerInstance()
-        {
-            GameRuleManagerInstance = Instantiate(gameRuleManagerPrefab);
-            GameRuleManagerInstance.GetComponent<NetworkObject>().Spawn();
-        }
-
-        private void KillGameRuleManagerInstance(bool _)
-        {
-            Destroy(GameRuleManagerInstance);
-        }
 
         #endregion
 

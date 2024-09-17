@@ -324,7 +324,7 @@ namespace GameManagement
                 _ => throw new Exception($"This gamemode ({gameMode}) does not exist")
             };
 
-            currentGameRule = (GameRule)GameNetworkManager.Manager.GameRuleManagerInstance.GetComponent(relevantGameRuleType);
+            currentGameRule = (GameRule)GameNetworkManager.Manager.GameManagerInstance.GetComponent(relevantGameRuleType);
         }
 
 
