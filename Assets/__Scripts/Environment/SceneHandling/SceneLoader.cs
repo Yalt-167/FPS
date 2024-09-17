@@ -5,16 +5,16 @@ using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEditor;
 using UnityEngine.SceneManagement;
 
 namespace SceneHandling
 {
-    public sealed class SceneLoader : MonoBehaviour
+    public sealed class SceneLoader : MonoBehaviour // perhaops add a callback for some Init when the map is loaded;
     {
         public static SceneLoader Instance;
 
         private readonly List<string> loadedScenes = new();
-        private readonly List<int> loadedScenesIndexes = new();
 
         #region GUI variables
 
@@ -31,6 +31,7 @@ namespace SceneHandling
 #endif
         }
 
+        [MenuItem("Developer/DebugLoadedScenes")]
         public static void DebugLoadedScenes()
         {
             var sceneCount = SceneManager.sceneCount;
@@ -45,19 +46,9 @@ namespace SceneHandling
 
         public void LoadScene(string scenePath, bool additive)
         {
-            //if (SceneInvalid(scenePath)) { return; }
-
             if (loadedScenes.Contains(scenePath)) { return; }
 
             StartCoroutine(LoadSceneAsyncInternal(scenePath, additive));
-        }
-        public void LoadScene(int sceneIndex, bool additive)
-        {
-            //if (SceneMissing(sceneIndex)) { return; }
-
-            if (loadedScenesIndexes.Contains(sceneIndex)) { return; }
-
-            StartCoroutine(LoadSceneAsyncInternal(sceneIndex, additive));
         }
 
         private IEnumerator LoadSceneAsyncInternal(string scene, bool additive)
@@ -70,17 +61,7 @@ namespace SceneHandling
             }
 
             loadedScenes.Add(scene);
-        }
-        private IEnumerator LoadSceneAsyncInternal(int sceneIndex, bool additive)
-        {
-            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneIndex, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
-
-            while (!asyncLoad.isDone)
-            {
-                yield return null;
-            }
-
-            loadedScenesIndexes.Add(sceneIndex);
+            
         }
 
         public void UnloadScene(string scene)
