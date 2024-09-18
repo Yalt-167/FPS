@@ -21,7 +21,8 @@ namespace GameManagement
     public sealed class Game : NetworkBehaviour
     {
         public static Game Manager;
-        private static GameRule currentGameRule;
+        private static IGameRule currentGameRule;
+        private readonly NetworkVariable<WinInfos> winInfos = new NetworkVariable<WinInfos>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
 
         #region Public References
 
@@ -43,8 +44,27 @@ namespace GameManagement
 
             if (!Started) { return; }
 
-            currentGameRule.OnGameUpdateServerRpc();
+            IClientSideGameRuleUpdateParam clientSideGameRuleUpdateParam = currentGameRule.UpdateGameServerSide();
+            UpdateGameRuleServerRpc(clientSideGameRuleUpdateParam);
         }
+
+        #endregion
+
+
+        #region GameRule Handling 
+
+        [Rpc(SendTo.Server)]
+        private void UpdateGameRuleServerRpc(IClientSideGameRuleUpdateParam param)
+        {
+            UpdateGameRuleClientRpc(param);
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void UpdateGameRuleClientRpc(IClientSideGameRuleUpdateParam param)
+        {
+            winInfos.Value = currentGameRule.UpdateGameClientSide(param);
+        }
+
 
         #endregion
 
@@ -121,7 +141,7 @@ namespace GameManagement
         [Rpc(SendTo.Server)]
         private void StartGameServerRpc()
         {
-            currentGameRule.OnGameStartServerRpc();
+            currentGameRule.StartGameServerSide();
             StartGameClientRpc();
         }
 
@@ -324,7 +344,7 @@ namespace GameManagement
                 _ => throw new Exception($"This gamemode ({gameMode}) does not exist")
             };
 
-            currentGameRule = (GameRule)GameNetworkManager.Manager.GameManagerInstance.GetComponent(relevantGameRuleType);
+            currentGameRule = (IGameRule)GameNetworkManager.Manager.GameManagerInstance.GetComponent(relevantGameRuleType);
         }
 
 

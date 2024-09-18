@@ -28,6 +28,7 @@ namespace GameManagement
         public int ScoreboardIndex;
 #if DEV_BUILD
         private static readonly string defaultProfileName = "default";
+
 #endif
         #region Spawn Logic
 
