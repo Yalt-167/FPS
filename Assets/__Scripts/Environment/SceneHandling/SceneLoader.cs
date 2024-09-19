@@ -27,9 +27,19 @@ namespace SceneHandling
         {
             Instance = this;
 #if DEV_BUILD
-            LoadScene("_Scenes/DebugOverlay", true);
+            LoadDebugOverlay();
+
 #endif
         }
+
+#if DEV_BUILD
+        private void LoadDebugOverlay()
+        {
+            LoadScene("_Scenes/DebugOverlay", true);
+        }
+
+#endif
+
 
         [MenuItem("Developer/DebugLoadedScenes")]
         public static void DebugLoadedScenes()
@@ -48,7 +58,18 @@ namespace SceneHandling
         {
             if (loadedScenes.Contains(scenePath)) { return; }
 
+            if (!additive)
+            {
+                loadedScenes.Clear();
+            }
             StartCoroutine(LoadSceneAsyncInternal(scenePath, additive));
+
+#if DEV_BUILD
+            if (!additive)
+            {
+                LoadDebugOverlay();
+            }
+#endif
         }
 
         private IEnumerator LoadSceneAsyncInternal(string scene, bool additive)
