@@ -9,9 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2066188824231230181}
+  - component: {fileID: 4886889710077519526}
   - component: {fileID: 4668943685630368531}
   - component: {fileID: 8829274396987033583}
-  - component: {fileID: 4886889710077519526}
+  - component: {fileID: 7971406469505765147}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -34,6 +35,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4886889710077519526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 707704775623689261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd587403537c7aa478f1bbe112c0162e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4668943685630368531
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -46,8 +59,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4166422831
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 2716754553
+  InScenePlacedSourceGlobalObjectIdHash: 2876229315
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -67,7 +80,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 035e297dc6eab4346a9b916c59db96f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4886889710077519526
+--- !u!114 &7971406469505765147
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -76,6 +89,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 707704775623689261}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd587403537c7aa478f1bbe112c0162e, type: 3}
+  m_Script: {fileID: 11500000, guid: ed50871ff0d94b743b768228b8e9a3a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
