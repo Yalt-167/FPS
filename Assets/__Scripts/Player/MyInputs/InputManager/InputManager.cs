@@ -123,7 +123,7 @@ namespace Inputs
                 GameSettingsMenu.ToggleMenu();
             }
 
-            Scoreboard.Instance.SetDoRender(!GameSettingsMenu.DoRenderMenu && showScoreboardActive);
+            FoldableScoreboard.Instance.SetDoRender(!GameSettingsMenu.DoRenderMenu && showScoreboardActive);
         }
 
         public void OnRenderMenu()
