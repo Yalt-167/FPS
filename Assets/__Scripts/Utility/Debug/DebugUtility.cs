@@ -6,31 +6,17 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
-using UnityEngine;
 
-using Debug = UnityEngine.Debug;
 namespace MyDebug
 {
     public static class DebugUtility
     {
         public static void LogMethodCall()
         {
-            Debug.Log($"[DebugUtility::Log Calls]: {new StackTrace().GetFrame(1).GetMethod().Name}");
+            UnityEngine.Debug.Log($"[DebugUtility::Log Calls]: {new StackTrace().GetFrame(1).GetMethod().Name}");
         }
 
-        public static void LogCallStack()
-        {
-            var stackTrace = new StackTrace(skipFrames: 1);
-
-            var upperBound = 5 > stackTrace.FrameCount ? stackTrace.FrameCount : 5; // basically upperBound = 5;
-            for (int i = 0; i < upperBound; i++)
-            {
-                var method = stackTrace.GetFrame(i).GetMethod();
-
-                Debug.Log($"[DebugUtility::Log Call Stack Frame {i}]: {method.DeclaringType.FullName}::{method.Name}");
-            }
-        }
-        public static void LogCallStack(int depth)
+        public static void LogCallStack(int depth = 5)
         {
             var stackTrace = new StackTrace(skipFrames: 1);
 
@@ -39,7 +25,7 @@ namespace MyDebug
             {
                 var method = stackTrace.GetFrame(i).GetMethod();
 
-                Debug.Log($"[DebugUtility::Log Call Stack Frame {i}]: {method.DeclaringType.FullName}::{method.Name}");
+                UnityEngine.Debug.Log($"[DebugUtility::Log Call Stack Frame {i}]: {method.DeclaringType.FullName}::{method.Name}");
             }
         }
 
@@ -58,7 +44,7 @@ namespace MyDebug
 
             _ = stringBuilder.Append(" ]");
 
-            Debug.Log(stringBuilder.ToString());
+            UnityEngine.Debug.Log(stringBuilder.ToString());
         }
     }
 
