@@ -21,12 +21,12 @@ namespace SceneHandling
 
             if (GUILayout.Button("Try loading scene"))
             {
-                sceneLoader.LoadScene(sceneLoader.SceneName, sceneLoader.Additive);
+                sceneLoader.LoadScene(sceneLoader.SceneName);
             }
 
             if (GUILayout.Button("Load Debug Overlay"))
             {
-                sceneLoader.LoadScene("_Scenes/DebugOverlay", true);
+                sceneLoader.LoadScene("_Scenes/DebugOverlay");
             }
         }
     }

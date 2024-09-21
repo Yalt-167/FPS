@@ -47,7 +47,7 @@ namespace GameManagement
             IClientSideGameRuleUpdateParam clientSideGameRuleUpdateParam = currentGameRule.UpdateGameServerSide();
             UpdateGameServerRpc(clientSideGameRuleUpdateParam);
 
-            if (winInfos.Value.WinningTeamNumber != 0)
+            if (winInfos.Value.HasWinner())
             {
                 currentGameRule.EndGameServerSide(winInfos.Value);
                 EndGameServerRpc(winInfos.Value);
@@ -81,6 +81,10 @@ namespace GameManagement
         private void EndGameClientRpc(WinInfos param)
         {
             currentGameRule.EndGameClientSide(param);
+
+            OnGeneralGameEndedClientSide?.Invoke();
+
+            Started = false;
         }
 
         #endregion
@@ -135,7 +139,8 @@ namespace GameManagement
         #region Game Start
 
         public static bool Started { get; private set; }
-        public static event Action OnGeneralGameStarted;
+        public static event Action OnGeneralGameStartedClientSide;
+        public static event Action OnGeneralGameEndedClientSide;
 
         public static void Setup()
         {
@@ -147,11 +152,13 @@ namespace GameManagement
 
         }
 
-        #region Start Game
+        #region Start/End Game
 
         [MenuItem("Developer/StartGame")]
         public static void StartGame()
         {
+            if (!Manager.IsServer) { return; }
+
             Manager.StartGameServerRpc();
         }
 
@@ -165,9 +172,9 @@ namespace GameManagement
         [Rpc(SendTo.ClientsAndHost)]
         private void StartGameClientRpc()
         {
-            currentGameRule.StartGameClientSide();
+            OnGeneralGameStartedClientSide?.Invoke();
 
-            OnGeneralGameStarted?.Invoke();
+            currentGameRule.StartGameClientSide();
 
             LobbyHandler.Instance.ToggleMenuCamera(false);
 
@@ -376,7 +383,7 @@ namespace GameManagement
         private void LoadMapClientRpc(string map)
         {
             // load relevant SO
-            SceneLoader.Instance.LoadScene(map, additive: false);
+            SceneLoader.Instance.LoadScene(map);
         }
 
         #endregion

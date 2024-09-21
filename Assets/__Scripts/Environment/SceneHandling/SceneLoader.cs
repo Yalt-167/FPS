@@ -19,7 +19,6 @@ namespace SceneHandling
         #region GUI variables
 
         public string SceneName;
-        public bool Additive;
 
         #endregion
 
@@ -35,7 +34,7 @@ namespace SceneHandling
 #if DEV_BUILD
         private void LoadDebugOverlay()
         {
-            LoadScene("_Scenes/DebugOverlay", true);
+            LoadScene("_Scenes/DebugOverlay");
         }
 
 #endif
@@ -54,27 +53,16 @@ namespace SceneHandling
             }
         }
 
-        public void LoadScene(string scenePath, bool additive)
+        public void LoadScene(string scenePath)
         {
             if (loadedScenes.Contains(scenePath)) { return; }
 
-            if (!additive)
-            {
-                loadedScenes.Clear();
-            }
-            StartCoroutine(LoadSceneAsyncInternal(scenePath, additive));
-
-#if DEV_BUILD
-            if (!additive)
-            {
-                LoadDebugOverlay();
-            }
-#endif
+            StartCoroutine(LoadSceneAsyncInternal(scenePath));
         }
 
-        private IEnumerator LoadSceneAsyncInternal(string scene, bool additive)
+        private IEnumerator LoadSceneAsyncInternal(string scene)
         {
-            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(scene, additive ? LoadSceneMode.Additive : LoadSceneMode.Single);
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(scene);
 
             while (!asyncLoad.isDone)
             {
