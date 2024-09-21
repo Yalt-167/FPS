@@ -1,10 +1,16 @@
+using GameManagement;
+using System;
 using Unity.Netcode;
+
 
 namespace GameManagement
 {
-    public interface IClientSideGameRuleUpdateParam : INetworkSerializable
+    public interface IClientSideGameRuleUpdateParam 
     {
-        //public void Serialize(ref FastBufferWriter writer);
-        //public void Deserialize(ref FastBufferReader reader);
+        public ClientSideGameRuleUpdateParamType GameRuleType { get; }
+        public void Serialize(ref FastBufferWriter writer);
+
+        public void Deserialize(ref FastBufferReader reader);
+
     }
 }
