@@ -45,7 +45,13 @@ namespace GameManagement
             if (!Started) { return; }
 
             IClientSideGameRuleUpdateParam clientSideGameRuleUpdateParam = currentGameRule.UpdateGameServerSide();
-            UpdateGameRuleServerRpc(clientSideGameRuleUpdateParam);
+            UpdateGameServerRpc(clientSideGameRuleUpdateParam);
+
+            if (winInfos.Value.WinningTeamNumber != 0)
+            {
+                currentGameRule.EndGameServerSide(winInfos.Value);
+                EndGameServerRpc(winInfos.Value);
+            }
         }
 
         #endregion
@@ -54,17 +60,28 @@ namespace GameManagement
         #region GameRule Handling 
 
         [Rpc(SendTo.Server)]
-        private void UpdateGameRuleServerRpc(IClientSideGameRuleUpdateParam param)
+        private void UpdateGameServerRpc(IClientSideGameRuleUpdateParam param)
         {
-            UpdateGameRuleClientRpc(param);
+            UpdateGameClientRpc(param);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        private void UpdateGameRuleClientRpc(IClientSideGameRuleUpdateParam param)
+        private void UpdateGameClientRpc(IClientSideGameRuleUpdateParam param)
         {
             winInfos.Value = currentGameRule.UpdateGameClientSide(param);
         }
 
+        [Rpc(SendTo.Server)]
+        private void EndGameServerRpc(WinInfos param)
+        {
+            EndGameClientRpc(param);
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void EndGameClientRpc(WinInfos param)
+        {
+            currentGameRule.EndGameClientSide(param);
+        }
 
         #endregion
 
@@ -148,15 +165,16 @@ namespace GameManagement
         [Rpc(SendTo.ClientsAndHost)]
         private void StartGameClientRpc()
         {
-            Started = true;
-            OnGeneralGameStarted?.Invoke();
+            currentGameRule.StartGameClientSide();
 
-            Debug.Log("Game was started");
+            OnGeneralGameStarted?.Invoke();
 
             LobbyHandler.Instance.ToggleMenuCamera(false);
 
             PlayerFrame.LocalPlayer.SetGameplayInputMode();
             PlayerFrame.LocalPlayer.ToggleHUD(true);
+
+            Started = true;
         }
 
         #endregion
@@ -344,7 +362,7 @@ namespace GameManagement
                 _ => throw new Exception($"This gamemode ({gameMode}) does not exist")
             };
 
-            currentGameRule = (IGameRule)GameNetworkManager.Manager.GameManagerInstance.GetComponent(relevantGameRuleType);
+            currentGameRule = (IGameRule)GameNetworkManager.Manager.GameManagerInstance.GetComponent(relevantGameRuleType) ?? throw new Exception("[LoadGamerule] GetComponent() call failed");
         }
 
 
@@ -357,6 +375,7 @@ namespace GameManagement
         [Rpc(SendTo.ClientsAndHost)]
         private void LoadMapClientRpc(string map)
         {
+            // load relevant SO
             SceneLoader.Instance.LoadScene(map, additive: false);
         }
 
@@ -390,18 +409,6 @@ namespace GameManagement
         #endregion
     }
 }
-
-// abstract class GameRule that handles the game flow
-
-// every gamemode has it s own derived class that handles the flow of the game
-
-// necessarily has
-// EntryPoint => OnStart()
-// fetch the spawnpoints and important things to the map
-// -> DataStructure for each map then prolly a SO
-
-
-// EndPoint => OnEnd()
 
 // loadMap takes in a SO representing the map
 // the SO has the scene in its member along with useful data about the map
