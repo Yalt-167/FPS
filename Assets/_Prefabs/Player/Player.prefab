@@ -1413,9 +1413,10 @@ GameObject:
   - component: {fileID: 5314762285684912620}
   - component: {fileID: 3274016814467245242}
   - component: {fileID: 3018800575568115996}
-  - component: {fileID: 1547610708643055703}
   - component: {fileID: 2461466814386011735}
   - component: {fileID: 7891554514326042408}
+  - component: {fileID: 1236349065094530700}
+  - component: {fileID: 9023620208860098355}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1538,9 +1539,10 @@ MonoBehaviour:
     - {fileID: 3857732353204371700}
     - {fileID: 3274016814467245242}
     - {fileID: 3018800575568115996}
-    - {fileID: 1547610708643055703}
+    - {fileID: 1236349065094530700}
     - {fileID: 2461466814386011735}
     - {fileID: 7891554514326042408}
+    - {fileID: 9023620208860098355}
     gameObjectsToKill:
     - {fileID: 3467822551731792150}
     - {fileID: 4356166339693058417}
@@ -1915,18 +1917,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c88f6f1e8c9865d4b9a014d1ed9b8200, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1547610708643055703
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5705630700605972737}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f661af135bf7c0e42b4fd891386b663a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2461466814386011735
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1951,6 +1941,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5df6c80d4c7f0774eb0f5159da10a390, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1236349065094530700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5705630700605972737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60b3bfbfe23ed1c4d9b5a4bfdd089896, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &9023620208860098355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5705630700605972737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6fda2aeeab3033459b0181a797b1d86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  widthPerTeam: 80
+  spaceBetweenTeamDisplay: 20
+  height: 100
 --- !u!1 &5814794369634734712
 GameObject:
   m_ObjectHideFlags: 0

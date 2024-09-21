@@ -14,6 +14,7 @@ using Unity.Services.Authentication;
 using Controller;
 using SaveAndLoad;
 using System.Reflection;
+using Menus;
 
 
 namespace GameManagement
@@ -54,7 +55,7 @@ namespace GameManagement
 
             ManageFiles(IsOwner);
 
-            TryCallOnPlayerMonoBehavioursRecursively(IsOwner ? "InitLocalPlayer" : "InitRemotePlayer", new object[] { });
+            CallOnPlayerScriptsRecursively<IMustBeInitiatedAfterPlayerFrame>(IsOwner ? "InitOnLocalPlayer" : "InitOnRemotePlayer", new object[] { });
         }
 
         [Rpc(SendTo.Server)]
@@ -229,12 +230,41 @@ namespace GameManagement
             }
         }
 
+
+
+        private void TryCallOnPlayerScriptsRecursively<T>(string methodName, object[] parameters, Transform transform_ = null)
+        {
+            transform_ = transform_ ?? transform;
+
+            MethodInfo methodInfo = typeof(T).GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
+
+            foreach (var monoBehaviour in transform_.GetComponents<MonoBehaviour>())
+            {
+                if (monoBehaviour is T monoBehaviourAsT)
+                {
+                    methodInfo.Invoke(monoBehaviourAsT, parameters);
+                }
+            }
+
+            for (int childIndex = 0; childIndex < transform_.childCount; childIndex++)
+            {
+                CallOnPlayerScriptsRecursively<T>(methodName, parameters, transform_.GetChild(childIndex));
+            }
+        }
+
         private void TryCallOnPlayerMonoBehavioursRecursively(string methodName, object[] parameters, Transform transform_ = null)
         {
             transform_ = transform_ ?? transform;
 
             foreach (var monoBehaviour in transform_.GetComponents<MonoBehaviour>())
             {
+                //Debug.Log(monoBehaviour);
+                Type type = monoBehaviour.GetType();
+
+                if (type == typeof(FoldableScoreboard))
+                {
+                    _ = type.GetMethod(methodName) ?? throw new Exception("Didn t catch it");
+                }
                 MethodInfo methodInfo = monoBehaviour.GetType().GetMethod(methodName);
 
                 if (methodInfo == null) { continue; }
