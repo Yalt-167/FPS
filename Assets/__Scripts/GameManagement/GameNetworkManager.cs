@@ -137,7 +137,7 @@ namespace GameManagement
 
         #region Team Selection Menu
 
-        public static void SpawnTeamSelectionMenu(ushort teamsCount, ushort teamsSize)
+        public static void SpawnTeamSelectionMenuOnAllClients(ushort teamsCount, ushort teamsSize)
         {
             Manager.SpawnTeamSelectionMenuInternal(teamsCount, teamsSize);
         }

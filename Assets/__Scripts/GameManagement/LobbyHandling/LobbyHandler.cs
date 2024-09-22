@@ -715,17 +715,17 @@ namespace LobbyHandling
 
         private void LaunchTeamSelectionMenu()
         {
-            Game.ToggleLobbyMenu(towardOn: false);
-            GameNetworkManager.SpawnTeamSelectionMenu(2, 6);
-            Game.CreatePlayerList();
-            Game.Setup();
+            Game.ToggleLobbyMenuOnAllClients(towardOn: false);
+            GameNetworkManager.SpawnTeamSelectionMenuOnAllClients(2, 6);
+            Game.CreatePlayerListOnAllClients();
+            Game.SetupOnAllClients();
             if (gameModesDropDown.Current != GameModes.ToBeVoted && mapsDropDown.Current != Maps.ToBeVoted)
             {
-                Game.LoadLevel(gameModesDropDown.Current, mapsDropDown.Current);
+                Game.LoadLevelOnAllClients(gameModesDropDown.Current, mapsDropDown.Current);
             }
             else
             {
-                Game.LoadLevel(GameModes.TeamFight, Maps.TeamFight.TeamFightMap1);
+                Game.LoadLevelOnAllClients(GameModes.TeamFight, Maps.TeamFight.TeamFightMap1);
             }
         }
 

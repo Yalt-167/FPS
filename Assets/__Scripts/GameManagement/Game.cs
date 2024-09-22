@@ -142,15 +142,24 @@ namespace GameManagement
         public static event Action OnGeneralGameStartedClientSide;
         public static event Action OnGeneralGameEndedClientSide;
 
-        public static void Setup()
+        public static void SetupOnAllClients()
         {
-            Manager.SetupInternal();
+            Manager.SetupServerRpc();
         }
 
-        private void SetupInternal()
+        [Rpc(SendTo.Server)]
+        private void SetupServerRpc()
         {
-
+            SetupClientRpc();
         }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void SetupClientRpc()
+        {
+            SceneLoader.LoadScene(Scenes.HUD.MainScoreboardHUD, SceneType.HUD);
+        }
+
+
 
         #region Start/End Game
 
@@ -189,7 +198,7 @@ namespace GameManagement
         #region Create Player List
 
         [MenuItem("Developer/CreatePlayerList")]
-        public static void CreatePlayerList()
+        public static void CreatePlayerListOnAllClients()
         {
             Manager.CreatePlayerListServerRpc();
         }
@@ -210,7 +219,7 @@ namespace GameManagement
 
         #region Lobby Menu
 
-        public static void ToggleLobbyMenu(bool towardOn)
+        public static void ToggleLobbyMenuOnAllClients(bool towardOn)
         {
             Manager.ToggleLobbyMenuServerRpc(towardOn);
         }
@@ -341,11 +350,11 @@ namespace GameManagement
 
         #region Level Loading
 
-        public static void LoadLevel(string gameMode, string map)
+        public static void LoadLevelOnAllClients(string gamemode, string map)
         {
-            Manager.LoadGameRuleServerRpc(gameMode);
+            Manager.LoadGameRuleServerRpc(gamemode);
 
-            Manager.LoadMapServerRpc($"_Scenes/{gameMode}/{map}");
+            Manager.LoadMapServerRpc(Scenes.GetSceneFromGamemodeAndMap(gamemode, map));
         }
 
         [Rpc(SendTo.Server)]
@@ -382,8 +391,9 @@ namespace GameManagement
         [Rpc(SendTo.ClientsAndHost)]
         private void LoadMapClientRpc(string map)
         {
-            // load relevant SO
-            SceneLoader.Instance.LoadScene(map);
+            // load relevant SO too
+            SceneLoader.UnloadScene(Scenes.LoginScene, SceneType.Map);
+            SceneLoader.LoadScene(map, SceneType.Map);
         }
 
         #endregion
