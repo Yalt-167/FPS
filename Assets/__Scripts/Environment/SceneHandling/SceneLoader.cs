@@ -10,15 +10,17 @@ using UnityEngine.SceneManagement;
 
 namespace SceneHandling
 {
-    public sealed class SceneLoader : MonoBehaviour // perhaops add a callback for some Init when the map is loaded;
+    public sealed class SceneLoader : MonoBehaviour // perhaps add a callback for some Init when the map is loaded;
     {
         public static SceneLoader Instance;
 
         private readonly List<string> loadedScenes = new();
+        private readonly List<string> loadedHUDs = new();
 
         #region GUI variables
 
         public string SceneName;
+        public SceneType SceneType;
 
         #endregion
 
@@ -34,13 +36,12 @@ namespace SceneHandling
 #if DEV_BUILD
         private void LoadDebugOverlay()
         {
-            LoadScene("_Scenes/DebugOverlay");
+            LoadScene(Scenes.HUD.DebugOverlay, SceneType.HUD);
         }
-
 #endif
 
 
-        [MenuItem("Developer/DebugLoadedScenes")]
+        [MenuItem("Developer/ScenesHandling/DebugLoadedScenes")]
         public static void DebugLoadedScenes()
         {
             var sceneCount = SceneManager.sceneCount;
@@ -53,34 +54,47 @@ namespace SceneHandling
             }
         }
 
-        public void LoadScene(string scenePath)
+        public static void LoadScene(string scenePath, SceneType sceneType)
         {
-            if (loadedScenes.Contains(scenePath)) { return; }
-
-            StartCoroutine(LoadSceneAsyncInternal(scenePath));
+            Instance.LoadSceneInternal(scenePath, sceneType);
         }
 
-        private IEnumerator LoadSceneAsyncInternal(string scene)
+        private void LoadSceneInternal(string scenePath, SceneType sceneType)
         {
-            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(scene);
+            List<string> relevantSceneList = Instance.GetRelevantSceneList(sceneType);
 
-            while (!asyncLoad.isDone)
+            if (relevantSceneList.Contains(scenePath)) { return; }
+
+            StartCoroutine(Instance.LoadSceneAsyncInternal(scenePath, relevantSceneList));
+        }
+
+        private IEnumerator LoadSceneAsyncInternal(string scene, List<string> relevantSceneList)
+        {
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
+
+            while (!asyncLoad.isDone) 
             {
                 yield return null;
             }
 
-            loadedScenes.Add(scene);
-            
+            relevantSceneList.Add(scene);
         }
 
-        public void UnloadScene(string scene)
+        public static void UnloadScene(string scene, SceneType sceneType)
         {
-            if (!loadedScenes.Contains(scene)) { return; }
-
-            StartCoroutine(UnloadSceneAsyncInternal(scene));
+            Instance.UnloadSceneInternal(scene, sceneType);
         }
 
-        private IEnumerator UnloadSceneAsyncInternal(string scene)
+        private void UnloadSceneInternal(string scene, SceneType sceneType)
+        {
+            List<string> relevantSceneList = Instance.GetRelevantSceneList(sceneType);
+
+            if (!relevantSceneList.Contains(scene)) { return; }
+
+            StartCoroutine(UnloadSceneAsyncInternal(scene, relevantSceneList));
+        }
+
+        private IEnumerator UnloadSceneAsyncInternal(string scene, List<string> relevantSceneList)
         {
             AsyncOperation asyncUnload = SceneManager.UnloadSceneAsync(scene);
 
@@ -89,7 +103,24 @@ namespace SceneHandling
                 yield return null;
             }
 
-            loadedScenes.Remove(scene);
+            relevantSceneList.Remove(scene);
         }
+
+        private List<string> GetRelevantSceneList(SceneType sceneType)
+        {
+            return sceneType switch
+            {
+                SceneType.Map => loadedScenes,
+                SceneType.HUD => loadedHUDs,
+                _ => throw new Exception($"This SceneType ({sceneType}) does not exist"),
+            };
+        }
+    }
+
+
+    public enum SceneType
+    {
+        Map,
+        HUD
     }
 }
