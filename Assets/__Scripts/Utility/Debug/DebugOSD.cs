@@ -145,18 +145,6 @@ namespace MyDebug
             Brief = 1200,
             Long = 2400
         }
-
-        public struct DebuggerOSDEntry
-        {
-            public string Data;
-            public bool HasLifetime;
-
-            public DebuggerOSDEntry(string data, bool hasLifetime)
-            {
-                Data = data;
-                HasLifetime = hasLifetime;
-            }
-        }
     }
 
 }
