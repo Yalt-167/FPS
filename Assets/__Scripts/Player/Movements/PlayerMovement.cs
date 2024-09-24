@@ -149,6 +149,7 @@ namespace Controller
 
         [Header("Jump")]
         [SerializeField] private float initialJumpSpeedBoost;
+        [SerializeField][Range(0, 1)] private float jumpCancelCoefficient = .75f;
         private float JumpForce => PlayerFrame.LocalPlayer?.ChampionStats.MovementStats.JumpStats.JumpForce ?? 1080f;
         private float timeLeftGround;
 
@@ -692,7 +693,7 @@ namespace Controller
             //Debug.Log($"Stopped jumping {Rigidbody.velocity.y <= 0f} || {forceResetJumping} || {InputQuery.Jump[InputType.OnKeyUp]}");
             if (InputQuery.Jump[InputType.OnKeyUp])
             {
-                Rigidbody.velocity = Rigidbody.velocity.Mask(1f, .5f, 1f);
+                Rigidbody.velocity = Rigidbody.velocity.Mask(1f, jumpCancelCoefficient, 1f);
             }
 
             forceResetJumping = false;
