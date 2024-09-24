@@ -1416,7 +1416,6 @@ GameObject:
   - component: {fileID: 2461466814386011735}
   - component: {fileID: 7891554514326042408}
   - component: {fileID: 1236349065094530700}
-  - component: {fileID: 9023620208860098355}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1542,7 +1541,6 @@ MonoBehaviour:
     - {fileID: 1236349065094530700}
     - {fileID: 2461466814386011735}
     - {fileID: 7891554514326042408}
-    - {fileID: 9023620208860098355}
     gameObjectsToKill:
     - {fileID: 3467822551731792150}
     - {fileID: 4356166339693058417}
@@ -1953,21 +1951,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60b3bfbfe23ed1c4d9b5a4bfdd089896, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &9023620208860098355
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5705630700605972737}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6fda2aeeab3033459b0181a797b1d86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  widthPerTeam: 80
-  spaceBetweenTeamDisplay: 20
-  height: 100
 --- !u!1 &5814794369634734712
 GameObject:
   m_ObjectHideFlags: 0

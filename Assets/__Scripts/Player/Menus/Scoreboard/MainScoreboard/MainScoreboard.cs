@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
+using GameManagement;
+
 namespace Menus
 {
     public sealed class MainScoreboard : MonoBehaviour
@@ -13,9 +15,12 @@ namespace Menus
         private int[] scores;
         private bool active;
 
-        [SerializeField] private int widthPerTeam;
-        [SerializeField] private int spaceBetweenTeamDisplay;
-        [SerializeField] private int height;
+        private int widthPerTeam;
+        //private int spaceBetweenTeamDisplay = 20;
+
+        private GUIStyle centeredLabelStyle;
+
+
         public static void Toggle(bool towardOn)
         {
             Instance.ToggleInternal(towardOn);
@@ -26,32 +31,53 @@ namespace Menus
             active = towardOn;
         }
 
-        private void InitLocalPlayer() // called by PlayerFrame through reflection
+        private void Awake()
         {
-            MyDebug.DebugUtility.LogMethodCall();
-            scores = new int[GameManagement.GameNetworkManager.Manager.TeamSelectionScreen.TeamsCount];
+            Game.OnGeneralGameStartedClientSide += Init;
+        }
+
+        private void OnDisable()
+        {
+            Game.OnGeneralGameStartedClientSide -= Init;
+        }
+
+        private void Init()
+        {
+            Instance = this;
+            scores = new int[GameNetworkManager.Manager.TeamSelectionScreen.TeamsCount];
             active = true;
+
+            centeredLabelStyle = GUI.skin.label;
+            centeredLabelStyle.alignment = TextAnchor.MiddleCenter;
+
+            widthPerTeam = 600 / scores.Length;
         }
 
         private void OnGUI()
         {
             if (!active) { return; }
 
-            GUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
+            GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
             GUILayout.FlexibleSpace();
 
-            GUILayout.BeginHorizontal(GUILayout.Width(widthPerTeam * scores.Length + spaceBetweenTeamDisplay * (scores.Length - 1)));
+            GUILayout.BeginHorizontal(CachedGUIStylesNames.Box, GUILayout.Width(600));
 
             for (int i = 0; i < scores.Length; i++)
             {
-                GUILayout.Label($"{scores[i]}");
-                GUILayout.Space(spaceBetweenTeamDisplay);
+                GUILayout.Label($"{scores[i]}", centeredLabelStyle,  GUILayout.Width(widthPerTeam));
             }
 
             GUILayout.EndHorizontal();
 
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
+        }
+
+
+
+        public static void AddScore(int teamNumber, int scoreToAdd)
+        {
+            Instance.scores[teamNumber - 1] = scoreToAdd;
         }
     }
 }
