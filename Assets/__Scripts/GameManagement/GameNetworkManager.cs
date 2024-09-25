@@ -17,6 +17,8 @@ namespace GameManagement
     [DefaultExecutionOrder(-99)]
     public sealed class GameNetworkManager : NetworkManager
     {
+        #region Managers
+
         public static GameNetworkManager Manager { get; private set; }
 
         [SerializeField] private GameObject gameManagerPrefab;
@@ -26,6 +28,8 @@ namespace GameManagement
         private GameObject teamSelectorInstance;
         public TeamSelector TeamSelectionScreen { get; private set; }
 
+        #endregion
+
         #region Unity Handled
 
         private void Awake()
@@ -33,7 +37,6 @@ namespace GameManagement
             Manager = this;
 
             OnServerStarted += CreateManagerInstance;
-            //OnServerStarted += CreateManagerInstance;
             OnServerStopped += KillManagerInstance;
 
         }
@@ -114,33 +117,6 @@ namespace GameManagement
                 }
             }
         }
-
-        #endregion
-
-        #region Debug
-
-        //[SerializeField] private bool debugBottomPlane;
-
-        //private void OnDrawGizmos()
-        //{
-        //    if (debugBottomPlane)
-        //    {
-        //        Gizmos.color = Color.red;
-        //        var origin = new Vector3(transform.position.x, -30, transform.position.z);
-        //        var debugDist = 100f; // how far the plane with be rendered
-
-        //        var sideward = Vector3.right * debugDist;
-        //        var forward = Vector3.forward * debugDist;
-        //        for (int offset = -100; offset <= 100; offset += 10)
-        //        {
-        //            var forwardOffsetVec = new Vector3(0, 0, offset);
-        //            Gizmos.DrawLine(origin - sideward + forwardOffsetVec, origin + sideward + forwardOffsetVec);
-
-        //            var sidewardOffsetVec = new Vector3(offset, 0, 0);
-        //            Gizmos.DrawLine(origin - forward + sidewardOffsetVec, origin + forward + sidewardOffsetVec);
-        //        }
-        //    }
-        //}
 
         #endregion
 
