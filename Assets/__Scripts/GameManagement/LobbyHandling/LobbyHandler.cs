@@ -716,9 +716,9 @@ namespace LobbyHandling
         private void LaunchTeamSelectionMenu()
         {
             Game.ToggleLobbyMenuOnAllClients(towardOn: false);
+            Game.SetupOnAllClients();
             GameNetworkManager.SpawnTeamSelectionMenuOnAllClients(2, 6);
             Game.CreatePlayerListOnAllClients();
-            Game.SetupOnAllClients();
             if (gameModesDropDown.Current != GameModes.ToBeVoted && mapsDropDown.Current != Maps.ToBeVoted)
             {
                 Game.LoadLevelOnAllClients(gameModesDropDown.Current, mapsDropDown.Current);

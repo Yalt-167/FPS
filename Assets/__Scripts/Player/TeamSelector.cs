@@ -27,6 +27,8 @@ public sealed class TeamSelector : NetworkBehaviour
     private void Awake()
     {
         Instance = this;
+
+        GameNetworkManager.AssignTeamSelectorInstance(gameObject);
     }
 
     [Rpc(SendTo.Server)]

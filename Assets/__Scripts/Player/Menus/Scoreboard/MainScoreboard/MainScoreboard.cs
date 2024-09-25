@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using GameManagement;
+using Unity.VisualScripting;
 
 namespace Menus
 {
@@ -14,6 +15,7 @@ namespace Menus
 
         private int[] scores;
         private bool active;
+        private bool fullInit;
 
         private int widthPerTeam;
         //private int spaceBetweenTeamDisplay = 20;
@@ -47,15 +49,19 @@ namespace Menus
             scores = new int[GameNetworkManager.Manager.TeamSelectionScreen.TeamsCount];
             active = true;
 
-            centeredLabelStyle = GUI.skin.label;
-            centeredLabelStyle.alignment = TextAnchor.MiddleCenter;
-
             widthPerTeam = 600 / scores.Length;
         }
 
         private void OnGUI()
         {
             if (!active) { return; }
+
+            if (!fullInit)
+            {
+                centeredLabelStyle = GUI.skin.label;
+                centeredLabelStyle.alignment = TextAnchor.MiddleCenter;
+                fullInit = true;
+            }
 
             GUILayout.BeginHorizontal(GUILayout.Width(Screen.width));
             GUILayout.FlexibleSpace();
