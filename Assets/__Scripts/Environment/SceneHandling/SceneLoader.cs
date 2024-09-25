@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.SceneManagement;
+using ParrelSync;
 
 namespace SceneHandling
 {
@@ -27,13 +28,16 @@ namespace SceneHandling
         private void Awake()
         {
             Instance = this;
-#if DEV_BUILD
-            LoadDebugOverlay();
-
-#endif
         }
 
 #if DEV_BUILD
+
+        [MenuItem("Developer/Debug/LaunchDebugOverlay")]
+        public static void StaticLoadLoadDebugOverlay()
+        {
+            Instance.LoadDebugOverlay();
+        }
+
         private void LoadDebugOverlay()
         {
             LoadScene(Scenes.HUD.DebugOverlay, SceneType.HUD);
