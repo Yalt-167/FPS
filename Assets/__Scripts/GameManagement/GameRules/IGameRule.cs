@@ -1,3 +1,6 @@
+//#define DEV_BUILD
+
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,6 +13,9 @@ namespace GameManagement
     public interface IGameRule
     {
         public IGameRuleState GameRuleState { get; }
+#if DEV_BUILD
+        public bool DebugGameRuleUpdateCalls { get; }
+#endif
 
         #region Game Start Handling
 

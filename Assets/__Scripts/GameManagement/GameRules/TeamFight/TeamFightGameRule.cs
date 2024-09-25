@@ -1,3 +1,5 @@
+#define DEV_BUILD
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,9 +12,29 @@ namespace GameManagement
 {
     public sealed class TeamFightGameRule : MonoBehaviour, IGameRule // might become a network behaviour so some values** cannot be tampered with
     {
+#if DEV_BUILD
+        private static TeamFightGameRule Instance { get; set; }
+
+#endif
         public IGameRuleState GameRuleState => TeamFightGameRuleState;
         private TeamFightGameRuleState TeamFightGameRuleState; // **
 
+#if DEV_BUILD
+
+        public bool DebugGameRuleUpdateCalls { get; private set; }
+
+        [UnityEditor.MenuItem("Developer/Debug/ToggleGameRuleUpdateCalls")]
+        public static void ToggleGameRuleUpdateCalls()
+        {
+            Instance.DebugGameRuleUpdateCalls = !Instance.DebugGameRuleUpdateCalls;
+        }
+
+        private void Awake()
+        {
+            Instance = this;
+        }
+
+#endif
         #region Start
 
         public event Action OnGameStartedServerSide;
@@ -22,14 +44,24 @@ namespace GameManagement
         {
             OnGameStartedServerSide?.Invoke();
 
-            Debug.Log("TeamFight was started ServerSide");
+#if DEV_BUILD
+            if (Instance.DebugGameRuleUpdateCalls)
+            { 
+                Debug.Log("TeamFight was started ServerSide");
+            }
+#endif
         }
 
         public void StartGameClientSide()
         {
             OnGameStartedClientSide?.Invoke();
-
-            Debug.Log("TeamFight was started ClientSide");
+            
+#if DEV_BUILD
+            if (Instance.DebugGameRuleUpdateCalls)
+            {
+                Debug.Log("TeamFight was started ClientSide");
+            }
+#endif
         }
 
         #endregion
@@ -42,7 +74,14 @@ namespace GameManagement
         public IClientSideGameRuleUpdateParam UpdateGameServerSide()
         {
             OnGameUpdatedServerSide?.Invoke();
-            Debug.Log("TeamFight was updated ServerSide");
+
+#if DEV_BUILD
+            if (Instance.DebugGameRuleUpdateCalls)
+            {
+                Debug.Log("TeamFight was updated ServerSide");
+            }
+#endif
+            
 
             //TeamFightGameRuleState // edit value as needed
 
@@ -52,8 +91,14 @@ namespace GameManagement
         public WinInfos UpdateGameClientSide(IClientSideGameRuleUpdateParam param) // client should not tamper with win info
         {
             OnGameUpdatedClientSide?.Invoke(param);
-            Debug.Log("TeamFight was updated ClientSide");
 
+#if DEV_BUILD
+            if (Instance.DebugGameRuleUpdateCalls)
+            {
+                Debug.Log("TeamFight was updated ClientSide");
+            }
+#endif
+            
             var winInfo = TeamFightGameRuleState.WinInfos;
             winInfo.WinningTeamNumber = Input.GetKeyDown(KeyCode.Return) ? 1 : 0;
             TeamFightGameRuleState.WinInfos = winInfo;
@@ -71,13 +116,25 @@ namespace GameManagement
         public void EndGameServerSide(WinInfos winInfos)
         {
             OnGameEndedServerSide?.Invoke();
-            Debug.Log("Teamfight was ended ServerSide");
+
+#if DEV_BUILD
+            if (Instance.DebugGameRuleUpdateCalls)
+            {
+                Debug.Log("Teamfight was ended ServerSide");
+            }
+#endif
         }
 
         public void EndGameClientSide(WinInfos winInfos)
         {
             OnGameEndedClientSide?.Invoke();
-            Debug.Log("Teamfight was ended ClientSide");
+
+#if DEV_BUILD
+            if (Instance.DebugGameRuleUpdateCalls)
+            {
+                Debug.Log("Teamfight was ended ClientSide");
+            }
+#endif
         }
 
         #endregion
