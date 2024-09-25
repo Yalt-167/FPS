@@ -33,10 +33,8 @@ namespace GameManagement
             Manager = this;
 
             OnServerStarted += CreateManagerInstance;
+            //OnServerStarted += CreateManagerInstance;
             OnServerStopped += KillManagerInstance;
-
-            OnClientConnectedCallback += Game.OnClientConnected;
-            OnClientDisconnectCallback += Game.OnClientDisconnected;
 
         }
 
@@ -55,6 +53,17 @@ namespace GameManagement
             Destroy(GameManagerInstance);
         }
 
+
+        public static void AssignGameManagerInstance(GameObject gameManagerInstance)
+        {
+            Manager.GameManagerInstance = gameManagerInstance;
+        }
+
+        public static void AssignTeamSelectorInstance(GameObject teamSelectorInstance)
+        {
+            Manager.teamSelectorInstance = teamSelectorInstance;
+            Manager.TeamSelectionScreen = teamSelectorInstance.GetComponent<TeamSelector>();
+        }
 
         #endregion
 
