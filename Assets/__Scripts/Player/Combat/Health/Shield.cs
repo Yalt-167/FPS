@@ -6,9 +6,17 @@ using UnityEngine;
 
 public sealed class Shield
 {
-    private ShieldCell[] shieldCells;
-    private ushort shieldCellAmount;
-    private ushort shieldCellHealth;
+    private readonly ShieldCell[] shieldCells; // so far
+    public ShieldCell this[int index]
+    {
+        get
+        { 
+            return shieldCells[index];
+        }
+    }
+    private readonly ushort shieldCellAmount;
+    public ushort ShieldCellAmount => shieldCellAmount;
+    private readonly ushort shieldCellHealth;
     private ushort lastHealthyShieldCellIndex;
     private ushort LastHealthyShieldCellIndex
     {
