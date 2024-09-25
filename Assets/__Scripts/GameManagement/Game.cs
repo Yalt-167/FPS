@@ -36,6 +36,8 @@ namespace GameManagement
         private void Awake()
         {
             Manager = this;
+
+            GameNetworkManager.AssignGameManagerInstance(gameObject);
         }
 
         private void Update()
@@ -150,13 +152,14 @@ namespace GameManagement
         [Rpc(SendTo.Server)]
         private void SetupServerRpc()
         {
-            SetupClientRpc();
+            SetupClientRpc(NetworkManager.Singleton.ConnectedClientsIds.Count);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        private void SetupClientRpc()
+        private void SetupClientRpc(int connectedClientCount)
         {
             SceneLoader.LoadScene(Scenes.HUD.MainScoreboardHUD, SceneType.HUD);
+            PlayerCount = connectedClientCount;
         }
 
 
@@ -245,12 +248,12 @@ namespace GameManagement
         private PlayerFrame[] players;
         public static void OnClientConnected(ulong clientID)
         {
-            PlayerCount++;
+            
         }
 
         public static void OnClientDisconnected(ulong clientID)
         {
-            PlayerCount--;
+
         }
 
 
