@@ -15,6 +15,7 @@ using Controller;
 using SaveAndLoad;
 using System.Reflection;
 using Menus;
+using ParrelSync;
 
 
 namespace GameManagement
@@ -47,6 +48,7 @@ namespace GameManagement
                     );
 
                 CallOnPlayerScriptsRecursively<IHaveSomethingToSave>("Load", new object[] { });
+
             }
             else
             {
@@ -85,7 +87,15 @@ namespace GameManagement
         {
             if (IsOwner)
             {
-                CallOnPlayerScriptsRecursively<IHaveSomethingToSave>("Save", new object[] { });
+#if DEV_BUILD
+                if (!ClonesManager.IsClone())
+                {
+#endif
+                    CallOnPlayerScriptsRecursively<IHaveSomethingToSave>("Save", new object[] { });
+#if DEV_BUILD
+                }
+#endif
+      
             }
             
             base.OnNetworkDespawn();
