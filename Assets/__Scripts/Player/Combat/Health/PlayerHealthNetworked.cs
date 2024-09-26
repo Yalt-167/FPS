@@ -35,7 +35,7 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
     private void PassiveRegen()
     {
         StartCoroutine(PassiveHealthRegen());
-        StartCoroutine(PassiveShieldRegen());
+        //StartCoroutine(PassiveShieldRegen());
     }
 
     private IEnumerator PassiveHealthRegen() // remake those for them to start regen only after a bit while not taking damage
@@ -68,6 +68,9 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
             RequestRespawnServerRpc();
             return;
         }
+
+        MyDebug.DebugOSD.Display("CurrentHealth", CurrentHealth);
+        MyDebug.DebugOSD.Display("TotalShield", TotalShield);
     }
 
     private void ResetHealth()
@@ -101,6 +104,24 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
         CurrentHealth -= damage;
     }
 
+    [UnityEditor.MenuItem("Developer/DamageLocalPlayer")]
+    public static void DamageLocalPlayer()
+    {
+        var damage = 10;
+
+        MyDebug.DebugOSD.Display("Damage before hitting shield", damage);
+
+        if (PlayerFrame.LocalPlayer.Health.Shield.HasShield)
+        {
+            damage = PlayerFrame.LocalPlayer.Health.Shield.TakeDamage((ushort)damage);
+        }
+
+        MyDebug.DebugOSD.Display("Damage after hitting shield", damage);
+
+        if (damage <= 0) { return; }
+
+        PlayerFrame.LocalPlayer.Health.CurrentHealth -= damage;
+    }
 
     public void RawHeal(ushort healProficiency)
     {

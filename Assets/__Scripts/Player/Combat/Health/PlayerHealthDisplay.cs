@@ -71,9 +71,15 @@ public sealed class PlayerHealthDisplay : MonoBehaviour
     private void Update()
     {
         healthSlider.value = Health / HealthData.MaxHealth;
+
         foreach (var idxValueTuple in Shield.AsSliderValues())
         {
             shieldCellsSliders[idxValueTuple.Index].value = idxValueTuple.Value;
         }
+
+        //for (int i = 0; i < Shield.ShieldCellAmount; i++)
+        //{
+        //    MyDebug.DebugOSD.Display($"{i}_", $"{Shield[i].Shield}/{Shield[i].MaxShield} = {(float)Shield[i].Shield / Shield[i].MaxShield}");
+        //}
     }
 }
