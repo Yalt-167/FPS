@@ -432,3 +432,38 @@ namespace GameManagement
 
 // loadMap takes in a SO representing the map
 // the SO has the scene in its member along with useful data about the map
+
+// rework camera
+// {
+//      - get rid of that camera roll
+//      - fix the slide camera bc it s goofy so far
+// }
+
+// rework guns
+// {
+//      add a level of inheritance so PlayerCombat only calls HeldItem.OnHold|OnOnRelease|etc so the HeldItem can be switched independantly
+//      separate file for each wap?(would allow to handle pull out time and each HeldItem cooldown can be internal) -> link to the relevant shooting style/ryhtm using using strategy pattern)
+
+// pull out ADS logic
+// add tw anchors (no ADS / ADS) and lerp from one to another with the guns transforms
+
+// pull out Kickback and recoil logic in separate scripts too
+
+// redo the hierarchy for gun as such
+// hand socket
+// {
+
+// - barrel ends holder
+//      {
+//          - as many barrel ends as I want so they can be picked up dynamically using transform.GetChild() calls
+//      }
+// - weapon
+//      {
+//          - actual weapon model hierarchy
+//      }
+// }
+
+
+// + dual wielding
+// each shot cycle the transform from which the shot is shot (separate class for barrel end -> call Wap.GetBarrelEnd() and do that
+// for ADS double the ADS anchors (separate class ADS anchor that could handle that internally)
