@@ -12,10 +12,10 @@ EditorBuildSettings:
     path: Assets/_Scenes/HUD/DebugOverlay.unity
     guid: 08dd248722debfe43b541f8bc3581a1b
   - enabled: 1
-    path: Assets/_Scenes/TeamFight/TeamFightMap1.unity
+    path: Assets/_Scenes/TeamFight/TeamFightMap1Data/TeamFightMap1.unity
     guid: fa4bde54f4d107d4e8b7ac0e3b16be63
   - enabled: 1
-    path: Assets/_Scenes/CaptureTheFlag/CaptureTheFlagMap1.unity
+    path: Assets/_Scenes/CaptureTheFlag/CaptureTheFlagMap1Data/CaptureTheFlagMap1.unity
     guid: 430dc5c8bd86cfa499efeda95b10a9f0
   - enabled: 1
     path: Assets/_Scenes/HUD/MainScoreboardHUD.unity

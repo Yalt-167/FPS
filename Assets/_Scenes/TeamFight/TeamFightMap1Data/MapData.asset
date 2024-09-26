@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e645e3712eda7845a6b541d0dbabd65, type: 3}
+  m_Name: MapData
+  m_EditorClassIdentifier: 
+  MapBounds:
+    HighestPoint: 100
+    DebugHighestPoint: 0
+    HighestOrigin: {x: 0, y: 100, z: 0}
+    LowestPoint: -100
+    DebugLowestPoint: 0
+    LowestOrigin: {x: -0, y: -100, z: -0}
+    NorthMostPoint: 100
+    DebugNorthMostPoint: 0
+    NorthMostOrigin: {x: 0, y: 0, z: 100}
+    SouthMostPoint: -100
+    DebugSouthMostPoint: 0
+    SouthMostOrigin: {x: -0, y: -0, z: -100}
+    EastMostPoint: 100
+    DebugEastMostPoint: 0
+    EastMostOrigin: {x: 100, y: 0, z: 0}
+    WestMostPoint: -100
+    DebugWestMostPoint: 0
+    WestMostOrigin: {x: -100, y: -0, z: -0}
+  DebugPlaneLineIncrement: 10
+  DebugPlaneLineExtents: 100
+  DebugDist: 100
