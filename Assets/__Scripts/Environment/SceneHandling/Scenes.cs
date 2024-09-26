@@ -6,7 +6,7 @@ namespace SceneHandling
     {
         public static string GetSceneFromGamemodeAndMap(string gamemode, string map)
         {
-            return $"_Scenes/{gamemode}/{map}";
+            return $"_Scenes/{gamemode}/{map}Data/{map}";
         }
 
         public static readonly string LoginScene = $"_Scenes/{nameof(LoginScene)}";
@@ -22,6 +22,4 @@ namespace SceneHandling
         }
 
     }
-
-
 }
