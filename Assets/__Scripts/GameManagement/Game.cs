@@ -296,7 +296,7 @@ namespace GameManagement
 
         #region Debug Player List
 
-        [MenuItem("Developer/DebugPlayerList")]
+        [MenuItem("Developer/Debug/DebugPlayerList")]
         public static void StaticDebugPlayerList()
         {
             Manager.DebugPlayerList();
@@ -394,44 +394,13 @@ namespace GameManagement
         [Rpc(SendTo.ClientsAndHost)]
         private void LoadMapClientRpc(string map)
         {
-            // load relevant SO too
             SceneLoader.UnloadScene(Scenes.LoginScene, SceneType.Map);
             SceneLoader.LoadScene(map, SceneType.Map);
         }
 
         #endregion
-
-        #region Debug
-
-        //[SerializeField] private bool debugBottomPlane;
-
-        //private void OnDrawGizmos()
-        //{
-        //    if (debugBottomPlane)
-        //    {
-        //        Gizmos.color = Color.red;
-        //        var origin = new Vector3(transform.position.x, -30, transform.position.z);
-        //        var debugDist = 100f; // how far the plane with be rendered
-
-        //        var sideward = Vector3.right * debugDist;
-        //        var forward = Vector3.forward * debugDist;
-        //        for (int offset = -100; offset <= 100; offset += 10)
-        //        {
-        //            var forwardOffsetVec = new Vector3(0, 0, offset);
-        //            Gizmos.DrawLine(origin - sideward + forwardOffsetVec, origin + sideward + forwardOffsetVec);
-
-        //            var sidewardOffsetVec = new Vector3(offset, 0, 0);
-        //            Gizmos.DrawLine(origin - forward + sidewardOffsetVec, origin + forward + sidewardOffsetVec);
-        //        }
-        //    }
-        //}
-
-        #endregion
     }
 }
-
-// loadMap takes in a SO representing the map
-// the SO has the scene in its member along with useful data about the map
 
 // rework camera
 // {

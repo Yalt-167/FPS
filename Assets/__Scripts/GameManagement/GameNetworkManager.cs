@@ -96,7 +96,7 @@ namespace GameManagement
 
         #region Network Objects Monitoring
 
-        [MenuItem("Developer/DebugNetworkObjects")]
+        [MenuItem("Developer/Debug/DebugNetworkObjects")]
         public static void DebugNetworkObjects()
         {
             foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)
@@ -105,7 +105,7 @@ namespace GameManagement
             }
         }
 
-        [MenuItem("Developer/DebugNetworkBehaviours")]
+        [MenuItem("Developer/Debug/DebugNetworkBehaviours")]
         public static void DebugNetworkBehaviours()
         {
             foreach (KeyValuePair<ulong, NetworkObject> element in NetworkManager.Singleton.SpawnManager.SpawnedObjects)

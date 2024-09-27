@@ -5,9 +5,5 @@ using UnityEditor;
 
 public static class Developer
 {
-    [MenuItem("Developer/BringDeathUponMortals")]
-    public static void BringDeathUponMereMortals()
-    {
-   
-    }
+    
 }
