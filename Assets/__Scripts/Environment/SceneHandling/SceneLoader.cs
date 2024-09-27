@@ -32,7 +32,7 @@ namespace SceneHandling
 
 #if DEV_BUILD
 
-        [MenuItem("Developer/Debug/LaunchDebugOverlay")]
+        [MenuItem("Developer/Debug/_LaunchDebugOverlay")]
         public static void StaticLoadLoadDebugOverlay()
         {
             Instance.LoadDebugOverlay();
