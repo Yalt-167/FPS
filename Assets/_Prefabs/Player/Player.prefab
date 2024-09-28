@@ -1655,6 +1655,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   initialJumpSpeedBoost: 60
+  jumpCancelCoefficient: 0.75
   terminalVelocity: -75
   afterDashMomentumConservationWindowDuration: 0.1
   slideCancelThreshold: 0.3
