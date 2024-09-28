@@ -97,6 +97,13 @@ namespace MyDebug
             debuggerEntries.Remove(key);
         }
 
+        public static void Display(object keyValue)
+        {
+            if (Instance == null) { return; }
+
+            Instance.DisplayInternal(keyValue.ToString(), keyValue.ToString());
+        }
+
         public static void Display(object key, object value)
         {
             if (Instance == null) { return; }

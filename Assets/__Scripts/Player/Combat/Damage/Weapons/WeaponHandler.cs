@@ -1383,6 +1383,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         targetRecoilHandlerRotation = Vector3.Lerp(targetRecoilHandlerRotation, Vector3.zero, RecoilRegulationSpeed * Time.deltaTime);
         currentRecoilHandlerRotation = Vector3.Slerp(currentRecoilHandlerRotation, targetRecoilHandlerRotation, recoilMovementSnappiness * Time.deltaTime);
         recoilHandlerTransform.localRotation = Quaternion.Euler(currentRecoilHandlerRotation);
+        MyDebug.DebugOSD.Display("currentRecoilHandlerRotation", currentRecoilHandlerRotation);
     }
 
     #endregion
