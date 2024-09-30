@@ -12,13 +12,14 @@ public sealed class HandleGunAngle : MonoBehaviour
     private void Awake()
     {
         cameraTransform = transform.parent;
-        barrelEnd = transform.GetChild(0).GetChild(0);
+        barrelEnd = transform.GetChild(0).GetChild(0).GetChild(0);
     }
 
     private void Update()
     {
-        transform.LookAt(GetPointOnCrosshair());
-        barrelEnd.LookAt(GetPointOnCrosshair());
+        var pointOnCrosshair = GetPointOnCrosshair();
+        transform.LookAt(pointOnCrosshair);
+        barrelEnd.LookAt(pointOnCrosshair);
     }
 
     private Vector3 GetPointOnCrosshair()
