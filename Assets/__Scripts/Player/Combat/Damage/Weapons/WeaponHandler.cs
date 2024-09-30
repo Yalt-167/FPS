@@ -12,7 +12,7 @@ using GameManagement;
 
 [Serializable]
 public sealed class WeaponHandler : NetworkBehaviour
-    //, IPlayerFrameMember
+//, IPlayerFrameMember
 {
     #region References
 
@@ -26,6 +26,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     [SerializeField] private Transform barrelEnd;
     [SerializeField] private Transform weaponTransform;
+    [SerializeField] private Transform weaponSocketTransform;
     [SerializeField] private LayerMask layersToHit;
     [SerializeField] private GameObject bulletTrailPrefab;
 
@@ -78,9 +79,9 @@ public sealed class WeaponHandler : NetworkBehaviour
     #endregion
 
     #region Spread Setup
-    
-    private float currentSpreadAngle = 0f; 
-    
+
+    private float currentSpreadAngle = 0f;
+
     #endregion
 
     #region Shotgun Setup
@@ -97,7 +98,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region RampUp Setup
 
-    
+
     private float currentCooldownBetweenRampUpShots;
     private float CurrentCooldownBetweenRampUpShots
     {
@@ -213,7 +214,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                         SetShotgunPelletsDirections(barrelEnd);
                         ExecuteShotgunHitscanShotClientRpc();
                     }
-                    :
+            :
                 () =>
                     {
                         SetShotgunPelletsDirections(barrelEnd);
@@ -221,7 +222,8 @@ public sealed class WeaponHandler : NetworkBehaviour
                     }
             ,
 
-            _ => () => { },
+            _ => () => { }
+            ,
         };
     }
 
@@ -247,7 +249,8 @@ public sealed class WeaponHandler : NetworkBehaviour
             ShootingRythm.Charge => () => { }
             ,
 
-            _ => () => { },
+            _ => () => { }
+            ,
         };
     }
 
@@ -255,11 +258,14 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         onHitWallMethod = currentWeaponStats.HitscanBulletSettings.ActionOnHitWall switch
         {
-            HitscanBulletActionOnHitWall.Classic => (_, _) => { },
-            HitscanBulletActionOnHitWall.ThroughWalls => (_, _) => { },
+            HitscanBulletActionOnHitWall.Classic => (_, _) => { }
+            ,
+            HitscanBulletActionOnHitWall.ThroughWalls => (_, _) => { }
+            ,
             HitscanBulletActionOnHitWall.Explosive => ExplodeUponWallHit,
             HitscanBulletActionOnHitWall.BounceOnWalls => BounceUponWallHit,
-            _ => (_, _) => { },
+            _ => (_, _) => { }
+            ,
         };
     }
 
@@ -409,7 +415,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             var ammoConsumedByThisShot = (ushort)(currentWeaponStats.ChargeStats.AmmoConsumedByFullyChargedShot * chargeRatio);
             if (ammos < ammoConsumedByThisShot)
             {
-                 RequestChargedShotServerRpc(ammos / currentWeaponStats.ChargeStats.AmmoConsumedByFullyChargedShot);
+                RequestChargedShotServerRpc(ammos / currentWeaponStats.ChargeStats.AmmoConsumedByFullyChargedShot);
             }
             else
             {
@@ -460,7 +466,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     //    if (currentWeaponStats.HitscanBulletSettings.PierceThroughPlayers)
     //    {
     //        var endPoint = barrelEnd.position + directionWithSpread * 100;
-            
+
     //        var hits = Physics.RaycastAll(barrelEnd.position, directionWithSpread, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore);
 
     //        Array.Sort(hits, new RaycastHitComparer());
@@ -547,13 +553,13 @@ public sealed class WeaponHandler : NetworkBehaviour
                     ),
                     GetRelevantHitscanBulletSettings()
                 );
-                
+
                 if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                 {
                     endPoint = hit.point;
                     break;
                 }
-                
+
             }
         }
 
@@ -668,13 +674,13 @@ public sealed class WeaponHandler : NetworkBehaviour
                             ),
                             GetRelevantHitscanBulletSettings()
                         );
-                        
+
                         if (currentWeaponStats.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                         {
                             endPoint = hit.point;
                             break;
                         }
-                        
+
                     }
                 }
             }
@@ -793,7 +799,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                     endPoint = hit.point;
                     break;
                 }
-                
+
             }
         }
 
@@ -882,7 +888,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             var hits = Physics.RaycastAll(barrelEnd.position, shotgunPelletsDirections[pelletIndex], currentWeaponStats.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
             Array.Sort(hits, new RaycastHitComparer());
 
-            foreach (var hit in hits)   
+            foreach (var hit in hits)
             {
                 if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
                 {
@@ -915,7 +921,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                         endPoint = hit.point;
                         break;
                     }
-                    
+
                 }
             }
 
@@ -942,7 +948,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             barrelEnd.position,
             Quaternion.LookRotation(GetDirectionWithSpread(currentSpreadAngle, barrelEnd))
             ).GetComponent<Projectile>();
-            
+
         if (projectile == null)
         {
             throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it");
@@ -973,7 +979,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         for (int i = 0; i < currentWeaponStats.ShotgunStats.PelletsCount; i++)
         {
-            
+
             var projectile = Instantiate(
                 currentWeaponStats.TravelTimeBulletSettings.BulletPrefab,
                 barrelEnd.position,
@@ -997,7 +1003,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                 //PlayerFrame.TeamID
                 PlayerFrame.LocalPlayer.TeamNumber
             );
-            
+
         }
 
         if (!IsOwner) { return; }
@@ -1034,7 +1040,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             //PlayerFrame.TeamID
             PlayerFrame.LocalPlayer.TeamNumber
         );
-        
+
 
         if (!IsOwner) { return; }
 
@@ -1155,7 +1161,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                     endPoint = hit.point;
                     break;
                 }
-                
+
             }
         }
 
@@ -1383,7 +1389,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         targetRecoilHandlerRotation = Vector3.Lerp(targetRecoilHandlerRotation, Vector3.zero, RecoilRegulationSpeed * Time.deltaTime);
         currentRecoilHandlerRotation = Vector3.Slerp(currentRecoilHandlerRotation, targetRecoilHandlerRotation, recoilMovementSnappiness * Time.deltaTime);
         recoilHandlerTransform.localRotation = Quaternion.Euler(currentRecoilHandlerRotation);
-        MyDebug.DebugOSD.Display("currentRecoilHandlerRotation", currentRecoilHandlerRotation);
+        MyDebug.DebugOSD.Display(currentRecoilHandlerRotation);
     }
 
     #endregion
