@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEditor;
+using Unity.VisualScripting;
 
 namespace EditorUtilities
 {
@@ -26,24 +27,25 @@ namespace EditorUtilities
             GUILayout.Label("Snap Camera", EditorStyles.boldLabel);
 
             targetPosition = EditorGUILayout.Vector3Field("Target Position", targetPosition);
+            if (GUILayout.Button("Snap Position")) { SnapToPosition(); }
 
             targetRotation = EditorGUILayout.Vector3Field("Target Rotation", targetRotation);
+            if (GUILayout.Button("Snap Rotation")) { SnapToRotation(); }
 
             targetFOV = EditorGUILayout.IntField("Target FOV", targetFOV);
+            if (GUILayout.Button("Snap FOV")) { SnapToFOV(); }
 
-            if (GUILayout.Button("Snap Camera"))
-            {
-                SnapCamera();
-            }
+            GUI.enabled = cameraData != null;
+            //if (GUILayout.Button($"Snap Camera {cameraData == null ? \"(Need a camera)" : \"\"}")) { SnapCamera(); }
+            GUI.enabled = true;
+
 
             EditorGUILayout.Space(30);
 
+
             cameraData  = (Camera)EditorGUILayout.ObjectField("Camera Data", cameraData, typeof(Camera), true);
 
-            if (GUILayout.Button("Copy Camera Data"))
-            {
-                CopyCameraData();
-            }
+            if (GUILayout.Button("Copy Camera Data")) { CopyCameraData(); }
         }
 
         private void SnapCamera()
@@ -59,8 +61,6 @@ namespace EditorUtilities
 
         private void CopyCameraData()
         {
-            if (cameraData == null) { return; }
-
             if (!TryGetSceneView(out var sceneView)) { return; }
 
             sceneView.pivot = cameraData.transform.position;
@@ -74,6 +74,31 @@ namespace EditorUtilities
             sceneView = SceneView.lastActiveSceneView;
 
             return sceneView != null;
+        }
+
+        private void SnapToPosition()
+        {
+            if (!TryGetSceneView(out var sceneView)) { return; }
+
+            sceneView.pivot = targetPosition;
+            sceneView.Repaint();
+
+        }
+
+        private void SnapToRotation()
+        {
+            if (!TryGetSceneView(out var sceneView)) { return; }
+
+            sceneView.rotation = Quaternion.Euler(targetRotation);
+            sceneView.Repaint();
+        }
+
+        private void SnapToFOV()
+        {
+            if (!TryGetSceneView(out var sceneView)) { return; }
+
+            sceneView.cameraSettings.fieldOfView = targetFOV;
+            sceneView.Repaint();
         }
     }
 }
