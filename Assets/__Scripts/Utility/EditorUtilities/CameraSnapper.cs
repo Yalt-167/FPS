@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEditor;
 using Unity.VisualScripting;
 
-namespace EditorUtilities
+namespace MyEditorUtilities
 {
     public sealed class CameraSnapper : EditorWindow
     {
