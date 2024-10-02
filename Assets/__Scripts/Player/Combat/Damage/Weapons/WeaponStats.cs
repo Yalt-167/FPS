@@ -1,9 +1,11 @@
 using System;
-using System.Buffers.Text;
+
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+
 using UnityEngine;
+
+using MyEditorUtilities;
 
 [Serializable]
 public struct WeaponStats
@@ -13,8 +15,9 @@ public struct WeaponStats
 
     [Header("Bullet Travel Settings")]
     public bool IsHitscan;
-    [Tooltip("Define how the bullet should act (Only considered is the IsHitscan param above is true)")] public HitscanBulletSettings HitscanBulletSettings;
-    [Tooltip("Define how the bullet should act (Only considered is the IsHitscan param above is false)")] public TravelTimeBulletSettings TravelTimeBulletSettings;
+    [SerializeField, If(nameof(IsHitscan))] private float variable;
+    [SerializeField, If(nameof(IsHitscan))][Tooltip("Define how the bullet should act (Only considered if the IsHitscan param above is true)")] public HitscanBulletSettings HitscanBulletSettings;
+    [SerializeField, If(nameof(IsHitscan))][Tooltip("Define how the bullet should act (Only considered if the IsHitscan param above is false)")] public TravelTimeBulletSettings TravelTimeBulletSettings;
 
 
     [Header("Magazine")]

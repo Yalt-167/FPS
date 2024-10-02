@@ -31,10 +31,12 @@ namespace MyEditorUtilities
 
             SerializedProperty conditionField = property.serializedObject.FindProperty(ifAttribute.ConditionField);
 
+            _ = conditionField ?? throw new System.Exception("The condition field doesn t exist");
+
             _ = conditionField.propertyType == SerializedPropertyType.Boolean ? (object)null : throw new System.Exception("The condition field is not a boolean");
 
             return ifAttribute.InvertCondition ? !conditionField.boolValue : conditionField.boolValue;
-        }
+        } 
     }
 }
 
