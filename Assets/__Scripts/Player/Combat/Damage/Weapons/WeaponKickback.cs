@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine;
+using MyEditorUtilities;
 
 namespace WeaponHandling
 {
@@ -12,11 +13,11 @@ namespace WeaponHandling
         private KickbackStats kickbackStats;
         //private WeaponStats weaponStats; // not sure which one I wanna use so far
 
-        private void ApplyKickback()
-        {
-            weaponTransform.localPosition -= new Vector3(0f, 0f, kickbackStats.WeaponKickBackPerShot);
-        }
-        private void ApplyKickback(float chargeRatio)
+        [SerializeField] private bool doShow;
+        [SerializeField, If(nameof(doShow))] private float iAmAFirstTestVariable;
+        [SerializeField, If(nameof(doShow), invertCondition: true)] private float iAmASecondTestVariable;
+
+        private void ApplyKickback(float chargeRatio = 1f)
         {
             weaponTransform.localPosition -= new Vector3(0f, 0f, kickbackStats.WeaponKickBackPerShot * chargeRatio);
         }
