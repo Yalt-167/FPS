@@ -1,11 +1,15 @@
 
 
+using System.Linq;
+
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 namespace MyEditorUtilities
 {
     [CustomPropertyDrawer(typeof(IfAttribute))]
+    [CustomPropertyDrawer(typeof(SerializeFieldIfAttribute))]
     public class SerializeFieldIfDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -14,6 +18,7 @@ namespace MyEditorUtilities
 
             EditorGUI.PropertyField(position, property, label, true);
         }
+
         /// <summary>
         /// Necessary when there are other fields to serialize because otherwise it would skip the space need for the serializeation of this variable before serializing the next field even when this one is not serialized (this probably makes no sense but idc im solo so far
         /// </summary>
@@ -27,7 +32,7 @@ namespace MyEditorUtilities
 
         private bool ShouldBeSerialized(SerializedProperty property)
         {
-            IfAttribute ifAttribute = (IfAttribute)attribute; 
+            ConditionalSerializationAttribute ifAttribute = (ConditionalSerializationAttribute)attribute;
 
             SerializedProperty conditionField = property.serializedObject.FindProperty(ifAttribute.ConditionField);
 
