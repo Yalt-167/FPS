@@ -16,12 +16,12 @@ public sealed class WeaponHandler : NetworkBehaviour
 {
     #region References
 
-    [SerializeField] private Weapon currentWeapon;
+    [SerializeField] private WeaponScriptableObject currentWeapon;
+    public WeaponScriptableObject CurrentWeapon => currentWeapon;
     private WeaponStats currentWeaponStats;
     private float cameraTransformInitialZ;
     private Transform cameraTransform;
     private new Camera camera;
-    private readonly int baseFOV = 60;
     private Transform recoilHandlerTransform;
 
     [SerializeField] private Transform barrelEnd;
@@ -72,9 +72,6 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private Vector3 currentRecoilHandlerRotation;
     private Vector3 targetRecoilHandlerRotation;
-    [SerializeField] private float recoilMovementSnappiness;
-
-    private float RecoilRegulationSpeed => isAiming ? currentWeaponStats.AimingRecoilStats.RecoilRegulationSpeed : currentWeaponStats.HipfireRecoilStats.RecoilRegulationSpeed;
 
     #endregion
 
@@ -115,13 +112,6 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #endregion
 
-    //public PlayerFrame PlayerFrame { get; set; }
-
-    //public void InitPlayerFrame(PlayerFrame playerFrame)
-    //{
-    //    PlayerFrame = playerFrame;
-    //}
-
     #region Charge Setup
 
     private float timeStartedCharging;
@@ -159,12 +149,12 @@ public sealed class WeaponHandler : NetworkBehaviour
         CurrentCooldownBetweenRampUpShots *= currentWeaponStats.RampUpStats.RampUpCooldownRegulationMultiplier;
     }
 
-    private void Update()
-    {
-        HandleRecoil();
-        HandleSpead();
-        HandleKickback();
-    }
+    //private void Update()
+    //{
+    //    HandleRecoil();
+    //    HandleSpead();
+    //    HandleKickback();
+    //}
 
     private void LateUpdate()
     {
@@ -181,7 +171,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region Init
 
-    public void SetWeapon(Weapon weapon)
+    public void SetWeapon(WeaponScriptableObject weapon)
     {
         currentWeapon = weapon;
         InitWeapon();
@@ -432,7 +422,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         if (!IsOwner) { return; }
 
-        PlayShootingSound(currentWeaponStats.AmmoLeftInMagazineToWarn >= ammos);
+        PlayShootingSoundServerRpc(currentWeaponStats.AmmoLeftInMagazineToWarn >= ammos);
 
         damageLogManager.UpdatePlayerSettings(DamageLogsSettings);
         timeLastShotFired = Time.time;
@@ -1290,173 +1280,152 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region Aiming
 
-    public void UpdateAimingState(bool shoulbBeAiming)
-    {
-        if (isAiming == shoulbBeAiming) { return; }
+    //public void UpdateAimingState(bool shoulbBeAiming)
+    //{
+    //    if (isAiming == shoulbBeAiming) { return; }
 
-        isAiming = shoulbBeAiming;
-        //StartCoroutine(ToggleAim(shoulbBeAiming));
-        StartCoroutine(ToggleAimFOV(shoulbBeAiming));
-    }
+    //    isAiming = shoulbBeAiming;
+    //    //StartCoroutine(ToggleAim(shoulbBeAiming));
+    //    StartCoroutine(ToggleAimFOV(shoulbBeAiming));
+    //}
 
-    private IEnumerator ToggleAimMovement(bool shouldBeAiming)
-    {
-        var startingPointZ = cameraTransform.localPosition.z;
-        var elapsedTime = 0f;
-        var (targetZ, targetDuration) = shouldBeAiming ?
-            (currentWeaponStats.AimingAndScopeStats.AimingFOV, currentWeaponStats.AimingAndScopeStats.TimeToADS)
-            :
-            (cameraTransformInitialZ, currentWeaponStats.AimingAndScopeStats.TimeToUnADS);
-        while (elapsedTime < targetDuration)
-        {
-            cameraTransform.localPosition = new(0f, 0f, Mathf.Lerp(startingPointZ, targetZ, elapsedTime / targetDuration));
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-    }
+    //private IEnumerator ToggleAimMovement(bool shouldBeAiming)
+    //{
+    //    var startingPointZ = cameraTransform.localPosition.z;
+    //    var elapsedTime = 0f;
+    //    var (targetZ, targetDuration) = shouldBeAiming ?
+    //        (currentWeaponStats.AimingAndScopeStats.AimingFOV, currentWeaponStats.AimingAndScopeStats.TimeToADS)
+    //        :
+    //        (cameraTransformInitialZ, currentWeaponStats.AimingAndScopeStats.TimeToUnADS);
+    //    while (elapsedTime < targetDuration)
+    //    {
+    //        cameraTransform.localPosition = new(0f, 0f, Mathf.Lerp(startingPointZ, targetZ, elapsedTime / targetDuration));
+    //        elapsedTime += Time.deltaTime;
+    //        yield return null;
+    //    }
+    //}
 
-    private IEnumerator ToggleAimFOV(bool shouldBeAiming)
-    {
-        var startingPoint = camera.fieldOfView;
-        var elapsedTime = 0f;
-        var (target, targetDuration) = shouldBeAiming ?
-            (GetRelevantFOV(), currentWeaponStats.AimingAndScopeStats.TimeToADS)
-            :
-            (baseFOV, currentWeaponStats.AimingAndScopeStats.TimeToUnADS);
-        while (elapsedTime < targetDuration)
-        {
-            camera.fieldOfView = Mathf.Lerp(startingPoint, target, elapsedTime / targetDuration);
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
+    //private IEnumerator ToggleAimFOV(bool shouldBeAiming)
+    //{
+    //    var startingPoint = camera.fieldOfView;
+    //    var elapsedTime = 0f;
+    //    var (target, targetDuration) = shouldBeAiming ?
+    //        (GetRelevantFOV(), currentWeaponStats.AimingAndScopeStats.TimeToADS)
+    //        :
+    //        (baseFOV, currentWeaponStats.AimingAndScopeStats.TimeToUnADS);
+    //    while (elapsedTime < targetDuration)
+    //    {
+    //        camera.fieldOfView = Mathf.Lerp(startingPoint, target, elapsedTime / targetDuration);
+    //        elapsedTime += Time.deltaTime;
+    //        yield return null;
+    //    }
 
-    }
+    //}
 
-    private float GetRelevantFOV()
-    {
-        return currentWeaponStats.AimingAndScopeStats.ScopeMagnification == 1f ?
-            currentWeaponStats.AimingAndScopeStats.AimingFOV
-            :
-            baseFOV / currentWeaponStats.AimingAndScopeStats.ScopeMagnification
-            ;
-    }
-
-    #endregion
-
-    #region Handle Recoil
-
-    private void ApplyRecoil()
-    {
-        if (isAiming)
-        {
-            targetRecoilHandlerRotation += new Vector3(
-                -currentWeaponStats.AimingRecoilStats.RecoilForceX,
-                Random.Range(-currentWeaponStats.AimingRecoilStats.RecoilForceY, currentWeaponStats.AimingRecoilStats.RecoilForceY),
-                Random.Range(-currentWeaponStats.AimingRecoilStats.RecoilForceZ, currentWeaponStats.AimingRecoilStats.RecoilForceZ)
-            );
-        }
-        else
-        {
-            targetRecoilHandlerRotation += new Vector3(
-                -currentWeaponStats.HipfireRecoilStats.RecoilForceX,
-                Random.Range(-currentWeaponStats.HipfireRecoilStats.RecoilForceY, currentWeaponStats.HipfireRecoilStats.RecoilForceY),
-                Random.Range(-currentWeaponStats.HipfireRecoilStats.RecoilForceZ, currentWeaponStats.HipfireRecoilStats.RecoilForceZ)
-            );
-        }
-    }
-    private void ApplyRecoil(float chargeRatio)
-    {
-        if (isAiming)
-        {
-            targetRecoilHandlerRotation += new Vector3(
-                -currentWeaponStats.AimingRecoilStats.RecoilForceX * chargeRatio,
-                Random.Range(-currentWeaponStats.AimingRecoilStats.RecoilForceY * chargeRatio, currentWeaponStats.AimingRecoilStats.RecoilForceY * chargeRatio),
-                Random.Range(-currentWeaponStats.AimingRecoilStats.RecoilForceZ * chargeRatio, currentWeaponStats.AimingRecoilStats.RecoilForceZ * chargeRatio)
-            );
-        }
-        else
-        {
-            targetRecoilHandlerRotation += new Vector3(
-                -currentWeaponStats.HipfireRecoilStats.RecoilForceX * chargeRatio,
-                Random.Range(-currentWeaponStats.HipfireRecoilStats.RecoilForceY * chargeRatio, currentWeaponStats.HipfireRecoilStats.RecoilForceY * chargeRatio),
-                Random.Range(-currentWeaponStats.HipfireRecoilStats.RecoilForceZ * chargeRatio, currentWeaponStats.HipfireRecoilStats.RecoilForceZ * chargeRatio)
-            );
-        }
-    }
-
-    private void HandleRecoil()
-    {
-        targetRecoilHandlerRotation = Vector3.Lerp(targetRecoilHandlerRotation, Vector3.zero, RecoilRegulationSpeed * Time.deltaTime);
-        currentRecoilHandlerRotation = Vector3.Slerp(currentRecoilHandlerRotation, targetRecoilHandlerRotation, recoilMovementSnappiness * Time.deltaTime);
-        recoilHandlerTransform.localRotation = Quaternion.Euler(currentRecoilHandlerRotation);
-        MyDebug.DebugOSD.Display(currentRecoilHandlerRotation);
-    }
+    //private float GetRelevantFOV()
+    //{
+    //    return currentWeaponStats.AimingAndScopeStats.ScopeMagnification == 1f ?
+    //        currentWeaponStats.AimingAndScopeStats.AimingFOV
+    //        :
+    //        baseFOV / currentWeaponStats.AimingAndScopeStats.ScopeMagnification
+    //        ;
+    //}
 
     #endregion
 
-    #region Handle Kickback
+    //#region Handle Recoil
 
-    private void ApplyKickback()
-    {
-        weaponTransform.localPosition -= new Vector3(0f, 0f, currentWeaponStats.KickbackStats.WeaponKickBackPerShot);
-    }
-    private void ApplyKickback(float chargeRatio)
-    {
-        weaponTransform.localPosition -= new Vector3(0f, 0f, currentWeaponStats.KickbackStats.WeaponKickBackPerShot * chargeRatio);
-    }
+    //private void ApplyRecoil()
+    //{
+    //    if (isAiming)
+    //    {
+    //        targetRecoilHandlerRotation += new Vector3(
+    //            -currentWeaponStats.AimingRecoilStats.RecoilForceX,
+    //            Random.Range(-currentWeaponStats.AimingRecoilStats.RecoilForceY, currentWeaponStats.AimingRecoilStats.RecoilForceY),
+    //            Random.Range(-currentWeaponStats.AimingRecoilStats.RecoilForceZ, currentWeaponStats.AimingRecoilStats.RecoilForceZ)
+    //        );
+    //    }
+    //    else
+    //    {
+    //        targetRecoilHandlerRotation += new Vector3(
+    //            -currentWeaponStats.HipfireRecoilStats.RecoilForceX,
+    //            Random.Range(-currentWeaponStats.HipfireRecoilStats.RecoilForceY, currentWeaponStats.HipfireRecoilStats.RecoilForceY),
+    //            Random.Range(-currentWeaponStats.HipfireRecoilStats.RecoilForceZ, currentWeaponStats.HipfireRecoilStats.RecoilForceZ)
+    //        );
+    //    }
+    //}
+    //private void ApplyRecoil(float chargeRatio)
+    //{
+    //    if (isAiming)
+    //    {
+    //        targetRecoilHandlerRotation += new Vector3(
+    //            -currentWeaponStats.AimingRecoilStats.RecoilForceX * chargeRatio,
+    //            Random.Range(-currentWeaponStats.AimingRecoilStats.RecoilForceY * chargeRatio, currentWeaponStats.AimingRecoilStats.RecoilForceY * chargeRatio),
+    //            Random.Range(-currentWeaponStats.AimingRecoilStats.RecoilForceZ * chargeRatio, currentWeaponStats.AimingRecoilStats.RecoilForceZ * chargeRatio)
+    //        );
+    //    }
+    //    else
+    //    {
+    //        targetRecoilHandlerRotation += new Vector3(
+    //            -currentWeaponStats.HipfireRecoilStats.RecoilForceX * chargeRatio,
+    //            Random.Range(-currentWeaponStats.HipfireRecoilStats.RecoilForceY * chargeRatio, currentWeaponStats.HipfireRecoilStats.RecoilForceY * chargeRatio),
+    //            Random.Range(-currentWeaponStats.HipfireRecoilStats.RecoilForceZ * chargeRatio, currentWeaponStats.HipfireRecoilStats.RecoilForceZ * chargeRatio)
+    //        );
+    //    }
+    //}
 
-    private void HandleKickback()
-    {
-        weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, Vector3.zero, currentWeaponStats.KickbackStats.WeaponKickBackRegulationTime * Time.time);
-    }
+    //private void HandleRecoil()
+    //{
+    //    targetRecoilHandlerRotation = Vector3.Lerp(targetRecoilHandlerRotation, Vector3.zero, RecoilRegulationSpeed * Time.deltaTime);
+    //    currentRecoilHandlerRotation = Vector3.Slerp(currentRecoilHandlerRotation, targetRecoilHandlerRotation, recoilMovementSnappiness * Time.deltaTime);
+    //    recoilHandlerTransform.localRotation = Quaternion.Euler(currentRecoilHandlerRotation);
+    //    MyDebug.DebugOSD.Display(currentRecoilHandlerRotation);
+    //}
 
-    #endregion
+    //#endregion
 
-    #region Handle Spread
+    //#region Handle Kickback
 
-    private void ApplySpread()
-    {
-        currentSpreadAngle += isAiming ? currentWeaponStats.AimingSimpleShotStats.SpreadAngleAddedPerShot : currentWeaponStats.SimpleShotStats.SpreadAngleAddedPerShot;
-    }
+    //private void ApplyKickback()
+    //{
+    //    weaponTransform.localPosition -= new Vector3(0f, 0f, currentWeaponStats.KickbackStats.WeaponKickBackPerShot);
+    //}
+    //private void ApplyKickback(float chargeRatio)
+    //{
+    //    weaponTransform.localPosition -= new Vector3(0f, 0f, currentWeaponStats.KickbackStats.WeaponKickBackPerShot * chargeRatio);
+    //}
 
-    private void HandleSpead()
-    {
-        currentSpreadAngle = Mathf.Lerp(currentSpreadAngle, 0f, (isAiming ? currentWeaponStats.AimingSimpleShotStats.SpreadRegulationSpeed : currentWeaponStats.SimpleShotStats.SpreadRegulationSpeed) * Time.time);
-    }
+    //private void HandleKickback()
+    //{
+    //    weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, Vector3.zero, currentWeaponStats.KickbackStats.WeaponKickBackRegulationTime * Time.time);
+    //}
 
-    private Vector3 GetDirectionWithSpread(float spreadAngle, Transform directionTransform)
-    {
-        var spreadStrength = spreadAngle / 45f;
-        /*Most fucked explanantion to ever cross the frontier of reality
-         / 45f -> to get value which we can use in a vector instead of an angle
-        ex in 2D:  a vector that has a 45� angle above X has a (1, 1) direction
-        while the X has a (1, 0)
-        so we essentially brought the 45� to a value we could use as a direction in the vector
-         */
-        // perhaps do directionTransform.forward * 45 instead of other / 45 (for performances purposes)
-        return (
-                directionTransform.forward + directionTransform.TransformDirection(
-                    new Vector3(
-                        Random.Range(-spreadStrength, spreadStrength),
-                        Random.Range(-spreadStrength, spreadStrength),
-                        0
-                    )
-                )
-            ).normalized;
-    }
+    //#endregion
 
-    //private Vector3 GetDirectionWithSpread(float spreadAngle, Vector3 direction)
+    //#region Handle Spread
+
+    //private void ApplySpread()
+    //{
+    //    currentSpreadAngle += isAiming ? currentWeaponStats.AimingSimpleShotStats.SpreadAngleAddedPerShot : currentWeaponStats.SimpleShotStats.SpreadAngleAddedPerShot;
+    //}
+
+    //private void HandleSpead()
+    //{
+    //    currentSpreadAngle = Mathf.Lerp(currentSpreadAngle, 0f, (isAiming ? currentWeaponStats.AimingSimpleShotStats.SpreadRegulationSpeed : currentWeaponStats.SimpleShotStats.SpreadRegulationSpeed) * Time.time);
+    //}
+
+    //private Vector3 GetDirectionWithSpread(float spreadAngle, Transform directionTransform)
     //{
     //    var spreadStrength = spreadAngle / 45f;
-    //    /*Most fucked explanantion to ever cross the frontier of reality
-    //     / 45f -> to get value which we can use iun a vector instead of an angle
-    //    ex in 2D:  a vector that has a 45� angle above X has a (1, 1) direction
+    //    /*Most fucked explanantion to ever cross the realm of reality
+    //     / 45f -> to get value which we can use in a vector instead of an angle
+    //    ex in 2D:  a vector that has a 45 angle above X has a (1, 1) direction
     //    while the X has a (1, 0)
-    //    so we essentially brought the 45� to a value we could use as a direction in the vector
+    //    so we essentially brought the 45 to a value we could use as a direction in the vector
     //     */
     //    // perhaps do directionTransform.forward * 45 instead of other / 45 (for performances purposes)
     //    return (
-    //            direction + direction.TransformDirection(
+    //            directionTransform.forward + directionTransform.TransformDirection(
     //                new Vector3(
     //                    Random.Range(-spreadStrength, spreadStrength),
     //                    Random.Range(-spreadStrength, spreadStrength),
@@ -1466,11 +1435,39 @@ public sealed class WeaponHandler : NetworkBehaviour
     //        ).normalized;
     //}
 
-    #endregion
+    ////private Vector3 GetDirectionWithSpread(float spreadAngle, Vector3 direction)
+    ////{
+    ////    var spreadStrength = spreadAngle / 45f;
+    ////    /*Most fucked explanantion to ever cross the frontier of reality
+    ////     / 45f -> to get value which we can use iun a vector instead of an angle
+    ////    ex in 2D:  a vector that has a 45� angle above X has a (1, 1) direction
+    ////    while the X has a (1, 0)
+    ////    so we essentially brought the 45� to a value we could use as a direction in the vector
+    ////     */
+    ////    // perhaps do directionTransform.forward * 45 instead of other / 45 (for performances purposes)
+    ////    return (
+    ////            direction + direction.TransformDirection(
+    ////                new Vector3(
+    ////                    Random.Range(-spreadStrength, spreadStrength),
+    ////                    Random.Range(-spreadStrength, spreadStrength),
+    ////                    0
+    ////                )
+    ////            )
+    ////        ).normalized;
+    ////}
+
+    //#endregion
 
     #region Handle Sound
 
-    private void PlayShootingSound(bool shouldWarn)
+    [Rpc(SendTo.Server)]
+    private void PlayShootingSoundServerRpc(bool shouldWarn)
+    {
+        PlayShootingSoundClientRpc(shouldWarn);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void PlayShootingSoundClientRpc(bool shouldWarn)
     {
         for (int iteration = 0; iteration < audioSourcePoolSize; iteration++) // this loop ensures that we only do <audioSourcePoolSize> loops
         {
@@ -1491,7 +1488,14 @@ public sealed class WeaponHandler : NetworkBehaviour
         audioSources[^1].Play();
     }
 
-    private void PlayReloadSound()
+    [Rpc(SendTo.Server)]
+    private void PlayReloadSoundServerRpc()
+    {
+        PlayReloadSoundClientRpc();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void PlayReloadSoundClientRpc()
     {
         // make the reload duration rely on the audio for its duration so no need to "eardrum it" (check for audioSource.isPlaying in the coroutine)
         foreach (var audioSource in audioSources)

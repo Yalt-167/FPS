@@ -8,22 +8,12 @@ using GameManagement;
 using Inputs;
 
 [DefaultExecutionOrder(-6)]
-public sealed class PlayerCombat : MonoBehaviour
-    //, IPlayerFrameMember
+public sealed class PlayerCombatInputs : MonoBehaviour
 {
-
-    //public PlayerFrame PlayerFrame { get; set; }
-
-    //public void InitPlayerFrame(PlayerFrame playerFrame)
-    //{
-    //    PlayerFrame = playerFrame;
-    //}
-
-
     [SerializeField] private int allowedWeaponsCount = 3;
     private InputManager inputManager;
     private CombatInputQuery InputQuery => inputManager.CombatInputs;
-    [SerializeField] private Weapon[] weapons;
+    [SerializeField] private WeaponScriptableObject[] weapons;
     private WeaponHandler weaponHandler;
     private int currentWeaponIndex;
     [SerializeField] private LayerMask layersToHit;
@@ -47,11 +37,12 @@ public sealed class PlayerCombat : MonoBehaviour
     {
         if (weapons.Length > allowedWeaponsCount)
         {
-            var temp = new Weapon[allowedWeaponsCount];
+            var temp = new WeaponScriptableObject[allowedWeaponsCount];
             for (int i = 0; i < allowedWeaponsCount; i++)
             {
                 temp[i] = weapons[i];
             }
+
             weapons = temp;
         }
     }
@@ -70,7 +61,7 @@ public sealed class PlayerCombat : MonoBehaviour
         HandleWeaponSwitch(); // upon check: there is
 
 
-        weaponHandler.UpdateAimingState(InputQuery.Aim);
+        //weaponHandler.UpdateAimingState(InputQuery.Aim);
 
         if (InputQuery.Reload)
         {
@@ -97,8 +88,6 @@ public sealed class PlayerCombat : MonoBehaviour
             UpdateWeaponWithIndex(2);
             return;
         }
-
-        
 
         var scrollWheelInput = Input.GetAxis(ScrollWheelAxis);
         if (scrollWheelInput != 0f)
@@ -180,7 +169,4 @@ public sealed class PlayerCombat : MonoBehaviour
     }
 
     #endregion
-
-
-
 }
