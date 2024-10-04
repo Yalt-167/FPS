@@ -11,6 +11,12 @@ namespace WeaponHandling
     /// </summary>
     public sealed class WeaponADS : WeaponBehaviour // moves the transfom which is already propagated + may do some clientside camera adjustment so no need to replicate
     {
+        public override void Setup(Weapon weapon)
+        {
+
+        }
+
+
         [SerializeField] private Transform basePosition;
         [SerializeField] private Transform ADSPosition;
         [SerializeField] private Transform weaponSocket;

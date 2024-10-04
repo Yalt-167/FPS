@@ -9,6 +9,11 @@ namespace WeaponHandling
 {
     public sealed class WeaponKickback : WeaponBehaviour
     {
+        public override void Setup(Weapon weapon)
+        {
+            throw new NotImplementedException();
+        }
+
         [SerializeField] private Transform weaponTransform; // not sustainable for dual wielding weapons
         private KickbackStats kickbackStats => weaponHandler.CurrentWeapon.KickbackStats;
         private WeaponHandler weaponHandler;

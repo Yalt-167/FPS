@@ -9,6 +9,11 @@ namespace WeaponHandling
 {
     public sealed class WeaponRecoil : WeaponBehaviour // moves the transfrom which is already propagated so doesn t need to be replicated
     {
+        public override void Setup(Weapon weapon)
+        {
+            throw new NotImplementedException();
+        }
+
         private Vector3 currentRecoilHandlerRotation;
         private Vector3 targetRecoilHandlerRotation;
         [SerializeField] private float recoilMovementSnappiness;
