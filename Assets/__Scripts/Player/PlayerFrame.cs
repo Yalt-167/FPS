@@ -244,7 +244,7 @@ namespace GameManagement
 
         [field: Space(12)]
         [field: SerializeField] public ChampionStats ChampionStats { get; set; }
-        public PlayerCombat Combat { get; private set; }
+        public PlayerCombatInputs Combat { get; private set; }
         public PlayerMovement Movement {get; private set;}
         public ClientNetworkTransform ClientNetworkTransform {get; private set;}
         public WeaponHandler WeaponHandler {get; private set;}
@@ -267,7 +267,7 @@ namespace GameManagement
         {
             InitPlayerCommon();
 
-            Combat = GetComponent<PlayerCombat>();
+            Combat = GetComponent<PlayerCombatInputs>();
 
             Movement = GetComponent<PlayerMovement>();
 

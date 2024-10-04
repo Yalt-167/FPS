@@ -1448,6 +1448,8 @@ GameObject:
   - component: {fileID: 2461466814386011735}
   - component: {fileID: 7891554514326042408}
   - component: {fileID: 1236349065094530700}
+  - component: {fileID: 106552621894956636}
+  - component: {fileID: 831508163283520518}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1537,7 +1539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 169908227
+  GlobalObjectIdHash: 2957232829
   InScenePlacedSourceGlobalObjectIdHash: 2957232829
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1573,6 +1575,8 @@ MonoBehaviour:
     - {fileID: 1236349065094530700}
     - {fileID: 2461466814386011735}
     - {fileID: 7891554514326042408}
+    - {fileID: 106552621894956636}
+    - {fileID: 831508163283520518}
     gameObjectsToKill:
     - {fileID: 3467822551731792150}
     - {fileID: 4356166339693058417}
@@ -1985,6 +1989,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60b3bfbfe23ed1c4d9b5a4bfdd089896, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &106552621894956636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5705630700605972737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f49aba46e8b5ae5469ef470037e45a11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponTransform: {fileID: 518363587083237927}
+  doShow: 0
+  iAmAFirstTestVariable: 0
+  iAmASecondTestVariable: 0
+--- !u!114 &831508163283520518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5705630700605972737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ec39e2fc577fa408e14b78b74cb56d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  recoilMovementSnappiness: 6
+  recoilHandlerTransform: {fileID: 8396766208941364844}
 --- !u!1 &5814794369634734712
 GameObject:
   m_ObjectHideFlags: 0
