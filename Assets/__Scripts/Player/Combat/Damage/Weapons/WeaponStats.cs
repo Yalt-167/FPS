@@ -5,8 +5,6 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-using MyEditorUtilities;
-
 [Serializable]
 public struct WeaponStats
 {
@@ -15,9 +13,8 @@ public struct WeaponStats
 
     [Header("Bullet Travel Settings")]
     public bool IsHitscan;
-    [SerializeField, If(nameof(IsHitscan))] private float variable;
-    [SerializeField, If(nameof(IsHitscan))][Tooltip("Define how the bullet should act (Only considered if the IsHitscan param above is true)")] public HitscanBulletSettings HitscanBulletSettings;
-    [SerializeField, If(nameof(IsHitscan))][Tooltip("Define how the bullet should act (Only considered if the IsHitscan param above is false)")] public TravelTimeBulletSettings TravelTimeBulletSettings;
+    [Tooltip("Define how the bullet should act (Only considered if the IsHitscan param above is true)")] public HitscanBulletSettings HitscanBulletSettings;
+    [Tooltip("Define how the bullet should act (Only considered if the IsHitscan param above is false)")] public TravelTimeBulletSettings TravelTimeBulletSettings;
 
 
     [Header("Magazine")]
@@ -50,24 +47,24 @@ public struct WeaponStats
     [Tooltip("Only considered when the ShootingRythm selected is Charge")] public ChargeStats ChargeStats;
 
 
-    [Header("ADS and Scopes")]
-    public AimAndScopeStats AimingAndScopeStats;
+    //[Header("ADS and Scopes")]
+    //public AimAndScopeStats AimingAndScopeStats;
     
 
-    [Header("Recoil")]
-    public RecoilStats HipfireRecoilStats;
-    public RecoilStats AimingRecoilStats;
+    //[Header("Recoil")]
+    //public WeaponRecoilStats HipfireRecoilStats;
+    //public WeaponRecoilStats AimingRecoilStats;
 
 
-    [Header("Kickback")]
-    public KickbackStats KickbackStats;
+    //[Header("Kickback")]
+    //public KickbackStats KickbackStats;
     
 
     public bool CanBreakThings;
     public Effects EffectsInflicted;
 
     [Header("Mobility")]
-    [Tooltip("Will define how fast teh player can move and how high he can jump")]public float Weight;
+    [Tooltip("Will define how fast the player can move and how high he can jump")] public float Weight;
 }
 
 
@@ -339,7 +336,7 @@ public struct KickbackStats
 }
 
 [Serializable]
-public struct RecoilStats
+public struct WeaponRecoilStats
 {
     [Tooltip("Upward recoil (Muzzle Climb)")] public float RecoilForceX;
     [Tooltip("Sideway recoil")] public float RecoilForceY;
@@ -384,3 +381,9 @@ public interface IEffectProficiency { } // interface for polymorphism on the eff
 // add a second healthbar beneath the actual one for a lerping one that slowly goes toward your health
 //just for aesthetic
 // add a report bug key ingame
+
+
+
+// keep the weaponHandler but no longer as a NetworkBehaviour just it holds the weapon data
+// have the weapon behaviour on the root of the weapon -> when  switch it enables the weapon associated
+// which subscribes its script to the weaponHandler which uses them
