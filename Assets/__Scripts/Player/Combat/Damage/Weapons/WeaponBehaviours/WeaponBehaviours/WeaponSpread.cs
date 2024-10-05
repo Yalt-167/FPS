@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace WeaponHandling
 {
-    public sealed class WeaponSpread : WeaponBehaviour // is only requested clientside so no need to be replicated
+    public sealed class WeaponSpread : WeaponReplicatedBehaviour // is only requested clientside so no need to be replicated
     {
-        public override void Setup(Weapon weapon)
+        public /*override*/ void Setup(Weapon weapon)
         {
             throw new NotImplementedException();
         }

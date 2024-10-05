@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine;
-using MyEditorUtilities;
 
 namespace WeaponHandling
 {
@@ -18,12 +17,12 @@ namespace WeaponHandling
         private KickbackStats kickbackStats => weaponHandler.CurrentWeapon.KickbackStats;
         private WeaponHandler weaponHandler;
 
-        private void Awake()
-        {
-            Setup();
-            weaponHandler = GetComponent<WeaponHandler>();
-            weaponTransform = transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).GetChild(0).GetChild(0);
-        }
+        //private void Awake()
+        //{
+        //    Setup();
+        //    weaponHandler = GetComponent<WeaponHandler>();
+        //    weaponTransform = transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).GetChild(0).GetChild(0);
+        //}
 
         private void ApplyKickback(float chargeRatio = 1f)
         {

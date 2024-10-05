@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace WeaponHandling
 {
-    public abstract class WeaponBehaviour
+    public abstract class WeaponBehaviour : MonoBehaviour
     {
         // public abstract void InitWeapon();
 
