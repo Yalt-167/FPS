@@ -15,51 +15,50 @@ public sealed class WeaponScriptableObject : ScriptableObject
 
     [Header("Bullet Travel Settings")]
     public bool IsHitscan;
-    [Tooltip("Define how the bullet should act (Only considered if the IsHitscan param above is true)")] public HitscanBulletSettings HitscanBulletSettings;
-    [Tooltip("Define how the bullet should act (Only considered if the IsHitscan param above is false)")] public TravelTimeBulletSettings TravelTimeBulletSettings;
+    [SerializeFieldIf(nameof(IsHitscan))] public HitscanBulletSettings HitscanBulletSettings;
+    [SerializeFieldIf(nameof(IsHitscan), invertCondition: true)] public TravelTimeBulletSettings TravelTimeBulletSettings;
 
 
     [Header("Magazine")]
     public ushort MagazineSize;
     public bool NeedReload;
     public float ReloadSpeed;
-    [Tooltip("If the weapon can reload one round by one round else leave it at 0")] public float TimeToReloadOneRound; // some that can reload one per one -> only consider when non-zero
+    [Tooltip("0 to ignore")] public float TimeToReloadOneRound; // some that can reload one per one -> only consider when non-zero
     public ushort AmmoLeftInMagazineToWarn;
 
     [Header("Shooting Style")]
-    [Tooltip("Wether it shoots simples shots of shotgun shots")] public ShootingStyle ShootingStyle;
-    [Space(8)]
-    [Tooltip("Stats of the simple shots (Only considered when the ShootingStyle selected is Simple)")] public SimpleShotStats SimpleShotStats;
-    [Tooltip("Stats of the simple shots (Only considered when the ShootingStyle selected is Simple)")] public SimpleShotStats AimingSimpleShotStats;
+    public ShootingStyle ShootingStyle;
+    [Space(16)]
 
+    [SerializeFieldIfMatchConstant(nameof(ShootingStyle), ShootingStyle.Single)] public SimpleShotStats SimpleShotStats;
+    [SerializeFieldIfMatchConstant(nameof(ShootingStyle), ShootingStyle.Single)]  public SimpleShotStats AimingSimpleShotStats;
+    
     [Space(4)]
-    [Tooltip("Stats of the shotgun shots (Only considered when the ShootingStyle selected is Shotgun)")] public ShotgunStats ShotgunStats;
+    [SerializeFieldIfMatchConstant(nameof(ShootingStyle), ShootingStyle.Shotgun)] public ShotgunStats ShotgunStats;
 
 
     [Header("Shooting Rythm")]
     public ShootingRythm ShootingRythm;
     public float CooldownBetweenShots;
-    [Space(8)]
-    [Tooltip("Only considered when the ShootingRythm selected is Burst")] public BurstStats BurstStats;
+    [Space(16)]
+    [SerializeFieldIfMatchConstant(nameof(ShootingRythm), ShootingRythm.Burst)] public BurstStats BurstStats;
 
     [Space(4)]
-    [Tooltip("Only considered when the ShootingRythm selected is RampUp")] public RampUpStats RampUpStats;
+    [SerializeFieldIfMatchConstant(nameof(ShootingRythm), ShootingRythm.RampUp)] public RampUpStats RampUpStats;
 
     [Space(4)]
-    [Tooltip("Only considered when the ShootingRythm selected is Charge")] public ChargeStats ChargeStats;
+    [SerializeFieldIfMatchConstant(nameof(ShootingRythm), ShootingRythm.Charge)] public ChargeStats ChargeStats;
 
-    [Header("Mobility")]
-
-    [Space(8)]
+    [Space(16)]
     [Header("ADS and Scopes")]
     public AimAndScopeStats AimingAndScopeStats;
 
-    [Space(8)]
+    [Space(16)]
     [Header("Recoil")]
     public WeaponRecoilStats HipfireRecoilStats;
     public WeaponRecoilStats AimingRecoilStats;
 
-    [Space(8)]
+    [Space(16)]
     [Header("Kickback")]
     public KickbackStats KickbackStats;
 

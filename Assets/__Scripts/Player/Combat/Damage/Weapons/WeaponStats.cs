@@ -358,7 +358,7 @@ public enum Effects
     Obscurity, // blindness
     Fading, // reduce your Vital Essence (instant -> not lingering) (not replenishing) (when no more Vital Essence -> dead) (get a new Vital Essence gauge when respawning)
     // ex when shot u lose say 50% of ur Vital Essence even if you heal the next shot will drop that gauge to 0 -> you die next Fading Shot
-    Shock, // damage nearby players (chaining) + can make weapon jam ?
+    Shock, // damage nearby players (chaining)
     // ex with a range of 3:
     // if u get shot and a teammate is less than 3units from u he gets shocked too (for less dmg) and if another teammate is less than 3units from him (not necessarily you) it chains too (the more depth of chaining the less dmg
     Charm, // damage reduced on the one who inflicted you this
