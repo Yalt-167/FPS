@@ -23,7 +23,7 @@ public sealed class WeaponScriptableObject : ScriptableObject
     public ushort MagazineSize;
     public bool NeedReload;
     public float ReloadSpeed;
-    [Tooltip("0 to ignore")] public float TimeToReloadOneRound; // some that can reload one per one -> only consider when non-zero
+    [Tooltip("0 to ignore")] public float TimeToReloadOneRound; // some that can reload one per one
     public ushort AmmoLeftInMagazineToWarn;
 
     [Header("Shooting Style")]
