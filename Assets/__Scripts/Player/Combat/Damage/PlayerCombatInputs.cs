@@ -19,20 +19,6 @@ public sealed class PlayerCombatInputs : MonoBehaviour
     [SerializeField] private LayerMask layersToHit;
     private static readonly string ScrollWheelAxis = "Mouse ScrollWheel";
 
-    #region Katana Setup
-
-    [SerializeField] private float slashingCooldown;
-    private bool slashingOnCooldown;
-    private readonly float slashBuffer = .1f;
-    private float lastSlashPressed;
-    private bool HasBufferedSlash => lastSlashPressed + slashBuffer > Time.time;
-
-    [SerializeField] private BoxCaster[] katanaChecks;
-    [SerializeField] private float slashSpeed;
-
-
-    #endregion
-
     private void OnValidate()
     {
         if (weapons.Length > allowedWeaponsCount)
@@ -108,65 +94,4 @@ public sealed class PlayerCombatInputs : MonoBehaviour
     {
         weaponHandler.SetWeapon(weapons[currentWeaponIndex]);
     }
-
-    #region Slashing
-
-    private void TrySlash(bool fromBuffer)
-    {
-        if (!fromBuffer)
-        {
-            lastSlashPressed = Time.time;
-        }
-
-        if (slashingOnCooldown)
-        {
-            return;
-        }
-
-        StartCoroutine(Slash(false));
-
-    }
-
-    private IEnumerator Slash(bool fromLeft)
-    {
-        slashingOnCooldown = true;
-
-        foreach (var check in fromLeft ? GetKatanaChecksFromLeft() : GetKatanaChecksFromRight())
-        {
-            if (check.ReturnCast(layersToHit, out var collidersHit))
-            {
-                foreach(var collider in collidersHit)
-                {
-                    if (collider.gameObject.TryGetComponent<ISlashable>(out var slashableComponent))
-                    {
-                        //slashableComponent.ReactSlash(cameraTransform.forward);
-                    }
-                }
-            }
-            
-            yield return new WaitForSeconds(slashSpeed);
-        }
-
-        yield return new WaitForSeconds(slashingCooldown);
-
-        slashingOnCooldown = false;
-    }
-
-    private IEnumerable<BoxCaster> GetKatanaChecksFromLeft()
-    {
-        for (int i = 0; i < 5; i++)
-        {
-            yield return katanaChecks[i];
-        }
-    }
-
-    private IEnumerable<BoxCaster> GetKatanaChecksFromRight()
-    {
-        for (int i = 4; i > -1; i--)
-        {
-            yield return katanaChecks[i];
-        }
-    }
-
-    #endregion
 }
