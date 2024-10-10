@@ -6,8 +6,5 @@ using UnityEngine;
 
 namespace WeaponHandling
 {
-    public sealed class BarrelEnd : WeaponBehaviour
-    {
-        public override WeaponBehaviour Setup(Weapon weapon) { return null; }
-    }
+    public sealed class BarrelEnd : WeaponBehaviour { }
 }

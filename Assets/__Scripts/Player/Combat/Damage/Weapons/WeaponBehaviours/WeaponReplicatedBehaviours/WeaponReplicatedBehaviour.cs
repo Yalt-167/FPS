@@ -8,8 +8,5 @@ using UnityEngine;
 
 namespace WeaponHandling
 {
-    public abstract class WeaponReplicatedBehaviour : NetworkBehaviour
-    {
-
-    }
+    public abstract class WeaponReplicatedBehaviour : NetworkBehaviour { }
 }

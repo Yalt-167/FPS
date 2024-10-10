@@ -15,7 +15,5 @@ namespace WeaponHandling
         // public abstract void SwitchToWeapon();
 
         // public abstract void SwitchOffWeapon();
-
-        public abstract void Setup(Weapon weapon);
     }
 }
