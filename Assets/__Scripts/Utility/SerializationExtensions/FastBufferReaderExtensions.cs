@@ -6,7 +6,7 @@ public static class FastBufferReaderExtensions
 
         GameManagement.IClientSideGameRuleUpdateParam instance = clientSideGameRuleUpdateParamType switch
         {
-            GameManagement.ClientSideGameRuleUpdateParamType.None => throw new System.Exception("How tf ClientSideGameRuleUpdateParamType is None?"),
+            GameManagement.ClientSideGameRuleUpdateParamType.None => throw new System.Exception("Compiler Happy"),
             GameManagement.ClientSideGameRuleUpdateParamType.TeamFight => (GameManagement.IClientSideGameRuleUpdateParam)new GameManagement.TeamFightClientSideUpdateParam(),
             _ => throw new System.Exception("This ClientSideUpdateParamType does not exist"),
         };
