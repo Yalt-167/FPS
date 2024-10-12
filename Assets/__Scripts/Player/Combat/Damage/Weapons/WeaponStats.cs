@@ -71,28 +71,22 @@ public struct WeaponStats
 [Serializable]
 public struct DamageDealt
 {
-    public ushort CriticalDamage;
-    public ushort HighDamage;
-    public ushort BaseDamage;
-    public ushort LowDamage;
-    public ushort NegatedDamage;
+    public ushort HeadshotDamage;
+    public ushort BodyshotDamage;
+    public ushort LegshotDamage;
 
-    public DamageDealt(ushort crit, ushort high, ushort base_, ushort low_, ushort negated_)
+    public DamageDealt(ushort high, ushort base_, ushort low_)
     {
-        CriticalDamage = crit;
-        HighDamage = high;
-        BaseDamage = base_;
-        LowDamage = low_;
-        NegatedDamage = negated_;
+        HeadshotDamage = high;
+        BodyshotDamage = base_;
+        LegshotDamage = low_;
     }
 
     public DamageDealt(DamageDealt previousStruct, float coefficient)
     {
-        CriticalDamage  = (ushort)(previousStruct.CriticalDamage * coefficient);
-        HighDamage  = (ushort)(previousStruct.HighDamage * coefficient);
-        BaseDamage  = (ushort)(previousStruct.BaseDamage * coefficient);
-        LowDamage = (ushort)(previousStruct.LowDamage * coefficient);
-        NegatedDamage = (ushort)(previousStruct.NegatedDamage * coefficient);
+        HeadshotDamage  = (ushort)(previousStruct.HeadshotDamage * coefficient);
+        BodyshotDamage  = (ushort)(previousStruct.BodyshotDamage * coefficient);
+        LegshotDamage = (ushort)(previousStruct.LegshotDamage * coefficient);
     }
 
     public static DamageDealt operator *(DamageDealt relevantStruct, float coefficient)

@@ -23,10 +23,10 @@ public sealed class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlash
     {
         return bodyPart switch
         {
-            BodyParts.HEAD => rawDamage.HighDamage,
-            BodyParts.BODY => rawDamage.BaseDamage,
-            BodyParts.LEGS => rawDamage.LowDamage,
-            _ => rawDamage.BaseDamage,
+            BodyParts.HEAD => rawDamage.HeadshotDamage,
+            BodyParts.BODY => rawDamage.BodyshotDamage,
+            BodyParts.LEGS => rawDamage.LegshotDamage,
+            _ => rawDamage.BodyshotDamage,
         };
     }
 

@@ -17,6 +17,8 @@ namespace WeaponHandling
         public WeaponBehaviourGatherer(BehaviourType[] components)
         {
             internalArray = components;
+
+            if (components.Length == 0) { throw new Exception("No BehaviourFound"); }
         }
 
         public void Setup()
