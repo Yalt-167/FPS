@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: TestRifle
   m_EditorClassIdentifier: 
   Damage:
-    CriticalDamage: 0
-    HighDamage: 0
-    BaseDamage: 0
-    LowDamage: 0
-    NegatedDamage: 0
+    CriticalDamage: 15
+    HighDamage: 10
+    BaseDamage: 5
+    LowDamage: 2
+    NegatedDamage: 1
   WeaponClass: 0
-  IsHitscan: 0
+  IsHitscan: 1
   HitscanBulletSettings:
     PierceThroughPlayers: 0
     ActionOnHitWall: 0
@@ -48,16 +48,16 @@ MonoBehaviour:
       ProjectilePlayerExplodeParams:
         ExplosionRadius: 0
         ExplosionDamage: 0
-  MagazineSize: 0
-  NeedReload: 0
-  ReloadSpeed: 0
+  MagazineSize: 50
+  NeedReload: 1
+  ReloadSpeed: 2
   TimeToReloadOneRound: 0
-  AmmoLeftInMagazineToWarn: 0
+  AmmoLeftInMagazineToWarn: 10
   ShootingStyle: 0
   SimpleShotStats:
-    MaxSpread: 0
-    SpreadAngleAddedPerShot: 0
-    SpreadRegulationSpeed: 0
+    MaxSpread: 0.5
+    SpreadAngleAddedPerShot: 0.1
+    SpreadRegulationSpeed: 0.001
   AimingSimpleShotStats:
     MaxSpread: 0
     SpreadAngleAddedPerShot: 0
@@ -74,7 +74,7 @@ MonoBehaviour:
     AimingPelletsSpreadAngle: 0
     PelletsRange: 0
   ShootingRythm: 0
-  CooldownBetweenShots: 0
+  CooldownBetweenShots: 0.07
   BurstStats:
     CooldownBetweenShotsOfBurst: 0
     BulletsPerBurst: 0
@@ -88,23 +88,23 @@ MonoBehaviour:
     AmmoConsumedByFullyChargedShot: 0
     MinChargeRatioToShoot: 0
   AimingAndScopeStats:
-    AimingFOV: 0
+    AimingFOV: 50
     ScopeMagnification: 0
-    TimeToADS: 0
-    TimeToUnADS: 0
+    TimeToADS: 0.1
+    TimeToUnADS: 0.2
   HipfireRecoilStats:
-    RecoilForceX: 0
-    RecoilForceY: 0
-    RecoilForceZ: 0
-    RecoilRegulationSpeed: 0
+    RecoilForceX: 2
+    RecoilForceY: 2
+    RecoilForceZ: 0.15
+    RecoilRegulationSpeed: 6
   AimingRecoilStats:
-    RecoilForceX: 0
+    RecoilForceX: 0.7
     RecoilForceY: 0
-    RecoilForceZ: 0
-    RecoilRegulationSpeed: 0
+    RecoilForceZ: 0.04666667
+    RecoilRegulationSpeed: 2
   KickbackStats:
-    WeaponKickBackPerShot: 0
-    WeaponKickBackRegulationTime: 0
+    WeaponKickBackPerShot: 0.26
+    WeaponKickBackRegulationTime: 0.003
   CanBreakThings: 0
   EffectsInflicted: 0
   Model: {fileID: 0}
