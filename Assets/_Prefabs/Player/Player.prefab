@@ -331,6 +331,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4055569346584767719}
   - component: {fileID: 4946924748623436326}
+  - component: {fileID: 3068597724279855407}
   m_Layer: 0
   m_Name: BarrelEnd
   m_TagString: Untagged
@@ -368,6 +369,18 @@ MonoBehaviour:
   lockPosition: 0
   lockScale: 1
   lockRotation: 0
+--- !u!114 &3068597724279855407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1490273979010500152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 537e6e6388384cc4ba7b3dde12f8058c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1761437060125563519
 GameObject:
   m_ObjectHideFlags: 0

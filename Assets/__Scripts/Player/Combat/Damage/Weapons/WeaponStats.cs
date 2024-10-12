@@ -93,6 +93,11 @@ public struct DamageDealt
     {
         return new(relevantStruct, coefficient);
     }
+
+    public static DamageDealt operator /(DamageDealt relevantStruct, float coefficient)
+    {
+        return new(relevantStruct, 1 / coefficient);
+    }
 }
 
 #region Shooting Style
@@ -114,7 +119,6 @@ public struct SimpleShotStats
 [Serializable]
 public struct ShotgunStats
 {
-    public DamageDealt PelletsDamage;
     public ushort PelletsCount;
     public float PelletsSpreadAngle;
     public float AimingPelletsSpreadAngle;

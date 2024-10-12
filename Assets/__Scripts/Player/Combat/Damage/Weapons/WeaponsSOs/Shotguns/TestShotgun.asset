@@ -13,11 +13,9 @@ MonoBehaviour:
   m_Name: TestShotgun
   m_EditorClassIdentifier: 
   Damage:
-    CriticalDamage: 0
-    HighDamage: 0
-    BaseDamage: 0
-    LowDamage: 0
-    NegatedDamage: 0
+    HeadshotDamage: 200
+    BodyshotDamage: 100
+    LegshotDamage: 75
   WeaponClass: 0
   IsHitscan: 0
   HitscanBulletSettings:
@@ -63,12 +61,6 @@ MonoBehaviour:
     SpreadAngleAddedPerShot: 0
     SpreadRegulationSpeed: 0
   ShotgunStats:
-    PelletsDamage:
-      CriticalDamage: 10
-      HighDamage: 7
-      BaseDamage: 5
-      LowDamage: 2
-      NegatedDamage: 1
     PelletsCount: 32
     PelletsSpreadAngle: 15
     AimingPelletsSpreadAngle: 10

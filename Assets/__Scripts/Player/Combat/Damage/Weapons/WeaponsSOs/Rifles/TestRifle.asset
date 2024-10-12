@@ -13,11 +13,9 @@ MonoBehaviour:
   m_Name: TestRifle
   m_EditorClassIdentifier: 
   Damage:
-    CriticalDamage: 15
-    HighDamage: 10
-    BaseDamage: 5
-    LowDamage: 2
-    NegatedDamage: 1
+    HeadshotDamage: 15
+    BodyshotDamage: 9
+    LegshotDamage: 5
   WeaponClass: 0
   IsHitscan: 1
   HitscanBulletSettings:
@@ -63,12 +61,6 @@ MonoBehaviour:
     SpreadAngleAddedPerShot: 0
     SpreadRegulationSpeed: 0
   ShotgunStats:
-    PelletsDamage:
-      CriticalDamage: 0
-      HighDamage: 0
-      BaseDamage: 0
-      LowDamage: 0
-      NegatedDamage: 0
     PelletsCount: 0
     PelletsSpreadAngle: 0
     AimingPelletsSpreadAngle: 0
