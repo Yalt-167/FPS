@@ -10,7 +10,7 @@ using UnityEngine;
 public sealed class WeaponScriptableObject : ScriptableObject
 {
 
-    [Tooltip("The damage dealt by the shot (Will be overriden by PelletDamage) if the weapon is a shotgun")] public DamageDealt Damage;
+    [Tooltip("Will be overriden by PelletDamage if the weapon is a shotgun")] public DamageDealt Damage;
     public WeaponClass WeaponClass;
 
     [Header("Bullet Travel Settings")]
@@ -62,7 +62,10 @@ public sealed class WeaponScriptableObject : ScriptableObject
     [Header("Kickback")]
     public KickbackStats KickbackStats;
 
+    [Space(16)]
     public bool CanBreakThings;
+
+    [Space(16)]
     public Effects EffectsInflicted;
 
     [Space(16)]
