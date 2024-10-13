@@ -9,6 +9,7 @@ using Random = UnityEngine.Random;
 
 using Projectiles;
 using GameManagement;
+using WeaponHandling;
 
 
 [Serializable]
@@ -30,7 +31,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     private Transform cameraTransform;
     private new Camera camera;
     private Transform recoilHandlerTransform;
-    private WeaponHandling.WeaponBehaviourGatherer<WeaponHandling.BarrelEnd> barrelEnds;
+    private WeaponBehaviourGatherer<BarrelEnd> barrelEnds;
 
     [SerializeField] private Transform weaponTransform;
     [SerializeField] private Transform weaponSocketTransform;
@@ -186,7 +187,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     public void InitWeapon()
     {
-        //barrelEnds = new(transform);
+        barrelEnds = new(GetComponentsInChildren<BarrelEnd>());
         currentWeaponSounds = currentWeapon.Sounds;
         ammos = currentWeapon.MagazineSize;
 
@@ -303,6 +304,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void RequestShotServerRpc()
     {
+        MyDebug.DebugUtility.LogMethodCall();
         CheckCooldownsClientRpc();
     }
 
@@ -426,7 +428,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private void UpdateOwnerSettingsUponShot()
     {
-        if (!IsOwner) { return; }
+        //if (!IsOwner) { return; }
 
         PlayShootingSoundServerRpc(currentWeapon.AmmoLeftInMagazineToWarn >= ammos);
 
@@ -649,7 +651,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                     if (IsOwner)
                     {
                         //shootableComponent.ReactShot(currentWeapon.ShotgunStats.PelletsDamage, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, PlayerFrame.TeamID, currentWeapon.CanBreakThings);
-                        shootableComponent.ReactShot(currentWeapon.ShotgunStats.PelletsDamage, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, PlayerFrame.LocalPlayer.TeamNumber, currentWeapon.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeapon.Damage / currentWeapon.ShotgunStats.PelletsCount, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, PlayerFrame.LocalPlayer.TeamNumber, currentWeapon.CanBreakThings);
                     }
 
                     if (!currentWeapon.HitscanBulletSettings.PierceThroughPlayers)
@@ -891,7 +893,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                     if (IsOwner)
                     {
                         //shootableComponent.ReactShot(currentWeapon.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, PlayerFrame.TeamID, currentWeapon.CanBreakThings);
-                        shootableComponent.ReactShot(currentWeapon.ShotgunStats.PelletsDamage * chargeRatio, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, PlayerFrame.LocalPlayer.TeamNumber, currentWeapon.CanBreakThings);
+                        shootableComponent.ReactShot(currentWeapon.Damage / currentWeapon.ShotgunStats.PelletsCount * chargeRatio, shotgunPelletsDirections[pelletIndex], hit.point, NetworkObjectId, PlayerFrame.LocalPlayer.TeamNumber, currentWeapon.CanBreakThings);
                     }
 
                     if (!currentWeapon.HitscanBulletSettings.PierceThroughPlayers)
@@ -981,7 +983,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             if (projectile == null) { throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it"); }
 
             projectile.Init(
-                currentWeapon.ShotgunStats.PelletsDamage,
+                currentWeapon.Damage / currentWeapon.ShotgunStats.PelletsCount,
                 currentWeapon.TravelTimeBulletSettings.BulletSpeed,
                 currentWeapon.TravelTimeBulletSettings.BulletDrop,
                 NetworkObjectId,
@@ -1049,7 +1051,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             if (projectile == null) { throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it"); }
 
             projectile.Init(
-                currentWeapon.ShotgunStats.PelletsDamage * chargeRatio,
+                currentWeapon.Damage / currentWeapon.ShotgunStats.PelletsCount * chargeRatio,
                 currentWeapon.TravelTimeBulletSettings.BulletSpeed,
                 currentWeapon.TravelTimeBulletSettings.BulletDrop,
                 NetworkObjectId,
@@ -1358,18 +1360,14 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region Handle Kickback
 
-    private void ApplyKickback()
-    {
-        weaponTransform.localPosition -= new Vector3(0f, 0f, currentWeaponKickbackStats.WeaponKickBackPerShot);
-    }
-    private void ApplyKickback(float chargeRatio)
+    private void ApplyKickback(float chargeRatio = 1f)
     {
         weaponTransform.localPosition -= new Vector3(0f, 0f, currentWeaponKickbackStats.WeaponKickBackPerShot * chargeRatio);
     }
 
     private void HandleKickback()
     {
-        weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, Vector3.zero, currentWeaponKickbackStats.WeaponKickBackRegulationTime * Time.time);
+        weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, new Vector3(0f, .777f, -1.02f), currentWeaponKickbackStats.WeaponKickBackRegulationTime * Time.time);
     }
 
     #endregion
@@ -1533,7 +1531,7 @@ public struct WeaponInfos
 
     public WeaponInfos(WeaponScriptableObject weaponStats, float chargeRatio = 1f)
     {
-        Damage = (weaponStats.ShootingStyle == ShootingStyle.Single ? weaponStats.Damage : weaponStats.ShotgunStats.PelletsDamage) * chargeRatio;
+        Damage = (weaponStats.ShootingStyle == ShootingStyle.Single ? weaponStats.Damage : weaponStats.Damage / weaponStats.ShotgunStats.PelletsCount) * chargeRatio;
         CanBreakThings = weaponStats.CanBreakThings;
         Effects = weaponStats.EffectsInflicted;
         PierceThroughPlayers = weaponStats.HitscanBulletSettings.PierceThroughPlayers;
@@ -1543,3 +1541,5 @@ public struct WeaponInfos
 
 
 // create a weapon abstract clas instead? with OnAttackDown OnAttackUp OnReload OnAimDown OnAimUp etc bc that could be more flexible
+
+// double/three fire rifle kinda like in thsi game where you can chop limbs off using your gun (horizontally would help for crowds of opponent while vertical would shred their health by allowing hitting headshot + 2 bodyshots at once
