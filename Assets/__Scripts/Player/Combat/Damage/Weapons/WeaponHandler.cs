@@ -958,7 +958,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             layersToHit,
             GetRelevantHitWallBehaviour(),
             GetRelevantHitPlayerBehaviour(),
-            PlayerFrame.LocalPlayer.TeamNumber
+            ownerFrame.TeamNumber
         );
 
         ApplyRecoil();
@@ -991,7 +991,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                 layersToHit,
                 GetRelevantHitWallBehaviour(),
                 GetRelevantHitPlayerBehaviour(),
-                PlayerFrame.LocalPlayer.TeamNumber
+                ownerFrame.TeamNumber
             );
 
         }
@@ -1024,7 +1024,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             layersToHit,
             GetRelevantHitWallBehaviour(),
             GetRelevantHitPlayerBehaviour(),
-            PlayerFrame.LocalPlayer.TeamNumber
+            ownerFrame.TeamNumber
         );
 
 
@@ -1059,7 +1059,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                 layersToHit,
                 GetRelevantHitWallBehaviour(),
                 GetRelevantHitPlayerBehaviour(),
-                PlayerFrame.LocalPlayer.TeamNumber
+                ownerFrame.TeamNumber
             );
         }
 
