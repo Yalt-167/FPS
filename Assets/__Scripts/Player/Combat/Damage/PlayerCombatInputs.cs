@@ -47,7 +47,7 @@ public sealed class PlayerCombatInputs : MonoBehaviour
         HandleWeaponSwitch(); // upon check: there is
 
 
-        //weaponHandler.UpdateAimingState(InputQuery.Aim);
+        weaponHandler.UpdateAimingState(InputQuery.Aim);
 
         if (InputQuery.Reload)
         {
