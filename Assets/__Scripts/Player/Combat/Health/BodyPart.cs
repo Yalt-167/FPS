@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+
 using Unity.Netcode;
+
+using UnityEngine;
 
 public sealed class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlashable
 {
@@ -19,18 +21,7 @@ public sealed class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlash
         playerHealth = transform.parent.parent.GetComponent<PlayerHealthNetworked>();
     }
 
-    private ushort GetEffectiveDamage(DamageDealt rawDamage)
-    {
-        return bodyPart switch
-        {
-            BodyParts.HEAD => rawDamage.HeadshotDamage,
-            BodyParts.BODY => rawDamage.BodyshotDamage,
-            BodyParts.LEGS => rawDamage.LegshotDamage,
-            _ => rawDamage.BodyshotDamage,
-        };
-    }
-
-    public void ReactShot(DamageDealt damage, Vector3 _, Vector3 __, ulong attackerNetworkObjectID, ushort attackerTeamNumber, bool ___)
+    public void ReactShot(DamageDealt rawDamage, Vector3 _, Vector3 __, ulong attackerNetworkObjectID, ushort attackerTeamNumber, bool ___)
     {
         //if (!IsOwner) { return; }
 
@@ -40,7 +31,7 @@ public sealed class BodyPart : NetworkBehaviour, IShootable, IExplodable, ISlash
             return;
         }
 
-        DamageTargetServerRpc(GetEffectiveDamage(damage), bodyPart, attackerNetworkObjectID);
+        DamageTargetServerRpc(rawDamage[bodyPart], bodyPart, attackerNetworkObjectID);
     }
 
     public void ReactExplosion(ushort damage, Vector3 _, ulong attackerNetworkObjectID, bool __)
