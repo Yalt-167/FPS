@@ -9,11 +9,11 @@ namespace WeaponHandling
     /// <summary>
     /// Add this script on the root/socket/handle of the weapon for it to handle the ADS logic
     /// </summary>
-    public sealed class WeaponADS : WeaponBehaviour // moves the transfom which is already propagated + may do some clientside camera adjustment so no need to replicate
+    public sealed class WeaponADS : MonoBehaviour // moves the transfom which is already propagated + may do some clientside camera adjustment so no need to replicate
     {
         [SerializeField] private Transform basePosition;
         [SerializeField] private Transform ADSPosition;
-        [SerializeField] private Transform weaponSocket;
+        [SerializeField] private bool doDebugPosition;
 
         private readonly int baseFOV = 60;
 
@@ -31,6 +31,10 @@ namespace WeaponHandling
 
         private bool isADSing;
 
+        public void SetupData(AimAndScopeStats aimingStats_)
+        {
+            AimAndScopeStats aimingStats = aimingStats_;
+        }
 
         public void ToggleADS(bool towardOn)
         {
@@ -46,20 +50,29 @@ namespace WeaponHandling
 
         private void HandleWeaponLerp()
         {
-            var startingPoint = weaponSocket.position;
+            var startingPoint = transform.position;
 
-            var (targetPosition, transitionSpeed) = isADSing ? (ADSPosition.position, aimingStats.TimeToADS) : (basePosition.position, aimingStats.TimeToUnADS);
-            weaponSocket.position = Vector3.Lerp(startingPoint, targetPosition, transitionSpeed);
+            var (targetPosition, transitionSpeed) = isADSing ? (ADSPosition, aimingStats.TimeToADS) : (basePosition, aimingStats.TimeToUnADS);
+            transform.position = Vector3.Lerp(startingPoint, targetPosition.position, transitionSpeed);
 
-            if ((weaponSocket.transform.position - targetPosition).sqrMagnitude < sqrLerpLeniency)
+            if ((transform.transform.position - targetPosition.position).sqrMagnitude < sqrLerpLeniency)
             {
-                weaponSocket.transform.position = targetPosition;
+                transform.transform.position = targetPosition.position;
             }
         }
 
         private void HandleFOVLerp()
         {
 
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.green;
+            if (basePosition != null) Gizmos.DrawWireSphere(basePosition.position, .1f);
+
+            Gizmos.color = Color.yellow;
+            if (ADSPosition != null) Gizmos.DrawWireSphere(ADSPosition.position, .1f);
         }
     }
 }
