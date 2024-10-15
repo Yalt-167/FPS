@@ -28,25 +28,25 @@ public sealed class WeaponScriptableObject : ScriptableObject
 
     [Header("Shooting Style")]
     public ShootingStyle ShootingStyle;
-    [Space(16)]
+
+    [Space(4)]
 
     [SerializeFieldIfMatchConstant(nameof(ShootingStyle), ShootingStyle.Single)] public SimpleShotStats SimpleShotStats;
     [SerializeFieldIfMatchConstant(nameof(ShootingStyle), ShootingStyle.Single)]  public SimpleShotStats AimingSimpleShotStats;
     
-    [Space(4)]
     [SerializeFieldIfMatchConstant(nameof(ShootingStyle), ShootingStyle.Shotgun)] public ShotgunStats ShotgunStats;
 
 
     [Header("Shooting Rythm")]
     public ShootingRythm ShootingRythm;
     public float CooldownBetweenShots;
-    [Space(16)]
+
+    [Space(4)]
+
     [SerializeFieldIfMatchConstant(nameof(ShootingRythm), ShootingRythm.Burst)] public BurstStats BurstStats;
 
-    [Space(4)]
     [SerializeFieldIfMatchConstant(nameof(ShootingRythm), ShootingRythm.RampUp)] public RampUpStats RampUpStats;
 
-    [Space(4)]
     [SerializeFieldIfMatchConstant(nameof(ShootingRythm), ShootingRythm.Charge)] public ChargeStats ChargeStats;
 
     [Space(16)]
@@ -61,6 +61,10 @@ public sealed class WeaponScriptableObject : ScriptableObject
     [Space(16)]
     [Header("Kickback")]
     public KickbackStats KickbackStats;
+
+    [Space(16)]
+    [Header("Switch")]
+    public float PulloutTime;
 
     [Space(16)]
     public bool CanBreakThings;
