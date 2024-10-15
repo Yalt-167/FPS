@@ -3,7 +3,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using Unity.VisualScripting;
+
 using UnityEngine;
+using UnityEngine.UI;
 
 [Serializable]
 public struct WeaponStats
@@ -62,9 +65,6 @@ public struct WeaponStats
 
     public bool CanBreakThings;
     public Effects EffectsInflicted;
-
-    [Header("Mobility")]
-    [Tooltip("Will define how fast the player can move and how high he can jump")] public float Weight;
 }
 
 
@@ -84,8 +84,8 @@ public struct DamageDealt
 
     public DamageDealt(DamageDealt previousStruct, float coefficient)
     {
-        HeadshotDamage  = (ushort)(previousStruct.HeadshotDamage * coefficient);
-        BodyshotDamage  = (ushort)(previousStruct.BodyshotDamage * coefficient);
+        HeadshotDamage = (ushort)(previousStruct.HeadshotDamage * coefficient);
+        BodyshotDamage = (ushort)(previousStruct.BodyshotDamage * coefficient);
         LegshotDamage = (ushort)(previousStruct.LegshotDamage * coefficient);
     }
 
@@ -98,6 +98,20 @@ public struct DamageDealt
     {
         return new(relevantStruct, 1 / coefficient);
     }
+
+    public readonly ushort this[BodyParts bodyPart]
+        {
+            get
+            {
+                return bodyPart switch
+                {
+                    BodyParts.HEAD => HeadshotDamage,
+                    BodyParts.BODY => BodyshotDamage,
+                    BodyParts.LEGS => LegshotDamage,
+                    _ => BodyshotDamage,
+                };
+            }
+        }
 }
 
 #region Shooting Style
