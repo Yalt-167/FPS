@@ -93,10 +93,11 @@ MonoBehaviour:
     RecoilForceX: 0.7
     RecoilForceY: 0
     RecoilForceZ: 0.04666667
-    RecoilRegulationSpeed: 3
+    RecoilRegulationSpeed: 6
   KickbackStats:
     WeaponKickBackPerShot: 0.3
     WeaponKickBackRegulationTime: 0.003
+  PulloutTime: 0
   CanBreakThings: 0
   EffectsInflicted: 0
   Model: {fileID: 0}
