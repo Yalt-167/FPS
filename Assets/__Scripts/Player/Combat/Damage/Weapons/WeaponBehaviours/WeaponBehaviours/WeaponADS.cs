@@ -38,14 +38,15 @@ namespace WeaponHandling
 
         public void SetupData(AimAndScopeStats aimingStats_)
         {
-            aimingStats = aimingStats_;
-            distancePerFixedUpdateCallForOneSecondAction = Vector3.Distance(ADSPositionTransform.position, basePositionTransform.position) / fixedUpdateCallsPerSecond;
-            ResetPosition();
             basePositionTransform = transform.parent.GetChild(1);
             ADSPositionTransform = transform.parent.GetChild(2);
+
             camera = transform.parent.parent.GetComponent<Camera>();
 
+            aimingStats = aimingStats_;
+            distancePerFixedUpdateCallForOneSecondAction = Vector3.Distance(ADSPositionTransform.position, basePositionTransform.position) / fixedUpdateCallsPerSecond;
 
+            ResetPosition();
         }
 
         public void ToggleADS(bool towardOn)
@@ -107,14 +108,14 @@ namespace WeaponHandling
 
         private void HandleFOVLerp()
         {
-            //var (targetFOV, transitionSpeed) = isADSing ? (aimingStats.AimingFOV, aimingStats.TimeToADS) : (baseFOV, aimingStats.TimeToUnADS);
+            var (targetFOV, transitionSpeed) = isADSing ? (aimingStats.AimingFOV, aimingStats.TimeToADS) : (baseFOV, aimingStats.TimeToUnADS);
 
-            //camera.fieldOfView = Mathf.Lerp(camera.fieldOfView, targetFOV, transitionSpeed);
+            camera.fieldOfView = Mathf.Lerp(camera.fieldOfView, targetFOV, transitionSpeed);
 
-            //if (camera.fieldOfView - targetFOV < sqrLerpLeniency)
-            //{
-            //    camera.fieldOfView = targetFOV;
-            //}
+            if (camera.fieldOfView - targetFOV < sqrLerpLeniency)
+            {
+                camera.fieldOfView = targetFOV;
+            }
 
         }
 
