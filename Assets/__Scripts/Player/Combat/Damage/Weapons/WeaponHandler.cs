@@ -19,12 +19,11 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     [SerializeField] private WeaponScriptableObject currentWeapon;
     public WeaponScriptableObject CurrentWeapon => currentWeapon;
-    //private WeaponStats currentWeapon;
 
-    private WeaponRecoilStats currentWeaponHipfireRecoilStats => currentWeapon.HipfireRecoilStats;
-    private WeaponRecoilStats currentWeaponADSRecoilStats => currentWeapon.AimingRecoilStats;
+    private WeaponRecoilStats CurrentWeaponHipfireRecoilStats => currentWeapon.HipfireRecoilStats;
+    private WeaponRecoilStats CurrentWeaponADSRecoilStats => currentWeapon.AimingRecoilStats;
 
-    private KickbackStats currentWeaponKickbackStats => currentWeapon.KickbackStats;
+    private KickbackStats CurrentWeaponKickbackStats => currentWeapon.KickbackStats;
 
 
     private float cameraTransformInitialZ;
@@ -32,6 +31,9 @@ public sealed class WeaponHandler : NetworkBehaviour
     private new Camera camera;
     private Transform recoilHandlerTransform;
     private WeaponBehaviourGatherer<BarrelEnd> barrelEnds;
+    private WeaponBehaviourGatherer<WeaponADS> weaponsADS;
+
+    private WeaponBehaviourGatherer<WeaponSocket> weaponSockets;
 
     [SerializeField] private Transform weaponTransform;
     [SerializeField] private Transform weaponSocketTransform;
@@ -188,6 +190,15 @@ public sealed class WeaponHandler : NetworkBehaviour
     public void InitWeapon()
     {
         barrelEnds = new(GetComponentsInChildren<BarrelEnd>());
+
+        weaponSockets = new(GetComponentsInChildren<WeaponSocket>());
+
+        weaponsADS = new(GetComponentsInChildren<WeaponADS>());
+        foreach (var weaponADS in weaponsADS)
+        {
+            weaponADS.SetupData(currentWeapon.AimingAndScopeStats);
+        }
+
         currentWeaponSounds = currentWeapon.Sounds;
         ammos = currentWeapon.MagazineSize;
 
@@ -301,10 +312,20 @@ public sealed class WeaponHandler : NetworkBehaviour
         shootingRythmMethod();
     }
 
+    public void UpdateAimingState(bool shouldBeAiming)
+    {
+        if (isAiming == shouldBeAiming) { return; }
+
+        isAiming = shouldBeAiming;
+        foreach (var weaponADS in weaponsADS)
+        {
+            weaponADS.ToggleADS(shouldBeAiming);
+        }
+    }
+
     [Rpc(SendTo.Server)]
     public void RequestShotServerRpc()
     {
-        MyDebug.DebugUtility.LogMethodCall();
         CheckCooldownsClientRpc();
     }
 
@@ -1333,27 +1354,26 @@ public sealed class WeaponHandler : NetworkBehaviour
         if (isAiming)
         {
             targetRecoilHandlerRotation += new Vector3(
-                -currentWeaponADSRecoilStats.RecoilForceX * chargeRatio,
-                Random.Range(-currentWeaponADSRecoilStats.RecoilForceY * chargeRatio, currentWeaponADSRecoilStats.RecoilForceY * chargeRatio),
-                Random.Range(-currentWeaponADSRecoilStats.RecoilForceZ * chargeRatio, currentWeaponADSRecoilStats.RecoilForceZ * chargeRatio)
-            );
+                -CurrentWeaponADSRecoilStats.RecoilForceX,
+                Random.Range(-CurrentWeaponADSRecoilStats.RecoilForceY, CurrentWeaponADSRecoilStats.RecoilForceY),
+                Random.Range(-CurrentWeaponADSRecoilStats.RecoilForceZ, CurrentWeaponADSRecoilStats.RecoilForceZ)
+            ) * chargeRatio;
         }
         else
         {
             targetRecoilHandlerRotation += new Vector3(
-                -currentWeaponHipfireRecoilStats.RecoilForceX * chargeRatio,
-                Random.Range(-currentWeaponHipfireRecoilStats.RecoilForceY * chargeRatio, currentWeaponHipfireRecoilStats.RecoilForceY * chargeRatio),
-                Random.Range(-currentWeaponHipfireRecoilStats.RecoilForceZ * chargeRatio, currentWeaponHipfireRecoilStats.RecoilForceZ * chargeRatio)
-            );
+                -CurrentWeaponHipfireRecoilStats.RecoilForceX,
+                Random.Range(-CurrentWeaponHipfireRecoilStats.RecoilForceY, CurrentWeaponHipfireRecoilStats.RecoilForceY),
+                Random.Range(-CurrentWeaponHipfireRecoilStats.RecoilForceZ, CurrentWeaponHipfireRecoilStats.RecoilForceZ)
+            ) * chargeRatio;
         }
     }
 
     private void HandleRecoil()
     {
-        targetRecoilHandlerRotation = Vector3.Lerp(targetRecoilHandlerRotation, Vector3.zero, isAiming ? currentWeaponADSRecoilStats.RecoilRegulationSpeed : currentWeaponHipfireRecoilStats.RecoilRegulationSpeed * Time.deltaTime);
+        targetRecoilHandlerRotation = Vector3.Lerp(targetRecoilHandlerRotation, Vector3.zero, (isAiming ? CurrentWeaponADSRecoilStats.RecoilRegulationSpeed : CurrentWeaponHipfireRecoilStats.RecoilRegulationSpeed) * Time.time);
         currentRecoilHandlerRotation = Vector3.Slerp(currentRecoilHandlerRotation, targetRecoilHandlerRotation, /*recoilMovementSnappiness*/6f * Time.deltaTime);
         recoilHandlerTransform.localRotation = Quaternion.Euler(currentRecoilHandlerRotation);
-        MyDebug.DebugOSD.Display(currentRecoilHandlerRotation);
     }
 
     #endregion
@@ -1362,12 +1382,12 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private void ApplyKickback(float chargeRatio = 1f)
     {
-        weaponTransform.localPosition -= new Vector3(0f, 0f, currentWeaponKickbackStats.WeaponKickBackPerShot * chargeRatio);
+        weaponTransform.localPosition -= new Vector3(0f, 0f, CurrentWeaponKickbackStats.WeaponKickBackPerShot * chargeRatio);
     }
 
     private void HandleKickback()
     {
-        weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, new Vector3(0f, .777f, -1.02f), currentWeaponKickbackStats.WeaponKickBackRegulationTime * Time.time);
+        weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, new Vector3(0f, .777f, -1.02f), CurrentWeaponKickbackStats.WeaponKickBackRegulationTime * Time.time);
     }
 
     #endregion
