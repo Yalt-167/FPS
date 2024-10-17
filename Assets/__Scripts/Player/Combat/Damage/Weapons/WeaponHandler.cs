@@ -10,6 +10,7 @@ using Random = UnityEngine.Random;
 using Projectiles;
 using GameManagement;
 using WeaponHandling;
+using System.Diagnostics;
 
 
 [Serializable]
@@ -24,6 +25,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     private WeaponRecoilStats CurrentWeaponADSRecoilStats => currentWeapon.AimingRecoilStats;
 
     private KickbackStats CurrentWeaponKickbackStats => currentWeapon.KickbackStats;
+    private bool isInitialized;
 
 
     private float cameraTransformInitialZ;
@@ -31,7 +33,8 @@ public sealed class WeaponHandler : NetworkBehaviour
     private new Camera camera;
     private Transform recoilHandlerTransform;
     private WeaponBehaviourGatherer<BarrelEnd> barrelEnds;
-    private WeaponBehaviourGatherer<WeaponADS> weaponsADS;
+    private WeaponBehaviourGatherer<WeaponADSGunMovement> weaponsADSGunMovements;
+    private WeaponADSFOV weaponADSFOV;
 
     private WeaponBehaviourGatherer<WeaponSocket> weaponSockets;
 
@@ -135,12 +138,15 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region Unity Handled
 
-    private void Awake()
+    private void Init()
     {
+        if (isInitialized) { return; }
+
         playerSettings = GetComponent<PlayerSettings>();
         recoilHandlerTransform = transform.GetChild(0).GetChild(0);
         cameraTransform = recoilHandlerTransform.GetChild(0);
         camera = cameraTransform.GetComponent<Camera>();
+        weaponADSFOV = cameraTransform.GetComponent<WeaponADSFOV>();
 
         InitWeapon();
         audioSourcePoolSize = 10; // (int)(Mathf.Max(currentWeaponSounds.ShootingSound.length, currentWeaponSounds.NearEmptyMagazineShootSound.length) / currentWeapon.CooldownBetweenShots);
@@ -150,6 +156,8 @@ public sealed class WeaponHandler : NetworkBehaviour
         }
 
         ownerFrame = GetComponent<PlayerFrame>();
+
+        isInitialized = true;
     }
 
     private void FixedUpdate()
@@ -172,17 +180,13 @@ public sealed class WeaponHandler : NetworkBehaviour
         shotThisFrame = false;
     }
 
-    private void OnValidate()
-    {
-        InitWeapon();
-    }
-
     #endregion
 
     #region Init
 
     public void SetWeapon(WeaponScriptableObject weapon)
     {
+        Init();
         currentWeapon = weapon;
         InitWeapon();
     }
@@ -193,11 +197,12 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         weaponSockets = new(GetComponentsInChildren<WeaponSocket>());
 
-        weaponsADS = new(GetComponentsInChildren<WeaponADS>());
-        foreach (var weaponADS in weaponsADS)
+        weaponsADSGunMovements = new(GetComponentsInChildren<WeaponADSGunMovement>());
+        foreach (var weaponADSGunMovement in weaponsADSGunMovements)
         {
-            weaponADS.SetupData(currentWeapon.AimingAndScopeStats);
+            weaponADSGunMovement.SetupData(currentWeapon.AimingAndScopeStats);
         }
+        weaponADSFOV.SetupData(currentWeapon.AimingAndScopeStats);
 
         currentWeaponSounds = currentWeapon.Sounds;
         ammos = currentWeapon.MagazineSize;
@@ -317,10 +322,11 @@ public sealed class WeaponHandler : NetworkBehaviour
         if (isAiming == shouldBeAiming) { return; }
 
         isAiming = shouldBeAiming;
-        foreach (var weaponADS in weaponsADS)
+        foreach (var weaponsADSGunMovement in weaponsADSGunMovements)
         {
-            weaponADS.ToggleADS(shouldBeAiming);
+            weaponsADSGunMovement.ToggleADS(shouldBeAiming);
         }
+        weaponADSFOV.ToggleADS(shouldBeAiming);
     }
 
     [Rpc(SendTo.Server)]
