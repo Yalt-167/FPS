@@ -16,13 +16,16 @@ namespace WeaponHandling
         private Transform basePositionTransform;
         private Transform ADSPositionTransform;
         [SerializeField] private bool doDebugPosition;
+        private float gunTravelDistanceWhenADSing;
+        [SerializeField] private float sqrDistanceLeniency = .01f;
+
         private new Camera camera;
+
         private float FOVDifference;
         private static readonly int baseFOV = 60;
-        private static readonly float fixedUpdateCallFrequency = .02f;
-        private float gunTravelDistanceWhenADSing;
 
-        [SerializeField] private float sqrDistanceLeniency = .01f;
+        private static readonly float fixedUpdateCallFrequency = .02f;
+
 
         private bool isADSing;
         private AimAndScopeStats aimingStats;
@@ -135,13 +138,3 @@ namespace WeaponHandling
         }
     }
 }
-
-
-//public sealed class ADSAnchor: MonoBehaviour
-//{
-//    [SerializeField] private Transform[] anchors;
-
-//    private int currentAnchorIndex = 0;
-//    public Transform Anchor => anchors[currentAnchorIndex++ % anchors.Length];
-
-//}
