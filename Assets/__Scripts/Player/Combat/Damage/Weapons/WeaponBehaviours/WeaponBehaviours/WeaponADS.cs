@@ -60,7 +60,37 @@ namespace WeaponHandling
 
         private void HandleWeaponLerp()
         {
-            
+            float stepPerFixedUpdate;
+            Vector3 targetPosition;
+            if (isADSing)
+            {
+                targetPosition = ADSPositionTransform.position;
+
+                if (ClampPosition(targetPosition)) { return; }
+
+                stepPerFixedUpdate = gunTravelDistanceWhenADSing / (aimingStats.TimeToADS / fixedUpdateCallFrequency);
+            }
+            else
+            {
+                targetPosition = basePositionTransform.position;
+
+                if (ClampPosition(targetPosition)) { return; }
+
+                stepPerFixedUpdate = gunTravelDistanceWhenADSing / (aimingStats.TimeToUnADS / fixedUpdateCallFrequency);
+            }
+
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, stepPerFixedUpdate);
+        }
+
+        private bool ClampPosition(Vector3 targetPosition)
+        {
+            if ((transform.position - targetPosition).sqrMagnitude <= sqrDistanceLeniency)
+            {
+                transform.position = targetPosition;
+                return true;
+            }
+
+            return false;
         }
 
         private void HandleFOVLerp()
