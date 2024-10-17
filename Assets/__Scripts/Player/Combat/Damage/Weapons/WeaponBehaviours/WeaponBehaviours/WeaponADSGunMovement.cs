@@ -9,7 +9,7 @@ namespace WeaponHandling
     /// <summary>
     /// Add this script on the root/socket/handle of the weapon for it to handle the ADS logic
     /// </summary>
-    public sealed class WeaponADS : MonoBehaviour // moves the transfom which is already propagated + may do some clientside camera adjustment so no need to replicate
+    public sealed class WeaponADSGunMovement : MonoBehaviour // moves the transfom which is already propagated + may do some clientside camera adjustment so no need to replicate
     {
         private Transform basePositionTransform;
         private Transform ADSPositionTransform;
@@ -18,11 +18,11 @@ namespace WeaponHandling
         [SerializeField] private float sqrDistanceLeniency = .01f;
 
 
-        private new Camera camera;
+        //private new Camera camera;
 
 
-        private float FOVDifference;
-        private static readonly int baseFOV = 60;
+        //private float FOVDifference;
+        //private static readonly int baseFOV = 60;
 
 
         private static readonly float fixedUpdateCallFrequency = .02f;
@@ -37,12 +37,12 @@ namespace WeaponHandling
             basePositionTransform = transform.parent.GetChild(1);
             ADSPositionTransform = transform.parent.GetChild(2);
 
-            camera = transform.parent.parent.GetComponent<Camera>();
+            //camera = transform.parent.parent.GetComponent<Camera>();
 
             aimingStats = aimingStats_;
 
             gunTravelDistanceWhenADSing = Vector3.Distance(ADSPositionTransform.position, basePositionTransform.position);
-            FOVDifference = baseFOV - aimingStats.AimingFOV;
+            //FOVDifference = baseFOV - aimingStats.AimingFOV;
             ResetPosition();
         }
 
@@ -54,7 +54,7 @@ namespace WeaponHandling
         private void FixedUpdate()
         {
             HandleWeaponLerp();
-            HandleFOVLerp();
+            //HandleFOVLerp();
         }
 
 
@@ -98,37 +98,37 @@ namespace WeaponHandling
             return false;
         }
 
-        private void HandleFOVLerp()
-        {
-            float stepPerFixedUpdate;
-            float targetFOV;
-            if (isADSing)
-            {
-                targetFOV = aimingStats.AimingFOV;
+        //private void HandleFOVLerp()
+        //{
+        //    float stepPerFixedUpdate;
+        //    float targetFOV;
+        //    if (isADSing)
+        //    {
+        //        targetFOV = aimingStats.AimingFOV;
 
-                if (camera.fieldOfView <= targetFOV)
-                {
-                    camera.fieldOfView = targetFOV;
-                    return;
-                }
+        //        if (camera.fieldOfView <= targetFOV)
+        //        {
+        //            camera.fieldOfView = targetFOV;
+        //            return;
+        //        }
 
-                stepPerFixedUpdate = FOVDifference / (aimingStats.TimeToADS / fixedUpdateCallFrequency);
-            }
-            else
-            {
-                targetFOV = baseFOV;
+        //        stepPerFixedUpdate = FOVDifference / (aimingStats.TimeToADS / fixedUpdateCallFrequency);
+        //    }
+        //    else
+        //    {
+        //        targetFOV = baseFOV;
 
-                if (camera.fieldOfView >= targetFOV)
-                {
-                    camera.fieldOfView = targetFOV;
-                    return;
-                }
+        //        if (camera.fieldOfView >= targetFOV)
+        //        {
+        //            camera.fieldOfView = targetFOV;
+        //            return;
+        //        }
 
-                stepPerFixedUpdate = FOVDifference / (aimingStats.TimeToUnADS / fixedUpdateCallFrequency);
-            }
+        //        stepPerFixedUpdate = FOVDifference / (aimingStats.TimeToUnADS / fixedUpdateCallFrequency);
+        //    }
 
-            camera.fieldOfView = Mathf.MoveTowards(camera.fieldOfView, targetFOV, stepPerFixedUpdate);
-        }
+        //    camera.fieldOfView = Mathf.MoveTowards(camera.fieldOfView, targetFOV, stepPerFixedUpdate);
+        //}
 
         private void OnDrawGizmosSelected()
         {
