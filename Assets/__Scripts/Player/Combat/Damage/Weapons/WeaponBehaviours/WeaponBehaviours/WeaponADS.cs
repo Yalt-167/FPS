@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using TMPro;
-
 using UnityEngine;
 
 namespace WeaponHandling
@@ -19,12 +17,16 @@ namespace WeaponHandling
         private float gunTravelDistanceWhenADSing;
         [SerializeField] private float sqrDistanceLeniency = .01f;
 
+
         private new Camera camera;
+
 
         private float FOVDifference;
         private static readonly int baseFOV = 60;
 
+
         private static readonly float fixedUpdateCallFrequency = .02f;
+
 
 
         private bool isADSing;
