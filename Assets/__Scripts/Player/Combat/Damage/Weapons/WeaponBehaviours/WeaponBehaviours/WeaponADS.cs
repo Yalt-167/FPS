@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using TMPro;
+
 using UnityEngine;
 
 namespace WeaponHandling
@@ -15,26 +17,15 @@ namespace WeaponHandling
         private Transform ADSPositionTransform;
         [SerializeField] private bool doDebugPosition;
         private new Camera camera;
-        private readonly int baseFOV = 60;
-        private float distancePerFixedUpdateCallForOneSecondAction;
+        private float FOVDifference;
+        private static readonly int baseFOV = 60;
+        private static readonly float fixedUpdateCallFrequency = .02f;
+        private float gunTravelDistanceWhenADSing;
 
-        private readonly int fixedUpdateCallsPerSecond = 50;
-        private Vector3 stepPerFixedUpdate;
-        private Transform targetPosition;
-
-        private AimAndScopeStats aimingStats;
-#if false
-        public struct AimAndScopeStats
-		{
-            public float AimingFOV; //perhaps just a cameraMove instead
-            [Range(1, 5)][Tooltip("Set to 1 for no Scope")] public float ScopeMagnification;
-            public float TimeToADS;
-            public float TimeToUnADS;
-        } 
-#endif
-        [SerializeField] private float sqrLerpLeniency = .01f;
+        [SerializeField] private float sqrDistanceLeniency = .01f;
 
         private bool isADSing;
+        private AimAndScopeStats aimingStats;
 
         public void SetupData(AimAndScopeStats aimingStats_)
         {
@@ -44,8 +35,9 @@ namespace WeaponHandling
             camera = transform.parent.parent.GetComponent<Camera>();
 
             aimingStats = aimingStats_;
-            distancePerFixedUpdateCallForOneSecondAction = Vector3.Distance(ADSPositionTransform.position, basePositionTransform.position) / fixedUpdateCallsPerSecond;
 
+            gunTravelDistanceWhenADSing = Vector3.Distance(ADSPositionTransform.position, basePositionTransform.position);
+            FOVDifference = baseFOV - aimingStats.AimingFOV;
             ResetPosition();
         }
 
@@ -68,64 +60,48 @@ namespace WeaponHandling
 
         private void HandleWeaponLerp()
         {
-            var startingPoint = transform.position;
-
-
-            var (
-                targetPosition,
-                transitionSpeed
-                ) = isADSing ?
-                (ADSPositionTransform, aimingStats.TimeToADS) : (basePositionTransform, aimingStats.TimeToUnADS);
-
-            transform.position = Vector3.Lerp(startingPoint, targetPosition.position, transitionSpeed);
-
-            //(targetPosition, stepPerFixedUpdate) = isADSing ?
-            //    (ADSPosition, (ADSPosition.position - basePosition.position) / fixedUpdateCallsPerSecond / aimingStats.TimeToADS):
-            //    (basePosition, (basePosition.position - ADSPosition.position) / fixedUpdateCallsPerSecond / aimingStats.TimeToUnADS);
-
-            //(targetPosition, stepPerFixedUpdate) = isADSing ?
-            //    (
-            //        ADSPosition,
-            //        (ADSPosition.position - basePosition.position).normalized / (distancePerFixedUpdateCallForOneSecondAction / aimingStats.TimeToADS)
-            //    )
-            //    :
-            //    (
-            //        basePosition,
-            //        (basePosition.position - ADSPosition.position).normalized / (distancePerFixedUpdateCallForOneSecondAction / aimingStats.TimeToUnADS)
-            //    );
-
-
-            //if ((transform.position - targetPosition.position).sqrMagnitude < sqrLerpLeniency)
-            //{
-            //    transform.position = targetPosition.position;
-            //}
-            //else
-            //{
-
-            //    transform.position += stepPerFixedUpdate;
-            //}
+            
         }
 
         private void HandleFOVLerp()
         {
-            var (targetFOV, transitionSpeed) = isADSing ? (aimingStats.AimingFOV, aimingStats.TimeToADS) : (baseFOV, aimingStats.TimeToUnADS);
-
-            camera.fieldOfView = Mathf.Lerp(camera.fieldOfView, targetFOV, transitionSpeed);
-
-            if (camera.fieldOfView - targetFOV < sqrLerpLeniency)
+            float stepPerFixedUpdate;
+            float targetFOV;
+            if (isADSing)
             {
-                camera.fieldOfView = targetFOV;
+                targetFOV = aimingStats.AimingFOV;
+
+                if (camera.fieldOfView <= targetFOV)
+                {
+                    camera.fieldOfView = targetFOV;
+                    return;
+                }
+
+                stepPerFixedUpdate = FOVDifference / (aimingStats.TimeToADS / fixedUpdateCallFrequency);
+            }
+            else
+            {
+                targetFOV = baseFOV;
+
+                if (camera.fieldOfView >= targetFOV)
+                {
+                    camera.fieldOfView = targetFOV;
+                    return;
+                }
+
+                stepPerFixedUpdate = FOVDifference / (aimingStats.TimeToUnADS / fixedUpdateCallFrequency);
             }
 
+            camera.fieldOfView = Mathf.MoveTowards(camera.fieldOfView, targetFOV, stepPerFixedUpdate);
         }
 
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.green;
-            if (basePositionTransform != null) Gizmos.DrawWireSphere(basePositionTransform.position, .1f);
+            if (basePositionTransform != null) { Gizmos.DrawWireSphere(basePositionTransform.position, .1f); }
 
             Gizmos.color = Color.yellow;
-            if (ADSPositionTransform != null) Gizmos.DrawWireSphere(ADSPositionTransform.position, .1f);
+            if (ADSPositionTransform != null) { Gizmos.DrawWireSphere(ADSPositionTransform.position, .1f); }
         }
     }
 }
