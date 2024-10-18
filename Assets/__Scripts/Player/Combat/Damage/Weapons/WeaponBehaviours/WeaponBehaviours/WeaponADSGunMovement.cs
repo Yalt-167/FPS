@@ -17,32 +17,19 @@ namespace WeaponHandling
         private float gunTravelDistanceWhenADSing;
         [SerializeField] private float sqrDistanceLeniency = .01f;
 
-
-        //private new Camera camera;
-
-
-        //private float FOVDifference;
-        //private static readonly int baseFOV = 60;
-
-
         private static readonly float fixedUpdateCallFrequency = .02f;
-
-
 
         private bool isADSing;
         private AimAndScopeStats aimingStats;
 
         public void SetupData(AimAndScopeStats aimingStats_)
         {
-            basePositionTransform = transform.parent.GetChild(1);
-            ADSPositionTransform = transform.parent.GetChild(2);
-
-            //camera = transform.parent.parent.GetComponent<Camera>();
+            basePositionTransform = transform.parent.GetChild(1).GetChild(0);
+            ADSPositionTransform = transform.parent.GetChild(1).GetChild(1);
 
             aimingStats = aimingStats_;
 
             gunTravelDistanceWhenADSing = Vector3.Distance(ADSPositionTransform.position, basePositionTransform.position);
-            //FOVDifference = baseFOV - aimingStats.AimingFOV;
             ResetPosition();
         }
 
@@ -54,7 +41,6 @@ namespace WeaponHandling
         private void FixedUpdate()
         {
             HandleWeaponLerp();
-            //HandleFOVLerp();
         }
 
 
@@ -98,40 +84,10 @@ namespace WeaponHandling
             return false;
         }
 
-        //private void HandleFOVLerp()
-        //{
-        //    float stepPerFixedUpdate;
-        //    float targetFOV;
-        //    if (isADSing)
-        //    {
-        //        targetFOV = aimingStats.AimingFOV;
-
-        //        if (camera.fieldOfView <= targetFOV)
-        //        {
-        //            camera.fieldOfView = targetFOV;
-        //            return;
-        //        }
-
-        //        stepPerFixedUpdate = FOVDifference / (aimingStats.TimeToADS / fixedUpdateCallFrequency);
-        //    }
-        //    else
-        //    {
-        //        targetFOV = baseFOV;
-
-        //        if (camera.fieldOfView >= targetFOV)
-        //        {
-        //            camera.fieldOfView = targetFOV;
-        //            return;
-        //        }
-
-        //        stepPerFixedUpdate = FOVDifference / (aimingStats.TimeToUnADS / fixedUpdateCallFrequency);
-        //    }
-
-        //    camera.fieldOfView = Mathf.MoveTowards(camera.fieldOfView, targetFOV, stepPerFixedUpdate);
-        //}
-
         private void OnDrawGizmosSelected()
         {
+            if (!doDebugPosition) { return; }
+
             Gizmos.color = Color.green;
             if (basePositionTransform != null) { Gizmos.DrawWireSphere(basePositionTransform.position, .1f); }
 
