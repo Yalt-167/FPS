@@ -21,6 +21,14 @@ namespace WeaponHandling
             return Current;
         }
 
+        public BehaviourType this[int index]
+        {
+            get
+            {
+                return internalArray[index % internalArray.Length];
+            }
+        }
+
         public void GoNext()
         {
             currentIndex++;
