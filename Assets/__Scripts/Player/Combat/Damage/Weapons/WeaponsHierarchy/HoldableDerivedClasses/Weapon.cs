@@ -14,7 +14,7 @@ namespace WeaponHandling
         [SerializeField] protected WeaponScriptableObject weaponData;
 
         protected WeaponRecoil weaponRecoil;
-        protected WeaponBehaviourGatherer<WeaponADS> weaponADSGatherer;
+        protected WeaponBehaviourGatherer<WeaponADSGunMovement> weaponADSGatherer;
         protected WeaponSpread weaponSpread;
         protected WeaponBehaviourGatherer<WeaponKickback> weaponKickbackGatherer;
         protected WeaponBehaviourGatherer<BarrelEnd> barrelEndsGatherer;
@@ -569,7 +569,7 @@ namespace WeaponHandling
         protected virtual void Awake()
         {
             weaponRecoil = GetComponentInChildren<WeaponRecoil>();
-            weaponADSGatherer = new(GetComponentsInChildren<WeaponADS>());
+            weaponADSGatherer = new(GetComponentsInChildren<WeaponADSGunMovement>());
             weaponSpread = GetComponentInChildren<WeaponSpread>();
             weaponKickbackGatherer = new(GetComponentsInChildren<WeaponKickback>());
             barrelEndsGatherer = new(GetComponentsInChildren<BarrelEnd>());
