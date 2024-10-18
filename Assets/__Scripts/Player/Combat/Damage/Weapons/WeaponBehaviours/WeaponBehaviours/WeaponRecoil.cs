@@ -30,22 +30,32 @@ namespace WeaponHandling
         private WeaponRecoilStats HipfireRecoilStats;
 
         [Rpc(SendTo.ClientsAndHost)]
-        public void ApplyRecoilClientRpc(float chargeRatio = 1)
+        public void ApplyRecoilClientRpc(float chargeRatio = 1) // woudl result in different recoil on each client
         {
+            var relevantRecoilStats = isAiming ? AimingRecoilStats : HipfireRecoilStats;
+
+            float y = relevantRecoilStats.RecoilForceY * chargeRatio;
+            float z = relevantRecoilStats.RecoilForceZ * chargeRatio;
+
+
             if (isAiming)
             {
+                y = AimingRecoilStats.RecoilForceY * chargeRatio;
+                z = AimingRecoilStats.RecoilForceZ * chargeRatio;
                 targetRecoilHandlerRotation.Value += new Vector3(
                     -AimingRecoilStats.RecoilForceX * chargeRatio,
-                    UnityEngine.Random.Range(-AimingRecoilStats.RecoilForceY * chargeRatio, AimingRecoilStats.RecoilForceY * chargeRatio),
-                    UnityEngine.Random.Range(-AimingRecoilStats.RecoilForceZ * chargeRatio, AimingRecoilStats.RecoilForceZ * chargeRatio)
+                    UnityEngine.Random.Range(-y, y),
+                    UnityEngine.Random.Range(-z, z)
                 );
             }
             else
             {
+                y = HipfireRecoilStats.RecoilForceY * chargeRatio;
+                z = HipfireRecoilStats.RecoilForceZ * chargeRatio;
                 targetRecoilHandlerRotation.Value += new Vector3(
                     -HipfireRecoilStats.RecoilForceX * chargeRatio,
-                    UnityEngine.Random.Range(-HipfireRecoilStats.RecoilForceY * chargeRatio, HipfireRecoilStats.RecoilForceY * chargeRatio),
-                    UnityEngine.Random.Range(-HipfireRecoilStats.RecoilForceZ * chargeRatio, HipfireRecoilStats.RecoilForceZ * chargeRatio)
+                    UnityEngine.Random.Range(-y, y),
+                    UnityEngine.Random.Range(-z, z)
                 );
             }
         }
