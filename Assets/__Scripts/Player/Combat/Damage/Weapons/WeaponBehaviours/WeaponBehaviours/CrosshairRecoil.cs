@@ -13,7 +13,7 @@ using Unity.Netcode;
 
 namespace WeaponHandling
 {
-    public sealed class WeaponRecoil : WeaponReplicatedBehaviour
+    public sealed class CrosshairRecoil : WeaponReplicatedBehaviour
     {
         private NetworkVariable<Vector3> currentRecoilHandlerRotation = new NetworkVariable<Vector3>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
         private NetworkVariable<Vector3> targetRecoilHandlerRotation = new NetworkVariable<Vector3>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
@@ -37,27 +37,11 @@ namespace WeaponHandling
             float y = relevantRecoilStats.RecoilForceY * chargeRatio;
             float z = relevantRecoilStats.RecoilForceZ * chargeRatio;
 
-
-            if (isAiming)
-            {
-                y = AimingRecoilStats.RecoilForceY * chargeRatio;
-                z = AimingRecoilStats.RecoilForceZ * chargeRatio;
-                targetRecoilHandlerRotation.Value += new Vector3(
-                    -AimingRecoilStats.RecoilForceX * chargeRatio,
-                    UnityEngine.Random.Range(-y, y),
-                    UnityEngine.Random.Range(-z, z)
-                );
-            }
-            else
-            {
-                y = HipfireRecoilStats.RecoilForceY * chargeRatio;
-                z = HipfireRecoilStats.RecoilForceZ * chargeRatio;
-                targetRecoilHandlerRotation.Value += new Vector3(
-                    -HipfireRecoilStats.RecoilForceX * chargeRatio,
-                    UnityEngine.Random.Range(-y, y),
-                    UnityEngine.Random.Range(-z, z)
-                );
-            }
+            targetRecoilHandlerRotation.Value += new Vector3(
+                 -HipfireRecoilStats.RecoilForceX * chargeRatio,
+                 UnityEngine.Random.Range(-y, y),
+                 UnityEngine.Random.Range(-z, z)
+            );
         }
 
         [Rpc(SendTo.ClientsAndHost)]
@@ -72,6 +56,12 @@ namespace WeaponHandling
         {
             AimingRecoilStats = AimingRecoilStats_;
             HipfireRecoilStats = HipfireRecoilStats_;
+        }
+
+
+        private void FindRecoilHandlerTransform()
+        {
+
         }
     }                       
 }
