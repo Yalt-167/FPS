@@ -54,7 +54,7 @@ namespace Controller
 
         private bool IsJumping { get; set; }
         private bool IsRunning { get; set; }
-        private bool IsSprinting => !InputQuery.HoldCrouch && PressingForwardOrStrafeInput;
+        private bool IsSprinting => !InputQuery.Crouch && PressingForwardOrStrafeInput;
         private bool IsCrouching { get; set; }
         private bool IsSliding { get; set; }
         private bool IsDashing { get; set; }
@@ -392,7 +392,7 @@ namespace Controller
             _ = InputQuery.QuickReset;
             _ = InputQuery.Slide[InputType.OnKeyHeld];
             _ = InputQuery.Jump[InputType.OnKeyHeld];
-            _ = InputQuery.HoldCrouch;
+            _ = InputQuery.Crouch;
 
             currentMovementMethod();
             currentCameraHandlingMethod();
@@ -749,7 +749,7 @@ namespace Controller
                 return;
             }
 
-            HandleCrouch(HasControls && InputQuery.HoldCrouch && isCollidingDown);
+            HandleCrouch(HasControls && InputQuery.Crouch && isCollidingDown);
         }
 
         private void Run()

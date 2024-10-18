@@ -24,7 +24,6 @@ namespace SaveAndLoad
 
         public IAmSomethingToSave Init()
         {
-            UnityEngine.Debug.Log(CameraHorizontalSensitivity);
             MovementInputs.Init();
             CombatInputs.Init();
             GeneralInputs.Init();

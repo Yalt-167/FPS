@@ -18,7 +18,7 @@ namespace Inputs
         public FixedKeybind Dash = new(KeyCode.Alpha9, InputType.OnKeyDown, nameof(Dash), true);
         public GroupKeybind Slide = new(KeyCode.LeftShift, new InputType[] { InputType.OnKeyDown, InputType.OnKeyHeld }, nameof(Slide), true);
         public GroupKeybind GrapplingHook = new(KeyCode.Space, new InputType[] { InputType.OnKeyDown, InputType.OnKeyHeld, InputType.OnKeyUp }, nameof(GrapplingHook), true);
-        public VariableKeybind HoldCrouch = new(KeyCode.LeftControl, new List<InputType>() { InputType.OnKeyHeld, InputType.Toggle }, nameof(HoldCrouch), true);
+        public VariableKeybind Crouch = new(KeyCode.LeftControl, new List<InputType>() { InputType.OnKeyHeld, InputType.Toggle }, nameof(Crouch), true);
         
         public FixedKeybind SwitchCameraPosition = new(KeyCode.W, InputType.OnKeyDown, nameof(SwitchCameraPosition), true);
         public VariableKeybind QuickReset = new(KeyCode.X, new List<InputType>() { InputType.OnKeyDown, InputType.OnKeyHeldForTime }, nameof(QuickReset), true, .5f);
@@ -34,7 +34,7 @@ namespace Inputs
 
             RegisterKeybind(Slide);
 
-            RegisterKeybind(HoldCrouch);
+            RegisterKeybind(Crouch);
 
             RegisterKeybind(Dash);
 
