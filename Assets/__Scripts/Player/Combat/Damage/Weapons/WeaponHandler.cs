@@ -32,11 +32,12 @@ public sealed class WeaponHandler : NetworkBehaviour
     private Transform cameraTransform;
     private new Camera camera;
     private Transform recoilHandlerTransform;
+    private CrosshairRecoil crosshairRecoil;
     private WeaponBehaviourGatherer<BarrelEnd> barrelEnds;
     private WeaponBehaviourGatherer<WeaponADSGunMovement> weaponsADSGunMovements;
     private WeaponADSFOV weaponADSFOV;
 
-    private WeaponBehaviourGatherer<WeaponSocket> weaponSockets;
+    //private WeaponBehaviourGatherer<WeaponSocket> weaponSockets;
 
     [SerializeField] private Transform weaponTransform;
     [SerializeField] private Transform weaponSocketTransform;
@@ -73,7 +74,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     private Action shootingRythmMethod;
     private Action<ShotInfos, IHitscanBulletEffectSettings> onHitWallMethod;
 
-    private bool isAiming;
+    public bool IsAiming { get; private set; }
 
     private static readonly float shootBuffer = .1f;
     private float lastShootPressed = float.NegativeInfinity;
@@ -138,12 +139,39 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region Unity Handled
 
+    private void FixedUpdate()
+    {
+        crosshairRecoil.HandleRecoilServerRpc();
+
+
+        if (shotThisFrame) { return; }
+
+        CurrentCooldownBetweenRampUpShots *= currentWeapon.RampUpStats.RampUpCooldownRegulationMultiplier;
+    }
+
+    private void Update()
+    {
+        //HandleRecoil();
+        HandleSpead();
+        HandleKickback();
+    }
+
+    private void LateUpdate()
+    {
+        switchedThisFrame = false;
+        shotThisFrame = false;
+    }
+
+    #endregion
+
+    #region Init
     private void Init()
     {
         if (isInitialized) { return; }
 
         playerSettings = GetComponent<PlayerSettings>();
         recoilHandlerTransform = transform.GetChild(0).GetChild(0);
+        crosshairRecoil = GetComponent<CrosshairRecoil>();
         cameraTransform = recoilHandlerTransform.GetChild(0);
         camera = cameraTransform.GetComponent<Camera>();
         weaponADSFOV = cameraTransform.GetComponent<WeaponADSFOV>();
@@ -160,30 +188,6 @@ public sealed class WeaponHandler : NetworkBehaviour
         isInitialized = true;
     }
 
-    private void FixedUpdate()
-    {
-        if (shotThisFrame) { return; }
-
-        CurrentCooldownBetweenRampUpShots *= currentWeapon.RampUpStats.RampUpCooldownRegulationMultiplier;
-    }
-
-    private void Update()
-    {
-        HandleRecoil();
-        HandleSpead();
-        HandleKickback();
-    }
-
-    private void LateUpdate()
-    {
-        switchedThisFrame = false;
-        shotThisFrame = false;
-    }
-
-    #endregion
-
-    #region Init
-
     public void SetWeapon(WeaponScriptableObject weapon)
     {
         Init();
@@ -195,7 +199,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         barrelEnds = new(GetComponentsInChildren<BarrelEnd>());
 
-        weaponSockets = new(GetComponentsInChildren<WeaponSocket>());
+        //weaponSockets = new(GetComponentsInChildren<WeaponSocket>());
 
         weaponsADSGunMovements = new(GetComponentsInChildren<WeaponADSGunMovement>());
         foreach (var weaponADSGunMovement in weaponsADSGunMovements)
@@ -203,6 +207,8 @@ public sealed class WeaponHandler : NetworkBehaviour
             weaponADSGunMovement.SetupData(currentWeapon.AimingAndScopeStats);
         }
         weaponADSFOV.SetupData(currentWeapon.AimingAndScopeStats);
+
+        StartCoroutine(crosshairRecoil.SetData(currentWeapon.AimingRecoilStats, currentWeapon.HipfireRecoilStats));
 
         currentWeaponSounds = currentWeapon.Sounds;
         ammos = currentWeapon.MagazineSize;
@@ -319,9 +325,9 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     public void UpdateAimingState(bool shouldBeAiming)
     {
-        if (isAiming == shouldBeAiming) { return; }
+        if (IsAiming == shouldBeAiming) { return; }
 
-        isAiming = shouldBeAiming;
+        IsAiming = shouldBeAiming;
         foreach (var weaponsADSGunMovement in weaponsADSGunMovements)
         {
             weaponsADSGunMovement.ToggleADS(shouldBeAiming);
@@ -543,11 +549,12 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         UpdateOwnerSettingsUponShot();
 
-        var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnds.Current.transform.position, Quaternion.identity).GetComponent<BulletTrail>();
-        var directionWithSpread = GetDirectionWithSpread(currentSpreadAngle, barrelEnds.Current.transform);
-        var endPoint = barrelEnds.Current.transform.position + directionWithSpread * 100;
+        var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
+        var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.transform.position, Quaternion.identity).GetComponent<BulletTrail>();
+        var directionWithSpread = GetDirectionWithSpread(currentSpreadAngle, barrelEnd.transform);
+        var endPoint = barrelEnd.transform.position + directionWithSpread * 100;
 
-        var hits = Physics.RaycastAll(barrelEnds.Current.transform.position, directionWithSpread, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore);
+        var hits = Physics.RaycastAll(barrelEnd.transform.position, directionWithSpread, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore);
 
         Array.Sort(hits, new RaycastHitComparer());
 
@@ -558,7 +565,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                 if (IsOwner)
                 {
                     //shootableComponent.ReactShot(currentWeapon.Damage, hit.point, barrelEnd.forward, NetworkObjectId, PlayerFrame.TeamID, currentWeapon.CanBreakThings);
-                    shootableComponent.ReactShot(currentWeapon.Damage, hit.point, barrelEnds.Current.transform.forward, NetworkObjectId, PlayerFrame.LocalPlayer.TeamNumber, currentWeapon.CanBreakThings);
+                    shootableComponent.ReactShot(currentWeapon.Damage, hit.point, barrelEnd.transform.forward, NetworkObjectId, PlayerFrame.LocalPlayer.TeamNumber, currentWeapon.CanBreakThings);
                 }
 
                 if (!currentWeapon.HitscanBulletSettings.PierceThroughPlayers)
@@ -593,6 +600,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         if (!IsOwner) { return; }
 
+        
         ApplyRecoil();
         ApplySpread();
         ApplyKickback();
@@ -1213,7 +1221,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         shotgunPelletsDirections = new Vector3[currentWeapon.ShotgunStats.PelletsCount];
 
-        var relevantSpread = isAiming ? currentWeapon.ShotgunStats.AimingPelletsSpreadAngle : currentWeapon.ShotgunStats.PelletsSpreadAngle;
+        var relevantSpread = IsAiming ? currentWeapon.ShotgunStats.AimingPelletsSpreadAngle : currentWeapon.ShotgunStats.PelletsSpreadAngle;
 
         for (int i = 0; i < currentWeapon.ShotgunStats.PelletsCount; i++)
         {
@@ -1357,27 +1365,29 @@ public sealed class WeaponHandler : NetworkBehaviour
     
     private void ApplyRecoil(float chargeRatio = 1)
     {
-        if (isAiming)
-        {
-            targetRecoilHandlerRotation += new Vector3(
-                -CurrentWeaponADSRecoilStats.RecoilForceX,
-                Random.Range(-CurrentWeaponADSRecoilStats.RecoilForceY, CurrentWeaponADSRecoilStats.RecoilForceY),
-                Random.Range(-CurrentWeaponADSRecoilStats.RecoilForceZ, CurrentWeaponADSRecoilStats.RecoilForceZ)
-            ) * chargeRatio;
-        }
-        else
-        {
-            targetRecoilHandlerRotation += new Vector3(
-                -CurrentWeaponHipfireRecoilStats.RecoilForceX,
-                Random.Range(-CurrentWeaponHipfireRecoilStats.RecoilForceY, CurrentWeaponHipfireRecoilStats.RecoilForceY),
-                Random.Range(-CurrentWeaponHipfireRecoilStats.RecoilForceZ, CurrentWeaponHipfireRecoilStats.RecoilForceZ)
-            ) * chargeRatio;
-        }
+
+        crosshairRecoil.ApplyRecoilServerRpc(chargeRatio);
+        //if (IsAiming)
+        //{
+        //    targetRecoilHandlerRotation += new Vector3(
+        //        -CurrentWeaponADSRecoilStats.RecoilForceX,
+        //        Random.Range(-CurrentWeaponADSRecoilStats.RecoilForceY, CurrentWeaponADSRecoilStats.RecoilForceY),
+        //        Random.Range(-CurrentWeaponADSRecoilStats.RecoilForceZ, CurrentWeaponADSRecoilStats.RecoilForceZ)
+        //    ) * chargeRatio;
+        //}
+        //else
+        //{
+        //    targetRecoilHandlerRotation += new Vector3(
+        //        -CurrentWeaponHipfireRecoilStats.RecoilForceX,
+        //        Random.Range(-CurrentWeaponHipfireRecoilStats.RecoilForceY, CurrentWeaponHipfireRecoilStats.RecoilForceY),
+        //        Random.Range(-CurrentWeaponHipfireRecoilStats.RecoilForceZ, CurrentWeaponHipfireRecoilStats.RecoilForceZ)
+        //    ) * chargeRatio;
+        //}
     }
 
     private void HandleRecoil()
     {
-        targetRecoilHandlerRotation = Vector3.Lerp(targetRecoilHandlerRotation, Vector3.zero, (isAiming ? CurrentWeaponADSRecoilStats.RecoilRegulationSpeed : CurrentWeaponHipfireRecoilStats.RecoilRegulationSpeed) * Time.time);
+        targetRecoilHandlerRotation = Vector3.Lerp(targetRecoilHandlerRotation, Vector3.zero, (IsAiming ? CurrentWeaponADSRecoilStats.RecoilRegulationSpeed : CurrentWeaponHipfireRecoilStats.RecoilRegulationSpeed) * Time.time);
         currentRecoilHandlerRotation = Vector3.Slerp(currentRecoilHandlerRotation, targetRecoilHandlerRotation, /*recoilMovementSnappiness*/6f * Time.deltaTime);
         recoilHandlerTransform.localRotation = Quaternion.Euler(currentRecoilHandlerRotation);
     }
@@ -1402,12 +1412,12 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private void ApplySpread()
     {
-        currentSpreadAngle += isAiming ? currentWeapon.AimingSimpleShotStats.SpreadAngleAddedPerShot : currentWeapon.SimpleShotStats.SpreadAngleAddedPerShot;
+        currentSpreadAngle += IsAiming ? currentWeapon.AimingSimpleShotStats.SpreadAngleAddedPerShot : currentWeapon.SimpleShotStats.SpreadAngleAddedPerShot;
     }
 
     private void HandleSpead()
     {
-        currentSpreadAngle = Mathf.Lerp(currentSpreadAngle, 0f, (isAiming ? currentWeapon.AimingSimpleShotStats.SpreadRegulationSpeed : currentWeapon.SimpleShotStats.SpreadRegulationSpeed) * Time.time);
+        currentSpreadAngle = Mathf.Lerp(currentSpreadAngle, 0f, (IsAiming ? currentWeapon.AimingSimpleShotStats.SpreadRegulationSpeed : currentWeapon.SimpleShotStats.SpreadRegulationSpeed) * Time.time);
     }
 
     private Vector3 GetDirectionWithSpread(float spreadAngle, Transform directionTransform)
