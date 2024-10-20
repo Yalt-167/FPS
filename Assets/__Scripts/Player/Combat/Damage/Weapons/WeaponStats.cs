@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using Unity.Netcode;
 using Unity.VisualScripting;
 
 using UnityEngine;
@@ -163,7 +164,7 @@ public struct RampUpStats
 {
     public float RampUpMaxCooldownBetweenShots;
     public float RampUpMinCooldownBetweenShots;
-    public float RampUpCooldownMultiplierPerShot;
+    public float RampUpCooldownMultiplierPerShot; // why tf are these multipliers???
     public float RampUpCooldownRegulationMultiplier;
 }
 
@@ -341,19 +342,33 @@ public struct AimAndScopeStats
 }
 
 [Serializable]
-public struct KickbackStats
+public struct KickbackStats : INetworkSerializable
 {
     public float WeaponKickBackPerShot;
     public float WeaponKickBackRegulationTime;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref WeaponKickBackPerShot);
+        serializer.SerializeValue(ref WeaponKickBackRegulationTime);
+    }
 }
 
 [Serializable]
-public struct WeaponRecoilStats
+public struct WeaponRecoilStats : INetworkSerializable
 {
     [Tooltip("Upward recoil (Muzzle Climb)")] public float RecoilForceX;
     [Tooltip("Sideway recoil")] public float RecoilForceY;
     [Tooltip("Camera rotation on side (somewhat screen shake) (Should stay really low)")] public float RecoilForceZ;
     public float RecoilRegulationSpeed;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref RecoilForceX);
+        serializer.SerializeValue(ref RecoilForceY);
+        serializer.SerializeValue(ref RecoilForceZ);
+        serializer.SerializeValue(ref RecoilRegulationSpeed);
+    }
 }
 
 public enum Effects
