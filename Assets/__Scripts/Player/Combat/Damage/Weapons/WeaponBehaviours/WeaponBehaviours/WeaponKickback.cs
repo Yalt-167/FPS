@@ -2,41 +2,63 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using Unity.Netcode;
+
 using UnityEngine;
 
 namespace WeaponHandling
 {
-    public sealed class WeaponKickback : WeaponBehaviour
+    public sealed class WeaponKickback : NetworkBehaviour
     {
-        public override void Setup(Weapon weapon)
+
+        [SerializeField] private Transform weaponSocketTransform;
+        private NetworkVariable<KickbackStats> kickbackStats = new NetworkVariable<KickbackStats>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
+        private bool hasSpawnedOnNetwork;
+
+        public override void OnNetworkSpawn()
         {
-            throw new NotImplementedException();
+            base.OnNetworkSpawn();
+
+            hasSpawnedOnNetwork = true;
         }
 
-        [SerializeField] private Transform weaponTransform; // not sustainable for dual wielding weapons
-        private KickbackStats kickbackStats => weaponHandler.CurrentWeapon.KickbackStats;
-        private WeaponHandler weaponHandler;
-
-        //private void Awake()
-        //{
-        //    Setup();
-        //    weaponHandler = GetComponent<WeaponHandler>();
-        //    weaponTransform = transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).GetChild(0).GetChild(0);
-        //}
-
-        private void ApplyKickback(float chargeRatio = 1f)
+        public IEnumerator SetData(KickbackStats kickbackStats_)
         {
-            weaponTransform.localPosition -= new Vector3(0f, 0f, kickbackStats.WeaponKickBackPerShot * chargeRatio);
+            yield return new WaitUntil(() => hasSpawnedOnNetwork);
+
+            SetDataServerRpc(kickbackStats_);
         }
 
-        private void HandleKickback()
+        [Rpc(SendTo.Server)]
+        public void SetDataServerRpc(KickbackStats kickbackStats_)
         {
-            weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, Vector3.zero, kickbackStats.WeaponKickBackRegulationTime * Time.time);
+            kickbackStats.Value = kickbackStats_;
         }
 
-        private void Update()
+
+
+        [Rpc(SendTo.Server)]
+        public void ApplyKickbackServerRpc(float chargeRatio = 1f)
         {
-            HandleKickback();
+            ApplyKickbackClientRpc(chargeRatio);
+        }
+        
+        [Rpc(SendTo.ClientsAndHost)]
+        private void ApplyKickbackClientRpc(float chargeRatio)
+        {
+            weaponSocketTransform.localPosition -= new Vector3(0f, 0f, kickbackStats.Value.WeaponKickBackPerShot * chargeRatio);
+        }
+
+        [Rpc(SendTo.Server)]
+        public void HandleKickbackServerRpc()
+        {
+            HandleKickbackClientRpc();
+        }
+
+        [Rpc(SendTo.ClientsAndHost)]
+        private void HandleKickbackClientRpc()
+        {
+            weaponSocketTransform.localPosition = Vector3.Slerp(weaponSocketTransform.localPosition, Vector3.zero, kickbackStats.Value.WeaponKickBackRegulationTime * Time.time);
         }
     }
 }
