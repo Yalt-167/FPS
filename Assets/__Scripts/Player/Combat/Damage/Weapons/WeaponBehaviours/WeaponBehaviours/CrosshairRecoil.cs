@@ -13,55 +13,77 @@ using Unity.Netcode;
 
 namespace WeaponHandling
 {
-    public sealed class CrosshairRecoil : WeaponReplicatedBehaviour
+    public sealed class CrosshairRecoil : NetworkBehaviour
     {
         private NetworkVariable<Vector3> currentRecoilHandlerRotation = new NetworkVariable<Vector3>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
         private NetworkVariable<Vector3> targetRecoilHandlerRotation = new NetworkVariable<Vector3>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
-        [SerializeField] private float recoilMovementSnappiness;
+        [SerializeField] private float recoilMovementSnappiness = 6f;
 
 
-        [SerializeField] private Transform recoilHandlerTransform;
-        private bool IsAiming => throw new NotImplementedException(); // link what needs to be and actually use this instead
+        private Transform recoilHandlerTransform;
+        private WeaponHandler weaponHandler;
+        private bool IsAiming => weaponHandler.IsAiming;
 
-        private bool isAiming;
-
-        // as networkVar to prevent tampering with those
-        private WeaponRecoilStats AimingRecoilStats; 
-        private WeaponRecoilStats HipfireRecoilStats;
-
-        [Rpc(SendTo.ClientsAndHost)]
-        public void ApplyRecoilClientRpc(float chargeRatio = 1) // woudl result in different recoil on each client
+        private NetworkVariable<WeaponRecoilStats> aimingRecoilStats = new NetworkVariable<WeaponRecoilStats>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server); 
+        private NetworkVariable<WeaponRecoilStats> hipfireRecoilStats = new NetworkVariable<WeaponRecoilStats>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
+        private bool hasSpawnedOnNetwork;
+        private void Awake()
         {
-            var relevantRecoilStats = isAiming ? AimingRecoilStats : HipfireRecoilStats;
+            recoilHandlerTransform = transform.GetChild(0).GetChild(0);
+            weaponHandler = GetComponent<WeaponHandler>();
+        }
 
-            float y = relevantRecoilStats.RecoilForceY * chargeRatio;
-            float z = relevantRecoilStats.RecoilForceZ * chargeRatio;
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            hasSpawnedOnNetwork = true;
+        }
+
+        public IEnumerator SetData(WeaponRecoilStats aimingRecoilStats_, WeaponRecoilStats hipfireRecoilStats_)
+        {
+            yield return new WaitUntil(() => hasSpawnedOnNetwork);
+
+            SetDataServerRpc(aimingRecoilStats_, hipfireRecoilStats_);
+        }
+
+        [Rpc(SendTo.Server)]
+        public void SetDataServerRpc(WeaponRecoilStats aimingRecoilStats_, WeaponRecoilStats hipfireRecoilStats_)
+        {
+
+            aimingRecoilStats.Value = aimingRecoilStats_;
+            hipfireRecoilStats.Value = hipfireRecoilStats_;
+        }
+
+        [Rpc(SendTo.Server)]
+        public void ApplyRecoilServerRpc(float chargeRatio = 1f)
+        {
+            var relevantRecoilStats = IsAiming ? aimingRecoilStats : hipfireRecoilStats;
+
+            float y = relevantRecoilStats.Value.RecoilForceY * chargeRatio;
+            float z = relevantRecoilStats.Value.RecoilForceZ * chargeRatio;
 
             targetRecoilHandlerRotation.Value += new Vector3(
-                 -HipfireRecoilStats.RecoilForceX * chargeRatio,
+                 -hipfireRecoilStats.Value.RecoilForceX * chargeRatio,
                  UnityEngine.Random.Range(-y, y),
                  UnityEngine.Random.Range(-z, z)
             );
         }
 
-        [Rpc(SendTo.ClientsAndHost)]
-        private void HandleRecoilClientRpc()
+        [Rpc(SendTo.Server)]
+        public void HandleRecoilServerRpc()
         {
-            targetRecoilHandlerRotation.Value = Vector3.Lerp(targetRecoilHandlerRotation.Value, Vector3.zero, (isAiming ? AimingRecoilStats.RecoilRegulationSpeed : HipfireRecoilStats.RecoilRegulationSpeed) * Time.deltaTime);
+            targetRecoilHandlerRotation.Value = Vector3.Lerp(targetRecoilHandlerRotation.Value, Vector3.zero, (IsAiming ? aimingRecoilStats.Value.RecoilRegulationSpeed : hipfireRecoilStats.Value.RecoilRegulationSpeed) * Time.deltaTime);
             currentRecoilHandlerRotation.Value = Vector3.Slerp(currentRecoilHandlerRotation.Value, targetRecoilHandlerRotation.Value, recoilMovementSnappiness * Time.deltaTime);
-            recoilHandlerTransform.localRotation = Quaternion.Euler(currentRecoilHandlerRotation.Value);
+            UpdateRecoilClientRpc(Quaternion.Euler(currentRecoilHandlerRotation.Value));
         }
 
-        public void SetData(WeaponRecoilStats AimingRecoilStats_, WeaponRecoilStats HipfireRecoilStats_)
+        [Rpc(SendTo.ClientsAndHost)]
+        private void UpdateRecoilClientRpc(Quaternion rotation)
         {
-            AimingRecoilStats = AimingRecoilStats_;
-            HipfireRecoilStats = HipfireRecoilStats_;
+            recoilHandlerTransform.localRotation = rotation;
         }
 
-
-        private void FindRecoilHandlerTransform()
-        {
-
-        }
+        
     }                       
 }
