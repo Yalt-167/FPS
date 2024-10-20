@@ -1341,64 +1341,8 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #endregion
 
-    #region Aiming
-
-    //public void UpdateAimingState(bool shoulbBeAiming)
-    //{
-    //    if (isAiming == shoulbBeAiming) { return; }
-
-    //    isAiming = shoulbBeAiming;
-    //    //StartCoroutine(ToggleAim(shoulbBeAiming));
-    //    StartCoroutine(ToggleAimFOV(shoulbBeAiming));
-    //}
-
-    //private IEnumerator ToggleAimMovement(bool shouldBeAiming)
-    //{
-    //    var startingPointZ = cameraTransform.localPosition.z;
-    //    var elapsedTime = 0f;
-    //    var (targetZ, targetDuration) = shouldBeAiming ?
-    //        (currentWeapon.AimingAndScopeStats.AimingFOV, currentWeapon.AimingAndScopeStats.TimeToADS)
-    //        :
-    //        (cameraTransformInitialZ, currentWeapon.AimingAndScopeStats.TimeToUnADS);
-    //    while (elapsedTime < targetDuration)
-    //    {
-    //        cameraTransform.localPosition = new(0f, 0f, Mathf.Lerp(startingPointZ, targetZ, elapsedTime / targetDuration));
-    //        elapsedTime += Time.deltaTime;
-    //        yield return null;
-    //    }
-    //}
-
-    //private IEnumerator ToggleAimFOV(bool shouldBeAiming)
-    //{
-    //    var startingPoint = camera.fieldOfView;
-    //    var elapsedTime = 0f;
-    //    var (target, targetDuration) = shouldBeAiming ?
-    //        (GetRelevantFOV(), currentWeapon.AimingAndScopeStats.TimeToADS)
-    //        :
-    //        (baseFOV, currentWeapon.AimingAndScopeStats.TimeToUnADS);
-    //    while (elapsedTime < targetDuration)
-    //    {
-    //        camera.fieldOfView = Mathf.Lerp(startingPoint, target, elapsedTime / targetDuration);
-    //        elapsedTime += Time.deltaTime;
-    //        yield return null;
-    //    }
-
-    //}
-
-    //private float GetRelevantFOV()
-    //{
-    //    return currentWeapon.AimingAndScopeStats.ScopeMagnification == 1f ?
-    //        currentWeapon.AimingAndScopeStats.AimingFOV
-    //        :
-    //        baseFOV / currentWeapon.AimingAndScopeStats.ScopeMagnification
-    //        ;
-    //}
-
-    #endregion
-
     #region Handle Recoil
 
-    
     private void ApplyRecoil(float chargeRatio = 1)
     {
         crosshairRecoil.ApplyRecoilServerRpc(chargeRatio);
