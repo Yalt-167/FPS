@@ -1404,27 +1404,6 @@ public sealed class WeaponHandler : NetworkBehaviour
             ).normalized;
     }
 
-    //private Vector3 GetDirectionWithSpread(float spreadAngle, Vector3 direction)
-    //{
-    //    var spreadStrength = spreadAngle / 45f;
-    //    /*Most fucked explanantion to ever cross the frontier of reality
-    //     / 45f -> to get value which we can use iun a vector instead of an angle
-    //    ex in 2D:  a vector that has a 45� angle above X has a (1, 1) direction
-    //    while the X has a (1, 0)
-    //    so we essentially brought the 45� to a value we could use as a direction in the vector
-    //     */
-    //    // perhaps do directionTransform.forward * 45 instead of other / 45 (for performances purposes)
-    //    return (
-    //            direction + direction.TransformDirection(
-    //                new Vector3(
-    //                    Random.Range(-spreadStrength, spreadStrength),
-    //                    Random.Range(-spreadStrength, spreadStrength),
-    //                    0
-    //                )
-    //            )
-    //        ).normalized;
-    //}
-
     #endregion
 
     #region Handle Sound
