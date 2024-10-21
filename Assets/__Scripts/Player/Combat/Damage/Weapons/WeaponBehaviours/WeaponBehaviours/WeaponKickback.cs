@@ -11,20 +11,14 @@ namespace WeaponHandling
     public sealed class WeaponKickback : NetworkBehaviour
     {
 
-        [SerializeField] private Transform weaponSocketTransform;
+        [SerializeField] private Transform weaponTransform; // eventually add a new layer 
         private NetworkVariable<KickbackStats> kickbackStats = new NetworkVariable<KickbackStats>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
-        private bool hasSpawnedOnNetwork;
+        [SerializeField] private Vector3 basePosition;
 
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-
-            hasSpawnedOnNetwork = true;
-        }
 
         public IEnumerator SetData(KickbackStats kickbackStats_)
         {
-            yield return new WaitUntil(() => hasSpawnedOnNetwork);
+            yield return new WaitUntil(() => IsSpawned);
 
             SetDataServerRpc(kickbackStats_);
         }
@@ -46,7 +40,7 @@ namespace WeaponHandling
         [Rpc(SendTo.ClientsAndHost)]
         private void ApplyKickbackClientRpc(float chargeRatio)
         {
-            weaponSocketTransform.localPosition -= new Vector3(0f, 0f, kickbackStats.Value.WeaponKickBackPerShot * chargeRatio);
+            weaponTransform.localPosition -= new Vector3(0f, 0f, kickbackStats.Value.WeaponKickBackPerShot * chargeRatio);
         }
 
         [Rpc(SendTo.Server)]
@@ -58,7 +52,7 @@ namespace WeaponHandling
         [Rpc(SendTo.ClientsAndHost)]
         private void HandleKickbackClientRpc()
         {
-            weaponSocketTransform.localPosition = Vector3.Slerp(weaponSocketTransform.localPosition, Vector3.zero, kickbackStats.Value.WeaponKickBackRegulationTime * Time.time);
+            weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, basePosition, kickbackStats.Value.WeaponKickBackRegulationTime * Time.time);
         }
     }
 }
