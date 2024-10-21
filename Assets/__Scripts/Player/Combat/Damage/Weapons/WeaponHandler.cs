@@ -1353,16 +1353,12 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #endregion
 
-    #region Handle Recoil
+    #region Handle Gun Movements
 
     private void ApplyRecoil(float chargeRatio = 1)
     {
         crosshairRecoil.ApplyRecoilServerRpc(chargeRatio);
     }
-
-    #endregion
-
-    #region Handle Kickback
 
     private void ApplyKickback(float chargeRatio = 1f)
     {
@@ -1370,13 +1366,8 @@ public sealed class WeaponHandler : NetworkBehaviour
         {
             weaponsKickback.ApplyKickbackServerRpc(chargeRatio);
         }
-        //weaponTransform.localPosition -= new Vector3(0f, 0f, CurrentWeaponKickbackStats.WeaponKickBackPerShot * chargeRatio);
     }
 
-    private void HandleKickback()
-    {
-        weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, new Vector3(0f, .777f, -1.02f), CurrentWeaponKickbackStats.WeaponKickBackRegulationTime * Time.time);
-    }
 
     #endregion
 
