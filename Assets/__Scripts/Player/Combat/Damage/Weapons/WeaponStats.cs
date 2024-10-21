@@ -124,11 +124,18 @@ public enum ShootingStyle : byte
 }
 
 [Serializable]
-public struct SimpleShotStats
+public struct SimpleShotStats : INetworkSerializable
 {
     public float MaxSpread;
     public float SpreadAngleAddedPerShot;
     public float SpreadRegulationSpeed;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref MaxSpread);
+        serializer.SerializeValue(ref SpreadAngleAddedPerShot);
+        serializer.SerializeValue(ref SpreadRegulationSpeed);
+    }
 }
 
 [Serializable]
