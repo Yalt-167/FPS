@@ -36,7 +36,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     private CrosshairRecoil crosshairRecoil;
     private WeaponBehaviourGatherer<BarrelEnd> barrelEnds;
     private WeaponBehaviourGatherer<WeaponADSGunMovement> weaponsADSGunMovements;
-    private WeaponBehaviourGatherer<WeaponKickback> weaponsKickback;
+    private WeaponBehaviourGatherer<WeaponKickback> weaponsKickbacks;
     private WeaponADSFOV weaponADSFOV;
 
     //private WeaponBehaviourGatherer<WeaponSocket> weaponSockets;
@@ -145,6 +145,11 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         crosshairRecoil.HandleRecoilServerRpc();
 
+        foreach (var weaponKickback in weaponsKickbacks)
+        {
+            weaponKickback.HandleKickbackServerRpc();
+        }
+
 
         if (shotThisFrame) { return; }
 
@@ -155,7 +160,6 @@ public sealed class WeaponHandler : NetworkBehaviour
     private void Update()
     {
         HandleSpead();
-        HandleKickback();
     }
 
     private void LateUpdate()
@@ -213,7 +217,8 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         StartCoroutine(crosshairRecoil.SetData(currentWeapon.AimingRecoilStats, currentWeapon.HipfireRecoilStats));
 
-        foreach (var weaponKickback in weaponsKickback)
+        weaponsKickbacks = new(GetComponentsInChildren<WeaponKickback>());
+        foreach (var weaponKickback in weaponsKickbacks)
         {
             StartCoroutine(weaponKickback.SetData(currentWeapon.KickbackStats));
         }
@@ -575,7 +580,14 @@ public sealed class WeaponHandler : NetworkBehaviour
                 if (IsOwner)
                 {
                     //shootableComponent.ReactShot(currentWeapon.Damage, hit.point, barrelEnd.forward, NetworkObjectId, PlayerFrame.TeamID, currentWeapon.CanBreakThings);
-                    shootableComponent.ReactShot(currentWeapon.Damage, hit.point, barrelEnd.transform.forward, NetworkObjectId, PlayerFrame.LocalPlayer.TeamNumber, currentWeapon.CanBreakThings);
+                    shootableComponent.ReactShot(
+                        currentWeapon.Damage,
+                        hit.point,
+                        barrelEnd.transform.forward,
+                        NetworkObjectId,
+                        PlayerFrame.LocalPlayer.TeamNumber,
+                        currentWeapon.CanBreakThings
+                    );
                 }
 
                 if (!currentWeapon.HitscanBulletSettings.PierceThroughPlayers)
@@ -1354,7 +1366,11 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private void ApplyKickback(float chargeRatio = 1f)
     {
-        weaponTransform.localPosition -= new Vector3(0f, 0f, CurrentWeaponKickbackStats.WeaponKickBackPerShot * chargeRatio);
+        foreach (var weaponsKickback in weaponsKickbacks)
+        {
+            weaponsKickback.ApplyKickbackServerRpc(chargeRatio);
+        }
+        //weaponTransform.localPosition -= new Vector3(0f, 0f, CurrentWeaponKickbackStats.WeaponKickBackPerShot * chargeRatio);
     }
 
     private void HandleKickback()
