@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [Serializable]
+[Obsolete("Only there for reference in case I break sth in WeaponScriptableObject (which is the new class to use")]
 public struct WeaponStats
 {
     [Tooltip("The damage dealt by the shot (Will be overriden by PelletDamage) if the weapon is a shotgun")] public DamageDealt Damage;
