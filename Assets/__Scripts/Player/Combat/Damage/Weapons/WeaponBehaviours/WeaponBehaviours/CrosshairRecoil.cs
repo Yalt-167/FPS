@@ -26,23 +26,16 @@ namespace WeaponHandling
 
         private NetworkVariable<WeaponRecoilStats> aimingRecoilStats = new NetworkVariable<WeaponRecoilStats>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server); 
         private NetworkVariable<WeaponRecoilStats> hipfireRecoilStats = new NetworkVariable<WeaponRecoilStats>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
-        private bool hasSpawnedOnNetwork;
+
         private void Awake()
         {
             recoilHandlerTransform = transform.GetChild(0).GetChild(0);
             weaponHandler = GetComponent<WeaponHandler>();
         }
 
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-
-            hasSpawnedOnNetwork = true;
-        }
-
         public IEnumerator SetData(WeaponRecoilStats aimingRecoilStats_, WeaponRecoilStats hipfireRecoilStats_)
         {
-            yield return new WaitUntil(() => hasSpawnedOnNetwork);
+            yield return new WaitUntil(() => IsSpawned);
 
             SetDataServerRpc(aimingRecoilStats_, hipfireRecoilStats_);
         }
@@ -50,7 +43,6 @@ namespace WeaponHandling
         [Rpc(SendTo.Server)]
         public void SetDataServerRpc(WeaponRecoilStats aimingRecoilStats_, WeaponRecoilStats hipfireRecoilStats_)
         {
-
             aimingRecoilStats.Value = aimingRecoilStats_;
             hipfireRecoilStats.Value = hipfireRecoilStats_;
         }
@@ -82,8 +74,6 @@ namespace WeaponHandling
         private void UpdateRecoilClientRpc(Quaternion rotation)
         {
             recoilHandlerTransform.localRotation = rotation;
-        }
-
-        
+        } 
     }                       
 }
