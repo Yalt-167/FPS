@@ -8,7 +8,10 @@ using UnityEngine;
 
 namespace WeaponHandling
 {
-    public sealed class WeaponSpread : WeaponReplicatedBehaviour // is only requested clientside so no need to be replicated
+    /// <summary>
+    /// put it on the root node of the weapon (socket)
+    /// </summary>
+    public sealed class WeaponSpread : NetworkBehaviour // is only requested clientside so no need to be replicated
     {
 
         private NetworkVariable<float> currentSpreadAngle = new NetworkVariable<float>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
@@ -42,9 +45,9 @@ namespace WeaponHandling
         }
 
         [Rpc(SendTo.Server)]
-        public void ApplySpreadServerRpc()
+        public void ApplySpreadServerRpc(float chargeRatio)
         {
-            currentSpreadAngle.Value += IsAiming ? aimingSimpleShotStats.Value.SpreadAngleAddedPerShot : hipfireSimpleShotStats.Value.SpreadAngleAddedPerShot;
+            currentSpreadAngle.Value += (IsAiming ? aimingSimpleShotStats.Value.SpreadAngleAddedPerShot : hipfireSimpleShotStats.Value.SpreadAngleAddedPerShot) * chargeRatio;
         }
 
         [Rpc(SendTo.Server)]

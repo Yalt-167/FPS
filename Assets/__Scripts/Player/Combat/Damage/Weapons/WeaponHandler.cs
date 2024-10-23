@@ -481,7 +481,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private void UpdateOwnerSettingsUponShot()
     {
-        //if (!IsOwner) { return; }
+        if (!IsOwner) { return; }
 
         PlayShootingSoundServerRpc(currentWeapon.AmmoLeftInMagazineToWarn >= ammos);
 
@@ -505,64 +505,6 @@ public sealed class WeaponHandler : NetworkBehaviour
             _ => null
         };
     }
-
-    //[Rpc(SendTo.ClientsAndHost)]
-    //private void _ExecuteSimpleHitscanShotClientRpc()
-    //{
-    //    UpdateOwnerSettingsUponShot();
-
-    //    var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.position, Quaternion.identity).GetComponent<BulletTrail>();
-    //    var directionWithSpread = GetDirectionWithSpread(currentSpreadAngle, barrelEnd);
-
-    //    if (currentWeapon.HitscanBulletSettings.PierceThroughPlayers)
-    //    {
-    //        var endPoint = barrelEnd.position + directionWithSpread * 100;
-
-    //        var hits = Physics.RaycastAll(barrelEnd.position, directionWithSpread, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore);
-
-    //        Array.Sort(hits, new RaycastHitComparer());
-
-    //        foreach (var hit in hits)
-    //        {
-    //            if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
-    //            {
-    //                if (IsOwner)
-    //                {
-    //                    shootableComponent.ReactShot(currentWeapon.Damage, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeapon.CanBreakThings);
-    //                }
-    //            }
-    //            else // so far else is the wall but do proper checks later on
-    //            {
-    //                endPoint = hit.point;
-    //                break;
-    //            }
-    //        }
-
-    //        bulletTrail.Set(barrelEnd.position, endPoint);
-
-    //    }
-    //    else
-    //    {
-    //        if (Physics.Raycast(barrelEnd.position, directionWithSpread, out RaycastHit hit, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore))
-    //        {
-    //            bulletTrail.Set(barrelEnd.position, hit.point);
-    //            if (IsOwner && hit.collider.gameObject.TryGetComponent<IShootable>(out var shootableComponent))
-    //            {
-    //                shootableComponent.ReactShot(currentWeapon.Damage, hit.point, barrelEnd.forward, NetworkObjectId, _____placeHolderTeamID, currentWeapon.CanBreakThings);
-    //            }
-    //        }
-    //        else
-    //        {
-    //            bulletTrail.Set(barrelEnd.position, barrelEnd.position + directionWithSpread * 100);
-    //        }
-    //    }
-
-    //    if (!IsOwner) { return; }
-
-    //    ApplyRecoil();
-    //    ApplySpread();
-    //    ApplyKickback();
-    //}
 
     [Rpc(SendTo.ClientsAndHost)]
     private void ExecuteSimpleHitscanShotClientRpc()
@@ -630,8 +572,8 @@ public sealed class WeaponHandler : NetworkBehaviour
         if (!IsOwner) { return; }
 
         
-        ApplyRecoil();
-        ApplySpread();
+        ApplyCrosshairRecoil();
+        ApplySpread(index);
         ApplyKickback();
     }
 
@@ -695,7 +637,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         if (!IsOwner) { return; }
 
-        ApplyRecoil();
+        ApplyCrosshairRecoil();
         ApplyKickback();
     }
 
@@ -756,8 +698,8 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         if (!IsOwner) { return; }
 
-        ApplyRecoil(chargeRatio);
-        ApplySpread();
+        ApplyCrosshairRecoil(chargeRatio);
+        ApplySpread(index, chargeRatio);
         ApplyKickback(chargeRatio);
     }
 
@@ -820,8 +762,8 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         if (!IsOwner) { return; }
 
-        ApplyRecoil();
-        ApplyKickback();
+        ApplyCrosshairRecoil(chargeRatio);
+        ApplyKickback(chargeRatio);
     }
 
     #endregion
@@ -859,8 +801,8 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         if (IsOwner) { return; }
 
-        ApplyRecoil();
-        ApplySpread();
+        ApplyCrosshairRecoil();
+        ApplySpread(index);
         ApplyKickback();
     }
 
@@ -900,7 +842,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         if (!IsOwner) { return; }
 
-        ApplyRecoil();
+        ApplyCrosshairRecoil();
         ApplyKickback();
     }
 
@@ -935,8 +877,8 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         if (!IsOwner) { return; }
 
-        ApplyRecoil(chargeRatio);
-        ApplySpread();
+        ApplyCrosshairRecoil(chargeRatio);
+        ApplySpread(index, chargeRatio);
         ApplyKickback(chargeRatio);
     }
 
@@ -974,8 +916,8 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         if (!IsOwner) { return; }
 
-        ApplyRecoil();
-        ApplyKickback();
+        ApplyCrosshairRecoil(chargeRatio);
+        ApplyKickback(chargeRatio);
     }
 
     #endregion
@@ -1181,7 +1123,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region Handle Gun Movements
 
-    private void ApplyRecoil(float chargeRatio = 1)
+    private void ApplyCrosshairRecoil(float chargeRatio = 1)
     {
         crosshairRecoil.ApplyRecoilServerRpc(chargeRatio);
     }
@@ -1199,9 +1141,9 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region Handle Spread
 
-    private void ApplySpread(int idx)
+    private void ApplySpread(int idx, float chargeRatio = 1f)
     {
-        weaponsSpreads[idx].ApplySpreadServerRpc();
+        weaponsSpreads[idx].ApplySpreadServerRpc(chargeRatio);
     }
 
     private void HandleSpead()
