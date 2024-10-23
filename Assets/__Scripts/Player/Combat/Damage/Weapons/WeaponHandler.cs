@@ -36,6 +36,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     private WeaponBehaviourGatherer<BarrelEnd> barrelEnds;
     private WeaponBehaviourGatherer<WeaponADSGunMovement> weaponsADSGunMovements;
     private WeaponBehaviourGatherer<WeaponKickback> weaponsKickbacks;
+    private WeaponBehaviourGatherer<WeaponSpread> weaponsSpreads;
     private WeaponADSFOV weaponADSFOV;
 
     //private WeaponBehaviourGatherer<WeaponSocket> weaponSockets;
@@ -214,14 +215,20 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         weaponADSFOV.SetupData(currentWeapon.AimingAndScopeStats);
 
-        StartCoroutine(crosshairRecoil.SetData(currentWeapon.AimingRecoilStats, currentWeapon.HipfireRecoilStats));
+        StartCoroutine(crosshairRecoil.SetupData(currentWeapon.AimingRecoilStats, currentWeapon.HipfireRecoilStats));
 
         weaponsKickbacks = new(GetComponentsInChildren<WeaponKickback>());
         foreach (var weaponKickback in weaponsKickbacks)
         {
-            StartCoroutine(weaponKickback.SetData(currentWeapon.KickbackStats));
+            StartCoroutine(weaponKickback.SetupData(currentWeapon.KickbackStats));
         }
-        
+
+
+        weaponsSpreads = new(GetComponentsInChildren<WeaponSpread>());
+        foreach (var weaponSpread in weaponsSpreads)
+        {
+            StartCoroutine(weaponSpread.SetupData(currentWeapon.SimpleShotStats, currentWeapon.AimingSimpleShotStats));
+        }
 
         currentWeaponSounds = currentWeapon.Sounds;
         ammos = currentWeapon.MagazineSize;
@@ -256,7 +263,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                     }
             ,
 
-            _ => throw new System.Exception("This Shooting Style does not exist")
+            _ => throw new Exception("This Shooting Style does not exist")
             ,
         };
     }
@@ -283,7 +290,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             ShootingRythm.Charge => () => { }
             ,
 
-            _ => throw new System.Exception("This Shooting Rhythm does not exist")
+            _ => throw new Exception("This Shooting Rhythm does not exist")
             ,
         };
     }
@@ -1192,14 +1199,17 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region Handle Spread
 
-    private void ApplySpread()
+    private void ApplySpread(int idx)
     {
-        currentSpreadAngle += IsAiming ? currentWeapon.AimingSimpleShotStats.SpreadAngleAddedPerShot : currentWeapon.SimpleShotStats.SpreadAngleAddedPerShot;
+        weaponsSpreads[idx].ApplySpreadServerRpc();
     }
 
     private void HandleSpead()
     {
-        currentSpreadAngle = Mathf.Lerp(currentSpreadAngle, 0f, (IsAiming ? currentWeapon.AimingSimpleShotStats.SpreadRegulationSpeed : currentWeapon.SimpleShotStats.SpreadRegulationSpeed) * Time.time);
+        foreach (var weaponSpread in weaponsSpreads)
+        {
+            weaponSpread.HandleSpreadServerRpc();
+        }
     }
 
     private Vector3 GetDirectionWithSpread(float spreadAngle, Transform directionTransform)
