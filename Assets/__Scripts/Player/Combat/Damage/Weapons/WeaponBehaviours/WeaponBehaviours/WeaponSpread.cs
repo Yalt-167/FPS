@@ -27,7 +27,7 @@ namespace WeaponHandling
             weaponHandler = GetComponentInParent<WeaponHandler>();
         }
 
-        public IEnumerator SetData(SimpleShotStats aimingSimpleShotStats_, SimpleShotStats hipfireSimpleShotStats_)
+        public IEnumerator SetupData(SimpleShotStats aimingSimpleShotStats_, SimpleShotStats hipfireSimpleShotStats_)
         {
             yield return new WaitUntil(() => IsSpawned);
 

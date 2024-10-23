@@ -33,7 +33,7 @@ namespace WeaponHandling
             weaponHandler = GetComponent<WeaponHandler>();
         }
 
-        public IEnumerator SetData(WeaponRecoilStats aimingRecoilStats_, WeaponRecoilStats hipfireRecoilStats_)
+        public IEnumerator SetupData(WeaponRecoilStats aimingRecoilStats_, WeaponRecoilStats hipfireRecoilStats_)
         {
             yield return new WaitUntil(() => IsSpawned);
 
