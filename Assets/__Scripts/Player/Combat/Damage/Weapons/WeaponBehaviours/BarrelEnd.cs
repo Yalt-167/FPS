@@ -6,5 +6,5 @@ using UnityEngine;
 
 namespace WeaponHandling
 {
-    public sealed class BarrelEnd : WeaponBehaviour { }
+    public sealed class BarrelEnd : MonoBehaviour { }
 }
