@@ -2368,122 +2368,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scaleFactor: 1
---- !u!1 &1026086064 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3773392536407631981, guid: 8a17c0f219837fc4c8035ebf302e1ae5,
-    type: 3}
-  m_PrefabInstance: {fileID: 1992730661404765724}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1026086069
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1026086064}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2321fc5c2c20fce4ca44cbc4e31548ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Stats:
-    Damage:
-      CriticalDamage: 0
-      HighDamage: 0
-      BaseDamage: 0
-      LowDamage: 0
-      NegatedDamage: 0
-    WeaponClass: 0
-    IsHitscan: 0
-    variable: 0
-    HitscanBulletSettings:
-      PierceThroughPlayers: 0
-      ActionOnHitWall: 0
-      BouncingBulletsSettings:
-        BouncesAmount: 0
-      ExplodingBulletsSettings:
-        ExplosionRadius: 0
-        ExplosionDamage: 0
-    TravelTimeBulletSettings:
-      BulletPrefab: {fileID: 0}
-      BulletDrop: 0
-      BulletSpeed: 0
-      OnHitWallBehaviour: 0
-      OnHitWallBehaviourParams:
-        ProjectileWallPierceParams:
-          MaxWallsToPierce: 0
-        ProjectileWallBounceParams:
-          MaxBounces: 0
-        ProjectileWallExplodeParams:
-          ExplosionRadius: 0
-          ExplosionDamage: 0
-      OnHitPlayerBehaviour: 0
-      OnHitPlayerBehaviourParams:
-        ProjectilePlayerPierceParams:
-          MaxPlayersToPierce: 0
-        ProjectilePlayerExplodeParams:
-          ExplosionRadius: 0
-          ExplosionDamage: 0
-    MagazineSize: 0
-    NeedReload: 0
-    ReloadSpeed: 0
-    TimeToReloadOneRound: 0
-    AmmoLeftInMagazineToWarn: 0
-    ShootingStyle: 0
-    SimpleShotStats:
-      MaxSpread: 0
-      SpreadAngleAddedPerShot: 0
-      SpreadRegulationSpeed: 0
-    AimingSimpleShotStats:
-      MaxSpread: 0
-      SpreadAngleAddedPerShot: 0
-      SpreadRegulationSpeed: 0
-    ShotgunStats:
-      PelletsDamage:
-        CriticalDamage: 0
-        HighDamage: 0
-        BaseDamage: 0
-        LowDamage: 0
-        NegatedDamage: 0
-      PelletsCount: 0
-      PelletsSpreadAngle: 0
-      AimingPelletsSpreadAngle: 0
-      PelletsRange: 0
-    ShootingRythm: 0
-    CooldownBetweenShots: 0
-    BurstStats:
-      CooldownBetweenShotsOfBurst: 0
-      BulletsPerBurst: 0
-    RampUpStats:
-      RampUpMaxCooldownBetweenShots: 0
-      RampUpMinCooldownBetweenShots: 0
-      RampUpCooldownMultiplierPerShot: 0
-      RampUpCooldownRegulationMultiplier: 0
-    ChargeStats:
-      ChargeDuration: 0
-      AmmoConsumedByFullyChargedShot: 0
-      MinChargeRatioToShoot: 0
-    AimingAndScopeStats:
-      AimingFOV: 0
-      ScopeMagnification: 0
-      TimeToADS: 0
-      TimeToUnADS: 0
-    HipfireRecoilStats:
-      RecoilForceX: 0
-      RecoilForceY: 0
-      RecoilForceZ: 0
-      RecoilRegulationSpeed: 0
-    AimingRecoilStats:
-      RecoilForceX: 0
-      RecoilForceY: 0
-      RecoilForceZ: 0
-      RecoilRegulationSpeed: 0
-    KickbackStats:
-      WeaponKickBackPerShot: 0
-      WeaponKickBackRegulationTime: 0
-    CanBreakThings: 0
-    EffectsInflicted: 0
-    Weight: 0
 --- !u!1 &1053669928
 GameObject:
   m_ObjectHideFlags: 0
@@ -6072,6 +5956,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: LobbyHandler
       objectReference: {fileID: 0}
+    - target: {fileID: 7721229645854933758, guid: 7eb95818ec246744294f2bab18dae493,
+        type: 3}
+      propertyPath: ProfileName
+      value: Yalt
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6143,11 +6032,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3773392536407631981, guid: 8a17c0f219837fc4c8035ebf302e1ae5,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1026086069}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8a17c0f219837fc4c8035ebf302e1ae5, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
