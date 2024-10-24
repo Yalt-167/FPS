@@ -16,7 +16,7 @@ namespace WeaponHandling
         [SerializeField] private Vector3 basePosition;
 
 
-        public IEnumerator SetData(KickbackStats kickbackStats_)
+        public IEnumerator SetupData(KickbackStats kickbackStats_)
         {
             yield return new WaitUntil(() => IsSpawned);
 

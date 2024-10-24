@@ -13,7 +13,7 @@ namespace WeaponHandling
     {
         [SerializeField] protected WeaponScriptableObject weaponData;
 
-        protected WeaponRecoil weaponRecoil;
+        protected CrosshairRecoil weaponRecoil;
         protected WeaponBehaviourGatherer<WeaponADSGunMovement> weaponADSGatherer;
         protected WeaponSpread weaponSpread;
         protected WeaponBehaviourGatherer<WeaponKickback> weaponKickbackGatherer;
@@ -568,7 +568,7 @@ namespace WeaponHandling
 
         protected virtual void Awake()
         {
-            weaponRecoil = GetComponentInChildren<WeaponRecoil>();
+            weaponRecoil = GetComponentInChildren<CrosshairRecoil>();
             weaponADSGatherer = new(GetComponentsInChildren<WeaponADSGunMovement>());
             weaponSpread = GetComponentInChildren<WeaponSpread>();
             weaponKickbackGatherer = new(GetComponentsInChildren<WeaponKickback>());

@@ -75,7 +75,7 @@ namespace Projectiles
 
             yield return new WaitUntil(() => startTime + lifetime < Time.time || !active);
 
-            Destroy(gameObject);
+            Destroy(gameObject); // add some sort of object pooling at some point
         }
 
         public void SetDirection(Vector3 newDirection)
