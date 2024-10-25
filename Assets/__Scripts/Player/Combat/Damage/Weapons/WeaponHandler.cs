@@ -21,10 +21,6 @@ public sealed class WeaponHandler : NetworkBehaviour
     [SerializeField] private WeaponScriptableObject currentWeapon;
     public WeaponScriptableObject CurrentWeapon => currentWeapon;
 
-    private WeaponRecoilStats CurrentWeaponHipfireRecoilStats => currentWeapon.HipfireRecoilStats;
-    private WeaponRecoilStats CurrentWeaponADSRecoilStats => currentWeapon.AimingRecoilStats;
-
-    private KickbackStats CurrentWeaponKickbackStats => currentWeapon.KickbackStats;
     private bool isInitialized;
 
 
@@ -34,15 +30,14 @@ public sealed class WeaponHandler : NetworkBehaviour
     private Transform recoilHandlerTransform;
     private CrosshairRecoil crosshairRecoil;
     private WeaponBehaviourGatherer<BarrelEnd> barrelEnds;
+    public WeaponBehaviourGatherer<BarrelEnd> BarrelEnds => barrelEnds;
     private WeaponBehaviourGatherer<WeaponADSGunMovement> weaponsADSGunMovements;
     private WeaponBehaviourGatherer<WeaponKickback> weaponsKickbacks;
     private WeaponBehaviourGatherer<WeaponSpread> weaponsSpreads;
     private WeaponADSFOV weaponADSFOV;
 
-    //private WeaponBehaviourGatherer<WeaponSocket> weaponSockets;
 
-    [SerializeField] private Transform weaponTransform;
-    [SerializeField] private Transform weaponSocketTransform;
+
     [SerializeField] private LayerMask layersToHit;
     [SerializeField] private GameObject bulletTrailPrefab;
 
@@ -514,7 +509,8 @@ public sealed class WeaponHandler : NetworkBehaviour
         var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
 
         var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.transform.position, Quaternion.identity).GetComponent<BulletTrail>();
-        var directionWithSpread = GetDirectionWithSpread(currentSpreadAngle, barrelEnd.transform);
+        //var directionWithSpread = GetDirectionWithSpread(currentSpreadAngle, barrelEnd.transform);
+        var directionWithSpread = weaponsSpreads[index].GetDirectionWithSpread(index);
         var endPoint = barrelEnd.transform.position + directionWithSpread * 100;
 
         var hits = Physics.RaycastAll(barrelEnd.transform.position, directionWithSpread, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore);
