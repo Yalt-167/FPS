@@ -1,13 +1,11 @@
 using System;
-
 using System.Collections;
 using System.Collections.Generic;
 
 using Unity.Netcode;
-using Unity.VisualScripting;
 
 using UnityEngine;
-using UnityEngine.UI;
+
 
 [Serializable]
 [Obsolete("Only there for reference in case I break sth in WeaponScriptableObject (which is the new class to use")]

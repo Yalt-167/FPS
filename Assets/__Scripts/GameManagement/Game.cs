@@ -46,6 +46,8 @@ namespace GameManagement
 
             if (!Started) { return; }
 
+            //Debug.Log("Game was Started");
+
             IClientSideGameRuleUpdateParam clientSideGameRuleUpdateParam = currentGameRule.UpdateGameServerSide();
             UpdateGameServerRpc(clientSideGameRuleUpdateParam);
 

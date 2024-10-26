@@ -3,7 +3,10 @@ guid: aa36f4638aad5fc44b7a0d83f720e74b
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - landingShotEffect: {instanceID: 0}
+  - bulletTrailPrefab: {instanceID: 0}
+  - damageLogManager: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
