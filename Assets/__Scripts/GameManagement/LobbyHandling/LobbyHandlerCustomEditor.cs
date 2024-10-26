@@ -24,7 +24,7 @@ namespace LobbyHandling
         {
             base.OnInspectorGUI();
 
-            spaceBetweenButtons = targetScript.SpaceBetweenButtons;
+            spaceBetweenButtons = LobbyHandler.SpaceBetweenButtons;
 
 
             GUILayout.Space(spaceBetweenButtons * 2);

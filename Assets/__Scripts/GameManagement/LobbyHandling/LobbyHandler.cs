@@ -28,7 +28,7 @@ namespace LobbyHandling
     public sealed class LobbyHandler : MonoBehaviour
     {
         public static LobbyHandler Instance { get; private set; }
-        public int SpaceBetweenButtons = 12;
+        public static int SpaceBetweenButtons = 4;
 
         private Lobby hostLobby;
         private bool isCreatingLobby;
@@ -59,7 +59,7 @@ namespace LobbyHandling
 #nullable disable
         private bool isSearchingForLobbies;
         private bool canRefreshLobbyList = true;
-        [SerializeField] private float cooldownBeforeCanRefreshLobbyList;
+        private readonly float cooldownBeforeCanRefreshLobbyList = 5f;
         private Vector2 scrollPosition = Vector2.zero;
         private string passwordToJoinListLobby;
 
