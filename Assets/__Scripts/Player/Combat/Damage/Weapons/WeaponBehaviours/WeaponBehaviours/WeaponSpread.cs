@@ -13,20 +13,33 @@ namespace WeaponHandling
     /// </summary>
     public sealed class WeaponSpread : NetworkBehaviour // is only requested clientside so no need to be replicated
     {
+        [SerializeField] private bool isShotgun;
 
         private NetworkVariable<float> currentSpreadAngle = new NetworkVariable<float>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
         private NetworkVariable<Vector3> directionWithSpread = new NetworkVariable<Vector3>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
+        private NetworkList<Vector3> shotgunDirectionsWithSpread = new NetworkList<Vector3>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
         public Vector3 GetDirectionWithSpread(int barrelEndIndex)
         {
             SetDirectionWithSpreadServerRpc(barrelEndIndex);
             return directionWithSpread.Value;
         }
-        // as networkVar to prevent tampering with those
+
+        public IEnumerable<Vector3> GetShotgunDirectionsWithSpread(int barrelEndIndex)
+        {
+            SetShotgunDirectionsWithSpreadServerRpc(barrelEndIndex);
+            var count = shotgunDirectionsWithSpread.Count;
+            for (int i = 0; i < count; i++)
+            {
+                yield return shotgunDirectionsWithSpread[i];
+            }
+        }
+
         private NetworkVariable<SimpleShotStats> aimingSimpleShotStats = new NetworkVariable<SimpleShotStats>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
         private NetworkVariable<SimpleShotStats> hipfireSimpleShotStats = new NetworkVariable<SimpleShotStats>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
 
         private WeaponHandler weaponHandler;
         private bool IsAiming => weaponHandler.IsAiming;
+        
 
         private void Awake()
         {
@@ -61,11 +74,23 @@ namespace WeaponHandling
 
 
 
+        private Vector3 GetDirectionWithSpreadInternal(float spreadStrength, Transform directionTransform)
+        {
+            
+            return (
+                    directionTransform.forward + directionTransform.TransformDirection(
+                        new Vector3(
+                            UnityEngine.Random.Range(-spreadStrength, spreadStrength),
+                            UnityEngine.Random.Range(-spreadStrength, spreadStrength),
+                            0
+                        )
+                    )
+                ).normalized;
+        }
 
         [Rpc(SendTo.Server)]
-        public void SetDirectionWithSpreadServerRpc(int barrelEndIndex)
+        private void SetDirectionWithSpreadServerRpc(int barrelEndIndex)
         {
-            var barrelEnd = weaponHandler.BarrelEnds[barrelEndIndex].transform;
             /*
              Most fucked explanantion to ever cross the realm of reality
              / 45f -> to get value which we can use in a vector instead of an angle
@@ -73,17 +98,18 @@ namespace WeaponHandling
             while the X has a (1, 0)
             so we essentially brought the 45 to a value we could use as a direction in the vector
              */
-
             var spreadStrength = currentSpreadAngle.Value / 45f;
-            directionWithSpread.Value = (
-                barrelEnd.forward + barrelEnd.TransformDirection(
-                    new Vector3(
-                        UnityEngine.Random.Range(-spreadStrength, spreadStrength),
-                        UnityEngine.Random.Range(-spreadStrength, spreadStrength),
-                        0
-                    )
-                )
-            ).normalized;
+            directionWithSpread.Value = GetDirectionWithSpreadInternal(spreadStrength, weaponHandler.BarrelEnds[barrelEndIndex].transform);
+
+            //    (
+            //    barrelEnd.forward + barrelEnd.TransformDirection(
+            //        new Vector3(
+            //            UnityEngine.Random.Range(-spreadStrength, spreadStrength),
+            //            UnityEngine.Random.Range(-spreadStrength, spreadStrength),
+            //            0
+            //        )
+            //    )
+            //).normalized;
 
 
             //// should be the same unless im retarded (no way huh? ^^)
@@ -96,6 +122,29 @@ namespace WeaponHandling
             //        )
             //    )
             //).normalized;
+        }
+
+
+        [Rpc(SendTo.Server)]
+        private void SetShotgunDirectionsWithSpreadServerRpc(int barrelEndIndex)
+        {
+            var barrelEnd = weaponHandler.BarrelEnds[barrelEndIndex].transform;
+
+            shotgunDirectionsWithSpread.Clear();
+
+            var relevantSpread = IsAiming ? weaponHandler.CurrentWeapon.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeapon.ShotgunStats.PelletsSpreadAngle;
+            relevantSpread /= 45f;
+
+            var pelletCount = weaponHandler.CurrentWeapon.ShotgunStats.PelletsCount;
+            for (int i = 0; i < pelletCount; i++)
+            {
+                shotgunDirectionsWithSpread.Add(GetDirectionWithSpreadInternal(relevantSpread, barrelEnd));
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
         }
     }
 }
