@@ -55,11 +55,11 @@ MonoBehaviour:
   SimpleShotStats:
     MaxSpread: 1
     SpreadAngleAddedPerShot: 1
-    SpreadRegulationSpeed: 0.001
+    SpreadRegulationSpeed: 10
   AimingSimpleShotStats:
     MaxSpread: 0.5
     SpreadAngleAddedPerShot: 0.5
-    SpreadRegulationSpeed: 0.001
+    SpreadRegulationSpeed: 100
   ShotgunStats:
     PelletsCount: 0
     PelletsSpreadAngle: 0
@@ -96,7 +96,7 @@ MonoBehaviour:
     RecoilRegulationSpeed: 6
   KickbackStats:
     WeaponKickBackPerShot: 0.3
-    WeaponKickBackRegulationTime: 0.003
+    WeaponKickBackRegulationTime: 5
   PulloutTime: 0
   CanBreakThings: 0
   EffectsInflicted: 0

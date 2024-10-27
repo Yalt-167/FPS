@@ -55,7 +55,7 @@ MonoBehaviour:
   SimpleShotStats:
     MaxSpread: 0.5
     SpreadAngleAddedPerShot: 0.1
-    SpreadRegulationSpeed: 0.001
+    SpreadRegulationSpeed: 1
   AimingSimpleShotStats:
     MaxSpread: 0
     SpreadAngleAddedPerShot: 0
@@ -96,7 +96,8 @@ MonoBehaviour:
     RecoilRegulationSpeed: 2
   KickbackStats:
     WeaponKickBackPerShot: 0.26
-    WeaponKickBackRegulationTime: 0.003
+    WeaponKickBackRegulationTime: 3
+  PulloutTime: 0
   CanBreakThings: 0
   EffectsInflicted: 0
   Model: {fileID: 0}

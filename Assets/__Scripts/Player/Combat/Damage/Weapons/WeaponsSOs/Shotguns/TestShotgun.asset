@@ -97,7 +97,7 @@ MonoBehaviour:
     RecoilRegulationSpeed: 2
   KickbackStats:
     WeaponKickBackPerShot: 0.5
-    WeaponKickBackRegulationTime: 0.003
+    WeaponKickBackRegulationTime: 3
   PulloutTime: 0
   CanBreakThings: 1
   EffectsInflicted: 0
