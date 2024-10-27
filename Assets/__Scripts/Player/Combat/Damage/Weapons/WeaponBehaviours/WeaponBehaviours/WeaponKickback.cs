@@ -36,7 +36,12 @@ namespace WeaponHandling
         {
             ApplyKickbackClientRpc(chargeRatio);
         }
-        
+
+        public void ApplyKickbackFromServer(float chargeRatio = 1f)
+        {
+            ApplyKickbackClientRpc(chargeRatio);
+        }
+
         [Rpc(SendTo.ClientsAndHost)]
         private void ApplyKickbackClientRpc(float chargeRatio)
         {
@@ -52,7 +57,7 @@ namespace WeaponHandling
         [Rpc(SendTo.ClientsAndHost)]
         private void HandleKickbackClientRpc()
         {
-            weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, basePosition, kickbackStats.Value.WeaponKickBackRegulationTime * Time.time);
+            weaponTransform.localPosition = Vector3.Slerp(weaponTransform.localPosition, basePosition, kickbackStats.Value.WeaponKickBackRegulationTime * Time.deltaTime);
         }
     }
 }
