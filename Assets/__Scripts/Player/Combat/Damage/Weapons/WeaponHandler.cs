@@ -246,19 +246,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             //ShootingStyle.Single => currentWeapon.IsHitscan ? ExecuteSimpleHitscanShotClientRpc : ExecuteSimpleTravelTimeShotClientRpc,
             ShootingStyle.Single => currentWeapon.IsHitscan ? ExecuteSimpleHitscanShot : ExecuteSimpleTravelTimeShotClientRpc,
 
-            ShootingStyle.Shotgun => currentWeapon.IsHitscan ?
-                () =>
-                    {
-                        SetShotgunPelletsDirections(barrelEnds.Current.transform);
-                        ExecuteShotgunHitscanShotClientRpc();
-                    }
-                :
-                () =>
-                    {
-                        SetShotgunPelletsDirections(barrelEnds.Current.transform);
-                        ExecuteShotgunTravelTimeShotClientRpc();
-                    }
-            ,
+            ShootingStyle.Shotgun => currentWeapon.IsHitscan ? ExecuteShotgunHitscanShotClientRpc :  ExecuteShotgunTravelTimeShotClientRpc,
 
             _ => throw new Exception("This Shooting Style does not exist")
             ,
@@ -387,11 +375,6 @@ public sealed class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void CheckChargedShotCooldownsClientRpc(float chargeRatio)
     {
-        if (currentWeapon.ShootingStyle == ShootingStyle.Shotgun)
-        {
-            SetShotgunPelletsDirections(barrelEnds.Current.transform); // different on all clients
-        }
-
         if (timeLastShotFired + GetRelevantCooldown() > Time.time) { return; }
 
         if (currentWeapon.IsHitscan)
@@ -1139,36 +1122,6 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #endregion
 
-    #region Setting up Shotgun Shot
-
-    private void SetShotgunPelletsDirections(Transform directionTranform)
-    {
-        shotgunPelletsDirections = new Vector3[currentWeapon.ShotgunStats.PelletsCount];
-
-        var relevantSpread = IsAiming ? currentWeapon.ShotgunStats.AimingPelletsSpreadAngle : currentWeapon.ShotgunStats.PelletsSpreadAngle;
-
-        for (int i = 0; i < currentWeapon.ShotgunStats.PelletsCount; i++)
-        {
-            shotgunPelletsDirections[i] = GetDirectionWithSpread(relevantSpread, directionTranform);
-        }
-
-        RequestUpdateShotgunPelletsDirectionServerRpc(shotgunPelletsDirections);
-    }
-
-    [Rpc(SendTo.Server)]
-    private void RequestUpdateShotgunPelletsDirectionServerRpc(Vector3[] directions)
-    {
-        UpdateShotgunPelletDirectionClientRpc(directions);
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    private void UpdateShotgunPelletDirectionClientRpc(Vector3[] directions)
-    {
-        shotgunPelletsDirections = directions;
-    }
-
-    #endregion
-
     #region Reload
 
     public void Reload()
@@ -1408,3 +1361,38 @@ public struct WeaponInfos
 // create a weapon abstract clas instead? with OnAttackDown OnAttackUp OnReload OnAimDown OnAimUp etc bc that could be more flexible
 
 // double/three fire rifle kinda like in thsi game where you can chop limbs off using your gun (horizontally would help for crowds of opponent while vertical would shred their health by allowing hitting headshot + 2 bodyshots at once
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
