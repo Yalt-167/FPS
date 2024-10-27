@@ -233,7 +233,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         switchedThisFrame = true;
 
         SetShootingStyle(); // the actual shooting logic
-        SetShootingRequestRythm(); // the rythm logic of the shots
+        SetShootingRythm(); // the rythm logic of the shots
         SetOnHitWallMethod();
         
     }
@@ -242,7 +242,9 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         shootingStyleMethod = currentWeapon.ShootingStyle switch
         {
-            ShootingStyle.Single => currentWeapon.IsHitscan ? ExecuteSimpleHitscanShotClientRpc : ExecuteSimpleTravelTimeShotClientRpc,
+            // ANCHOR
+            //ShootingStyle.Single => currentWeapon.IsHitscan ? ExecuteSimpleHitscanShotClientRpc : ExecuteSimpleTravelTimeShotClientRpc,
+            ShootingStyle.Single => currentWeapon.IsHitscan ? ExecuteSimpleHitscanShot : ExecuteSimpleTravelTimeShotClientRpc,
 
             ShootingStyle.Shotgun => currentWeapon.IsHitscan ?
                 () =>
@@ -250,7 +252,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                         SetShotgunPelletsDirections(barrelEnds.Current.transform);
                         ExecuteShotgunHitscanShotClientRpc();
                     }
-            :
+                :
                 () =>
                     {
                         SetShotgunPelletsDirections(barrelEnds.Current.transform);
@@ -263,7 +265,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         };
     }
 
-    private void SetShootingRequestRythm()
+    private void SetShootingRythm()
     {
         shootingRythmMethod = currentWeapon.ShootingRythm switch
         {
@@ -294,10 +296,8 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         onHitWallMethod = currentWeapon.HitscanBulletSettings.ActionOnHitWall switch
         {
-            HitscanBulletActionOnHitWall.Classic => (_, _) => { }
-            ,
-            HitscanBulletActionOnHitWall.ThroughWalls => (_, _) => { }
-            ,
+            HitscanBulletActionOnHitWall.Classic => (_, _) => { },
+            HitscanBulletActionOnHitWall.ThroughWalls => (_, _) => { },
             HitscanBulletActionOnHitWall.Explosive => ExplodeUponWallHit,
             HitscanBulletActionOnHitWall.BounceOnWalls => BounceUponWallHit,
             _ => (_, _) => { }
@@ -323,10 +323,10 @@ public sealed class WeaponHandler : NetworkBehaviour
                     return;
                 }
             }
-            else  // just released the attack key
-            {
+            //else  // just released the attack key
+            //{
 
-            }
+            //}
 
         }
 
@@ -351,9 +351,19 @@ public sealed class WeaponHandler : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server)]
-    public void RequestShotServerRpc()
+    public void _RequestShotServerRpc()
     {
         CheckCooldownsClientRpc();
+    }
+
+    [Rpc(SendTo.Server)]
+    public void RequestShotServerRpc()
+    {
+        if (timeLastShotFired + GetRelevantCooldown() > Time.time) { return; }
+
+        if (ammos <= 0) { return; }
+
+        shootingStyleMethod();
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -487,6 +497,17 @@ public sealed class WeaponHandler : NetworkBehaviour
         bulletFiredthisBurst++;
     }
 
+    private void UpdateOwnerSettingsUponShotFromServer()
+    {
+        PlayShootingSoundClientRpc(currentWeapon.AmmoLeftInMagazineToWarn >= ammos);
+
+        damageLogManager.UpdatePlayerSettings(DamageLogsSettings);
+        timeLastShotFired = Time.time;
+        shotThisFrame = true;
+        ammos--;
+        bulletFiredthisBurst++;
+    }
+
     #region Execute Shot Hitscan
 
     private IHitscanBulletEffectSettings GetRelevantHitscanBulletSettings()
@@ -569,6 +590,72 @@ public sealed class WeaponHandler : NetworkBehaviour
         ApplyCrosshairRecoil();
         ApplySpread(index);
         ApplyKickback(index);
+    }
+
+
+    private void ExecuteSimpleHitscanShot()
+    {
+        //Debug.Log($"IsServer: {IsServer}");
+        UpdateOwnerSettingsUponShotFromServer();
+
+        var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
+
+        var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.transform.position, Quaternion.identity).GetComponent<BulletTrail>();
+        var directionWithSpread = weaponsSpreads[index].GetDirectionWithSpreadFromServer(index);
+        var endPoint = barrelEnd.transform.position + directionWithSpread * 100;
+
+        var hits = Physics.RaycastAll(barrelEnd.transform.position, directionWithSpread, float.PositiveInfinity, layersToHit, QueryTriggerInteraction.Ignore);
+
+        Array.Sort(hits, new RaycastHitComparer());
+
+        foreach (var hit in hits)
+        {
+            if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
+            {
+                shootableComponent.ReactShot(
+                    currentWeapon.Damage,
+                    hit.point,
+                    barrelEnd.transform.forward,
+                    NetworkObjectId,
+                    PlayerFrame.LocalPlayer.TeamNumber,
+                    currentWeapon.CanBreakThings
+                );
+                
+
+                if (!currentWeapon.HitscanBulletSettings.PierceThroughPlayers)
+                {
+                    endPoint = hit.point;
+                    break;
+                }
+            }
+            else // so far else is the wall but do proper checks later on
+            {
+                onHitWallMethod(
+                    new(
+                        directionWithSpread,
+                        hit,
+                        NetworkObjectId,
+                        new(currentWeapon)
+                    ),
+                    GetRelevantHitscanBulletSettings()
+                );
+
+                if (currentWeapon.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                {
+                    endPoint = hit.point;
+                    break;
+                }
+
+            }
+        }
+
+        bulletTrail.Set(barrelEnds.Current.transform.position, endPoint);
+
+        barrelEnds.GoNext();
+
+        ApplyCrosshairRecoilFromServer();
+        ApplySpreadFromServer(index);
+        ApplyKickbackFromServer(index);
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -982,8 +1069,14 @@ public sealed class WeaponHandler : NetworkBehaviour
             {
                 if (IsOwner)
                 {
-                    //shootableComponent.ReactShot(shotInfos.WeaponInfos.Damage, hit.point, newShotDirection, NetworkObjectId, PlayerFrame.TeamID, shotInfos.WeaponInfos.CanBreakThings);
-                    shootableComponent.ReactShot(shotInfos.WeaponInfos.Damage, hit.point, newShotDirection, NetworkObjectId, PlayerFrame.LocalPlayer.TeamNumber, shotInfos.WeaponInfos.CanBreakThings);
+                    shootableComponent.ReactShot(
+                        shotInfos.WeaponInfos.Damage,
+                        hit.point,
+                        newShotDirection,
+                        NetworkObjectId,
+                        PlayerFrame.LocalPlayer.TeamNumber,
+                        shotInfos.WeaponInfos.CanBreakThings
+                    );
                 }
 
                 if (!shotInfos.WeaponInfos.PierceThroughPlayers)
@@ -1136,11 +1229,16 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #endregion
 
-    #region Handle Gun Movements
+    #region Handle Gun Behaviour
 
     private void ApplyCrosshairRecoil(float chargeRatio = 1)
     {
         crosshairRecoil.ApplyRecoilServerRpc(chargeRatio);
+    }
+
+    private void ApplyCrosshairRecoilFromServer(float chargeRatio = 1)
+    {
+        crosshairRecoil.ApplyRecoilFromServer(chargeRatio);
     }
 
     private void ApplyKickback(int idx, float chargeRatio = 1f)
@@ -1148,14 +1246,19 @@ public sealed class WeaponHandler : NetworkBehaviour
         weaponsKickbacks[idx].ApplyKickbackServerRpc(chargeRatio);
     }
 
-
-    #endregion
-
-    #region Handle Spread
+    private void ApplyKickbackFromServer(int idx, float chargeRatio = 1f)
+    {
+        weaponsKickbacks[idx].ApplyKickbackFromServer(chargeRatio);
+    }
 
     private void ApplySpread(int idx, float chargeRatio = 1f)
     {
         weaponsSpreads[idx].ApplySpreadServerRpc(chargeRatio);
+    }
+
+    private void ApplySpreadFromServer(int idx, float chargeRatio = 1f)
+    {
+        weaponsSpreads[idx].ApplySpreadFromServer(chargeRatio);
     }
 
     private void HandleSpead()
@@ -1300,6 +1403,7 @@ public struct WeaponInfos
     }
 }
 
+// create a spread increase on shotguns in case I add a somewhat auto shotgun
 
 // create a weapon abstract clas instead? with OnAttackDown OnAttackUp OnReload OnAimDown OnAimUp etc bc that could be more flexible
 
