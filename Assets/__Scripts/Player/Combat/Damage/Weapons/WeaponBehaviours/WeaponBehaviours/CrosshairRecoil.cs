@@ -62,6 +62,20 @@ namespace WeaponHandling
             );
         }
 
+        public void ApplyRecoilFromServer(float chargeRatio = 1f)
+        {
+            var relevantRecoilStats = IsAiming ? aimingRecoilStats : hipfireRecoilStats;
+
+            float y = relevantRecoilStats.Value.RecoilForceY * chargeRatio;
+            float z = relevantRecoilStats.Value.RecoilForceZ * chargeRatio;
+
+            targetRecoilHandlerRotation.Value += new Vector3(
+                 -hipfireRecoilStats.Value.RecoilForceX * chargeRatio,
+                 UnityEngine.Random.Range(-y, y),
+                 UnityEngine.Random.Range(-z, z)
+            );
+        }
+
         [Rpc(SendTo.Server)]
         public void HandleRecoilServerRpc()
         {
