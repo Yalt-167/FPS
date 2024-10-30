@@ -1,4 +1,4 @@
-#define NETWORK_LIST_AMALGAMATION
+//#define NETWORK_LIST_AMALGAMATION
 
 using System;
 using System.Collections;
@@ -211,7 +211,19 @@ namespace WeaponHandling
 
         public override void OnNetworkDespawn()
         {
+            MyDebug.DebugUtility.LogMethodCall();
             base.OnNetworkDespawn();
+        }
+
+        private void OnDisable()
+        {
+            MyDebug.DebugUtility.LogMethodCall();
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            MyDebug.DebugUtility.LogMethodCall();
         }
     }
 }
