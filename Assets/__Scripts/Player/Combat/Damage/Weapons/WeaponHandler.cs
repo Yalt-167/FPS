@@ -10,6 +10,7 @@ using Random = UnityEngine.Random;
 using Projectiles;
 using GameManagement;
 using WeaponHandling;
+using System.Net;
 
 
 
@@ -59,6 +60,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region Global Setup
 
+    // eventually make this a NetworkVariable
     private float timeLastShotFired = float.NegativeInfinity;
     private bool switchedThisFrame;
     private bool shotThisFrame;
@@ -154,7 +156,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private void Update()
     {
-        HandleSpead();
+        HandleSpread();
     }
 
     private void LateUpdate()
@@ -185,6 +187,8 @@ public sealed class WeaponHandler : NetworkBehaviour
         }
 
         ownerFrame = GetComponent<PlayerFrame>();
+
+        damageLogManager.UpdatePlayerSettings(DamageLogsSettings);
 
         isInitialized = true;
     }
@@ -465,6 +469,15 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #endregion
 
+    [Rpc(SendTo.ClientsAndHost)]
+    private void EmulateHitscanShotClientRpc(int barrelEndIndex, Vector3 endPoint)
+    {
+        var bulletTrail = Instantiate(bulletTrailPrefab, BarrelEnds[barrelEndIndex].transform.position, Quaternion.identity).GetComponent<BulletTrail>();
+        bulletTrail.Set(BarrelEnds[barrelEndIndex].transform.position, endPoint);
+
+        PlayShootingSound(currentWeapon.AmmoLeftInMagazineToWarn > ammos);
+    }
+
     #region Execute Shot
 
     private void UpdateOwnerSettingsUponShot()
@@ -473,7 +486,6 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         PlayShootingSoundServerRpc(currentWeapon.AmmoLeftInMagazineToWarn >= ammos);
 
-        damageLogManager.UpdatePlayerSettings(DamageLogsSettings);
         timeLastShotFired = Time.time;
         shotThisFrame = true;
         ammos--;
@@ -482,9 +494,6 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private void UpdateOwnerSettingsUponShotFromServer()
     {
-        PlayShootingSoundClientRpc(currentWeapon.AmmoLeftInMagazineToWarn >= ammos);
-
-        damageLogManager.UpdatePlayerSettings(DamageLogsSettings);
         timeLastShotFired = Time.time;
         shotThisFrame = true;
         ammos--;
@@ -583,7 +592,6 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
 
-        var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.transform.position, Quaternion.identity).GetComponent<BulletTrail>();
         var directionWithSpread = weaponsSpreads[index].GetDirectionWithSpreadFromServer(index);
         var endPoint = barrelEnd.transform.position + directionWithSpread * 100;
 
@@ -632,7 +640,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             }
         }
 
-        bulletTrail.Set(barrelEnds.Current.transform.position, endPoint);
+        EmulateHitscanShotClientRpc(index, endPoint);
 
         barrelEnds.GoNext();
 
@@ -647,12 +655,12 @@ public sealed class WeaponHandler : NetworkBehaviour
         UpdateOwnerSettingsUponShot();
 
         var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
-        //for (int pelletIndex = 0; pelletIndex < currentWeapon.ShotgunStats.PelletsCount; pelletIndex++)
+
         foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpread(index))
         {
             var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.transform.position, Quaternion.identity).GetComponent<BulletTrail>();
-            var endPoint = barrelEnd.transform.position + /*shotgunPelletsDirections[pelletIndex]*/direction * 100;
-            var hits = Physics.RaycastAll(barrelEnd.transform.position, /*shotgunPelletsDirections[pelletIndex]*/direction, currentWeapon.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
+            var endPoint = barrelEnd.transform.position + direction * 100;
+            var hits = Physics.RaycastAll(barrelEnd.transform.position, direction, currentWeapon.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
             Array.Sort(hits, new RaycastHitComparer());
 
             foreach (var hit in hits)
@@ -663,7 +671,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                     {
                         shootableComponent.ReactShot(
                             currentWeapon.Damage / currentWeapon.ShotgunStats.PelletsCount,
-                            /*shotgunPelletsDirections[pelletIndex]*/direction,
+                            direction,
                             hit.point,
                             NetworkObjectId,
                             PlayerFrame.LocalPlayer.TeamNumber,
@@ -682,7 +690,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
                         onHitWallMethod(
                             new(
-                                /*shotgunPelletsDirections[pelletIndex]*/direction,
+                                direction,
                                 hit,
                                 NetworkObjectId,
                                 new(currentWeapon)
@@ -785,14 +793,13 @@ public sealed class WeaponHandler : NetworkBehaviour
         UpdateOwnerSettingsUponShot();
 
         var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
-        //for (int pelletIndex = 0; pelletIndex < currentWeapon.ShotgunStats.PelletsCount; pelletIndex++)
         foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpread(index))
         {
             var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.transform.position, Quaternion.identity).GetComponent<BulletTrail>();
-            var endPoint = barrelEnd.transform.position + /*shotgunPelletsDirections[pelletIndex]*/direction * 100;
+            var endPoint = barrelEnd.transform.position + direction * 100;
 
 
-            var hits = Physics.RaycastAll(barrelEnd.transform.position, /*shotgunPelletsDirections[pelletIndex]*/direction, currentWeapon.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
+            var hits = Physics.RaycastAll(barrelEnd.transform.position, direction, currentWeapon.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
             Array.Sort(hits, new RaycastHitComparer());
 
             foreach (var hit in hits)
@@ -803,7 +810,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                     {
                         shootableComponent.ReactShot(
                             currentWeapon.Damage / currentWeapon.ShotgunStats.PelletsCount * chargeRatio,
-                            /*shotgunPelletsDirections[pelletIndex]*/direction,
+                            direction,
                             hit.point,
                             NetworkObjectId,
                             PlayerFrame.LocalPlayer.TeamNumber,
@@ -821,7 +828,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                 {
                     onHitWallMethod(
                         new(
-                            /*shotgunPelletsDirections[pelletIndex]*/direction,
+                            direction,
                             hit,
                             NetworkObjectId,
                             new(currentWeapon, chargeRatio)
@@ -1214,7 +1221,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         weaponsSpreads[idx].ApplySpreadFromServer(chargeRatio);
     }
 
-    private void HandleSpead()
+    private void HandleSpread()
     {
         foreach (var weaponSpread in weaponsSpreads)
         {
@@ -1255,6 +1262,11 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     [Rpc(SendTo.ClientsAndHost)]
     private void PlayShootingSoundClientRpc(bool shouldWarn)
+    {
+        PlayShootingSound(shouldWarn);
+    }
+
+    private void PlayShootingSound(bool shouldWarn)
     {
         for (int iteration = 0; iteration < audioSourcePoolSize; iteration++) // this loop ensures that we only do <audioSourcePoolSize> loops
         {
@@ -1361,38 +1373,3 @@ public struct WeaponInfos
 // create a weapon abstract clas instead? with OnAttackDown OnAttackUp OnReload OnAimDown OnAimUp etc bc that could be more flexible
 
 // double/three fire rifle kinda like in thsi game where you can chop limbs off using your gun (horizontally would help for crowds of opponent while vertical would shred their health by allowing hitting headshot + 2 bodyshots at once
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
