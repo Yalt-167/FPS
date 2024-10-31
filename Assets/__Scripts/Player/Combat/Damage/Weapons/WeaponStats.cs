@@ -242,6 +242,7 @@ public struct TravelTimeBulletSettings
     public GameObject BulletPrefab;
     public float BulletDrop;
     public float BulletSpeed;
+    public bool ChargeAffectsBulletsSpeed;
     public ProjectileBehaviourOnHitWall OnHitWallBehaviour;
     public ProjectileBehaviourOnHitWallParams OnHitWallBehaviourParams;
     public ProjectileBehaviourOnHitPlayer OnHitPlayerBehaviour;
