@@ -28,7 +28,6 @@ namespace WeaponHandling
             SetDirectionWithSpreadServerRpc(barrelEndIndex);
             return directionWithSpread.Value;
         }
-
         public Vector3 GetDirectionWithSpreadFromServer(int barrelEndIndex)
         {
             SetDirectionWithSpreadFromServer(barrelEndIndex);
@@ -52,6 +51,24 @@ namespace WeaponHandling
 #endif
             }
         }
+        public IEnumerable<Vector3> GetShotgunDirectionsWithSpreadFromServer(int barrelEndIndex)
+        {
+            SetShotgunDirectionsWithSpreadFromServer(barrelEndIndex);
+#if NETWORK_LIST_AMALGAMATION
+            var count = shotgunDirectionsWithSpread.Value.Count;
+#else
+            var count = shotgunDirectionsWithSpread.Count;
+#endif
+            for (int i = 0; i < count; i++)
+            {
+#if NETWORK_LIST_AMALGAMATION
+                yield return shotgunDirectionsWithSpread.Value[i];
+#else
+                yield return shotgunDirectionsWithSpread[i];
+#endif
+            }
+        }
+
 
         private NetworkVariable<SimpleShotStats> aimingSimpleShotStats = new NetworkVariable<SimpleShotStats>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
         private NetworkVariable<SimpleShotStats> hipfireSimpleShotStats = new NetworkVariable<SimpleShotStats>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
@@ -100,7 +117,6 @@ namespace WeaponHandling
 
         private Vector3 GetDirectionWithSpreadInternal(float spreadStrength, Transform directionTransform)
         {
-            
             return (
                     directionTransform.forward + directionTransform.TransformDirection(
                         new Vector3(
@@ -147,8 +163,6 @@ namespace WeaponHandling
             //    )
             //).normalized;
         }
-
-
         private void SetDirectionWithSpreadFromServer(int barrelEndIndex)
         {
             /*
@@ -186,6 +200,29 @@ namespace WeaponHandling
 
         [Rpc(SendTo.Server)]
         private void SetShotgunDirectionsWithSpreadServerRpc(int barrelEndIndex)
+        {
+            var barrelEnd = weaponHandler.BarrelEnds[barrelEndIndex].transform;
+
+#if NETWORK_LIST_AMALGAMATION
+            shotgunDirectionsWithSpread.Value.Clear();
+#else
+            shotgunDirectionsWithSpread.Clear();
+#endif
+
+            var relevantSpread = IsAiming ? weaponHandler.CurrentWeapon.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeapon.ShotgunStats.PelletsSpreadAngle;
+            relevantSpread /= 45f;
+
+            var pelletCount = weaponHandler.CurrentWeapon.ShotgunStats.PelletsCount;
+            for (int i = 0; i < pelletCount; i++)
+            {
+#if NETWORK_LIST_AMALGAMATION
+                shotgunDirectionsWithSpread.Value.Add(GetDirectionWithSpreadInternal(relevantSpread, barrelEnd));
+#else
+                shotgunDirectionsWithSpread.Add(GetDirectionWithSpreadInternal(relevantSpread, barrelEnd));
+#endif
+            }
+        }
+        private void SetShotgunDirectionsWithSpreadFromServer(int barrelEndIndex)
         {
             var barrelEnd = weaponHandler.BarrelEnds[barrelEndIndex].transform;
 
