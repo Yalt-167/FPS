@@ -403,6 +403,7 @@ namespace Controller
             LocalVelocityDebug = new(transform.InverseTransformDirection(Rigidbody.velocity));
             GlobalVelocityDebug = new(Rigidbody.velocity);
 
+            
             MyDebug.DebugOSD.Display("Velocity", Rigidbody.velocity);
             MyDebug.DebugOSD.Display("MovementMode", currentMovementMode);
 

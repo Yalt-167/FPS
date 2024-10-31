@@ -209,7 +209,7 @@ namespace WeaponHandling
             shotgunDirectionsWithSpread.Clear();
 #endif
 
-            var relevantSpread = IsAiming ? weaponHandler.CurrentWeapon.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeapon.ShotgunStats.PelletsSpreadAngle;
+            var relevantSpread = IsAiming ? weaponHandler.CurrentWeapon.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeapon.ShotgunStats.HipfirePelletsSpreadAngle;
             relevantSpread /= 45f;
 
             var pelletCount = weaponHandler.CurrentWeapon.ShotgunStats.PelletsCount;
@@ -232,7 +232,7 @@ namespace WeaponHandling
             shotgunDirectionsWithSpread.Clear();
 #endif
 
-            var relevantSpread = IsAiming ? weaponHandler.CurrentWeapon.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeapon.ShotgunStats.PelletsSpreadAngle;
+            var relevantSpread = IsAiming ? weaponHandler.CurrentWeapon.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeapon.ShotgunStats.HipfirePelletsSpreadAngle;
             relevantSpread /= 45f;
 
             var pelletCount = weaponHandler.CurrentWeapon.ShotgunStats.PelletsCount;

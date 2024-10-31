@@ -165,14 +165,6 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
 
     private TargetType MapBodyPartToTargetType(BodyParts bodyPart, bool hadShield)
     {
-        //return bodyPart switch
-        //{
-        //    BodyParts.HEAD => hadShield ? TargetType.HEAD_SHIELDED : TargetType.HEAD,
-        //    BodyParts.BODY => hadShield ? TargetType.BODY_SHIELDED : TargetType.BODY,
-        //    BodyParts.LEGS => hadShield ? TargetType.LEGS_SHIELDED : TargetType.LEGS,
-        //    _ => throw new NotImplementedException(),
-        //};
-
         return (TargetType)(bodyPart switch
         {
             BodyParts.HEAD => (int)TargetType.HEAD,

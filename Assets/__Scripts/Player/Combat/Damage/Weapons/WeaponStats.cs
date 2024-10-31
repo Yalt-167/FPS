@@ -141,11 +141,10 @@ public struct SimpleShotStats : INetworkSerializable
 public struct ShotgunStats
 {
     public ushort PelletsCount;
-    public float PelletsSpreadAngle;
+    public float HipfirePelletsSpreadAngle;
     public float AimingPelletsSpreadAngle;
     public float PelletsRange;
 }
-
 #endregion 
 
 #region Shooting Rythm
