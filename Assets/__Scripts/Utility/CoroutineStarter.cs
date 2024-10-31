@@ -15,9 +15,9 @@ namespace MyUtility
             Instance = this;
         }
 
-        public void HandleCoroutine(IEnumerator coroutine)
+        public static void HandleCoroutine(IEnumerator coroutine)
         {
-            StartCoroutine(coroutine);
+            Instance.StartCoroutine(coroutine);
         }
     }
 }

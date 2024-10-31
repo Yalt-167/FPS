@@ -137,7 +137,7 @@ namespace Inputs
 
         private void Rebind()
         {
-            MyUtility.CoroutineStarter.Instance.HandleCoroutine(RebindInternal());
+            MyUtility.CoroutineStarter.HandleCoroutine(RebindInternal());
         }
 
         private IEnumerator RebindInternal()
