@@ -2,12 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using MyEditorUtilities;
+using Unity.Netcode;
 
 using UnityEngine;
 
+using MyEditorUtilities;
+
 [CreateAssetMenu(fileName = "Weapon", menuName = "ScriptableObjects/Weapon")]
-public sealed class WeaponScriptableObject : ScriptableObject
+public sealed class WeaponScriptableObject : ScriptableObject, INetworkSerializable, IEquatable<WeaponScriptableObject>
 {
 
     [Tooltip("Will be overriden by PelletDamage if the weapon is a shotgun")] public DamageDealt Damage;
@@ -32,8 +34,8 @@ public sealed class WeaponScriptableObject : ScriptableObject
     [Space(4)]
 
     [SerializeFieldIfMatchConstant(nameof(ShootingStyle), ShootingStyle.Single)] public SimpleShotStats SimpleShotStats;
-    [SerializeFieldIfMatchConstant(nameof(ShootingStyle), ShootingStyle.Single)]  public SimpleShotStats AimingSimpleShotStats;
-    
+    [SerializeFieldIfMatchConstant(nameof(ShootingStyle), ShootingStyle.Single)] public SimpleShotStats AimingSimpleShotStats;
+
     [SerializeFieldIfMatchConstant(nameof(ShootingStyle), ShootingStyle.Shotgun)] public ShotgunStats ShotgunStats;
 
 
@@ -73,10 +75,103 @@ public sealed class WeaponScriptableObject : ScriptableObject
     public Effects EffectsInflicted;
 
     [Space(16)]
-    public Mesh Model;
+    public WeaponSounds Sounds; // ? chjange to interface at some point to incudes more sounds?
 
-    [Space(16)]
-    public WeaponSounds Sounds;
+    public bool Equals(WeaponScriptableObject other)
+    {
+        return other == this;
+    }
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter // ffs
+    {
+        //#error "Didn t finish this impl"
+        #region Damage
+
+        serializer.SerializeValue(ref Damage.HeadshotDamage);
+        serializer.SerializeValue(ref Damage.BodyshotDamage);
+        serializer.SerializeValue(ref Damage.LegshotDamage);
+
+        #endregion
+
+        serializer.SerializeValue(ref WeaponClass);
+
+        # region Bullet Travel Settings
+
+        serializer.SerializeValue(ref IsHitscan);
+
+        HitscanBulletSettings.NetworkSerialize(serializer);
+
+        //serializer.SerializeValue(ref HitscanBulletSettings.PierceThroughPlayers);
+        //serializer.SerializeValue(ref HitscanBulletSettings.ActionOnHitWall);
+        ////serializer.SerializeValue(ref HitscanBulletSettings.BouncingBulletsSettings);
+        ////serializer.SerializeValue(ref HitscanBulletSettings.ExplodingBulletsSettings);
+        //serializer.SerializeValue(ref HitscanBulletSettings.PierceThroughPlayers);
+
+        TravelTimeBulletSettings.NetworkSerialize(serializer);
+
+        ////serializer.SerializeValue(ref TravelTimeBulletSettings.BulletPrefab);
+        //serializer.SerializeValue(ref TravelTimeBulletSettings.BulletDrop);
+        //serializer.SerializeValue(ref TravelTimeBulletSettings.BulletSpeed);
+        //serializer.SerializeValue(ref TravelTimeBulletSettings.ChargeAffectsBulletsSpeed);
+        //serializer.SerializeValue(ref TravelTimeBulletSettings.OnHitWallBehaviour);
+        ////serializer.SerializeValue(ref TravelTimeBulletSettings.OnHitWallBehaviourParams);
+        //serializer.SerializeValue(ref TravelTimeBulletSettings.OnHitPlayerBehaviour);
+        ////serializer.SerializeValue(ref TravelTimeBulletSettings.OnHitPlayerBehaviourParams);
+
+        #endregion
+
+        #region Magazine
+
+        serializer.SerializeValue(ref MagazineSize);
+        serializer.SerializeValue(ref NeedReload);
+        serializer.SerializeValue(ref ReloadSpeed);
+        serializer.SerializeValue(ref TimeToReloadOneRound);
+        serializer.SerializeValue(ref AmmoLeftInMagazineToWarn);
+
+        #endregion
+
+
+        #region Shooting Style
+
+        serializer.SerializeValue(ref ShootingStyle);
+
+        SimpleShotStats.NetworkSerialize(serializer);
+        AimingSimpleShotStats.NetworkSerialize(serializer);
+
+        ShotgunStats.NetworkSerialize(serializer);
+
+
+        #endregion
+
+        #region Shooting Rythm
+
+
+        serializer.SerializeValue(ref ShootingRythm);
+        serializer.SerializeValue(ref CooldownBetweenShots);
+
+        BurstStats.NetworkSerialize(serializer);
+        RampUpStats.NetworkSerialize(serializer);
+        ChargeStats.NetworkSerialize(serializer);
+
+        #endregion
+
+
+        AimingAndScopeStats.NetworkSerialize(serializer);
+
+        HipfireRecoilStats.NetworkSerialize(serializer);
+        AimingRecoilStats.NetworkSerialize(serializer);
+
+        KickbackStats.NetworkSerialize(serializer);
+
+
+        serializer.SerializeValue(ref PulloutTime);
+
+
+        serializer.SerializeValue(ref CanBreakThings);
+        serializer.SerializeValue(ref EffectsInflicted);
+
+        Sounds.NetworkSerialize(serializer);
+    }
 }
 
 [Serializable]
