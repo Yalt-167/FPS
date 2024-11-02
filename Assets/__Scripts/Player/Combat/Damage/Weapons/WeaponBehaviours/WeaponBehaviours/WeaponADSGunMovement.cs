@@ -19,23 +19,19 @@ namespace WeaponHandling
 
         private static readonly float fixedUpdateCallFrequency = .02f;
 
-        private bool isADSing;
-        private AimAndScopeStats aimingStats;
+        private WeaponHandler weaponHandler;
+        private AimAndScopeStats AimingStats => weaponHandler.CurrentWeapon.AimingAndScopeStats;
+        private bool IsADSing => weaponHandler.IsAiming;
 
-        public void SetupData(AimAndScopeStats aimingStats_)
+        public void SetupData(WeaponHandler weaponHandler_)
         {
             basePositionTransform = transform.parent.GetChild(1).GetChild(0);
             ADSPositionTransform = transform.parent.GetChild(1).GetChild(1);
 
-            aimingStats = aimingStats_;
+            weaponHandler = weaponHandler_;
 
             gunTravelDistanceWhenADSing = Vector3.Distance(ADSPositionTransform.position, basePositionTransform.position);
             ResetPosition();
-        }
-
-        public void ToggleADS(bool towardOn)
-        {
-            isADSing = towardOn;
         }
 
         private void FixedUpdate()
@@ -53,13 +49,13 @@ namespace WeaponHandling
         {
             float stepPerFixedUpdate;
             Vector3 targetPosition;
-            if (isADSing)
+            if (IsADSing)
             {
                 targetPosition = ADSPositionTransform.position;
 
                 if (ClampPosition(targetPosition)) { return; }
 
-                stepPerFixedUpdate = gunTravelDistanceWhenADSing / (aimingStats.TimeToADS / fixedUpdateCallFrequency);
+                stepPerFixedUpdate = gunTravelDistanceWhenADSing / (AimingStats.TimeToADS / fixedUpdateCallFrequency);
             }
             else
             {
@@ -67,7 +63,7 @@ namespace WeaponHandling
 
                 if (ClampPosition(targetPosition)) { return; }
 
-                stepPerFixedUpdate = gunTravelDistanceWhenADSing / (aimingStats.TimeToUnADS / fixedUpdateCallFrequency);
+                stepPerFixedUpdate = gunTravelDistanceWhenADSing / (AimingStats.TimeToUnADS / fixedUpdateCallFrequency);
             }
 
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, stepPerFixedUpdate);
