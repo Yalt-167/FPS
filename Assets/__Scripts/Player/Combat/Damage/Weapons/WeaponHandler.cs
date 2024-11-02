@@ -66,7 +66,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     private NetworkVariable<bool> shotThisFrame = new NetworkVariable<bool>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
     private NetworkVariable<ushort> ammos = new NetworkVariable<ushort>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
 
-    private bool canShoot;
+    private NetworkVariable<bool> canShoot = new NetworkVariable<bool>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
 
 
     private Action shootingStyleMethod;
@@ -237,7 +237,6 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         currentWeaponSounds = currentWeapon.Sounds;
 
-        canShoot = true;
         StartCoroutine(InitWeaponFromServer());
         switchedThisFrame = true;
 
@@ -258,6 +257,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         timeLastShotFired.Value = float.MinValue;
         ammos.Value = currentWeapon.MagazineSize;
+        canShoot.Value = true;
     }
 
     private void SetShootingStyle()
@@ -341,7 +341,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         }
 
-        if (!(canShoot && holdingAttackKey))
+        if (!(canShoot.Value && holdingAttackKey))
         {
             return;
         }
@@ -369,6 +369,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void RequestShotServerRpc()
     {
+        MyDebug.DebugUtility.LogMethodCall();
 
         if (timeLastShotFired.Value + GetRelevantCooldown() > Time.time) { return; }
         RequestShotCallbackClientRpc(false);
@@ -443,7 +444,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         };
     }
 
-    private IEnumerator ShootBurst(int bullets)
+    private IEnumerator ShootBurst(int bullets) // ANCHOR
     {
         if (ammos.Value <= 0) { yield break; }
 
@@ -451,7 +452,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         bulletFiredthisBurst = 0;
 
-        canShoot = false;
+        //canShoot = false;
 
         for (int i = 0; i < bullets; i++)
         {
@@ -464,7 +465,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             RequestShotServerRpc();
         }
 
-        canShoot = true;
+        //canShoot = true;
     }
 
     private IEnumerator ChargeShot()
@@ -1376,21 +1377,42 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         if (ammos.Value == currentWeapon.MagazineSize) { return; } // already fully loaded
 
+        if (currentWeapon.TimeToReloadOneRound == 0f)
+        {
+            ExecuteReloadServerRpc();
+        }
+        else
+        {
+            ExecuteReloadRoundPerRoundServerRpc();
+        }
         StartCoroutine(currentWeapon.TimeToReloadOneRound == 0f ? ExecuteReload() : ExecuteReloadRoundPerRound());
+    }
+
+    [Rpc(SendTo.Server)]
+    private void ExecuteReloadServerRpc()
+    {
+        StartCoroutine(ExecuteReload());
     }
 
     private IEnumerator ExecuteReload()
     {
-        canShoot = false;
+        canShoot.Value = false;
 
+        // PlayReloadAnimCientRpc();
         var timerStart = Time.time;
         yield return new WaitUntil(() => timerStart + currentWeapon.ReloadSpeed < Time.time || switchedThisFrame);
 
-        canShoot = true;
+        canShoot.Value = true;
 
         if (switchedThisFrame) { yield break; }
 
         ammos.Value = currentWeapon.MagazineSize;
+    }
+
+    [Rpc(SendTo.Server)]
+    private void ExecuteReloadRoundPerRoundServerRpc()
+    {
+        StartCoroutine(ExecuteReloadRoundPerRound());
     }
 
     private IEnumerator ExecuteReloadRoundPerRound()
@@ -1402,8 +1424,8 @@ public sealed class WeaponHandler : NetworkBehaviour
             var timerStart = Time.time;
             yield return new WaitUntil(
                 () => timerStart + currentWeapon.TimeToReloadOneRound < Time.time ||
-                switchedThisFrame ||
-                HasBufferedShoot
+                switchedThisFrame || // pass that server side then
+                HasBufferedShoot // pass that server side too
                 ); // + buffer a shoot input that would interrupt the reload
 
             if (switchedThisFrame) { yield break; }
