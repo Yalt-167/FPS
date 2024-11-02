@@ -138,12 +138,20 @@ public struct SimpleShotStats : INetworkSerializable
 }
 
 [Serializable]
-public struct ShotgunStats
+public struct ShotgunStats : INetworkSerializable
 {
     public ushort PelletsCount;
     public float HipfirePelletsSpreadAngle;
     public float AimingPelletsSpreadAngle;
     public float PelletsRange;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref PelletsCount);
+        serializer.SerializeValue(ref HipfirePelletsSpreadAngle);
+        serializer.SerializeValue(ref AimingPelletsSpreadAngle);
+        serializer.SerializeValue(ref PelletsRange);
+    }
 }
 #endregion 
 
