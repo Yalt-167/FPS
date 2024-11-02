@@ -70,8 +70,8 @@ namespace WeaponHandling
         }
 
 
-        private NetworkVariable<SimpleShotStats> aimingSimpleShotStats = new NetworkVariable<SimpleShotStats>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
-        private NetworkVariable<SimpleShotStats> hipfireSimpleShotStats = new NetworkVariable<SimpleShotStats>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
+        private SimpleShotStats AimingSimpleShotStats => weaponHandler.CurrentWeapon.AimingSimpleShotStats;
+        private SimpleShotStats HipfireSimpleShotStats => weaponHandler.CurrentWeapon.SimpleShotStats;
 
         private WeaponHandler weaponHandler;
         private bool IsAiming => weaponHandler.IsAiming;
@@ -82,35 +82,26 @@ namespace WeaponHandling
             weaponHandler = GetComponentInParent<WeaponHandler>();
         }
 
-        public IEnumerator SetupData(SimpleShotStats aimingSimpleShotStats_, SimpleShotStats hipfireSimpleShotStats_)
+        public void SetupData(WeaponHandler weaponHandler_)
         {
-            yield return new WaitUntil(() => IsSpawned);
-
-            SetDataServerRpc(aimingSimpleShotStats_, hipfireSimpleShotStats_);
-        }
-
-        [Rpc(SendTo.Server)]
-        public void SetDataServerRpc(SimpleShotStats aimingSimpleShotStats_, SimpleShotStats hipfireSimpleShotStats_)
-        {
-            aimingSimpleShotStats.Value = aimingSimpleShotStats_;
-            hipfireSimpleShotStats.Value = hipfireSimpleShotStats_;
+            weaponHandler = weaponHandler_;
         }
 
         [Rpc(SendTo.Server)]
         public void ApplySpreadServerRpc(float chargeRatio)
         {
-            currentSpreadAngle.Value += (IsAiming ? aimingSimpleShotStats.Value.SpreadAngleAddedPerShot : hipfireSimpleShotStats.Value.SpreadAngleAddedPerShot) * chargeRatio;
+            currentSpreadAngle.Value += (IsAiming ? AimingSimpleShotStats.SpreadAngleAddedPerShot : HipfireSimpleShotStats.SpreadAngleAddedPerShot) * chargeRatio;
         }
 
         public void ApplySpreadFromServer(float chargeRatio)
         {
-            currentSpreadAngle.Value += (IsAiming ? aimingSimpleShotStats.Value.SpreadAngleAddedPerShot : hipfireSimpleShotStats.Value.SpreadAngleAddedPerShot) * chargeRatio;
+            currentSpreadAngle.Value += (IsAiming ? AimingSimpleShotStats.SpreadAngleAddedPerShot : HipfireSimpleShotStats.SpreadAngleAddedPerShot) * chargeRatio;
         }
 
         [Rpc(SendTo.Server)]
         public void HandleSpreadServerRpc()
         {
-            currentSpreadAngle.Value = Mathf.Lerp(currentSpreadAngle.Value, 0f, (IsAiming ? aimingSimpleShotStats.Value.SpreadRegulationSpeed : hipfireSimpleShotStats.Value.SpreadRegulationSpeed) * Time.deltaTime);
+            currentSpreadAngle.Value = Mathf.Lerp(currentSpreadAngle.Value, 0f, (IsAiming ? AimingSimpleShotStats.SpreadRegulationSpeed : HipfireSimpleShotStats.SpreadRegulationSpeed) * Time.deltaTime);
         }
 
 
