@@ -21,11 +21,12 @@ namespace WeaponHandling
 
 
         private Transform recoilHandlerTransform;
+
         private WeaponHandler weaponHandler;
         private bool IsAiming => weaponHandler.IsAiming;
-
-        private NetworkVariable<WeaponRecoilStats> aimingRecoilStats = new NetworkVariable<WeaponRecoilStats>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server); 
-        private NetworkVariable<WeaponRecoilStats> hipfireRecoilStats = new NetworkVariable<WeaponRecoilStats>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
+        private WeaponRecoilStats AimingRecoilStats => weaponHandler.CurrentWeapon.AimingRecoilStats;
+        private WeaponRecoilStats HipfireRecoilStats => weaponHandler.CurrentWeapon.HipfireRecoilStats;
+        
 
         private void Awake()
         {
@@ -33,30 +34,21 @@ namespace WeaponHandling
             weaponHandler = GetComponent<WeaponHandler>();
         }
 
-        public IEnumerator SetupData(WeaponRecoilStats aimingRecoilStats_, WeaponRecoilStats hipfireRecoilStats_)
+        public void SetupData(WeaponHandler weaponHandler_)
         {
-            yield return new WaitUntil(() => IsSpawned);
 
-            SetDataServerRpc(aimingRecoilStats_, hipfireRecoilStats_);
-        }
-
-        [Rpc(SendTo.Server)]
-        public void SetDataServerRpc(WeaponRecoilStats aimingRecoilStats_, WeaponRecoilStats hipfireRecoilStats_)
-        {
-            aimingRecoilStats.Value = aimingRecoilStats_;
-            hipfireRecoilStats.Value = hipfireRecoilStats_;
         }
 
         [Rpc(SendTo.Server)]
         public void ApplyRecoilServerRpc(float chargeRatio = 1f)
         {
-            var relevantRecoilStats = IsAiming ? aimingRecoilStats : hipfireRecoilStats;
+            var relevantRecoilStats = IsAiming ? AimingRecoilStats : HipfireRecoilStats;
 
-            float y = relevantRecoilStats.Value.RecoilForceY * chargeRatio;
-            float z = relevantRecoilStats.Value.RecoilForceZ * chargeRatio;
+            float y = relevantRecoilStats.RecoilForceY * chargeRatio;
+            float z = relevantRecoilStats.RecoilForceZ * chargeRatio;
 
             targetRecoilHandlerRotation.Value += new Vector3(
-                 -hipfireRecoilStats.Value.RecoilForceX * chargeRatio,
+                 -relevantRecoilStats.RecoilForceX * chargeRatio,
                  UnityEngine.Random.Range(-y, y),
                  UnityEngine.Random.Range(-z, z)
             );
@@ -64,13 +56,13 @@ namespace WeaponHandling
 
         public void ApplyRecoilFromServer(float chargeRatio = 1f)
         {
-            var relevantRecoilStats = IsAiming ? aimingRecoilStats : hipfireRecoilStats;
+            var relevantRecoilStats = IsAiming ? AimingRecoilStats : HipfireRecoilStats;
 
-            float y = relevantRecoilStats.Value.RecoilForceY * chargeRatio;
-            float z = relevantRecoilStats.Value.RecoilForceZ * chargeRatio;
+            float y = relevantRecoilStats.RecoilForceY * chargeRatio;
+            float z = relevantRecoilStats.RecoilForceZ * chargeRatio;
 
             targetRecoilHandlerRotation.Value += new Vector3(
-                 -hipfireRecoilStats.Value.RecoilForceX * chargeRatio,
+                 -relevantRecoilStats.RecoilForceX * chargeRatio,
                  UnityEngine.Random.Range(-y, y),
                  UnityEngine.Random.Range(-z, z)
             );
@@ -79,7 +71,7 @@ namespace WeaponHandling
         [Rpc(SendTo.Server)]
         public void HandleRecoilServerRpc()
         {
-            targetRecoilHandlerRotation.Value = Vector3.Lerp(targetRecoilHandlerRotation.Value, Vector3.zero, (IsAiming ? aimingRecoilStats.Value.RecoilRegulationSpeed : hipfireRecoilStats.Value.RecoilRegulationSpeed) * Time.deltaTime);
+            targetRecoilHandlerRotation.Value = Vector3.Lerp(targetRecoilHandlerRotation.Value, Vector3.zero, (IsAiming ? AimingRecoilStats.RecoilRegulationSpeed : HipfireRecoilStats.RecoilRegulationSpeed) * Time.deltaTime);
             currentRecoilHandlerRotation.Value = Vector3.Slerp(currentRecoilHandlerRotation.Value, targetRecoilHandlerRotation.Value, recoilMovementSnappiness * Time.deltaTime);
             UpdateRecoilClientRpc(Quaternion.Euler(currentRecoilHandlerRotation.Value));
         }
