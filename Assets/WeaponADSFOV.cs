@@ -18,31 +18,28 @@ namespace WeaponHandling
 
         private static readonly float fixedUpdateCallFrequency = .02f;
 
-        private bool isADSing;
-        private AimAndScopeStats aimingStats;
+        private WeaponHandler weaponHandler;
+        private bool IsADSing => weaponHandler.IsAiming;
+        private AimAndScopeStats AimingStats => weaponHandler.CurrentWeapon.AimingAndScopeStats;
 
-        public void SetupData(AimAndScopeStats aimingStats_)
+        public void SetupData(WeaponHandler weapnHandler_)
         {
             camera = GetComponent<Camera>();
 
-            aimingStats = aimingStats_;
+            weaponHandler = weapnHandler_;
 
-            FOVDifference = baseFOV - aimingStats.AimingFOV;
+            FOVDifference = baseFOV - AimingStats.AimingFOV;
         }
 
-        public void ToggleADS(bool towardOn)
-        {
-            isADSing = towardOn;
-        }
 
 
         private void HandleFOVLerp()
         {
             float stepPerFixedUpdate;
             float targetFOV;
-            if (isADSing)
+            if (IsADSing)
             {
-                targetFOV = aimingStats.AimingFOV;
+                targetFOV = AimingStats.AimingFOV;
 
                 if (camera.fieldOfView <= targetFOV)
                 {
@@ -50,7 +47,7 @@ namespace WeaponHandling
                     return;
                 }
 
-                stepPerFixedUpdate = FOVDifference / (aimingStats.TimeToADS / fixedUpdateCallFrequency);
+                stepPerFixedUpdate = FOVDifference / (AimingStats.TimeToADS / fixedUpdateCallFrequency);
             }
             else
             {
@@ -62,7 +59,7 @@ namespace WeaponHandling
                     return;
                 }
 
-                stepPerFixedUpdate = FOVDifference / (aimingStats.TimeToUnADS / fixedUpdateCallFrequency);
+                stepPerFixedUpdate = FOVDifference / (AimingStats.TimeToUnADS / fixedUpdateCallFrequency);
             }
 
             camera.fieldOfView = Mathf.MoveTowards(camera.fieldOfView, targetFOV, stepPerFixedUpdate);
