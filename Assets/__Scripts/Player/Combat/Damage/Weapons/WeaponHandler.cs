@@ -71,7 +71,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private Action shootingStyleMethod;
     private Action shootingRythmMethod;
-    private Action<ShotInfos, IHitscanBulletEffectSettings> onHitWallMethod;
+    private Action<ShotInfos, INetworkSerializable> onHitWallMethod;
 
     public bool IsAiming { get; private set; }
 
@@ -541,7 +541,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region Execute Shot Hitscan
 
-    private IHitscanBulletEffectSettings GetRelevantHitscanBulletSettings()
+    private INetworkSerializable GetRelevantHitscanBulletSettings()
     {
         return currentWeapon.Value.HitscanBulletSettings.ActionOnHitWall switch
         {
@@ -1257,7 +1257,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region Hitscan Wall Hit Effects
 
-    private void ExplodeUponWallHit(ShotInfos shotInfos, IHitscanBulletEffectSettings hitscanBulletEffectSettings_)
+    private void ExplodeUponWallHit(ShotInfos shotInfos, INetworkSerializable hitscanBulletEffectSettings_)
     {
         var hitscanBulletEffectSettings = (ExplodingHitscanBulletsSettings)hitscanBulletEffectSettings_;
 
@@ -1277,7 +1277,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         }
     }
 
-    private void BounceUponWallHit(ShotInfos shotInfos, IHitscanBulletEffectSettings hitscanBulletEffectSettings_)
+    private void BounceUponWallHit(ShotInfos shotInfos, INetworkSerializable hitscanBulletEffectSettings_)
     {
         var hitscanBulletEffectSettings = (BouncingHitscanBulletsSettings)hitscanBulletEffectSettings_;
 
