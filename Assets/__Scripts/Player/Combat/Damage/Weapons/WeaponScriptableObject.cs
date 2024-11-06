@@ -84,14 +84,7 @@ public sealed class WeaponScriptableObject : ScriptableObject, INetworkSerializa
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter // ffs
     {
-        //#error "Didn t finish this impl"
-        #region Damage
-
-        serializer.SerializeValue(ref Damage.HeadshotDamage);
-        serializer.SerializeValue(ref Damage.BodyshotDamage);
-        serializer.SerializeValue(ref Damage.LegshotDamage);
-
-        #endregion
+        Damage.NetworkSerialize(serializer);
 
         serializer.SerializeValue(ref WeaponClass);
 
@@ -101,22 +94,7 @@ public sealed class WeaponScriptableObject : ScriptableObject, INetworkSerializa
 
         HitscanBulletSettings.NetworkSerialize(serializer);
 
-        //serializer.SerializeValue(ref HitscanBulletSettings.PierceThroughPlayers);
-        //serializer.SerializeValue(ref HitscanBulletSettings.ActionOnHitWall);
-        ////serializer.SerializeValue(ref HitscanBulletSettings.BouncingBulletsSettings);
-        ////serializer.SerializeValue(ref HitscanBulletSettings.ExplodingBulletsSettings);
-        //serializer.SerializeValue(ref HitscanBulletSettings.PierceThroughPlayers);
-
         TravelTimeBulletSettings.NetworkSerialize(serializer);
-
-        ////serializer.SerializeValue(ref TravelTimeBulletSettings.BulletPrefab);
-        //serializer.SerializeValue(ref TravelTimeBulletSettings.BulletDrop);
-        //serializer.SerializeValue(ref TravelTimeBulletSettings.BulletSpeed);
-        //serializer.SerializeValue(ref TravelTimeBulletSettings.ChargeAffectsBulletsSpeed);
-        //serializer.SerializeValue(ref TravelTimeBulletSettings.OnHitWallBehaviour);
-        ////serializer.SerializeValue(ref TravelTimeBulletSettings.OnHitWallBehaviourParams);
-        //serializer.SerializeValue(ref TravelTimeBulletSettings.OnHitPlayerBehaviour);
-        ////serializer.SerializeValue(ref TravelTimeBulletSettings.OnHitPlayerBehaviourParams);
 
         #endregion
 
@@ -175,9 +153,14 @@ public sealed class WeaponScriptableObject : ScriptableObject, INetworkSerializa
 }
 
 [Serializable]
-public struct WeaponSounds
+public struct WeaponSounds : INetworkSerializable
 {
     public AudioClip ShootingSound;
     public AudioClip ReloadSound;
     public AudioClip NearEmptyMagazineShootSound;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
