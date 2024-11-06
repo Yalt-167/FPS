@@ -69,7 +69,7 @@ public struct WeaponStats
 
 
 [Serializable]
-public struct DamageDealt
+public struct DamageDealt : INetworkSerializable
 {
     public ushort HeadshotDamage;
     public ushort BodyshotDamage;
@@ -112,6 +112,11 @@ public struct DamageDealt
                 };
             }
         }
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 #region Shooting Style
@@ -166,27 +171,42 @@ public enum ShootingRythm : byte
 }
 
 [Serializable]
-public struct BurstStats
+public struct BurstStats : INetworkSerializable
 {
     public float CooldownBetweenShotsOfBurst;
     public ushort BulletsPerBurst;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 [Serializable]
-public struct RampUpStats
+public struct RampUpStats : INetworkSerializable
 {
     public float RampUpMaxCooldownBetweenShots;
     public float RampUpMinCooldownBetweenShots;
     public float RampUpCooldownMultiplierPerShot; // why tf are these multipliers???
     public float RampUpCooldownRegulationMultiplier;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 [Serializable]
-public struct ChargeStats
+public struct ChargeStats : INetworkSerializable
 {
     public float ChargeDuration;
     public ushort AmmoConsumedByFullyChargedShot;
     [Range(.1f, 1f)] public float MinChargeRatioToShoot;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 #endregion
@@ -196,18 +216,21 @@ public struct ChargeStats
 #region Hitscan Bullet Settings
 
 [Serializable]
-public struct HitscanBulletSettings
+public struct HitscanBulletSettings : INetworkSerializable
 {
     public bool PierceThroughPlayers;
     public HitscanBulletActionOnHitWall ActionOnHitWall;
     public BouncingHitscanBulletsSettings BouncingBulletsSettings;
     public ExplodingHitscanBulletsSettings ExplodingBulletsSettings;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
-public interface IHitscanBulletEffectSettings { }
-
 [Serializable]
-public struct BouncingHitscanBulletsSettings : IHitscanBulletEffectSettings
+public struct BouncingHitscanBulletsSettings : INetworkSerializable
 {
     public int BouncesAmount;
 
@@ -220,15 +243,25 @@ public struct BouncingHitscanBulletsSettings : IHitscanBulletEffectSettings
     {
         return new BouncingHitscanBulletsSettings(--relevantStruct.BouncesAmount);
     }
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 [Serializable]
-public struct ExplodingHitscanBulletsSettings : IHitscanBulletEffectSettings
+public struct ExplodingHitscanBulletsSettings : INetworkSerializable
 {
     public int ExplosionRadius;
     public ushort ExplosionDamage;
     // should it add up ? (hitting directly + explosion) -> yes
     // should it account for different part of the body (? avoid stacking ?)
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 // redo hit sequence when not piercing player as we should account for walls and bullet effect still
@@ -245,7 +278,7 @@ public enum HitscanBulletActionOnHitWall : byte
 #region Travel Time Bullet Settings
 
 [Serializable]
-public struct TravelTimeBulletSettings
+public struct TravelTimeBulletSettings : INetworkSerializable
 {
     public GameObject BulletPrefab;
     public float BulletDrop;
@@ -255,6 +288,11 @@ public struct TravelTimeBulletSettings
     public ProjectileBehaviourOnHitWallParams OnHitWallBehaviourParams;
     public ProjectileBehaviourOnHitPlayer OnHitPlayerBehaviour;
     public ProjectileBehaviourOnHitPlayerParams OnHitPlayerBehaviourParams;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 # region On Hit Wall Behaviour
@@ -268,32 +306,52 @@ public enum ProjectileBehaviourOnHitWall : byte
 }
 
 [Serializable]
-public struct ProjectileBehaviourOnHitWallParams // main structs that groups all the small param structs
+public struct ProjectileBehaviourOnHitWallParams : INetworkSerializable // main structs that groups all the small param structs
 {
     public ProjectileWallPierceParams ProjectileWallPierceParams;
     public ProjectileWallBounceParams ProjectileWallBounceParams;
     public ProjectileWallExplodeParams ProjectileWallExplodeParams;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public interface IProjectileBehaviourOnHitWallParam { } // type for delegate
 
 [Serializable]
-public struct ProjectileWallPierceParams : IProjectileBehaviourOnHitWallParam
+public struct ProjectileWallPierceParams : IProjectileBehaviourOnHitWallParam, INetworkSerializable
 {
     public ushort MaxWallsToPierce;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 [Serializable]
-public struct ProjectileWallBounceParams : IProjectileBehaviourOnHitWallParam
+public struct ProjectileWallBounceParams : IProjectileBehaviourOnHitWallParam, INetworkSerializable
 {
     public ushort MaxBounces;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 [Serializable]
-public struct ProjectileWallExplodeParams : IProjectileBehaviourOnHitWallParam
+public struct ProjectileWallExplodeParams : IProjectileBehaviourOnHitWallParam, INetworkSerializable
 {
     public ushort ExplosionRadius;
     public ushort ExplosionDamage;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 # endregion
@@ -308,25 +366,40 @@ public enum ProjectileBehaviourOnHitPlayer : byte
 }
 
 [Serializable]
-public struct ProjectileBehaviourOnHitPlayerParams
+public struct ProjectileBehaviourOnHitPlayerParams : INetworkSerializable
 {
     public ProjectilePlayerPierceParams ProjectilePlayerPierceParams;
     public ProjectilePlayerExplodeParams ProjectilePlayerExplodeParams;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public interface IProjectileBehaviourOnHitPlayerParam { } // type for delegate
 
 [Serializable]
-public struct ProjectilePlayerPierceParams : IProjectileBehaviourOnHitPlayerParam
+public struct ProjectilePlayerPierceParams : IProjectileBehaviourOnHitPlayerParam, INetworkSerializable
 {
     public ushort MaxPlayersToPierce;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 [Serializable]
-public struct ProjectilePlayerExplodeParams : IProjectileBehaviourOnHitPlayerParam
+public struct ProjectilePlayerExplodeParams : IProjectileBehaviourOnHitPlayerParam, INetworkSerializable
 {
     public ushort ExplosionRadius;
     public ushort ExplosionDamage;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 #endregion
@@ -347,12 +420,17 @@ public enum WeaponClass
 }
 
 [Serializable]
-public struct AimAndScopeStats
+public struct AimAndScopeStats : INetworkSerializable
 {
     public float AimingFOV; //perhaps just a cameraMove instead
     [Range(1, 5)][Tooltip("Set to 1 for no Scope")] public float ScopeMagnification;
     public float TimeToADS;
     public float TimeToUnADS;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        throw new NotImplementedException();
+    }
 }
 
 [Serializable]
@@ -388,7 +466,7 @@ public struct WeaponRecoilStats : INetworkSerializable
 public enum Effects
 {
     None,
-    Fire, // depletes shield & health (stacking until a certain threshold
+    Fire, // depletes shield & health (?stacking until a certain threshold)
     Freeze, // slows + increased damage when already frozen
     Bleeding, // depletes life
     Poison, // deplete life
