@@ -115,7 +115,9 @@ public struct DamageDealt : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        serializer.SerializeValue(ref HeadshotDamage);
+        serializer.SerializeValue(ref BodyshotDamage);
+        serializer.SerializeValue(ref LegshotDamage);
     }
 }
 
@@ -178,7 +180,8 @@ public struct BurstStats : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        serializer.SerializeValue(ref CooldownBetweenShotsOfBurst);
+        serializer.SerializeValue(ref BulletsPerBurst);
     }
 }
 
@@ -192,7 +195,10 @@ public struct RampUpStats : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        serializer.SerializeValue(ref RampUpMaxCooldownBetweenShots);
+        serializer.SerializeValue(ref RampUpMinCooldownBetweenShots);
+        serializer.SerializeValue(ref RampUpCooldownMultiplierPerShot);
+        serializer.SerializeValue(ref RampUpCooldownRegulationMultiplier);
     }
 }
 
@@ -205,7 +211,9 @@ public struct ChargeStats : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        serializer.SerializeValue(ref ChargeDuration);
+        serializer.SerializeValue(ref AmmoConsumedByFullyChargedShot);
+        serializer.SerializeValue(ref MinChargeRatioToShoot);
     }
 }
 
@@ -225,7 +233,10 @@ public struct HitscanBulletSettings : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        serializer.SerializeValue(ref PierceThroughPlayers);
+        serializer.SerializeValue(ref ActionOnHitWall);
+        BouncingBulletsSettings.NetworkSerialize(serializer);
+        ExplodingBulletsSettings.NetworkSerialize(serializer);
     }
 }
 
@@ -246,7 +257,7 @@ public struct BouncingHitscanBulletsSettings : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        serializer.SerializeValue(ref BouncesAmount);
     }
 }
 
@@ -255,12 +266,13 @@ public struct ExplodingHitscanBulletsSettings : INetworkSerializable
 {
     public int ExplosionRadius;
     public ushort ExplosionDamage;
-    // should it add up ? (hitting directly + explosion) -> yes
+    // should it add up ? (hitting directly + explosion)
     // should it account for different part of the body (? avoid stacking ?)
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        serializer.SerializeValue(ref ExplosionRadius);
+        serializer.SerializeValue(ref ExplosionDamage);
     }
 }
 
@@ -280,7 +292,7 @@ public enum HitscanBulletActionOnHitWall : byte
 [Serializable]
 public struct TravelTimeBulletSettings : INetworkSerializable
 {
-    public GameObject BulletPrefab;
+    public GameObject BulletPrefab; // ffs
     public float BulletDrop;
     public float BulletSpeed;
     public bool ChargeAffectsBulletsSpeed;
@@ -291,7 +303,13 @@ public struct TravelTimeBulletSettings : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        serializer.SerializeValue(ref BulletDrop);
+        serializer.SerializeValue(ref BulletSpeed);
+        serializer.SerializeValue(ref ChargeAffectsBulletsSpeed);
+        serializer.SerializeValue(ref OnHitWallBehaviour);
+        OnHitWallBehaviourParams.NetworkSerialize(serializer);
+        serializer.SerializeValue(ref OnHitPlayerBehaviour);
+        OnHitPlayerBehaviourParams.NetworkSerialize(serializer);
     }
 }
 
@@ -314,7 +332,9 @@ public struct ProjectileBehaviourOnHitWallParams : INetworkSerializable // main 
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        ProjectileWallPierceParams.NetworkSerialize(serializer);
+        ProjectileWallBounceParams.NetworkSerialize(serializer);
+        ProjectileWallExplodeParams.NetworkSerialize(serializer);
     }
 }
 
@@ -327,7 +347,7 @@ public struct ProjectileWallPierceParams : IProjectileBehaviourOnHitWallParam, I
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        serializer.SerializeValue(ref MaxWallsToPierce);
     }
 }
 
@@ -338,7 +358,7 @@ public struct ProjectileWallBounceParams : IProjectileBehaviourOnHitWallParam, I
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        serializer.SerializeValue(ref MaxBounces);
     }
 }
 
@@ -350,7 +370,8 @@ public struct ProjectileWallExplodeParams : IProjectileBehaviourOnHitWallParam, 
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        serializer.SerializeValue(ref ExplosionRadius);
+        serializer.SerializeValue(ref ExplosionDamage);
     }
 }
 
@@ -373,7 +394,8 @@ public struct ProjectileBehaviourOnHitPlayerParams : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        ProjectilePlayerPierceParams.NetworkSerialize(serializer);
+        ProjectilePlayerExplodeParams.NetworkSerialize(serializer);
     }
 }
 
@@ -386,7 +408,7 @@ public struct ProjectilePlayerPierceParams : IProjectileBehaviourOnHitPlayerPara
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        serializer.SerializeValue(ref MaxPlayersToPierce);
     }
 }
 
@@ -398,7 +420,8 @@ public struct ProjectilePlayerExplodeParams : IProjectileBehaviourOnHitPlayerPar
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        serializer.SerializeValue(ref ExplosionRadius);
+        serializer.SerializeValue(ref ExplosionDamage);
     }
 }
 
@@ -429,7 +452,10 @@ public struct AimAndScopeStats : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        throw new NotImplementedException();
+        serializer.SerializeValue(ref AimingFOV);
+        serializer.SerializeValue(ref ScopeMagnification);
+        serializer.SerializeValue(ref TimeToADS);
+        serializer.SerializeValue(ref TimeToUnADS);
     }
 }
 
