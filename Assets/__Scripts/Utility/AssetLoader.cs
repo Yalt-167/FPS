@@ -4,13 +4,7 @@ namespace MyUtility
     {
         public static T LoadAsset<T>(string path) where T : UnityEngine.Object
         {
-            T asset = UnityEngine.Resources.Load<T>(path);
-            if (asset == null)
-            {
-                UnityEngine.Debug.LogError($"No proper asset found at {path}");
-            }
-
-            return asset;
+            return UnityEngine.Resources.Load<T>(path) ?? throw new System.Exception($"No proper asset found at {path}");
         }
     }
 }
