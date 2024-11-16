@@ -21,6 +21,8 @@ public sealed class PlayerCombatInputs : MonoBehaviour
 
     private void OnValidate()
     {
+        return;
+#pragma warning disable
         if (weapons.Length > allowedWeaponsCount)
         {
             var temp = new WeaponScriptableObject[allowedWeaponsCount];
@@ -31,14 +33,14 @@ public sealed class PlayerCombatInputs : MonoBehaviour
 
             weapons = temp;
         }
+#pragma warning restore
     }
 
     private void Awake()
     {
-        //cameraTransform = transform.GetChild(0).GetChild(0);
         weaponHandler = GetComponent<WeaponHandler>();
         inputManager = GetComponent<InputManager>();
-        UpdateWeapon();
+        //UpdateWeapon();
     }
 
     private void Update()
@@ -61,37 +63,32 @@ public sealed class PlayerCombatInputs : MonoBehaviour
     {
         if (InputQuery.FirstGun)
         {
-            UpdateWeaponWithIndex(0);
+            UpdateWeapon(0);
             return;
         }
         else if (InputQuery.SecondGun)
         {
-            UpdateWeaponWithIndex(1);
+            UpdateWeapon(1);
             return;
         }
         else if (InputQuery.ThirdGun)
         {
-            UpdateWeaponWithIndex(2);
+            UpdateWeapon(2);
             return;
         }
 
         var scrollWheelInput = Input.GetAxis(ScrollWheelAxis);
         if (scrollWheelInput != 0f)
         {
-            UpdateWeaponWithIndex(
-                MyUtility.Utility.ModuloThatWorksWithNegatives(scrollWheelInput > 0f ? ++currentWeaponIndex : --currentWeaponIndex, allowedWeaponsCount)
+            UpdateWeapon(
+                MyUtilities.Utility.ModuloThatWorksWithNegatives(scrollWheelInput > 0f ? ++currentWeaponIndex : --currentWeaponIndex, allowedWeaponsCount)
             );
         }
     }
 
 
-    private void UpdateWeaponWithIndex(int index)
+    private void UpdateWeapon(int index)
     {
         weaponHandler.SetWeapon(weapons[currentWeaponIndex = index]);
-    }
-
-    private void UpdateWeapon()
-    {
-        weaponHandler.SetWeapon(weapons[currentWeaponIndex]);
     }
 }
