@@ -17,7 +17,7 @@ MonoBehaviour:
     BodyshotDamage: 100
     LegshotDamage: 75
   WeaponClass: 0
-  IsHitscan: 0
+  IsHitscan: 1
   HitscanBulletSettings:
     PierceThroughPlayers: 0
     ActionOnHitWall: 0
@@ -31,6 +31,7 @@ MonoBehaviour:
       type: 3}
     BulletDrop: 0
     BulletSpeed: 3
+    ChargeAffectsBulletsSpeed: 0
     OnHitWallBehaviour: 1
     OnHitWallBehaviourParams:
       ProjectileWallPierceParams:
@@ -63,8 +64,8 @@ MonoBehaviour:
     SpreadRegulationSpeed: 0
   ShotgunStats:
     PelletsCount: 32
-    PelletsSpreadAngle: 15
-    AimingPelletsSpreadAngle: 10
+    HipfirePelletsSpreadAngle: 5
+    AimingPelletsSpreadAngle: 2
     PelletsRange: 100
   ShootingRythm: 0
   CooldownBetweenShots: 1
