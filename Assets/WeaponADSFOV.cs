@@ -12,7 +12,7 @@ namespace WeaponHandling
     public sealed class WeaponADSFOV : MonoBehaviour
     {
         private new Camera camera;
-
+        private bool isSetUp;
         private float FOVDifference;
         private static readonly int baseFOV = 60;
 
@@ -22,19 +22,23 @@ namespace WeaponHandling
         private bool IsADSing => weaponHandler.IsAiming;
         private AimAndScopeStats AimingStats => weaponHandler.CurrentWeapon.AimingAndScopeStats;
 
-        public void SetupData(WeaponHandler weapnHandler_)
+        public void SetupData(WeaponHandler weaponHandler_)
         {
             camera = GetComponent<Camera>();
 
-            weaponHandler = weapnHandler_;
+            weaponHandler = weaponHandler_;
 
             FOVDifference = baseFOV - AimingStats.AimingFOV;
+
+            isSetUp = true;
         }
 
 
 
         private void HandleFOVLerp()
         {
+            if (!isSetUp) { return; }
+
             float stepPerFixedUpdate;
             float targetFOV;
             if (IsADSing)
