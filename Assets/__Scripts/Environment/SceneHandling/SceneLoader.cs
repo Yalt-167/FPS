@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.SceneManagement;
-using ParrelSync;
 
 namespace SceneHandling
 {
@@ -65,11 +64,11 @@ namespace SceneHandling
 
         private void LoadSceneInternal(string scenePath, SceneType sceneType)
         {
-            List<string> relevantSceneList = Instance.GetRelevantSceneList(sceneType);
+            List<string> relevantSceneList = GetRelevantSceneList(sceneType);
 
             if (relevantSceneList.Contains(scenePath)) { return; }
 
-            StartCoroutine(Instance.LoadSceneAsyncInternal(scenePath, relevantSceneList));
+            StartCoroutine(LoadSceneAsyncInternal(scenePath, relevantSceneList));
         }
 
         private IEnumerator LoadSceneAsyncInternal(string scene, List<string> relevantSceneList)
@@ -91,7 +90,7 @@ namespace SceneHandling
 
         private void UnloadSceneInternal(string scene, SceneType sceneType)
         {
-            List<string> relevantSceneList = Instance.GetRelevantSceneList(sceneType);
+            List<string> relevantSceneList = GetRelevantSceneList(sceneType);
 
             if (!relevantSceneList.Contains(scene)) { return; }
 
