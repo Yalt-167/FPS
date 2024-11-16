@@ -11,6 +11,8 @@ namespace WeaponHandling
     /// </summary>
     public sealed class WeaponADSGunMovement : MonoBehaviour // moves the transfom which is already propagated + may do some clientside camera adjustment so no need to replicate
     {
+        private bool isSetUp;
+
         private Transform basePositionTransform;
         private Transform ADSPositionTransform;
         [SerializeField] private bool doDebugPosition;
@@ -32,6 +34,8 @@ namespace WeaponHandling
 
             gunTravelDistanceWhenADSing = Vector3.Distance(ADSPositionTransform.position, basePositionTransform.position);
             ResetPosition();
+
+            isSetUp = true;
         }
 
         private void FixedUpdate()
@@ -47,6 +51,8 @@ namespace WeaponHandling
 
         private void HandleWeaponLerp()
         {
+            if (!isSetUp) { return; }
+
             float stepPerFixedUpdate;
             Vector3 targetPosition;
             if (IsADSing)

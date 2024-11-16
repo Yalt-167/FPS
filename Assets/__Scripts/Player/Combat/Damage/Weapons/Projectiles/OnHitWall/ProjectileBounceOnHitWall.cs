@@ -26,7 +26,7 @@ namespace Projectiles
             var closestPoint = relevantWall.ClosestPoint(relevantProjectile.Position);
             if (Physics.Raycast(relevantProjectile.Position, closestPoint - relevantProjectile.Position, out var hit, 3f, Layers.Ground, QueryTriggerInteraction.Ignore))
             {
-                relevantProjectile.SetDirection(MyUtility.Utility.ReflectVector(relevantProjectile.Direction, hit.normal));
+                relevantProjectile.SetDirection(MyUtilities.Utility.ReflectVector(relevantProjectile.Direction, hit.normal));
                 bounces++;
             }
             else
