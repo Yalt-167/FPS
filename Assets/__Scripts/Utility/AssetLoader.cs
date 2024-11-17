@@ -1,4 +1,4 @@
-namespace MyUtility
+namespace MyUtilities
 {
     public static class AssetLoader
     {
