@@ -4,8 +4,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 using UnityEngine;
 using Unity.Netcode;
@@ -81,7 +79,7 @@ namespace GameManagement
             }
             else
             {
-                Debug.LogError("NetworkPrefab is missing a NetworkObject component.");
+                throw new Exception("NetworkPrefab is missing a NetworkObject component.");
             }
         }
 
@@ -141,6 +139,32 @@ namespace GameManagement
         }
 
         #endregion
+
+        public enum NetworkPrefabs
+        {
+            GameManager,
+            Player,
+            TeamSelectionMenu,
+            BaseProjectile
+        }
+
+        //private void SpawnNetworkPrefab(NetworkPrefabs prefab, Vector3 position, Quaternion rotation)
+        //{
+        //    SpawnNetworkPrefab((int)prefab, position, rotation);
+        //}
+        //private void SpawnNetworkPrefab(int index, Vector3 position, Quaternion rotation)
+        //{
+        //    if (index < 0 || index >= NetworkManager.Singleton.NetworkConfig.Prefabs.Prefabs.Count)
+        //    {
+        //        throw new Exception($"This index ({index}) is invalid");
+        //    }
+
+        //    NetworkObject spawnedObject = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(
+        //        NetworkManager.Singleton.NetworkConfig.Prefabs.Prefabs[index], 0, true, false, false, position, rotation);
+            
+        //}
+
+
     }
 }
 
