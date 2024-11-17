@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-using Random = UnityEngine.Random;
-
 using Projectiles;
 using GameManagement;
 using WeaponHandling;
@@ -22,7 +20,10 @@ public sealed class WeaponHandler : NetworkBehaviour
     [SerializeField] private NetworkVariable<WeaponScriptableObject> currentWeapon = new NetworkVariable<WeaponScriptableObject>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
     public WeaponScriptableObject CurrentWeapon => currentWeapon.Value;
 
-    private bool isInitialized;
+    private int currentWeaponIndex;
+    private PlayerWeaponGatherer weapons;
+
+    private bool IsInitialized ;
 
 
     private float cameraTransformInitialZ;
@@ -138,8 +139,21 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region Unity Handled
 
+
+    private void Awake()
+    {
+        MyUtilities.NetworkUtility.CallWhenNetworkSpawned(this, Init);
+    }
     private void FixedUpdate()
     {
+        if (!IsInitialized) { return; }
+
+        _ = weaponsSpreads is null ? throw new Exception("Nope") : (object)null;
+        foreach (var weaponSpread in weaponsSpreads)
+        {
+            weaponSpread.HandleSpreadServerRpc();
+        }
+
         crosshairRecoil.HandleRecoilServerRpc();
 
         foreach (var weaponKickback in weaponsKickbacks)
@@ -152,11 +166,6 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         // ?do a delegate PostShotLogic() to handle such behaviour? (and juste do plain increment instead of this)
         CurrentCooldownBetweenRampUpShots *= currentWeapon.Value.RampUpStats.RampUpCooldownRegulationMultiplier;
-    }
-
-    private void Update()
-    {
-        HandleSpread();
     }
 
     private void LateUpdate()
@@ -176,7 +185,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     #region Init
     private void Init()
     {
-        if (isInitialized) { return; }
+        InitPlayerLoadoutServerRpc();
 
         playerSettings = GetComponent<PlayerSettings>();
         recoilHandlerTransform = transform.GetChild(0).GetChild(0);
@@ -185,6 +194,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         camera = cameraTransform.GetComponent<Camera>();
         weaponADSFOV = cameraTransform.GetComponent<WeaponADSFOV>();
 
+        SetWeapon(weapons[0].Weapon);
         InitWeapon();
         audioSourcePoolSize = 10; // (int)(Mathf.Max(currentWeaponSounds.ShootingSound.length, currentWeaponSounds.NearEmptyMagazineShootSound.length) / currentWeapon.CooldownBetweenShots);
         for (int i = 0; i < audioSourcePoolSize; i++)
@@ -196,12 +206,32 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         damageLogManager.UpdatePlayerSettings(DamageLogsSettings);
 
-        isInitialized = true;
+        IsInitialized = true;
+    }
+
+    [Rpc(SendTo.Server)]
+    private void InitPlayerLoadoutServerRpc()
+    {
+        Debug.Log("I was");
+        InitPlayerLoadoutClientRpc();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void InitPlayerLoadoutClientRpc()
+    {
+        Debug.Log("Called");
+        weapons = new PlayerWeaponGatherer(
+            new string[]
+            {
+                "Weapons/Shotguns/TestShotgun",
+                "Weapons/SMGs/TestSMG",
+                "Weapons/Rifles/TestRifle",
+            }
+        );
     }
 
     public void SetWeapon(WeaponScriptableObject weapon)
     {
-        Init();
         SetWeaponServerRpc(weapon);
         InitWeapon();
     }
@@ -215,8 +245,6 @@ public sealed class WeaponHandler : NetworkBehaviour
     public void InitWeapon()
     {
         barrelEnds = new(GetComponentsInChildren<BarrelEnd>());
-
-        //weaponSockets = new(GetComponentsInChildren<WeaponSocket>());
 
         weaponsADSGunMovements = new(GetComponentsInChildren<WeaponADSGunMovement>());
         foreach (var weaponADSGunMovement in weaponsADSGunMovements)
@@ -243,19 +271,12 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         currentWeaponSounds = currentWeapon.Value.Sounds;
 
-        StartCoroutine(InitWeaponFromServer());
+        InitWeaponServerRpc();
         switchedThisFrame = true;
 
         SetShootingStyle(); // the actual shooting logic
         SetShootingRythm(); // the rythm logic of the shots
         SetOnHitWallMethod();
-    }
-
-    private IEnumerator InitWeaponFromServer()
-    {
-        yield return new WaitUntil(() => IsSpawned);
-
-        InitWeaponServerRpc();
     }
 
     [Rpc(SendTo.Server)]
@@ -270,7 +291,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         shootingStyleMethod = currentWeapon.Value.ShootingStyle switch
         {
-            // ANCHOR
+            // HERE
             //ShootingStyle.Single => currentWeapon.IsHitscan ? ExecuteSimpleHitscanShotClientRpc : ExecuteSimpleTravelTimeShotClientRpc,
             ShootingStyle.Single => currentWeapon.Value.IsHitscan ? ExecuteSimpleHitscanShot : ExecuteSimpleTravelTimeShotClientRpc,
 
@@ -648,7 +669,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                     hit.point,
                     barrelEnd.transform.forward,
                     NetworkObjectId,
-                    PlayerFrame.LocalPlayer.TeamNumber,
+                    PlayerFrame.LocalPlayer.TeamNumber, // cannot work anymore
                     currentWeapon.Value.CanBreakThings
                 );
                 
@@ -698,7 +719,8 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
 
-        foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpread(index))
+        //foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpread(index))
+        foreach (var direction in weaponsSpreads[index].ComputeShotgunSpreadEnumerable(index))
         {
             var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.transform.position, Quaternion.identity).GetComponent<BulletTrail>();
             var endPoint = barrelEnd.transform.position + direction * 100;
@@ -766,7 +788,8 @@ public sealed class WeaponHandler : NetworkBehaviour
         var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
         var pelletIdx = 0;
         var endPoints = new Vector3[currentWeapon.Value.ShotgunStats.PelletsCount];
-        foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpreadFromServer(index))
+        //foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpreadFromServer(index))
+        foreach (var direction in weaponsSpreads[index].ComputeShotgunSpreadEnumerable(index))
         {
             endPoints[pelletIdx] = barrelEnd.transform.position + direction * 100;
 
@@ -967,7 +990,8 @@ public sealed class WeaponHandler : NetworkBehaviour
         
 
         var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
-        foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpread(index))
+        //foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpread(index))
+        foreach (var direction in weaponsSpreads[index].ComputeShotgunSpreadEnumerable(index))
         {
             var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.transform.position, Quaternion.identity).GetComponent<BulletTrail>();
             var endPoint = barrelEnd.transform.position + direction * 100;
@@ -1034,7 +1058,8 @@ public sealed class WeaponHandler : NetworkBehaviour
         UpdateOwnerSettingsUponShotFromServer();
 
         var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
-        foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpreadFromServer(index))
+        //foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpreadFromServer(index))
+        foreach (var direction in weaponsSpreads[index].ComputeShotgunSpreadEnumerable(index))
         {
             var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.transform.position, Quaternion.identity).GetComponent<BulletTrail>();
             var endPoint = barrelEnd.transform.position + direction * 100;
@@ -1102,7 +1127,9 @@ public sealed class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void ExecuteSimpleTravelTimeShotClientRpc()
     {
+#pragma warning disable
         UpdateOwnerSettingsUponShot();
+#pragma warning restore
 
         var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
 
@@ -1138,12 +1165,15 @@ public sealed class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void ExecuteShotgunTravelTimeShotClientRpc()
     {
+#pragma warning disable
         UpdateOwnerSettingsUponShot();
+#pragma warning restore
 
         var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
 
         //for (int i = 0; i < currentWeapon.ShotgunStats.PelletsCount; i++)
-        foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpread(index))
+        //foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpread(index))
+        foreach (var direction in weaponsSpreads[index].ComputeShotgunSpreadEnumerable(index))
         {
 
             var projectile = Instantiate(
@@ -1179,7 +1209,9 @@ public sealed class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void ExecuteChargedTravelTimeShotClientRpc(float chargeRatio)
     {
+#pragma warning disable
         UpdateOwnerSettingsUponShot();
+#pragma warning restore
 
         var barrelEnd = barrelEnds.GetCurrentAndIndex(out int index);
 
@@ -1215,12 +1247,15 @@ public sealed class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void ExecuteChargedShotgunTravelTimeShotClientRpc(float chargeRatio)
     {
+#pragma warning disable
         UpdateOwnerSettingsUponShot();
+#pragma warning restore
 
         var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
 
         //for (int i = 0; i < currentWeapon.ShotgunStats.PelletsCount; i++)
-        foreach(var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpread(index))
+        //foreach(var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpread(index))
+        foreach(var direction in weaponsSpreads[index].ComputeShotgunSpreadEnumerable(index))
         {
             var projectile = Instantiate(
                 currentWeapon.Value.TravelTimeBulletSettings.BulletPrefab,
@@ -1283,7 +1318,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         if (hitscanBulletEffectSettings.BouncesAmount == 0) { return; }
 
-        var newShotDirection = MyUtility.Utility.ReflectVector(shotInfos.ShotDirection, shotInfos.Hit.normal);
+        var newShotDirection = MyUtilities.Utility.ReflectVector(shotInfos.ShotDirection, shotInfos.Hit.normal);
 
         var bulletTrail = Instantiate(bulletTrailPrefab, shotInfos.Hit.point, Quaternion.identity).GetComponent<BulletTrail>();
         var endPoint = shotInfos.Hit.point + newShotDirection * 100;
@@ -1480,14 +1515,6 @@ public sealed class WeaponHandler : NetworkBehaviour
         weaponsSpreads[idx].ApplySpreadFromServer(chargeRatio);
     }
 
-    private void HandleSpread()
-    {
-        foreach (var weaponSpread in weaponsSpreads)
-        {
-            weaponSpread.HandleSpreadServerRpc();
-        }
-    }
-
     private Vector3 GetDirectionWithSpread(float spreadAngle, Transform directionTransform)
     {
         var spreadStrength = spreadAngle / 45f;
@@ -1501,8 +1528,8 @@ public sealed class WeaponHandler : NetworkBehaviour
         return (
                 directionTransform.forward + directionTransform.TransformDirection(
                     new Vector3(
-                        Random.Range(-spreadStrength, spreadStrength),
-                        Random.Range(-spreadStrength, spreadStrength),
+                        UnityEngine.Random.Range(-spreadStrength, spreadStrength),
+                        UnityEngine.Random.Range(-spreadStrength, spreadStrength),
                         0
                     )
                 )
