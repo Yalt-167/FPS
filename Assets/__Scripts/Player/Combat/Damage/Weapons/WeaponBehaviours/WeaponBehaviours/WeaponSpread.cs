@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace WeaponHandling
 {
@@ -20,7 +21,7 @@ namespace WeaponHandling
 #if NETWORK_LIST_AMALGAMATION
         private NetworkVariable<List<Vector3>> shotgunDirectionsWithSpread = new NetworkVariable<List<Vector3>>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
 #else
-        private NetworkList<Vector3> shotgunDirectionsWithSpread = new NetworkList<Vector3>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
+        //private NetworkList<Vector3> shotgunDirectionsWithSpread = new NetworkList<Vector3>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
 #endif
         // make that a List<NetworkVariable<Vector3>> XD
         public Vector3 GetDirectionWithSpread(int barrelEndIndex)
@@ -34,40 +35,40 @@ namespace WeaponHandling
             return directionWithSpread.Value;
         }
 
-        public IEnumerable<Vector3> GetShotgunDirectionsWithSpread(int barrelEndIndex)
-        {
-            SetShotgunDirectionsWithSpreadServerRpc(barrelEndIndex);
-#if NETWORK_LIST_AMALGAMATION
-            var count = shotgunDirectionsWithSpread.Value.Count;
-#else
-            var count = shotgunDirectionsWithSpread.Count;
-#endif
-            for (int i = 0; i < count; i++)
-            {
-#if NETWORK_LIST_AMALGAMATION
-                yield return shotgunDirectionsWithSpread.Value[i];
-#else
-                yield return shotgunDirectionsWithSpread[i];
-#endif
-            }
-        }
-        public IEnumerable<Vector3> GetShotgunDirectionsWithSpreadFromServer(int barrelEndIndex)
-        {
-            SetShotgunDirectionsWithSpreadFromServer(barrelEndIndex);
-#if NETWORK_LIST_AMALGAMATION
-            var count = shotgunDirectionsWithSpread.Value.Count;
-#else
-            var count = shotgunDirectionsWithSpread.Count;
-#endif
-            for (int i = 0; i < count; i++)
-            {
-#if NETWORK_LIST_AMALGAMATION
-                yield return shotgunDirectionsWithSpread.Value[i];
-#else
-                yield return shotgunDirectionsWithSpread[i];
-#endif
-            }
-        }
+//        public IEnumerable<Vector3> GetShotgunDirectionsWithSpread(int barrelEndIndex)
+//        {
+//            SetShotgunDirectionsWithSpreadServerRpc(barrelEndIndex);
+//#if NETWORK_LIST_AMALGAMATION
+//            var count = shotgunDirectionsWithSpread.Value.Count;
+//#else
+//            var count = shotgunDirectionsWithSpread.Count;
+//#endif
+//            for (int i = 0; i < count; i++)
+//            {
+//#if NETWORK_LIST_AMALGAMATION
+//                yield return shotgunDirectionsWithSpread.Value[i];
+//#else
+//                yield return shotgunDirectionsWithSpread[i];
+//#endif
+//            }
+//        }
+//        public IEnumerable<Vector3> GetShotgunDirectionsWithSpreadFromServer(int barrelEndIndex)
+//        {
+//            SetShotgunDirectionsWithSpreadFromServer(barrelEndIndex);
+//#if NETWORK_LIST_AMALGAMATION
+//            var count = shotgunDirectionsWithSpread.Value.Count;
+//#else
+//            var count = shotgunDirectionsWithSpread.Count;
+//#endif
+//            for (int i = 0; i < count; i++)
+//            {
+//#if NETWORK_LIST_AMALGAMATION
+//                yield return shotgunDirectionsWithSpread.Value[i];
+//#else
+//                yield return shotgunDirectionsWithSpread[i];
+//#endif
+//            }
+//        }
 
 
         private SimpleShotStats AimingSimpleShotStats => weaponHandler.CurrentWeapon.AimingSimpleShotStats;
@@ -75,7 +76,7 @@ namespace WeaponHandling
 
         private WeaponHandler weaponHandler;
         private bool IsAiming => weaponHandler.IsAiming;
-        
+
 
         private void Awake()
         {
@@ -189,53 +190,53 @@ namespace WeaponHandling
             //).normalized;
         }
 
-        [Rpc(SendTo.Server)]
-        private void SetShotgunDirectionsWithSpreadServerRpc(int barrelEndIndex)
-        {
-            var barrelEnd = weaponHandler.BarrelEnds[barrelEndIndex].transform;
+//        [Rpc(SendTo.Server)]
+//        private void SetShotgunDirectionsWithSpreadServerRpc(int barrelEndIndex)
+//        {
+//            var barrelEnd = weaponHandler.BarrelEnds[barrelEndIndex].transform;
 
-#if NETWORK_LIST_AMALGAMATION
-            shotgunDirectionsWithSpread.Value.Clear();
-#else
-            shotgunDirectionsWithSpread.Clear();
-#endif
+//#if NETWORK_LIST_AMALGAMATION
+//            shotgunDirectionsWithSpread.Value.Clear();
+//#else
+//            shotgunDirectionsWithSpread.Clear();
+//#endif
 
-            var relevantSpread = IsAiming ? weaponHandler.CurrentWeapon.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeapon.ShotgunStats.HipfirePelletsSpreadAngle;
-            relevantSpread /= 45f;
+//            var relevantSpread = IsAiming ? weaponHandler.CurrentWeapon.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeapon.ShotgunStats.HipfirePelletsSpreadAngle;
+//            relevantSpread /= 45f;
 
-            var pelletCount = weaponHandler.CurrentWeapon.ShotgunStats.PelletsCount;
-            for (int i = 0; i < pelletCount; i++)
-            {
-#if NETWORK_LIST_AMALGAMATION
-                shotgunDirectionsWithSpread.Value.Add(GetDirectionWithSpreadInternal(relevantSpread, barrelEnd));
-#else
-                shotgunDirectionsWithSpread.Add(GetDirectionWithSpreadInternal(relevantSpread, barrelEnd));
-#endif
-            }
-        }
-        private void SetShotgunDirectionsWithSpreadFromServer(int barrelEndIndex)
-        {
-            var barrelEnd = weaponHandler.BarrelEnds[barrelEndIndex].transform;
+//            var pelletCount = weaponHandler.CurrentWeapon.ShotgunStats.PelletsCount;
+//            for (int i = 0; i < pelletCount; i++)
+//            {
+//#if NETWORK_LIST_AMALGAMATION
+//                shotgunDirectionsWithSpread.Value.Add(GetDirectionWithSpreadInternal(relevantSpread, barrelEnd));
+//#else
+//                shotgunDirectionsWithSpread.Add(GetDirectionWithSpreadInternal(relevantSpread, barrelEnd));
+//#endif
+//            }
+//        }
+//        private void SetShotgunDirectionsWithSpreadFromServer(int barrelEndIndex)
+//        {
+//            var barrelEnd = weaponHandler.BarrelEnds[barrelEndIndex].transform;
 
-#if NETWORK_LIST_AMALGAMATION
-            shotgunDirectionsWithSpread.Value.Clear();
-#else
-            shotgunDirectionsWithSpread.Clear();
-#endif
+//#if NETWORK_LIST_AMALGAMATION
+//            shotgunDirectionsWithSpread.Value.Clear();
+//#else
+//            shotgunDirectionsWithSpread.Clear();
+//#endif
 
-            var relevantSpread = IsAiming ? weaponHandler.CurrentWeapon.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeapon.ShotgunStats.HipfirePelletsSpreadAngle;
-            relevantSpread /= 45f;
+//            var relevantSpread = IsAiming ? weaponHandler.CurrentWeapon.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeapon.ShotgunStats.HipfirePelletsSpreadAngle;
+//            relevantSpread /= 45f;
 
-            var pelletCount = weaponHandler.CurrentWeapon.ShotgunStats.PelletsCount;
-            for (int i = 0; i < pelletCount; i++)
-            {
-#if NETWORK_LIST_AMALGAMATION
-                shotgunDirectionsWithSpread.Value.Add(GetDirectionWithSpreadInternal(relevantSpread, barrelEnd));
-#else
-                shotgunDirectionsWithSpread.Add(GetDirectionWithSpreadInternal(relevantSpread, barrelEnd));
-#endif
-            }
-        }
+//            var pelletCount = weaponHandler.CurrentWeapon.ShotgunStats.PelletsCount;
+//            for (int i = 0; i < pelletCount; i++)
+//            {
+//#if NETWORK_LIST_AMALGAMATION
+//                shotgunDirectionsWithSpread.Value.Add(GetDirectionWithSpreadInternal(relevantSpread, barrelEnd));
+//#else
+//                shotgunDirectionsWithSpread.Add(GetDirectionWithSpreadInternal(relevantSpread, barrelEnd));
+//#endif
+//            }
+//        }
 
         public override void OnNetworkDespawn()
         {
@@ -250,8 +251,88 @@ namespace WeaponHandling
 
         public override void OnDestroy()
         {
-            base.OnDestroy();
             MyDebug.DebugUtility.LogMethodCall();
+            base.OnDestroy();
+        }
+
+        [UnityEditor.MenuItem("Developer/TestComputeShotgunSpread")]
+        public static void TestComputeShotgunSpread()
+        {
+            MyDebug.DebugUtility.PrintIterable(new Vector3[] { });
+        }
+
+        // make shotgun spread constant instead
+        public Vector3[] ComputeShotgunSpread(int barrelEndIndex)
+        {
+            var barrelEnd = weaponHandler.BarrelEnds[barrelEndIndex].transform;
+
+            var relevantSpread = IsAiming ? weaponHandler.CurrentWeapon.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeapon.ShotgunStats.HipfirePelletsSpreadAngle;
+            relevantSpread /= 45f;
+
+            Vector3[] values = new Vector3[weaponHandler.CurrentWeapon.ShotgunStats.PelletsCount];
+
+            //_ = values.Length % 4 == 0 ? (object)null : throw new System.Exception("Make sure the pellets count is divisible by 4");
+            Assert.IsTrue(values.Length % 4 == 0);
+
+            float spreadThisIteration;
+            for (int i = 0; i < values.Length / 4; i++)
+            {
+                spreadThisIteration = relevantSpread / i;
+                values[i * 4] = barrelEnd.forward + barrelEnd.TransformDirection(
+                    new Vector3(spreadThisIteration, spreadThisIteration, 0f
+                        )
+                ).normalized;
+                values[i * 4 + 1] = barrelEnd.forward + barrelEnd.TransformDirection(
+                    new Vector3(spreadThisIteration, -spreadThisIteration, 0f
+                        )
+                ).normalized;
+                values[i * 4 + 2] = barrelEnd.forward + barrelEnd.TransformDirection(
+                    new Vector3(-spreadThisIteration, spreadThisIteration, 0f
+                        )
+                ).normalized;
+                values[i * 4 + 3] = barrelEnd.forward + barrelEnd.TransformDirection(
+                    new Vector3(-spreadThisIteration, -spreadThisIteration, 0f
+                        )
+                ).normalized;
+            }
+
+            return values;
+        }
+
+
+        public IEnumerable<Vector3> ComputeShotgunSpreadEnumerable(int barrelEndIndex)
+        {
+            var barrelEnd = weaponHandler.BarrelEnds[barrelEndIndex].transform;
+
+            var relevantSpread = IsAiming ? weaponHandler.CurrentWeapon.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeapon.ShotgunStats.HipfirePelletsSpreadAngle;
+            relevantSpread /= 45f;
+
+            Assert.IsTrue(weaponHandler.CurrentWeapon.ShotgunStats.PelletsCount % 4 == 0);
+            int length = weaponHandler.CurrentWeapon.ShotgunStats.PelletsCount / 4;
+
+            //_ = values.Length % 4 == 0 ? (object)null : throw new System.Exception("Make sure the pellets count is divisible by 4");
+
+            float spreadThisIteration;
+            for (int i = 0; i < length / 4; i++)
+            {
+                spreadThisIteration = relevantSpread / i;
+                yield return barrelEnd.forward + barrelEnd.TransformDirection(
+                    new Vector3(spreadThisIteration, spreadThisIteration, 0f
+                        )
+                ).normalized;
+                yield return barrelEnd.forward + barrelEnd.TransformDirection(
+                    new Vector3(spreadThisIteration, -spreadThisIteration, 0f
+                        )
+                ).normalized;
+                yield return barrelEnd.forward + barrelEnd.TransformDirection(
+                    new Vector3(-spreadThisIteration, spreadThisIteration, 0f
+                        )
+                ).normalized;
+                yield return barrelEnd.forward + barrelEnd.TransformDirection(
+                    new Vector3(-spreadThisIteration, -spreadThisIteration, 0f
+                        )
+                ).normalized;
+            }
         }
     }
 }
