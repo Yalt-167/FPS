@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+
+
 using UnityEngine;
 
 public static class Extensions
@@ -30,28 +32,15 @@ public static class Extensions
         return new(currentVector.x * x, currentVector.y * y, currentVector.z * z);
     }
 
-    /// <summary>
-    /// Make sure to ASSIGN it to the vector you want<br/>
-    /// otherwise it will NOT take effect due to Vector3 being a struct (value type)
-    /// </summary>
-    /// <param name="currentVector"></param>
-    /// <param name="keepX"></param>
-    /// <param name="keepY"></param>
-    /// <param name="keepZ"></param>
-    /// <returns></returns>
-    public static Vector3 Mask(this Vector3 currentVector, bool keepX, bool keepY, bool keepZ)
-    {
-        return currentVector.Mask(
-            new Vector3(
-                keepX ? 1 : 0,
-                keepY ? 1 : 0,
-                keepZ ? 1 : 0
-            )
-        );
-    }
-
     public static Rect ToRect(this Vector4 currentVector)
     {
         return new Rect(currentVector.x, currentVector.y, currentVector.z, currentVector.w);
     }
+
+    //public static IEnumerator CallWhenNetworkSpawned(this Unity.Netcode.NetworkBehaviour networkBehaviour, System.Action delegate_)
+    //{
+    //    yield return new WaitUntil(() => networkBehaviour.IsSpawned);
+
+    //    delegate_();
+    //}
 }
