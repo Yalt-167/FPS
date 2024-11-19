@@ -81,7 +81,10 @@ public sealed class PlayerCombatInputs : MonoBehaviour
         if (scrollWheelInput != 0f)
         {
             UpdateWeapon(
-                MyUtilities.Utility.ModuloThatWorksWithNegatives(scrollWheelInput > 0f ? ++currentWeaponIndex : --currentWeaponIndex, allowedWeaponsCount)
+                MyUtilities.Utility.ModuloThatWorksWithNegatives(
+                    scrollWheelInput > 0f ? ++currentWeaponIndex : --currentWeaponIndex,
+                    allowedWeaponsCount
+                )
             );
         }
     }
@@ -89,6 +92,7 @@ public sealed class PlayerCombatInputs : MonoBehaviour
 
     private void UpdateWeapon(int index)
     {
-        weaponHandler.SetWeapon(weapons[currentWeaponIndex = index]);
+        //weaponHandler.SetWeapon(weapons[currentWeaponIndex = index]);
+        weaponHandler.SetWeapon(currentWeaponIndex = index);
     }
 }
