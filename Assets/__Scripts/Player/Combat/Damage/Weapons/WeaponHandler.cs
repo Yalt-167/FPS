@@ -1,3 +1,5 @@
+#define USING_RUNTIME_WEAPON_DATA
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,22 +19,23 @@ public sealed class WeaponHandler : NetworkBehaviour
 {
     #region References
 
-    [SerializeField] private NetworkVariable<WeaponScriptableObject> currentWeapon = new NetworkVariable<WeaponScriptableObject>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
-    public WeaponScriptableObject CurrentWeapon => currentWeapon.Value;
+    //[SerializeField] private NetworkVariable<WeaponScriptableObject> currentWeapon = new NetworkVariable<WeaponScriptableObject>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
+    public WeaponScriptableObject CurrentWeapon =>
+#if USING_RUNTIME_WEAPON_DATA
+        weaponsGatherer[currentWeaponIndex.Value].Weapon;
+#else
+        CurrentWeapon;
 
-    private int currentWeaponIndex;
-    private PlayerWeaponGatherer weapons;
+#endif
+    private NetworkVariable<int> currentWeaponIndex = new NetworkVariable<int>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
+    private PlayerWeaponsGatherer weaponsGatherer;
 
     private bool IsInitialized ;
 
 
-    private float cameraTransformInitialZ;
-    private Transform cameraTransform;
-    private new Camera camera;
-    private Transform recoilHandlerTransform;
+
     private CrosshairRecoil crosshairRecoil;
-    private WeaponBehaviourGatherer<BarrelEnd> barrelEnds;
-    public WeaponBehaviourGatherer<BarrelEnd> BarrelEnds => barrelEnds;
+    public WeaponBehaviourGatherer<BarrelEnd> BarrelEnds;
     private WeaponBehaviourGatherer<WeaponADSGunMovement> weaponsADSGunMovements;
     private WeaponBehaviourGatherer<WeaponKickback> weaponsKickbacks;
     private WeaponBehaviourGatherer<WeaponSpread> weaponsSpreads;
@@ -48,11 +51,11 @@ public sealed class WeaponHandler : NetworkBehaviour
     [SerializeField] private DamageLogManager damageLogManager;
     private PlayerFrame ownerFrame;
 
-    #endregion
+#endregion
 
     #region Sound Setup
 
-    private List<AudioSource> audioSources = new();
+    private readonly List<AudioSource> audioSources = new();
     private int audioSourcePoolSize;
     private int currentAudioSourceIndex;
     private WeaponSounds currentWeaponSounds;
@@ -62,8 +65,9 @@ public sealed class WeaponHandler : NetworkBehaviour
     #region Global Setup
 
     // eventually make this a NetworkVariable
-    private NetworkVariable<float> timeLastShotFired = new NetworkVariable<float>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
     private bool switchedThisFrame;
+
+    private NetworkVariable<float> timeLastShotFired = new NetworkVariable<float>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
     private NetworkVariable<bool> shotThisFrame = new NetworkVariable<bool>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
     private NetworkVariable<ushort> ammos = new NetworkVariable<ushort>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
 
@@ -82,24 +86,6 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #endregion
 
-    #region Recoil Setup
-
-    private Vector3 currentRecoilHandlerRotation;
-    private Vector3 targetRecoilHandlerRotation;
-
-    #endregion
-
-    #region Spread Setup
-
-    private float currentSpreadAngle = 0f;
-
-    #endregion
-
-    #region Shotgun Setup
-
-    private Vector3[] shotgunPelletsDirections;
-
-    #endregion
 
     #region Burst Setup
 
@@ -119,7 +105,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         }
         set
         {
-            currentCooldownBetweenRampUpShots = Mathf.Clamp(value, currentWeapon.Value.RampUpStats.RampUpMinCooldownBetweenShots, currentWeapon.Value.RampUpStats.RampUpMaxCooldownBetweenShots);
+            currentCooldownBetweenRampUpShots = Mathf.Clamp(value, CurrentWeapon.RampUpStats.RampUpMinCooldownBetweenShots, CurrentWeapon.RampUpStats.RampUpMaxCooldownBetweenShots);
         }
     }
 
@@ -129,9 +115,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     #region Charge Setup
 
     private float timeStartedCharging;
-    private bool holdingAttackKey = false;
-
-
+    private bool holdingAttackKey;
 
     #endregion
 
@@ -144,11 +128,14 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         MyUtilities.NetworkUtility.CallWhenNetworkSpawned(this, Init);
     }
+
     private void FixedUpdate()
     {
         if (!IsInitialized) { return; }
 
-        _ = weaponsSpreads is null ? throw new Exception("Nope") : (object)null;
+        if (!IsServer) { return; }
+
+        //_ = weaponsSpreads ?? throw new Exception("Nope");
         foreach (var weaponSpread in weaponsSpreads)
         {
             weaponSpread.HandleSpreadServerRpc();
@@ -165,12 +152,15 @@ public sealed class WeaponHandler : NetworkBehaviour
         if (shotThisFrame.Value) { return; }
 
         // ?do a delegate PostShotLogic() to handle such behaviour? (and juste do plain increment instead of this)
-        CurrentCooldownBetweenRampUpShots *= currentWeapon.Value.RampUpStats.RampUpCooldownRegulationMultiplier;
+        CurrentCooldownBetweenRampUpShots *= CurrentWeapon.RampUpStats.RampUpCooldownRegulationMultiplier;
     }
 
     private void LateUpdate()
     {
         switchedThisFrame = false;
+
+        if(!IsServer) { return; }
+
         LateUpdateServerRpc();
     }
 
@@ -188,14 +178,11 @@ public sealed class WeaponHandler : NetworkBehaviour
         InitPlayerLoadoutServerRpc();
 
         playerSettings = GetComponent<PlayerSettings>();
-        recoilHandlerTransform = transform.GetChild(0).GetChild(0);
         crosshairRecoil = GetComponent<CrosshairRecoil>();
-        cameraTransform = recoilHandlerTransform.GetChild(0);
-        camera = cameraTransform.GetComponent<Camera>();
-        weaponADSFOV = cameraTransform.GetComponent<WeaponADSFOV>();
+        weaponADSFOV = transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<WeaponADSFOV>();
 
-        SetWeapon(weapons[0].Weapon);
-        InitWeapon();
+        //SetWeapon(weaponsGatherer[0].Weapon);
+        SetWeapon(0);
         audioSourcePoolSize = 10; // (int)(Mathf.Max(currentWeaponSounds.ShootingSound.length, currentWeaponSounds.NearEmptyMagazineShootSound.length) / currentWeapon.CooldownBetweenShots);
         for (int i = 0; i < audioSourcePoolSize; i++)
         {
@@ -209,6 +196,8 @@ public sealed class WeaponHandler : NetworkBehaviour
         IsInitialized = true;
     }
 
+    #region Init Player Loadout
+
     [Rpc(SendTo.Server)]
     private void InitPlayerLoadoutServerRpc()
     {
@@ -220,7 +209,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     private void InitPlayerLoadoutClientRpc()
     {
         Debug.Log("Called");
-        weapons = new PlayerWeaponGatherer(
+        weaponsGatherer = new PlayerWeaponsGatherer(
             new string[]
             {
                 "Weapons/Shotguns/TestShotgun",
@@ -230,21 +219,29 @@ public sealed class WeaponHandler : NetworkBehaviour
         );
     }
 
-    public void SetWeapon(WeaponScriptableObject weapon)
+    #endregion
+
+    public void SetWeapon(int index)
     {
-        SetWeaponServerRpc(weapon);
-        InitWeapon();
+        SetWeaponServerRpc(index);
     }
 
     [Rpc(SendTo.Server)]
-    private void SetWeaponServerRpc(WeaponScriptableObject weapon)
-    { 
-        currentWeapon.Value = weapon;
+    private void SetWeaponServerRpc(int index)
+    {
+        currentWeaponIndex.Value = index;
+        InitWeaponClientRpc();
     }
 
-    public void InitWeapon()
+    [Rpc(SendTo.ClientsAndHost)]
+    private void InitWeaponClientRpc()
     {
-        barrelEnds = new(GetComponentsInChildren<BarrelEnd>());
+        InitWeapon();
+    }
+
+    private void InitWeapon()
+    {
+        BarrelEnds = new(GetComponentsInChildren<BarrelEnd>());
 
         weaponsADSGunMovements = new(GetComponentsInChildren<WeaponADSGunMovement>());
         foreach (var weaponADSGunMovement in weaponsADSGunMovements)
@@ -269,7 +266,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             weaponSpread.SetupData(this);
         }
 
-        currentWeaponSounds = currentWeapon.Value.Sounds;
+        currentWeaponSounds = CurrentWeapon.Sounds;
 
         InitWeaponServerRpc();
         switchedThisFrame = true;
@@ -283,20 +280,20 @@ public sealed class WeaponHandler : NetworkBehaviour
     private void InitWeaponServerRpc()
     {
         timeLastShotFired.Value = float.MinValue;
-        ammos.Value = currentWeapon.Value.MagazineSize;
+        ammos.Value = CurrentWeapon.MagazineSize;
         canShoot.Value = true;
     }
 
     private void SetShootingStyle()
     {
-        shootingStyleMethod = currentWeapon.Value.ShootingStyle switch
+        shootingStyleMethod = CurrentWeapon.ShootingStyle switch
         {
             // HERE
             //ShootingStyle.Single => currentWeapon.IsHitscan ? ExecuteSimpleHitscanShotClientRpc : ExecuteSimpleTravelTimeShotClientRpc,
-            ShootingStyle.Single => currentWeapon.Value.IsHitscan ? ExecuteSimpleHitscanShot : ExecuteSimpleTravelTimeShotClientRpc,
+            ShootingStyle.Single => CurrentWeapon.IsHitscan ? ExecuteSimpleHitscanShot : ExecuteSimpleTravelTimeShotClientRpc,
 
             //ShootingStyle.Shotgun => currentWeapon.IsHitscan ? ExecuteShotgunHitscanShotClientRpc :  ExecuteShotgunTravelTimeShotClientRpc,
-            ShootingStyle.Shotgun => currentWeapon.Value.IsHitscan ? ExecuteShotgunHitscanShot :  ExecuteShotgunTravelTimeShotClientRpc,
+            ShootingStyle.Shotgun => CurrentWeapon.IsHitscan ? ExecuteShotgunHitscanShot :  ExecuteShotgunTravelTimeShotClientRpc,
 
             _ => throw new Exception("This Shooting Style does not exist")
             ,
@@ -305,20 +302,20 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private void SetShootingRythm()
     {
-        shootingRythmMethod = currentWeapon.Value.ShootingRythm switch
+        shootingRythmMethod = CurrentWeapon.ShootingRythm switch
         {
             ShootingRythm.Single => RequestShotServerRpc,
 
             ShootingRythm.Burst => () =>
                 {
-                    StartCoroutine(ShootBurst(currentWeapon.Value.BurstStats.BulletsPerBurst));
+                    StartCoroutine(ShootBurst(CurrentWeapon.BurstStats.BulletsPerBurst));
                 }
             ,
 
             ShootingRythm.RampUp => () =>
                 {
                     RequestShotServerRpc();
-                    CurrentCooldownBetweenRampUpShots *= currentWeapon.Value.RampUpStats.RampUpCooldownMultiplierPerShot;
+                    CurrentCooldownBetweenRampUpShots *= CurrentWeapon.RampUpStats.RampUpCooldownMultiplierPerShot;
                 }
             ,
 
@@ -332,7 +329,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private void SetOnHitWallMethod()
     {
-        onHitWallMethod = currentWeapon.Value.HitscanBulletSettings.ActionOnHitWall switch
+        onHitWallMethod = CurrentWeapon.HitscanBulletSettings.ActionOnHitWall switch
         {
             HitscanBulletActionOnHitWall.Classic => (_, _) => { },
             HitscanBulletActionOnHitWall.ThroughWalls => (_, _) => { },
@@ -355,7 +352,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             if (holdingAttackKey_) // just started pressing the attack key
             {
                 lastShootPressed = Time.time;
-                if (currentWeapon.Value.ShootingRythm == ShootingRythm.Charge)
+                if (CurrentWeapon.ShootingRythm == ShootingRythm.Charge)
                 {
                     StartCoroutine(ChargeShot());
                     return;
@@ -427,9 +424,9 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         if (timeLastShotFired.Value + GetRelevantCooldown() > Time.time) { return; }
 
-        if (currentWeapon.Value.IsHitscan)
+        if (CurrentWeapon.IsHitscan)
         {
-            if (currentWeapon.Value.ShootingStyle == ShootingStyle.Shotgun)
+            if (CurrentWeapon.ShootingStyle == ShootingStyle.Shotgun)
             {
                 ExecuteChargedShotgunHitscanShotClientRpc(chargeRatio);
             }
@@ -441,7 +438,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         }
         else
         {
-            if (currentWeapon.Value.ShootingStyle == ShootingStyle.Shotgun)
+            if (CurrentWeapon.ShootingStyle == ShootingStyle.Shotgun)
             {
                 ExecuteChargedShotgunTravelTimeShotClientRpc(chargeRatio);
             }
@@ -454,12 +451,12 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private float GetRelevantCooldown()
     {
-        return currentWeapon.Value.ShootingRythm switch
+        return CurrentWeapon.ShootingRythm switch
         {
-            ShootingRythm.Single => currentWeapon.Value.CooldownBetweenShots,
-            ShootingRythm.Burst => bulletFiredthisBurst == currentWeapon.Value.BurstStats.BulletsPerBurst ? currentWeapon.Value.CooldownBetweenShots : currentWeapon.Value.BurstStats.CooldownBetweenShotsOfBurst,
+            ShootingRythm.Single => CurrentWeapon.CooldownBetweenShots,
+            ShootingRythm.Burst => bulletFiredthisBurst == CurrentWeapon.BurstStats.BulletsPerBurst ? CurrentWeapon.CooldownBetweenShots : CurrentWeapon.BurstStats.CooldownBetweenShotsOfBurst,
             ShootingRythm.RampUp => CurrentCooldownBetweenRampUpShots,
-            ShootingRythm.Charge => currentWeapon.Value.CooldownBetweenShots,
+            ShootingRythm.Charge => CurrentWeapon.CooldownBetweenShots,
             _ => 0f,
         };
     }
@@ -478,7 +475,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         {
             var timerStart = Time.time;
 
-            yield return new WaitUntil(() => timerStart + currentWeapon.Value.BurstStats.CooldownBetweenShotsOfBurst < Time.time || switchedThisFrame);
+            yield return new WaitUntil(() => timerStart + CurrentWeapon.BurstStats.CooldownBetweenShotsOfBurst < Time.time || switchedThisFrame);
 
             if (switchedThisFrame) { yield break; }
 
@@ -499,13 +496,13 @@ public sealed class WeaponHandler : NetworkBehaviour
         yield return new WaitWhile(() => holdingAttackKey);
 
         var timeCharged = Time.time - timeStartedCharging;
-        var chargeRatio = timeCharged / currentWeapon.Value.ChargeStats.ChargeDuration;
-        if (chargeRatio >= currentWeapon.Value.ChargeStats.MinChargeRatioToShoot)
+        var chargeRatio = timeCharged / CurrentWeapon.ChargeStats.ChargeDuration;
+        if (chargeRatio >= CurrentWeapon.ChargeStats.MinChargeRatioToShoot)
         {
-            var ammoConsumedByThisShot = (ushort)(currentWeapon.Value.ChargeStats.AmmoConsumedByFullyChargedShot * chargeRatio);
+            var ammoConsumedByThisShot = (ushort)(CurrentWeapon.ChargeStats.AmmoConsumedByFullyChargedShot * chargeRatio);
             if (ammos.Value < ammoConsumedByThisShot)
             {
-                RequestChargedShotServerRpc(ammos.Value / currentWeapon.Value.ChargeStats.AmmoConsumedByFullyChargedShot);
+                RequestChargedShotServerRpc(ammos.Value / CurrentWeapon.ChargeStats.AmmoConsumedByFullyChargedShot);
             }
             else
             {
@@ -522,7 +519,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         var bulletTrail = Instantiate(bulletTrailPrefab, BarrelEnds[barrelEndIndex].transform.position, Quaternion.identity).GetComponent<BulletTrail>();
         bulletTrail.Set(BarrelEnds[barrelEndIndex].transform.position, endPoint);
 
-        PlayShootingSound(currentWeapon.Value.AmmoLeftInMagazineToWarn > ammos.Value);
+        PlayShootingSound(CurrentWeapon.AmmoLeftInMagazineToWarn > ammos.Value);
     }
     [Rpc(SendTo.ClientsAndHost)]
     private void EmulateHitscanShotsClientRpc(int barrelEndIndex, Vector3[] endPoints)
@@ -533,7 +530,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             bulletTrail.Set(BarrelEnds[barrelEndIndex].transform.position, endPoints[i]);
         }
 
-        PlayShootingSound(currentWeapon.Value.AmmoLeftInMagazineToWarn > ammos.Value);
+        PlayShootingSound(CurrentWeapon.AmmoLeftInMagazineToWarn > ammos.Value);
     }
 
     #region Execute Shot
@@ -545,7 +542,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         if (!IsOwner) { return; }
 
-        PlayShootingSoundServerRpc(currentWeapon.Value.AmmoLeftInMagazineToWarn >= ammos.Value);
+        PlayShootingSoundServerRpc(CurrentWeapon.AmmoLeftInMagazineToWarn >= ammos.Value);
 
         timeLastShotFired.Value = Time.time;
         //shotThisFrame = true;
@@ -564,10 +561,10 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private INetworkSerializable GetRelevantHitscanBulletSettings()
     {
-        return currentWeapon.Value.HitscanBulletSettings.ActionOnHitWall switch
+        return CurrentWeapon.HitscanBulletSettings.ActionOnHitWall switch
         {
-            HitscanBulletActionOnHitWall.Explosive => currentWeapon.Value.HitscanBulletSettings.ExplodingBulletsSettings,
-            HitscanBulletActionOnHitWall.BounceOnWalls => currentWeapon.Value.HitscanBulletSettings.BouncingBulletsSettings,
+            HitscanBulletActionOnHitWall.Explosive => CurrentWeapon.HitscanBulletSettings.ExplodingBulletsSettings,
+            HitscanBulletActionOnHitWall.BounceOnWalls => CurrentWeapon.HitscanBulletSettings.BouncingBulletsSettings,
             HitscanBulletActionOnHitWall.Classic => null,
             HitscanBulletActionOnHitWall.ThroughWalls => null,
             _ => null
@@ -581,7 +578,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         UpdateOwnerSettingsUponShot();
 #pragma warning restore
 
-        var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
+        var barrelEnd = BarrelEnds.GetCurrentAndIndex(out var index);
 
         var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.transform.position, Quaternion.identity).GetComponent<BulletTrail>();
         var directionWithSpread = weaponsSpreads[index].GetDirectionWithSpread(index);
@@ -598,16 +595,16 @@ public sealed class WeaponHandler : NetworkBehaviour
                 if (IsOwner)
                 {
                     shootableComponent.ReactShot(
-                        currentWeapon.Value.Damage,
+                        CurrentWeapon.Damage,
                         hit.point,
                         barrelEnd.transform.forward,
                         NetworkObjectId,
                         PlayerFrame.LocalPlayer.TeamNumber,
-                        currentWeapon.Value.CanBreakThings
+                        CurrentWeapon.CanBreakThings
                     );
                 }
 
-                if (!currentWeapon.Value.HitscanBulletSettings.PierceThroughPlayers)
+                if (!CurrentWeapon.HitscanBulletSettings.PierceThroughPlayers)
                 {
                     endPoint = hit.point;
                     break;
@@ -620,12 +617,12 @@ public sealed class WeaponHandler : NetworkBehaviour
                         directionWithSpread,
                         hit,
                         NetworkObjectId,
-                        new(currentWeapon.Value)
+                        new(CurrentWeapon)
                     ),
                     GetRelevantHitscanBulletSettings()
                 );
 
-                if (currentWeapon.Value.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                if (CurrentWeapon.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                 {
                     endPoint = hit.point;
                     break;
@@ -634,9 +631,9 @@ public sealed class WeaponHandler : NetworkBehaviour
             }
         }
 
-        bulletTrail.Set(barrelEnds.Current.transform.position, endPoint);
+        bulletTrail.Set(BarrelEnds.Current.transform.position, endPoint);
 
-        barrelEnds.GoNext();
+        BarrelEnds.GoNext();
 
         if (!IsOwner) { return; }
 
@@ -651,7 +648,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         MyDebug.DebugUtility.LogMethodCall();
         UpdateOwnerSettingsUponShotFromServer();
 
-        var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
+        var barrelEnd = BarrelEnds.GetCurrentAndIndex(out var index);
 
         var directionWithSpread = weaponsSpreads[index].GetDirectionWithSpreadFromServer(index);
         var endPoint = barrelEnd.transform.position + directionWithSpread * 100;
@@ -665,16 +662,16 @@ public sealed class WeaponHandler : NetworkBehaviour
             if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
             {
                 shootableComponent.ReactShot(
-                    currentWeapon.Value.Damage,
+                    CurrentWeapon.Damage,
                     hit.point,
                     barrelEnd.transform.forward,
                     NetworkObjectId,
                     PlayerFrame.LocalPlayer.TeamNumber, // cannot work anymore
-                    currentWeapon.Value.CanBreakThings
+                    CurrentWeapon.CanBreakThings
                 );
                 
 
-                if (!currentWeapon.Value.HitscanBulletSettings.PierceThroughPlayers)
+                if (!CurrentWeapon.HitscanBulletSettings.PierceThroughPlayers)
                 {
                     endPoint = hit.point;
                     break;
@@ -687,12 +684,12 @@ public sealed class WeaponHandler : NetworkBehaviour
                         directionWithSpread,
                         hit,
                         NetworkObjectId,
-                        new(currentWeapon.Value)
+                        new(CurrentWeapon)
                     ),
                     GetRelevantHitscanBulletSettings()
                 );
 
-                if (currentWeapon.Value.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                if (CurrentWeapon.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                 {
                     endPoint = hit.point;
                     break;
@@ -703,7 +700,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         EmulateHitscanShotClientRpc(index, endPoint);
 
-        barrelEnds.GoNext();
+        BarrelEnds.GoNext();
 
         ApplyCrosshairRecoilFromServer();
         ApplySpreadFromServer(index);
@@ -717,14 +714,14 @@ public sealed class WeaponHandler : NetworkBehaviour
         UpdateOwnerSettingsUponShot();
 #pragma warning restore
 
-        var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
+        var barrelEnd = BarrelEnds.GetCurrentAndIndex(out var index);
 
         //foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpread(index))
         foreach (var direction in weaponsSpreads[index].ComputeShotgunSpreadEnumerable(index))
         {
             var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.transform.position, Quaternion.identity).GetComponent<BulletTrail>();
             var endPoint = barrelEnd.transform.position + direction * 100;
-            var hits = Physics.RaycastAll(barrelEnd.transform.position, direction, currentWeapon.Value.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
+            var hits = Physics.RaycastAll(barrelEnd.transform.position, direction, CurrentWeapon.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
             Array.Sort(hits, new RaycastHitComparer());
 
             foreach (var hit in hits)
@@ -734,16 +731,16 @@ public sealed class WeaponHandler : NetworkBehaviour
                     if (IsOwner)
                     {
                         shootableComponent.ReactShot(
-                            currentWeapon.Value.Damage / currentWeapon.Value.ShotgunStats.PelletsCount,
+                            CurrentWeapon.Damage / CurrentWeapon.ShotgunStats.PelletsCount,
                             direction,
                             hit.point,
                             NetworkObjectId,
                             PlayerFrame.LocalPlayer.TeamNumber,
-                            currentWeapon.Value.CanBreakThings
+                            CurrentWeapon.CanBreakThings
                         );
                     }
 
-                    if (!currentWeapon.Value.HitscanBulletSettings.PierceThroughPlayers)
+                    if (!CurrentWeapon.HitscanBulletSettings.PierceThroughPlayers)
                     {
                         endPoint = hit.point;
                         break;
@@ -757,12 +754,12 @@ public sealed class WeaponHandler : NetworkBehaviour
                             direction,
                             hit,
                             NetworkObjectId,
-                            new(currentWeapon.Value)
+                            new(CurrentWeapon)
                         ),
                         GetRelevantHitscanBulletSettings()
                     );
 
-                    if (currentWeapon.Value.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                    if (CurrentWeapon.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                     {
                         endPoint = hit.point;
                         break;
@@ -774,7 +771,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             bulletTrail.Set(barrelEnd.transform.position, endPoint);
         }
 
-        barrelEnds.GoNext();
+        BarrelEnds.GoNext();
 
         if (!IsOwner) { return; }
 
@@ -785,15 +782,15 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         UpdateOwnerSettingsUponShotFromServer();
 
-        var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
+        var barrelEnd = BarrelEnds.GetCurrentAndIndex(out var index);
         var pelletIdx = 0;
-        var endPoints = new Vector3[currentWeapon.Value.ShotgunStats.PelletsCount];
+        var endPoints = new Vector3[CurrentWeapon.ShotgunStats.PelletsCount];
         //foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpreadFromServer(index))
         foreach (var direction in weaponsSpreads[index].ComputeShotgunSpreadEnumerable(index))
         {
             endPoints[pelletIdx] = barrelEnd.transform.position + direction * 100;
 
-            var hits = Physics.RaycastAll(barrelEnd.transform.position, direction, currentWeapon.Value.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
+            var hits = Physics.RaycastAll(barrelEnd.transform.position, direction, CurrentWeapon.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
             Array.Sort(hits, new RaycastHitComparer());
 
             foreach (var hit in hits)
@@ -801,16 +798,16 @@ public sealed class WeaponHandler : NetworkBehaviour
                 if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
                 {
                     shootableComponent.ReactShot(
-                        currentWeapon.Value.Damage / currentWeapon.Value.ShotgunStats.PelletsCount,
+                        CurrentWeapon.Damage / CurrentWeapon.ShotgunStats.PelletsCount,
                         direction,
                         hit.point,
                         NetworkObjectId,
                         PlayerFrame.LocalPlayer.TeamNumber,
-                        currentWeapon.Value.CanBreakThings
+                        CurrentWeapon.CanBreakThings
                     );
                     
 
-                    if (!currentWeapon.Value.HitscanBulletSettings.PierceThroughPlayers)
+                    if (!CurrentWeapon.HitscanBulletSettings.PierceThroughPlayers)
                     {
                         endPoints[pelletIdx] = hit.point;
                         break;
@@ -823,12 +820,12 @@ public sealed class WeaponHandler : NetworkBehaviour
                             direction,
                             hit,
                             NetworkObjectId,
-                            new(currentWeapon.Value)
+                            new(CurrentWeapon)
                         ),
                         GetRelevantHitscanBulletSettings()
                     );
 
-                    if (currentWeapon.Value.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                    if (CurrentWeapon.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                     {
                         endPoints[pelletIdx] = hit.point;
                         break;
@@ -842,7 +839,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         
         EmulateHitscanShotsClientRpc(index, endPoints);
 
-        barrelEnds.GoNext();
+        BarrelEnds.GoNext();
 
         ApplyCrosshairRecoil();
         ApplyKickback(index);
@@ -855,7 +852,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         UpdateOwnerSettingsUponShot();
 #pragma warning restore
 
-        var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
+        var barrelEnd = BarrelEnds.GetCurrentAndIndex(out var index);
         var bulletTrail = Instantiate(bulletTrailPrefab, barrelEnd.transform.position, Quaternion.identity).GetComponent<BulletTrail>();
         var directionWithSpread = weaponsSpreads[index].GetDirectionWithSpread(index);
         var endPoint = barrelEnd.transform.position + directionWithSpread * 100;
@@ -871,16 +868,16 @@ public sealed class WeaponHandler : NetworkBehaviour
                 if (IsOwner)
                 {
                     shootableComponent.ReactShot(
-                        currentWeapon.Value.Damage * chargeRatio,
+                        CurrentWeapon.Damage * chargeRatio,
                         hit.point,
                         barrelEnd.transform.forward,
                         NetworkObjectId,
                         PlayerFrame.LocalPlayer.TeamNumber,
-                        currentWeapon.Value.CanBreakThings
+                        CurrentWeapon.CanBreakThings
                     );
                 }
 
-                if (!currentWeapon.Value.HitscanBulletSettings.PierceThroughPlayers)
+                if (!CurrentWeapon.HitscanBulletSettings.PierceThroughPlayers)
                 {
                     endPoint = hit.point;
                     break;
@@ -893,12 +890,12 @@ public sealed class WeaponHandler : NetworkBehaviour
                         directionWithSpread,
                         hit,
                         NetworkObjectId,
-                        new(currentWeapon.Value, chargeRatio)
+                        new(CurrentWeapon, chargeRatio)
                     ),
                     GetRelevantHitscanBulletSettings()
                 );
 
-                if (currentWeapon.Value.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                if (CurrentWeapon.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                 {
                     endPoint = hit.point;
                     break;
@@ -909,7 +906,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         bulletTrail.Set(barrelEnd.transform.position, endPoint);
 
-        barrelEnds.GoNext();
+        BarrelEnds.GoNext();
 
         if (!IsOwner) { return; }
 
@@ -921,7 +918,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         UpdateOwnerSettingsUponShotFromServer();
 
-        var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
+        var barrelEnd = BarrelEnds.GetCurrentAndIndex(out var index);
         var directionWithSpread = weaponsSpreads[index].GetDirectionWithSpreadFromServer(index);
         var endPoint = barrelEnd.transform.position + directionWithSpread * 100;
 
@@ -934,16 +931,16 @@ public sealed class WeaponHandler : NetworkBehaviour
             if (hit.collider.TryGetComponent<IShootable>(out var shootableComponent))
             {
                 shootableComponent.ReactShot(
-                    currentWeapon.Value.Damage * chargeRatio,
+                    CurrentWeapon.Damage * chargeRatio,
                     hit.point,
                     barrelEnd.transform.forward,
                     NetworkObjectId,
                     PlayerFrame.LocalPlayer.TeamNumber,
-                    currentWeapon.Value.CanBreakThings
+                    CurrentWeapon.CanBreakThings
                 );
              
 
-                if (!currentWeapon.Value.HitscanBulletSettings.PierceThroughPlayers)
+                if (!CurrentWeapon.HitscanBulletSettings.PierceThroughPlayers)
                 {
                     endPoint = hit.point;
                     break;
@@ -956,12 +953,12 @@ public sealed class WeaponHandler : NetworkBehaviour
                         directionWithSpread,
                         hit,
                         NetworkObjectId,
-                        new(currentWeapon.Value, chargeRatio)
+                        new(CurrentWeapon, chargeRatio)
                     ),
                     GetRelevantHitscanBulletSettings()
                 );
 
-                if (currentWeapon.Value.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                if (CurrentWeapon.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                 {
                     endPoint = hit.point;
                     break;
@@ -972,7 +969,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         EmulateHitscanShotClientRpc(index, endPoint);
 
-        barrelEnds.GoNext();
+        BarrelEnds.GoNext();
 
         if (!IsOwner) { return; }
 
@@ -989,7 +986,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 #pragma warning restore
         
 
-        var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
+        var barrelEnd = BarrelEnds.GetCurrentAndIndex(out var index);
         //foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpread(index))
         foreach (var direction in weaponsSpreads[index].ComputeShotgunSpreadEnumerable(index))
         {
@@ -997,7 +994,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             var endPoint = barrelEnd.transform.position + direction * 100;
 
 
-            var hits = Physics.RaycastAll(barrelEnd.transform.position, direction, currentWeapon.Value.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
+            var hits = Physics.RaycastAll(barrelEnd.transform.position, direction, CurrentWeapon.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
             Array.Sort(hits, new RaycastHitComparer());
 
             foreach (var hit in hits)
@@ -1007,16 +1004,16 @@ public sealed class WeaponHandler : NetworkBehaviour
                     if (IsOwner)
                     {
                         shootableComponent.ReactShot(
-                            currentWeapon.Value.Damage / currentWeapon.Value.ShotgunStats.PelletsCount * chargeRatio,
+                            CurrentWeapon.Damage / CurrentWeapon.ShotgunStats.PelletsCount * chargeRatio,
                             direction,
                             hit.point,
                             NetworkObjectId,
                             PlayerFrame.LocalPlayer.TeamNumber,
-                            currentWeapon.Value.CanBreakThings
+                            CurrentWeapon.CanBreakThings
                         );
                     }
 
-                    if (!currentWeapon.Value.HitscanBulletSettings.PierceThroughPlayers)
+                    if (!CurrentWeapon.HitscanBulletSettings.PierceThroughPlayers)
                     {
                         endPoint = hit.point;
                         break;
@@ -1029,12 +1026,12 @@ public sealed class WeaponHandler : NetworkBehaviour
                             direction,
                             hit,
                             NetworkObjectId,
-                            new(currentWeapon.Value, chargeRatio)
+                            new(CurrentWeapon, chargeRatio)
                             ),
                         GetRelevantHitscanBulletSettings()
                     );
 
-                    if (currentWeapon.Value.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                    if (CurrentWeapon.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                     {
                         endPoint = hit.point;
                         break;
@@ -1046,7 +1043,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             bulletTrail.Set(barrelEnd.transform.position, endPoint);
         }
 
-        barrelEnds.GoNext();
+        BarrelEnds.GoNext();
 
         if (!IsOwner) { return; }
 
@@ -1057,7 +1054,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         UpdateOwnerSettingsUponShotFromServer();
 
-        var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
+        var barrelEnd = BarrelEnds.GetCurrentAndIndex(out var index);
         //foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpreadFromServer(index))
         foreach (var direction in weaponsSpreads[index].ComputeShotgunSpreadEnumerable(index))
         {
@@ -1065,7 +1062,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             var endPoint = barrelEnd.transform.position + direction * 100;
 
 
-            var hits = Physics.RaycastAll(barrelEnd.transform.position, direction, currentWeapon.Value.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
+            var hits = Physics.RaycastAll(barrelEnd.transform.position, direction, CurrentWeapon.ShotgunStats.PelletsRange, layersToHit, QueryTriggerInteraction.Ignore);
             Array.Sort(hits, new RaycastHitComparer());
 
             foreach (var hit in hits)
@@ -1075,16 +1072,16 @@ public sealed class WeaponHandler : NetworkBehaviour
                     if (IsOwner)
                     {
                         shootableComponent.ReactShot(
-                            currentWeapon.Value.Damage / currentWeapon.Value.ShotgunStats.PelletsCount * chargeRatio,
+                            CurrentWeapon.Damage / CurrentWeapon.ShotgunStats.PelletsCount * chargeRatio,
                             direction,
                             hit.point,
                             NetworkObjectId,
                             PlayerFrame.LocalPlayer.TeamNumber,
-                            currentWeapon.Value.CanBreakThings
+                            CurrentWeapon.CanBreakThings
                         );
                     }
 
-                    if (!currentWeapon.Value.HitscanBulletSettings.PierceThroughPlayers)
+                    if (!CurrentWeapon.HitscanBulletSettings.PierceThroughPlayers)
                     {
                         endPoint = hit.point;
                         break;
@@ -1097,12 +1094,12 @@ public sealed class WeaponHandler : NetworkBehaviour
                             direction,
                             hit,
                             NetworkObjectId,
-                            new(currentWeapon.Value, chargeRatio)
+                            new(CurrentWeapon, chargeRatio)
                             ),
                         GetRelevantHitscanBulletSettings()
                     );
 
-                    if (currentWeapon.Value.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
+                    if (CurrentWeapon.HitscanBulletSettings.ActionOnHitWall != HitscanBulletActionOnHitWall.ThroughWalls)
                     {
                         endPoint = hit.point;
                         break;
@@ -1114,7 +1111,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             bulletTrail.Set(barrelEnd.transform.position, endPoint);
         }
 
-        barrelEnds.GoNext();
+        BarrelEnds.GoNext();
 
         ApplyCrosshairRecoil(chargeRatio);
         ApplyKickback(index, chargeRatio);
@@ -1131,10 +1128,10 @@ public sealed class WeaponHandler : NetworkBehaviour
         UpdateOwnerSettingsUponShot();
 #pragma warning restore
 
-        var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
+        var barrelEnd = BarrelEnds.GetCurrentAndIndex(out var index);
 
         var projectile = Instantiate(
-            currentWeapon.Value.TravelTimeBulletSettings.BulletPrefab,
+            CurrentWeapon.TravelTimeBulletSettings.BulletPrefab,
             barrelEnd.transform.position,
             Quaternion.LookRotation(weaponsSpreads[index].GetDirectionWithSpread(index))
             ).GetComponent<Projectile>();
@@ -1142,18 +1139,18 @@ public sealed class WeaponHandler : NetworkBehaviour
         if (projectile == null) { throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it"); }
 
         projectile.Init(
-            currentWeapon.Value.Damage,
-            currentWeapon.Value.TravelTimeBulletSettings.BulletSpeed,
-            currentWeapon.Value.TravelTimeBulletSettings.BulletDrop,
+            CurrentWeapon.Damage,
+            CurrentWeapon.TravelTimeBulletSettings.BulletSpeed,
+            CurrentWeapon.TravelTimeBulletSettings.BulletDrop,
             NetworkObjectId,
-            currentWeapon.Value.CanBreakThings,
+            CurrentWeapon.CanBreakThings,
             layersToHit,
             GetRelevantHitWallBehaviour(),
             GetRelevantHitPlayerBehaviour(),
             ownerFrame.TeamNumber
         );
 
-        barrelEnds.GoNext();
+        BarrelEnds.GoNext();
 
         if (IsOwner) { return; }
 
@@ -1169,7 +1166,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         UpdateOwnerSettingsUponShot();
 #pragma warning restore
 
-        var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
+        var barrelEnd = BarrelEnds.GetCurrentAndIndex(out var index);
 
         //for (int i = 0; i < currentWeapon.ShotgunStats.PelletsCount; i++)
         //foreach (var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpread(index))
@@ -1177,7 +1174,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         {
 
             var projectile = Instantiate(
-                currentWeapon.Value.TravelTimeBulletSettings.BulletPrefab,
+                CurrentWeapon.TravelTimeBulletSettings.BulletPrefab,
                 barrelEnd.transform.position,
                 Quaternion.LookRotation(/*shotgunPelletsDirections[i]*/ direction)
             ).GetComponent<Projectile>();
@@ -1185,11 +1182,11 @@ public sealed class WeaponHandler : NetworkBehaviour
             if (projectile == null) { throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it"); }
 
             projectile.Init(
-                currentWeapon.Value.Damage / currentWeapon.Value.ShotgunStats.PelletsCount,
-                currentWeapon.Value.TravelTimeBulletSettings.BulletSpeed,
-                currentWeapon.Value.TravelTimeBulletSettings.BulletDrop,
+                CurrentWeapon.Damage / CurrentWeapon.ShotgunStats.PelletsCount,
+                CurrentWeapon.TravelTimeBulletSettings.BulletSpeed,
+                CurrentWeapon.TravelTimeBulletSettings.BulletDrop,
                 NetworkObjectId,
-                currentWeapon.Value.CanBreakThings,
+                CurrentWeapon.CanBreakThings,
                 layersToHit,
                 GetRelevantHitWallBehaviour(),
                 GetRelevantHitPlayerBehaviour(),
@@ -1198,7 +1195,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         }
 
-        barrelEnds.GoNext();
+        BarrelEnds.GoNext();
 
         if (!IsOwner) { return; }
 
@@ -1213,10 +1210,10 @@ public sealed class WeaponHandler : NetworkBehaviour
         UpdateOwnerSettingsUponShot();
 #pragma warning restore
 
-        var barrelEnd = barrelEnds.GetCurrentAndIndex(out int index);
+        var barrelEnd = BarrelEnds.GetCurrentAndIndex(out int index);
 
         var projectile = Instantiate(
-            currentWeapon.Value.TravelTimeBulletSettings.BulletPrefab,
+            CurrentWeapon.TravelTimeBulletSettings.BulletPrefab,
             barrelEnd.transform.position,
             Quaternion.LookRotation(weaponsSpreads[index].GetDirectionWithSpread(index))
         ).GetComponent<Projectile>();
@@ -1224,18 +1221,18 @@ public sealed class WeaponHandler : NetworkBehaviour
         if (projectile == null) { throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it"); }
 
         projectile.Init(
-            currentWeapon.Value.Damage * chargeRatio,
-            currentWeapon.Value.TravelTimeBulletSettings.BulletSpeed * chargeRatio,
-            currentWeapon.Value.TravelTimeBulletSettings.BulletDrop,
+            CurrentWeapon.Damage * chargeRatio,
+            CurrentWeapon.TravelTimeBulletSettings.BulletSpeed * chargeRatio,
+            CurrentWeapon.TravelTimeBulletSettings.BulletDrop,
             NetworkObjectId,
-            currentWeapon.Value.CanBreakThings,
+            CurrentWeapon.CanBreakThings,
             layersToHit,
             GetRelevantHitWallBehaviour(),
             GetRelevantHitPlayerBehaviour(),
             ownerFrame.TeamNumber
         );
 
-        barrelEnds.GoNext();
+        BarrelEnds.GoNext();
 
         if (!IsOwner) { return; }
 
@@ -1251,14 +1248,14 @@ public sealed class WeaponHandler : NetworkBehaviour
         UpdateOwnerSettingsUponShot();
 #pragma warning restore
 
-        var barrelEnd = barrelEnds.GetCurrentAndIndex(out var index);
+        var barrelEnd = BarrelEnds.GetCurrentAndIndex(out var index);
 
         //for (int i = 0; i < currentWeapon.ShotgunStats.PelletsCount; i++)
         //foreach(var direction in weaponsSpreads[index].GetShotgunDirectionsWithSpread(index))
         foreach(var direction in weaponsSpreads[index].ComputeShotgunSpreadEnumerable(index))
         {
             var projectile = Instantiate(
-                currentWeapon.Value.TravelTimeBulletSettings.BulletPrefab,
+                CurrentWeapon.TravelTimeBulletSettings.BulletPrefab,
                 barrelEnd.transform.position,
                 Quaternion.LookRotation(/*shotgunPelletsDirections[i]*/direction)
             ).GetComponent<Projectile>();
@@ -1266,11 +1263,11 @@ public sealed class WeaponHandler : NetworkBehaviour
             if (projectile == null) { throw new Exception("The prefab used for this projectile doesn t have a projectile script attached to it"); }
 
             projectile.Init(
-                currentWeapon.Value.Damage / currentWeapon.Value.ShotgunStats.PelletsCount * chargeRatio,
-                currentWeapon.Value.TravelTimeBulletSettings.BulletSpeed,
-                currentWeapon.Value.TravelTimeBulletSettings.BulletDrop,
+                CurrentWeapon.Damage / CurrentWeapon.ShotgunStats.PelletsCount * chargeRatio,
+                CurrentWeapon.TravelTimeBulletSettings.BulletSpeed,
+                CurrentWeapon.TravelTimeBulletSettings.BulletDrop,
                 NetworkObjectId,
-                currentWeapon.Value.CanBreakThings,
+                CurrentWeapon.CanBreakThings,
                 layersToHit,
                 GetRelevantHitWallBehaviour(),
                 GetRelevantHitPlayerBehaviour(),
@@ -1278,7 +1275,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             );
         }
 
-        barrelEnds.GoNext();
+        BarrelEnds.GoNext();
 
         if (!IsOwner) { return; }
 
@@ -1307,7 +1304,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                     shotInfos.Hit.point,
                     shotInfos.AttackerNetworkID,
                     shotInfos.WeaponInfos.CanBreakThings
-                    );
+                );
             }
         }
     }
@@ -1356,7 +1353,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                             newShotDirection,
                             hit,
                             shotInfos.AttackerNetworkID,
-                            new(currentWeapon.Value)
+                            new(CurrentWeapon)
                             ),
                         --hitscanBulletEffectSettings
                         );
@@ -1379,12 +1376,12 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private ProjectileOnHitWallBehaviour GetRelevantHitWallBehaviour()
     {
-        return currentWeapon.Value.TravelTimeBulletSettings.OnHitWallBehaviour switch
+        return CurrentWeapon.TravelTimeBulletSettings.OnHitWallBehaviour switch
         {
             ProjectileBehaviourOnHitWall.Stop => new ProjectileStopOnHitWall(null),
-            ProjectileBehaviourOnHitWall.Pierce => new ProjectilePierceOnHitWall(currentWeapon.Value.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallPierceParams),
-            ProjectileBehaviourOnHitWall.Bounce => new ProjectileBounceOnHitWall(currentWeapon.Value.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallBounceParams),
-            ProjectileBehaviourOnHitWall.Explode => new ProjectileExplodeOnHitWall(currentWeapon.Value.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallExplodeParams),
+            ProjectileBehaviourOnHitWall.Pierce => new ProjectilePierceOnHitWall(CurrentWeapon.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallPierceParams),
+            ProjectileBehaviourOnHitWall.Bounce => new ProjectileBounceOnHitWall(CurrentWeapon.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallBounceParams),
+            ProjectileBehaviourOnHitWall.Explode => new ProjectileExplodeOnHitWall(CurrentWeapon.TravelTimeBulletSettings.OnHitWallBehaviourParams.ProjectileWallExplodeParams),
             _ => throw new NotImplementedException(),
         };
     }
@@ -1392,11 +1389,11 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private ProjectileOnHitPlayerBehaviour GetRelevantHitPlayerBehaviour()
     {
-        return currentWeapon.Value.TravelTimeBulletSettings.OnHitPlayerBehaviour switch
+        return CurrentWeapon.TravelTimeBulletSettings.OnHitPlayerBehaviour switch
         {
-            ProjectileBehaviourOnHitPlayer.Stop => new ProjectileStopOnHitPlayer(null),
-            ProjectileBehaviourOnHitPlayer.Pierce => new ProjectilePierceOnHitPlayer(currentWeapon.Value.TravelTimeBulletSettings.OnHitPlayerBehaviourParams.ProjectilePlayerPierceParams),
-            ProjectileBehaviourOnHitPlayer.Explode => new ProjectileExplodeOnHitPlayer(currentWeapon.Value.TravelTimeBulletSettings.OnHitPlayerBehaviourParams.ProjectilePlayerExplodeParams),
+            ProjectileBehaviourOnHitPlayer.Stop => new ProjectileStopOnHitPlayer(),
+            ProjectileBehaviourOnHitPlayer.Pierce => new ProjectilePierceOnHitPlayer(CurrentWeapon.TravelTimeBulletSettings.OnHitPlayerBehaviourParams.ProjectilePlayerPierceParams),
+            ProjectileBehaviourOnHitPlayer.Explode => new ProjectileExplodeOnHitPlayer(CurrentWeapon.TravelTimeBulletSettings.OnHitPlayerBehaviourParams.ProjectilePlayerExplodeParams),
             _ => throw new NotImplementedException(),
         };
     }
@@ -1407,11 +1404,11 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     public void Reload()
     {
-        if (!currentWeapon.Value.NeedReload) { return; }
+        if (!CurrentWeapon.NeedReload) { return; }
 
-        if (ammos.Value == currentWeapon.Value.MagazineSize) { return; } // already fully loaded
+        if (ammos.Value == CurrentWeapon.MagazineSize) { return; } // already fully loaded
 
-        if (currentWeapon.Value.TimeToReloadOneRound == 0f)
+        if (CurrentWeapon.TimeToReloadOneRound == 0f)
         {
             ExecuteReloadServerRpc();
         }
@@ -1433,13 +1430,13 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         // PlayReloadAnimCientRpc();
         var timerStart = Time.time;
-        yield return new WaitUntil(() => timerStart + currentWeapon.Value.ReloadSpeed < Time.time || switchedThisFrame);
+        yield return new WaitUntil(() => timerStart + CurrentWeapon.ReloadSpeed < Time.time || switchedThisFrame);
         
         canShoot.Value = true;
 
         if (switchedThisFrame) { yield break; }
 
-        ammos.Value = currentWeapon.Value.MagazineSize;
+        ammos.Value = CurrentWeapon.MagazineSize;
     }
 
     [Rpc(SendTo.Server)]
@@ -1450,13 +1447,13 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private IEnumerator ExecuteReloadRoundPerRound()
     {
-        var ammosToReload = currentWeapon.Value.MagazineSize - ammos.Value;
+        var ammosToReload = CurrentWeapon.MagazineSize - ammos.Value;
 
         for (int i = 0; i < ammosToReload; i++)
         {
             var timerStart = Time.time;
             yield return new WaitUntil(
-                () => timerStart + currentWeapon.Value.TimeToReloadOneRound < Time.time ||
+                () => timerStart + CurrentWeapon.TimeToReloadOneRound < Time.time ||
                 switchedThisFrame || // pass that server side then
                 HasBufferedShoot // pass that server side too
                 ); // + buffer a shoot input that would interrupt the reload
@@ -1465,7 +1462,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
             if (HasBufferedShoot)
             {
-                if (currentWeapon.Value.ShootingRythm == ShootingRythm.Charge)
+                if (CurrentWeapon.ShootingRythm == ShootingRythm.Charge)
                 {
                     StartCoroutine(ChargeShot());
                 }
