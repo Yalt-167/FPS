@@ -8,7 +8,7 @@ namespace Projectiles
     [Serializable]
     public sealed class ProjectileStopOnHitPlayer : ProjectileOnHitPlayerBehaviour
     {
-        public ProjectileStopOnHitPlayer(IProjectileBehaviourOnHitPlayerParam _) { }
+        public ProjectileStopOnHitPlayer() { }
 
         public override void OnHitPlayer(Projectile relevantProjectile, IShootable _)
         {
