@@ -9,18 +9,20 @@ using UnityEngine.Rendering;
 
 namespace WeaponHandling
 {
-    public struct PlayerWeaponGatherer
+    public struct PlayerWeaponsGatherer
     {
         public int WeaponCount;
         public WeaponRuntimeData[] weapons;
 
-        public PlayerWeaponGatherer(string[] SO_Paths)
+        public PlayerWeaponsGatherer(string[] SO_Paths)
         {
             WeaponCount = SO_Paths.Length;
             weapons = new WeaponRuntimeData[WeaponCount];
             for (int i = 0; i < WeaponCount; i++)
             {
-                weapons[i] = new WeaponRuntimeData(MyUtilities.AssetLoader.LoadAsset<WeaponScriptableObject>(SO_Paths[i]));       
+                weapons[i] = new WeaponRuntimeData(
+                    MyUtilities.AssetLoader.LoadAsset<WeaponScriptableObject>(SO_Paths[i])
+                );       
             }
         }
 
