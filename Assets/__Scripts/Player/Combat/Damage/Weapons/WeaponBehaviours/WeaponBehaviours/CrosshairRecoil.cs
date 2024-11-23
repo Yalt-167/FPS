@@ -24,8 +24,8 @@ namespace WeaponHandling
 
         private WeaponHandler weaponHandler;
         private bool IsAiming => weaponHandler.IsAiming;
-        private WeaponRecoilStats AimingRecoilStats => weaponHandler.CurrentWeapon.AimingRecoilStats;
-        private WeaponRecoilStats HipfireRecoilStats => weaponHandler.CurrentWeapon.HipfireRecoilStats;
+        private WeaponRecoilStats AimingRecoilStats => weaponHandler.CurrentWeaponSO.AimingRecoilStats;
+        private WeaponRecoilStats HipfireRecoilStats => weaponHandler.CurrentWeaponSO.HipfireRecoilStats;
         
 
         private void Awake()
