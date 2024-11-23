@@ -71,8 +71,8 @@ namespace WeaponHandling
 //        }
 
 
-        private SimpleShotStats AimingSimpleShotStats => weaponHandler.CurrentWeapon.AimingSimpleShotStats;
-        private SimpleShotStats HipfireSimpleShotStats => weaponHandler.CurrentWeapon.SimpleShotStats;
+        private SimpleShotStats AimingSimpleShotStats => weaponHandler.CurrentWeaponSO.AimingSimpleShotStats;
+        private SimpleShotStats HipfireSimpleShotStats => weaponHandler.CurrentWeaponSO.SimpleShotStats;
 
         private WeaponHandler weaponHandler;
         private bool IsAiming => weaponHandler.IsAiming;
@@ -266,10 +266,10 @@ namespace WeaponHandling
         {
             var barrelEnd = weaponHandler.BarrelEnds[barrelEndIndex].transform;
 
-            var relevantSpread = IsAiming ? weaponHandler.CurrentWeapon.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeapon.ShotgunStats.HipfirePelletsSpreadAngle;
+            var relevantSpread = IsAiming ? weaponHandler.CurrentWeaponSO.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeaponSO.ShotgunStats.HipfirePelletsSpreadAngle;
             relevantSpread /= 45f;
 
-            Vector3[] values = new Vector3[weaponHandler.CurrentWeapon.ShotgunStats.PelletsCount];
+            Vector3[] values = new Vector3[weaponHandler.CurrentWeaponSO.ShotgunStats.PelletsCount];
 
             //_ = values.Length % 4 == 0 ? (object)null : throw new System.Exception("Make sure the pellets count is divisible by 4");
             Assert.IsTrue(values.Length % 4 == 0);
@@ -304,11 +304,11 @@ namespace WeaponHandling
         {
             var barrelEnd = weaponHandler.BarrelEnds[barrelEndIndex].transform;
 
-            var relevantSpread = IsAiming ? weaponHandler.CurrentWeapon.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeapon.ShotgunStats.HipfirePelletsSpreadAngle;
+            var relevantSpread = IsAiming ? weaponHandler.CurrentWeaponSO.ShotgunStats.AimingPelletsSpreadAngle : weaponHandler.CurrentWeaponSO.ShotgunStats.HipfirePelletsSpreadAngle;
             relevantSpread /= 45f;
 
-            Assert.IsTrue(weaponHandler.CurrentWeapon.ShotgunStats.PelletsCount % 4 == 0);
-            int length = weaponHandler.CurrentWeapon.ShotgunStats.PelletsCount / 4;
+            Assert.IsTrue(weaponHandler.CurrentWeaponSO.ShotgunStats.PelletsCount % 4 == 0);
+            int length = weaponHandler.CurrentWeaponSO.ShotgunStats.PelletsCount / 4;
 
             //_ = values.Length % 4 == 0 ? (object)null : throw new System.Exception("Make sure the pellets count is divisible by 4");
 
