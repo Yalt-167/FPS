@@ -3,13 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Unity.Netcode;
-using Unity.VisualScripting;
 
 using UnityEngine;
 
 namespace WeaponHandling
 {
-    public struct PlayerWeaponsGathererNetworked : INetworkSerializable
+    public class PlayerWeaponsGathererNetworked : INetworkSerializable
     {
         public WeaponRuntimeData[] weapons;
 
@@ -24,7 +23,7 @@ namespace WeaponHandling
             }
         }
 
-        public readonly WeaponRuntimeData this[int index]
+        public WeaponRuntimeData this[int index]
         {
             get
             {
@@ -32,7 +31,7 @@ namespace WeaponHandling
             }
         }
 
-        public readonly void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             for (int i = 0; i < weapons.Length; i++)
             {
