@@ -28,6 +28,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
 #endif
 
+    public WeaponRuntimeData CurrentWeaponRuntimeData => CurrentWeaponRuntimeData;
 
     private readonly NetworkVariable<int> currentWeaponIndex = new NetworkVariable<int>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
     private readonly NetworkVariable<PlayerWeaponsGathererNetworked> weaponsGathererNetworked = new NetworkVariable<PlayerWeaponsGathererNetworked>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
@@ -405,11 +406,11 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         MyDebug.DebugUtility.LogMethodCall();
 
-        Debug.Log($"{weaponsGathererNetworked.Value[currentWeaponIndex.Value].TimeLastShotFired} + {GetRelevantCooldown()} > {Time.time} -> {weaponsGathererNetworked.Value[currentWeaponIndex.Value].TimeLastShotFired + GetRelevantCooldown() > Time.time}");
-        if (weaponsGathererNetworked.Value[currentWeaponIndex.Value].TimeLastShotFired + GetRelevantCooldown() > Time.time) { return; }
+        Debug.Log($"{CurrentWeaponRuntimeData.TimeLastShotFired} + {GetRelevantCooldown()} > {Time.time} -> {CurrentWeaponRuntimeData.TimeLastShotFired + GetRelevantCooldown() > Time.time}");
+        if (CurrentWeaponRuntimeData.TimeLastShotFired + GetRelevantCooldown() > Time.time) { return; }
         RequestShotCallbackClientRpc(false);
 
-        if (weaponsGathererNetworked.Value[currentWeaponIndex.Value].Ammos <= 0) { return; }
+        if (CurrentWeaponRuntimeData.Ammos <= 0) { return; }
         RequestShotCallbackClientRpc(true);
         shootingStyleMethod();
     }
@@ -424,9 +425,9 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         if (!IsOwner) { return; }
 
-        if (weaponsGathererNetworked.Value[currentWeaponIndex.Value].TimeLastShotFired+ GetRelevantCooldown() > Time.time) { return; }
+        if (CurrentWeaponRuntimeData.TimeLastShotFired+ GetRelevantCooldown() > Time.time) { return; }
 
-        if (weaponsGathererNetworked.Value[currentWeaponIndex.Value].Ammos <= 0) { return; }
+        if (CurrentWeaponRuntimeData.Ammos <= 0) { return; }
 
         shootingStyleMethod();
     }
@@ -440,7 +441,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void CheckChargedShotCooldownsClientRpc(float chargeRatio)
     {
-        if (weaponsGathererNetworked.Value[currentWeaponIndex.Value].TimeLastShotFired + GetRelevantCooldown() > Time.time) { return; }
+        if (CurrentWeaponRuntimeData.TimeLastShotFired + GetRelevantCooldown() > Time.time) { return; }
 
         if (CurrentWeaponSO.IsHitscan)
         {
@@ -481,9 +482,9 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private IEnumerator ShootBurst(int bullets) // HERE
     {
-        if (weaponsGathererNetworked.Value[currentWeaponIndex.Value].Ammos <= 0) { yield break; }
+        if (CurrentWeaponRuntimeData.Ammos <= 0) { yield break; }
 
-        if (weaponsGathererNetworked.Value[currentWeaponIndex.Value].TimeLastShotFired + GetRelevantCooldown() > Time.time) { yield break; }
+        if (CurrentWeaponRuntimeData.TimeLastShotFired + GetRelevantCooldown() > Time.time) { yield break; }
 
         bulletFiredthisBurst = 0;
 
@@ -505,9 +506,9 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private IEnumerator ChargeShot()
     {
-        if (weaponsGathererNetworked.Value[currentWeaponIndex.Value].Ammos <= 0) { yield break; }
+        if (CurrentWeaponRuntimeData.Ammos <= 0) { yield break; }
 
-        if (weaponsGathererNetworked.Value[currentWeaponIndex.Value].TimeLastShotFired + GetRelevantCooldown() > Time.time) { yield break; }
+        if (CurrentWeaponRuntimeData.TimeLastShotFired + GetRelevantCooldown() > Time.time) { yield break; }
 
         timeStartedCharging = Time.time;
 
@@ -518,9 +519,9 @@ public sealed class WeaponHandler : NetworkBehaviour
         if (chargeRatio >= CurrentWeaponSO.ChargeStats.MinChargeRatioToShoot)
         {
             var ammoConsumedByThisShot = (ushort)(CurrentWeaponSO.ChargeStats.AmmoConsumedByFullyChargedShot * chargeRatio);
-            if (weaponsGathererNetworked.Value[currentWeaponIndex.Value].Ammos < ammoConsumedByThisShot)
+            if (CurrentWeaponRuntimeData.Ammos < ammoConsumedByThisShot)
             {
-                RequestChargedShotServerRpc(weaponsGathererNetworked.Value[currentWeaponIndex.Value].Ammos / CurrentWeaponSO.ChargeStats.AmmoConsumedByFullyChargedShot);
+                RequestChargedShotServerRpc(CurrentWeaponRuntimeData.Ammos / CurrentWeaponSO.ChargeStats.AmmoConsumedByFullyChargedShot);
             }
             else
             {
@@ -537,7 +538,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         var bulletTrail = Instantiate(bulletTrailPrefab, BarrelEnds[barrelEndIndex].transform.position, Quaternion.identity).GetComponent<BulletTrail>();
         bulletTrail.Set(BarrelEnds[barrelEndIndex].transform.position, endPoint);
 
-        PlayShootingSound(CurrentWeaponSO.AmmoLeftInMagazineToWarn > weaponsGathererNetworked.Value[currentWeaponIndex.Value].Ammos);
+        PlayShootingSound(CurrentWeaponSO.AmmoLeftInMagazineToWarn > CurrentWeaponRuntimeData.Ammos);
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -550,7 +551,7 @@ public sealed class WeaponHandler : NetworkBehaviour
             bulletTrail.Set(BarrelEnds[barrelEndIndex].transform.position, endPoints[i]);
         }
 
-        PlayShootingSound(CurrentWeaponSO.AmmoLeftInMagazineToWarn > weaponsGathererNetworked.Value[currentWeaponIndex.Value].Ammos);
+        PlayShootingSound(CurrentWeaponSO.AmmoLeftInMagazineToWarn > CurrentWeaponRuntimeData.Ammos);
     }
 
     #region Execute Shot
@@ -575,9 +576,9 @@ public sealed class WeaponHandler : NetworkBehaviour
     /// <returns>Wether should abort</returns>
     private bool UpdateOwnerSettingsUponShotFromServer()
     {
-        if (weaponsGathererNetworked.Value[currentWeaponIndex.Value].TimeLastShotFired + GetRelevantCooldown() > Time.time) { return true; }
+        if (CurrentWeaponRuntimeData.TimeLastShotFired + GetRelevantCooldown() > Time.time) { return true; }
 
-        weaponsGathererNetworked.Value[currentWeaponIndex.Value].Shoot(IsServer);
+        CurrentWeaponRuntimeData.Shoot(IsServer);
         
         shotThisFrame.Value = true;
         bulletFiredthisBurst++;
@@ -1433,7 +1434,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         if (!CurrentWeaponSO.NeedReload) { return; }
 
-        if (weaponsGathererNetworked.Value[currentWeaponIndex.Value].Ammos == CurrentWeaponSO.MagazineSize) { return; } // already fully loaded
+        if (CurrentWeaponRuntimeData.Ammos == CurrentWeaponSO.MagazineSize) { return; } // already fully loaded
 
         if (CurrentWeaponSO.TimeToReloadOneRound == 0f)
         {
@@ -1463,7 +1464,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         if (switchedThisFrame) { yield break; }
 
-        weaponsGathererNetworked.Value[currentWeaponIndex.Value].Reload(CurrentWeaponSO.MagazineSize, IsServer);
+        CurrentWeaponRuntimeData.Reload(CurrentWeaponSO.MagazineSize, IsServer);
     }
 
     [Rpc(SendTo.Server)]
@@ -1474,7 +1475,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     private IEnumerator ExecuteReloadRoundPerRound() // 
     {
-        var ammosToReload = CurrentWeaponSO.MagazineSize - weaponsGathererNetworked.Value[currentWeaponIndex.Value].Ammos;
+        var ammosToReload = CurrentWeaponSO.MagazineSize - CurrentWeaponRuntimeData.Ammos;
 
         for (int i = 0; i < ammosToReload; i++)
         {
@@ -1501,7 +1502,7 @@ public sealed class WeaponHandler : NetworkBehaviour
                 yield break;
             }
 
-            weaponsGathererNetworked.Value[currentWeaponIndex.Value].ReloadOne(IsServer);
+            CurrentWeaponRuntimeData.ReloadOne(IsServer);
         }
     }
 
