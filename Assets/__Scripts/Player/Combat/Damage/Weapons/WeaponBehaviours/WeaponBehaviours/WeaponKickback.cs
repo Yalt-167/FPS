@@ -15,7 +15,7 @@ namespace WeaponHandling
         [SerializeField] private Vector3 basePosition;
 
         private WeaponHandler weaponHandler;
-        private KickbackStats KickbackStats => weaponHandler.CurrentWeapon.KickbackStats;
+        private KickbackStats KickbackStats => weaponHandler.CurrentWeaponSO.KickbackStats;
 
         public void SetupData(WeaponHandler weapnHandler_)
         {
