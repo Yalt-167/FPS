@@ -22,7 +22,7 @@ namespace WeaponHandling
         private static readonly float fixedUpdateCallFrequency = .02f;
 
         private WeaponHandler weaponHandler;
-        private AimAndScopeStats AimingStats => weaponHandler.CurrentWeapon.AimingAndScopeStats;
+        private AimAndScopeStats AimingStats => weaponHandler.CurrentWeaponSO.AimingAndScopeStats;
         private bool IsADSing => weaponHandler.IsAiming;
 
         public void SetupData(WeaponHandler weaponHandler_)
