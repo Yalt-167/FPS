@@ -10,6 +10,7 @@ using UnityEngine;
 using Projectiles;
 using GameManagement;
 using WeaponHandling;
+using Unity.VisualScripting;
 
 
 
@@ -34,9 +35,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     private readonly NetworkVariable<PlayerWeaponsGathererNetworked> weaponsGathererNetworked = new NetworkVariable<PlayerWeaponsGathererNetworked>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
     private PlayerWeaponsGathererStatic weaponGathererStatic = PlayerWeaponsGathererStatic.Empty;
 
-    private bool IsInitialized ;
-
-
+    private bool IsInitialized;
 
     private CrosshairRecoil crosshairRecoil;
     public WeaponBehaviourGatherer<BarrelEnd> BarrelEnds;
@@ -68,10 +67,8 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region Global Setup
 
-    // eventually make this a NetworkVariable
-    private bool switchedThisFrame;
-
     private readonly NetworkVariable<bool> shotThisFrame = new NetworkVariable<bool>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
+    private readonly NetworkVariable<bool> switchedThisFrame = new NetworkVariable<bool>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
     private readonly NetworkVariable<bool> canShoot = new NetworkVariable<bool>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
 
 
@@ -87,7 +84,6 @@ public sealed class WeaponHandler : NetworkBehaviour
     private bool HasBufferedShoot => lastShootPressed + shootBuffer > Time.time;
 
     #endregion
-
 
     #region Burst Setup
 
@@ -164,8 +160,6 @@ public sealed class WeaponHandler : NetworkBehaviour
     private void LateUpdate()
 #pragma warning restore
     {
-        switchedThisFrame = false;
-
         if (!IsServer) { return; }
 
         LateUpdateServerRpc();
@@ -175,11 +169,13 @@ public sealed class WeaponHandler : NetworkBehaviour
     private void LateUpdateServerRpc()
     {
         shotThisFrame.Value = false;
+        switchedThisFrame.Value = false;
     }
 
     #endregion
 
     #region Init
+
     private void Init()
     {
         InitPlayerLoadoutServerRpc();
@@ -188,7 +184,7 @@ public sealed class WeaponHandler : NetworkBehaviour
         crosshairRecoil = GetComponent<CrosshairRecoil>();
         weaponADSFOV = transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<WeaponADSFOV>();
 
-        SetWeapon(0);
+        _ = SetWeapon(0);
         audioSourcePoolSize = 10; // (int)(Mathf.Max(currentWeaponSounds.ShootingSound.length, currentWeaponSounds.NearEmptyMagazineShootSound.length) / currentWeapon.CooldownBetweenShots);
         for (int i = 0; i < audioSourcePoolSize; i++)
         {
@@ -207,7 +203,6 @@ public sealed class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.Server)]
     private void InitPlayerLoadoutServerRpc()
     {
-        Debug.Log("I was");
         weaponGathererStatic = new PlayerWeaponsGathererStatic(
             // the instanciation underneath nead these so pre load them
             new string[]
@@ -229,7 +224,6 @@ public sealed class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void InitPlayerLoadoutClientRpc()
     {
-        Debug.Log("Called");
         weaponGathererStatic = weaponGathererStatic == PlayerWeaponsGathererStatic.Empty ?
             new PlayerWeaponsGathererStatic(
                 // Contains SO -> cannot be passed as an argument on the network -> load them locally via string reference
@@ -246,9 +240,18 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #endregion
 
-    public void SetWeapon(int index)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns>Validated index</returns>
+    public int SetWeapon(int index)
     {
+        index = MyUtilities.Utility.ModuloThatWorksWithNegatives(index, weaponGathererStatic.WeaponCount);
+
         SetWeaponServerRpc(index);
+
+        return index;
     }
 
     [Rpc(SendTo.Server)]
@@ -294,7 +297,6 @@ public sealed class WeaponHandler : NetworkBehaviour
         currentWeaponSounds = CurrentWeaponSO.Sounds;
 
         if (IsOwner) { InitWeaponServerRpc(); }
-        switchedThisFrame = true;
 
         SetShootingStyle(); // the actual shooting logic
         SetShootingRythm(); // the rythm logic of the shots
@@ -305,6 +307,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     private void InitWeaponServerRpc()
     {
         canShoot.Value = true;
+        switchedThisFrame.Value = true;
     }
 
     private void SetShootingStyle()
@@ -402,27 +405,8 @@ public sealed class WeaponHandler : NetworkBehaviour
     }
 
     [Rpc(SendTo.Server)]
-    public void _RequestShotServerRpc()
-    {
-        CheckCooldownsClientRpc();
-    }
-    [Rpc(SendTo.Server)]
     public void RequestShotServerRpc()
     {
-        MyDebug.DebugUtility.LogMethodCall();
-
-        if (CurrentWeaponRuntimeData.TimeLastShotFired + GetRelevantCooldown() > Time.time) { return; }
-
-        if (CurrentWeaponRuntimeData.Ammos <= 0) { return; }
-
-        shootingStyleMethod();
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    private void CheckCooldownsClientRpc()
-    {
-        if (!IsOwner) { return; }
-
         if (CurrentWeaponRuntimeData.TimeLastShotFired + GetRelevantCooldown() > Time.time) { return; }
 
         if (CurrentWeaponRuntimeData.Ammos <= 0) { return; }
@@ -433,35 +417,28 @@ public sealed class WeaponHandler : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void RequestChargedShotServerRpc(float chargeRatio)
     {
-        CheckChargedShotCooldownsClientRpc(chargeRatio);
-    }
-
-    [Rpc(SendTo.ClientsAndHost)]
-    private void CheckChargedShotCooldownsClientRpc(float chargeRatio)
-    {
         if (CurrentWeaponRuntimeData.TimeLastShotFired + GetRelevantCooldown() > Time.time) { return; }
 
-        if (CurrentWeaponSO.IsHitscan)
+        switch (CurrentWeaponSO.IsHitscan, CurrentWeaponSO.ShootingStyle == ShootingStyle.Shotgun)
         {
-            if (CurrentWeaponSO.ShootingStyle == ShootingStyle.Shotgun)
-            {
+            case (true, true): // hitscan shotgun
                 ExecuteChargedShotgunHitscanShotClientRpc(chargeRatio);
-            }
-            else
-            {
+                return;
+
+            case (true, false): // hitscan plain shot
                 ExecuteChargedHitscanShot(chargeRatio);
-            }
-        }
-        else
-        {
-            if (CurrentWeaponSO.ShootingStyle == ShootingStyle.Shotgun)
-            {
+                return;
+
+            case (false, true): // travel time shotgun
                 ExecuteChargedShotgunTravelTimeShotClientRpc(chargeRatio);
-            }
-            else
-            {
+                return;
+
+            case (false, false): // travel time plain shot
                 ExecuteChargedTravelTimeShotClientRpc(chargeRatio);
-            }
+                return;
+
+            default: // literally can t happen
+                throw new Exception("Compiler happy");
         }
     }
 
@@ -485,20 +462,16 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         bulletFiredthisBurst = 0;
 
-        //canShoot = false;
-
         for (int i = 0; i < bullets; i++)
         {
             var timerStart = Time.time;
 
-            yield return new WaitUntil(() => timerStart + CurrentWeaponSO.BurstStats.CooldownBetweenShotsOfBurst < Time.time || switchedThisFrame);
+            yield return new WaitUntil(() => timerStart + CurrentWeaponSO.BurstStats.CooldownBetweenShotsOfBurst < Time.time || switchedThisFrame.Value);
 
-            if (switchedThisFrame) { yield break; }
+            if (switchedThisFrame.Value) { yield break; }
 
             RequestShotServerRpc();
         }
-
-        //canShoot = true;
     }
 
     private IEnumerator ChargeShot()
@@ -669,9 +642,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     }
     private void ExecuteSimpleHitscanShot()
     {
-        //Debug.Log($"IsServer: {IsServer}");
         if (UpdateOwnerSettingsUponShotFromServer()) { return; }
-        MyDebug.DebugUtility.LogMethodCall();
 
         var barrelEnd = BarrelEnds.GetCurrentAndIndex(out var index);
 
@@ -1433,44 +1404,31 @@ public sealed class WeaponHandler : NetworkBehaviour
 
         if (CurrentWeaponRuntimeData.Ammos == CurrentWeaponSO.MagazineSize) { return; } // already fully loaded
 
-        if (CurrentWeaponSO.TimeToReloadOneRound == 0f)
-        {
-            ExecuteReloadServerRpc();
-        }
-        else
-        {
-            ExecuteReloadRoundPerRoundServerRpc();
-        }
+        ExecuteReloadServerRpc(CurrentWeaponSO.TimeToReloadOneRound == 0f);
     }
 
     [Rpc(SendTo.Server)]
-    private void ExecuteReloadServerRpc()
+    private void ExecuteReloadServerRpc(bool allAtOnce)
     {
-        StartCoroutine(ExecuteReload());
+        StartCoroutine(allAtOnce ? ExecuteReload() : ExecuteReloadRoundPerRound());
     }
 
-    private IEnumerator ExecuteReload()
+    private IEnumerator ExecuteReload() // is called from the server
     {
         canShoot.Value = false;
 
-        // PlayReloadAnimCientRpc();
+        // PlayReloadAnimClientRpc();
         var timerStart = Time.time;
-        yield return new WaitUntil(() => timerStart + CurrentWeaponSO.ReloadSpeed < Time.time || switchedThisFrame);
+        yield return new WaitUntil(() => timerStart + CurrentWeaponSO.ReloadSpeed < Time.time || switchedThisFrame.Value);
         
         canShoot.Value = true;
 
-        if (switchedThisFrame) { yield break; }
+        if (switchedThisFrame.Value) { yield break; }
 
         CurrentWeaponRuntimeData.Reload(CurrentWeaponSO.MagazineSize, IsServer);
     }
 
-    [Rpc(SendTo.Server)]
-    private void ExecuteReloadRoundPerRoundServerRpc()
-    {
-        StartCoroutine(ExecuteReloadRoundPerRound());
-    }
-
-    private IEnumerator ExecuteReloadRoundPerRound() // 
+    private IEnumerator ExecuteReloadRoundPerRound() // is called from the server
     {
         var ammosToReload = CurrentWeaponSO.MagazineSize - CurrentWeaponRuntimeData.Ammos;
 
@@ -1479,11 +1437,11 @@ public sealed class WeaponHandler : NetworkBehaviour
             var timerStart = Time.time;
             yield return new WaitUntil(
                 () => timerStart + CurrentWeaponSO.TimeToReloadOneRound < Time.time ||
-                switchedThisFrame || // pass that server side then
+                switchedThisFrame.Value || // pass that server side then
                 HasBufferedShoot // pass that server side too
                 ); // + buffer a shoot input that would interrupt the reload
 
-            if (switchedThisFrame) { yield break; }
+            if (switchedThisFrame.Value) { yield break; }
 
             if (HasBufferedShoot)
             {
@@ -1680,4 +1638,4 @@ public struct WeaponInfos
 
 // create a weapon abstract clas instead? with OnAttackDown OnAttackUp OnReload OnAimDown OnAimUp etc bc that could be more flexible
 
-// double/three fire rifle kinda like in thsi game where you can chop limbs off using your gun (horizontally would help for crowds of opponent while vertical would shred their health by allowing hitting headshot + 2 bodyshots at once
+// double/triple fire rifle kinda like in this game where you can chop limbs off using your gun (horizontally would help for crowds of opponent while vertical would shred their health by allowing hitting headshot + 2 bodyshots at once
