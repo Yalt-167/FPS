@@ -13,6 +13,11 @@ namespace WeaponHandling
         public int Ammos;
         public float TimeLastShotFired;
 
+        public WeaponRuntimeData()
+        {
+            Ammos = 0;
+            TimeLastShotFired = float.MinValue;
+        }
         public WeaponRuntimeData(int magazineSize)
         {
             Ammos = magazineSize;
@@ -59,6 +64,28 @@ namespace WeaponHandling
         {
             serializer.SerializeValue(ref Ammos);
             serializer.SerializeValue(ref TimeLastShotFired);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is WeaponRuntimeData data &&
+                   Ammos == data.Ammos &&
+                   TimeLastShotFired == data.TimeLastShotFired;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Ammos, TimeLastShotFired);
+        }
+
+        public static bool operator==(WeaponRuntimeData self, WeaponRuntimeData other)
+        {
+            return self.Ammos == other.Ammos && self.TimeLastShotFired == other.TimeLastShotFired;
+        }
+
+        public static bool operator !=(WeaponRuntimeData self, WeaponRuntimeData other)
+        {
+            return !(self == other);
         }
     }
 }
