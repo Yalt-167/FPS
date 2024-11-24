@@ -28,7 +28,7 @@ public sealed class WeaponHandler : NetworkBehaviour
 
 #endif
 
-    public WeaponRuntimeData CurrentWeaponRuntimeData => CurrentWeaponRuntimeData;
+    public WeaponRuntimeData CurrentWeaponRuntimeData => weaponsGathererNetworked.Value[currentWeaponIndex.Value];
 
     private readonly NetworkVariable<int> currentWeaponIndex = new NetworkVariable<int>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
     private readonly NetworkVariable<PlayerWeaponsGathererNetworked> weaponsGathererNetworked = new NetworkVariable<PlayerWeaponsGathererNetworked>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
@@ -71,8 +71,8 @@ public sealed class WeaponHandler : NetworkBehaviour
     // eventually make this a NetworkVariable
     private bool switchedThisFrame;
 
-    private NetworkVariable<bool> shotThisFrame = new NetworkVariable<bool>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
-    private NetworkVariable<bool> canShoot = new NetworkVariable<bool>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
+    private readonly NetworkVariable<bool> shotThisFrame = new NetworkVariable<bool>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
+    private readonly NetworkVariable<bool> canShoot = new NetworkVariable<bool>(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
 
 
 
@@ -125,13 +125,16 @@ public sealed class WeaponHandler : NetworkBehaviour
 
     #region Unity Handled
 
-
+#pragma warning disable
     private void Awake()
+#pragma warning restore
     {
         MyUtilities.NetworkUtility.CallWhenNetworkSpawned(this, Init);
     }
 
+#pragma warning disable
     private void FixedUpdate()
+#pragma warning restore
     {
         if (!IsInitialized) { return; }
 
@@ -157,11 +160,13 @@ public sealed class WeaponHandler : NetworkBehaviour
         CurrentCooldownBetweenRampUpShots *= CurrentWeaponSO.RampUpStats.RampUpCooldownRegulationMultiplier;
     }
 
+#pragma warning disable
     private void LateUpdate()
+#pragma warning restore
     {
         switchedThisFrame = false;
 
-        if(!IsServer) { return; }
+        if (!IsServer) { return; }
 
         LateUpdateServerRpc();
     }
@@ -406,18 +411,11 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         MyDebug.DebugUtility.LogMethodCall();
 
-        Debug.Log($"{CurrentWeaponRuntimeData.TimeLastShotFired} + {GetRelevantCooldown()} > {Time.time} -> {CurrentWeaponRuntimeData.TimeLastShotFired + GetRelevantCooldown() > Time.time}");
         if (CurrentWeaponRuntimeData.TimeLastShotFired + GetRelevantCooldown() > Time.time) { return; }
-        RequestShotCallbackClientRpc(false);
 
         if (CurrentWeaponRuntimeData.Ammos <= 0) { return; }
-        RequestShotCallbackClientRpc(true);
+
         shootingStyleMethod();
-    }
-    [Rpc(SendTo.ClientsAndHost)]
-    private void RequestShotCallbackClientRpc(bool full)
-    {
-        Debug.Log($"Gone through {(full ? "" : "half")}");
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -425,7 +423,7 @@ public sealed class WeaponHandler : NetworkBehaviour
     {
         if (!IsOwner) { return; }
 
-        if (CurrentWeaponRuntimeData.TimeLastShotFired+ GetRelevantCooldown() > Time.time) { return; }
+        if (CurrentWeaponRuntimeData.TimeLastShotFired + GetRelevantCooldown() > Time.time) { return; }
 
         if (CurrentWeaponRuntimeData.Ammos <= 0) { return; }
 
@@ -451,7 +449,6 @@ public sealed class WeaponHandler : NetworkBehaviour
             }
             else
             {
-                //ExecuteChargedHitscanShotClientRpc(chargeRatio);
                 ExecuteChargedHitscanShot(chargeRatio);
             }
         }
