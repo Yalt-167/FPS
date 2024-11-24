@@ -8,16 +8,20 @@ using UnityEngine;
 
 namespace WeaponHandling
 {
-    public class PlayerWeaponsGathererNetworked : INetworkSerializable
+    public sealed class PlayerWeaponsGathererNetworked : INetworkSerializable, IEquatable<PlayerWeaponsGathererNetworked>
     {
-        public WeaponRuntimeData[] weapons;
+        public WeaponRuntimeData[] Weapons;
 
+        public PlayerWeaponsGathererNetworked()
+        {
+            Weapons = new WeaponRuntimeData[0] { };
+        }
         public PlayerWeaponsGathererNetworked(PlayerWeaponsGathererStatic playeWeaponGathererStatic)
         {
-            weapons = new WeaponRuntimeData[playeWeaponGathererStatic.WeaponCount];
+            Weapons = new WeaponRuntimeData[playeWeaponGathererStatic.WeaponCount];
             for (int i = 0; i < playeWeaponGathererStatic.WeaponCount; i++)
             {
-                weapons[i] = new WeaponRuntimeData(
+                Weapons[i] = new WeaponRuntimeData(
                     playeWeaponGathererStatic[i].MagazineSize
                 );       
             }
@@ -27,70 +31,29 @@ namespace WeaponHandling
         {
             get
             {
-                return weapons[index];
-            }
-        }
-
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            for (int i = 0; i < weapons.Length; i++)
-            {
-                weapons[i].NetworkSerialize(serializer);
-            }
-        }
-    }
-
-    public struct PlayerWeaponsGathererStatic
-    {
-        public static PlayerWeaponsGathererStatic Empty = new(new string[0] { });
-        public int WeaponCount;
-        public WeaponScriptableObject[] Weapons;
-        public PlayerWeaponsGathererStatic(string[] SO_Paths)
-        {
-            WeaponCount = SO_Paths.Length;
-            Weapons = new WeaponScriptableObject[WeaponCount];
-            for (int i = 0; i < WeaponCount; i++)
-            {
-                Weapons[i] = MyUtilities.AssetLoader.LoadAsset<WeaponScriptableObject>(SO_Paths[i]);
-            }
-
-        }
-
-        public readonly WeaponScriptableObject this[int index]
-        {
-            get
-            {
                 return Weapons[index];
             }
         }
 
-        public override readonly bool Equals(object obj)
+        public bool Equals(PlayerWeaponsGathererNetworked other)
         {
-            return obj is PlayerWeaponsGathererStatic other &&
-                   WeaponCount == other.WeaponCount &&
-                   EqualityComparer<WeaponScriptableObject[]>.Default.Equals(Weapons, other.Weapons);
-        }
+            if (Weapons.Length != other.Weapons.Length) {  return false; }
 
-        public override readonly int GetHashCode()
-        {
-            return HashCode.Combine(WeaponCount, Weapons);
-        }
-
-        public static bool operator==(PlayerWeaponsGathererStatic self, PlayerWeaponsGathererStatic other)
-        {
-            if (self.WeaponCount != other.WeaponCount) { return false; }
-
-            for (int i = 0; i < self.WeaponCount; i++)
+            for (int i = 0; i < Weapons.Length; i++)
             {
-                if (self.Weapons[i] != other.Weapons[i]) { return false; }
+                if (Weapons[i] != other.Weapons[i]) {  return false; }
             }
+
 
             return true;
         }
 
-        public static bool operator !=(PlayerWeaponsGathererStatic self, PlayerWeaponsGathererStatic other)
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            return !(self == other);
+            for (int i = 0; i < Weapons.Length; i++)
+            {
+                Weapons[i].NetworkSerialize(serializer);
+            }
         }
     }
 }
