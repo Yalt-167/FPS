@@ -4,64 +4,44 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-using GameManagement;
 using Inputs;
 
 [DefaultExecutionOrder(-6)]
 public sealed class PlayerCombatInputs : MonoBehaviour
 {
-    [SerializeField] private int allowedWeaponsCount = 3;
     private InputManager inputManager;
     private CombatInputQuery InputQuery => inputManager.CombatInputs;
-    [SerializeField] private WeaponScriptableObject[] weapons;
     private WeaponHandler weaponHandler;
     private int currentWeaponIndex;
-    [SerializeField] private LayerMask layersToHit;
     private static readonly string ScrollWheelAxis = "Mouse ScrollWheel";
 
-    private void OnValidate()
-    {
-        return;
 #pragma warning disable
-        if (weapons.Length > allowedWeaponsCount)
-        {
-            var temp = new WeaponScriptableObject[allowedWeaponsCount];
-            for (int i = 0; i < allowedWeaponsCount; i++)
-            {
-                temp[i] = weapons[i];
-            }
-
-            weapons = temp;
-        }
-#pragma warning restore
-    }
-
     private void Awake()
+#pragma warning restore
     {
         weaponHandler = GetComponent<WeaponHandler>();
         inputManager = GetComponent<InputManager>();
-        //UpdateWeapon();
     }
 
+#pragma warning disable
     private void Update()
+#pragma warning restore
     {
-        // so far there might be an exploit -> init gun after each shot effectively reseting its cd
-        HandleWeaponSwitch(); // upon check: there is
+        HandleWeaponSwitch();
 
-
-        weaponHandler.UpdateAimingState(InputQuery.Aim);
+        weaponHandler.UpdateAimingState(InputQuery.Aim); // switch Aim for SecondaryFire ? could be nice for some fancy waps
 
         if (InputQuery.Reload)
         {
             weaponHandler.Reload();
         }
 
-        weaponHandler.UpdateState(InputQuery.Shoot);
+        weaponHandler.UpdateState(InputQuery.Fire);
     }
 
     private void HandleWeaponSwitch()
     {
-        if (InputQuery.FirstGun)
+        if (InputQuery.FirstGun) // so far fixed for 3 waps but might need to find another way to do this
         {
             UpdateWeapon(0);
             return;
@@ -80,19 +60,12 @@ public sealed class PlayerCombatInputs : MonoBehaviour
         var scrollWheelInput = Input.GetAxis(ScrollWheelAxis);
         if (scrollWheelInput != 0f)
         {
-            UpdateWeapon(
-                MyUtilities.Utility.ModuloThatWorksWithNegatives(
-                    scrollWheelInput > 0f ? ++currentWeaponIndex : --currentWeaponIndex,
-                    allowedWeaponsCount
-                )
-            );
+            UpdateWeapon(scrollWheelInput > 0f ? ++currentWeaponIndex : --currentWeaponIndex);
         }
     }
 
-
     private void UpdateWeapon(int index)
     {
-        //weaponHandler.SetWeapon(weapons[currentWeaponIndex = index]);
-        weaponHandler.SetWeapon(currentWeaponIndex = index);
+        currentWeaponIndex = weaponHandler.SetWeapon(index);
     }
 }
