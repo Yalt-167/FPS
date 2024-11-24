@@ -32,8 +32,6 @@ namespace WeaponHandling
                 return;
             }
 
-            Debug.Log("Been there");
-
             TimeLastShotFired = Time.time;
             Ammos--;
         }

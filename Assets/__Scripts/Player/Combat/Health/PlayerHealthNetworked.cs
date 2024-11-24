@@ -88,6 +88,7 @@ public sealed class PlayerHealthNetworked : NetworkBehaviour
         // send the info about wether shielded here (bool)Shield
         if (IsOwner)
         {
+            // GetComponent<> left the chat? (unless im retarded)
             SendDamageLogInfosServerRpc(MapBodyPartToTargetType(bodyPartShot, Shield.HasShield), damage, attackerNetworkObjectID);
         }
 

@@ -7,7 +7,6 @@ using UnityEngine;
 using GameManagement;
 using SaveAndLoad;
 using Menus;
-using MyCollections;
 
 namespace Inputs
 {
@@ -36,7 +35,8 @@ namespace Inputs
 
         public IEnumerator InitWhenLoaded()
         {
-            yield return new WaitUntil(() => Loaded);
+            yield break; // public IEnumerator InitWhenLoaded() comes from an interface so have to do it
+            // yield return new WaitUntil(() => Loaded);
         }
 
         public void Save()

@@ -9,7 +9,7 @@ namespace Inputs
     [Serializable]
     public sealed class CombatInputQuery : InputQuery
     {
-        public FixedKeybind Shoot = new(KeyCode.Mouse0, InputType.OnKeyHeld, nameof(Shoot), true);
+        public FixedKeybind Fire = new(KeyCode.Mouse0, InputType.OnKeyHeld, nameof(Fire), true);
         public VariableKeybind Aim = new(KeyCode.Mouse1, new List<InputType>() { InputType.OnKeyHeld, InputType.Toggle }, nameof(Aim), true);
         public FixedKeybind Reload = new(KeyCode.R, InputType.OnKeyDown, nameof(Reload), true);
 
@@ -26,7 +26,7 @@ namespace Inputs
 
         public override void Init()
         {
-            RegisterKeybind(Shoot);
+            RegisterKeybind(Fire);
             RegisterKeybind(Aim);
             RegisterKeybind(Reload);
 
