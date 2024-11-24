@@ -238,22 +238,6 @@ namespace WeaponHandling
 //            }
 //        }
 
-        public override void OnNetworkDespawn()
-        {
-            MyDebug.DebugUtility.LogMethodCall();
-            base.OnNetworkDespawn();
-        }
-
-        private void OnDisable()
-        {
-            MyDebug.DebugUtility.LogMethodCall();
-        }
-
-        public override void OnDestroy()
-        {
-            MyDebug.DebugUtility.LogMethodCall();
-            base.OnDestroy();
-        }
 
         [UnityEditor.MenuItem("Developer/TestComputeShotgunSpread")]
         public static void TestComputeShotgunSpread()
