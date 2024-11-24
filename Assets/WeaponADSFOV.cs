@@ -20,7 +20,7 @@ namespace WeaponHandling
 
         private WeaponHandler weaponHandler;
         private bool IsADSing => weaponHandler.IsAiming;
-        private AimAndScopeStats AimingStats => weaponHandler.CurrentWeapon.AimingAndScopeStats;
+        private AimAndScopeStats AimingStats => weaponHandler.CurrentWeaponSO.AimingAndScopeStats;
 
         public void SetupData(WeaponHandler weaponHandler_)
         {
